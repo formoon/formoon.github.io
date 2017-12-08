@@ -5,7 +5,7 @@ description: 我们来到这个世界上，只是为了看一看月亮
 
 url: "https://formoon.github.io/jekyllBlog/"
 
-permalink: /:year/:month/:title/
+permalink: /jekyllBlog/:year/:month/:title/
 
 # Format
 highlighter: plain
