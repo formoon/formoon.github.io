@@ -2,16 +2,16 @@
 title: 月色的部落格
 author: Andrew
 description: 我们来到这个世界上，只是为了看一看月亮
-
+baseurl: /jekyllBlog
 url: "https://formoon.github.io/jekyllBlog/"
 
-permalink: /jekyllBlog/:year/:month/:title/
+permalink: /jekyllBlog/:year/:month/:day/:title/
 
 # Format
 highlighter: plain
-markdown: redcarpet
-redcarpet:
-  extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink", "strikethrough", "superscript", tables]
+#kramdown: redcarpet
+#redcarpet:
+#  extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink", "strikethrough", "superscript", tables]
 
 # Pagination
 gems: [jekyll-paginate]
