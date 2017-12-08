@@ -1,0 +1,109 @@
+---
+layout: default
+---
+
+<link rel="stylesheet" type="text/css" href="{{ "/assets/css/list.css" | prepend: site.baseurl }}">
+
+<div class="list-container">
+	<div layout="row top-left">
+		<div class="container--sidebar" self="top">
+			<div class="sidebar">
+				<div class="sidebar-title">
+					<h1>Tags</h1>
+				</div>
+				<div id="filters">
+					<div class="filter-tab">
+						<li class="filter sidebar-link" data-filter="all"><a data-scroll class="selected" href="#" data-type="all">ALL</a></li>
+						{% for tag in site.tags %}
+						<li class="filter sidebar-link" data-filter=".{{ tag[0] }}">
+							<a data-scroll href="#" data-type="{{ tag[0] }}">{{ tag[0] }}</a>
+						</li>
+						{% endfor %}
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="container--grid">
+			<ul layout="rows top-left">
+				{% for post in site.posts %}
+				{% if post.post-card-type == 'article' %}
+				<li class="mix {% for tag in post.tags %} {{ tag }} {% endfor %}">
+					<a href="{{ post.url }}">
+						<div class="card card--article not-visible">
+							<div class="card-body">
+								<div class="card-title card-title--articleIfNoImage">{{ post.title }}</div>
+								<p class="card-description card-description--clamp-14">“{{ post.subtitle }}”</p>
+								<p class="card-description card-article-preview">
+									{{ post.content | strip_html | strip_newlines | truncate: 350 }}
+								</p>
+								<p></p>
+							</div>
+							<div class="card-footer">
+								<div class="card-footer-wrapper" layout="row bottom-left">
+									<div class="card-type is-notShownIfHover">{{ post.date | date: "%F"}}</div>
+									<div class="card-tag is-notShownIfHover">@{{ site.author }}</div>
+									<div class="card-tag is-shownIfHover">
+										{% for tag in post.tags %}
+											{{ tag }} &nbsp;&nbsp;
+										{% endfor %}
+									</div>
+									<div class="card-logo is-shownIfHover" self="right"></div>
+								</div>
+							</div>
+						</div>
+					</a>
+				</li>
+				{% endif %}
+				{% if post.post-card-type == 'website' %}
+				<li class="mix {% for tag in post.tags %} {{ tag }} {% endfor %}">
+					<a href="{{ post.website-url }}" target="_blank">
+						<div class="card card--collection not-visible" style="background:#0C0C0C url({{ post.card-image }}) no-repeat bottom center;background-size:cover;background-position: center center;">
+							<div style="height: 100%;width: 100%;background: rgba(0, 0, 0, 0.5);">
+								<div class="card-body">
+									<div class="card-title card-title--articleIfNoImage">{{ post.title }}</div>
+									<p class="card-description card-description--clamp-14">“{{ post.subtitle }}”</p>
+								</div>
+								<div class="card-footer">
+									<div class="card-footer-wrapper" layout="row bottom-left">
+										<div class="card-tag is-notShownIfHover">@{{ post.author }}</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</a>
+				</li>
+				{% endif %}
+				{% if post.post-card-type == 'image' %}
+				<li class="mix {% for tag in post.tags %} {{ tag }} {% endfor %}">
+					<a href="{{ post.url }}">
+						<div class="card card--article not-visible" >
+							<div class="card-body">
+								<div class="card-title">{{ post.title }}</div>
+								<div class="card-description card-description--clamp-0">
+									{{ post.content | strip_html | strip_newlines | truncate: 200 }}
+								</div>
+							</div>
+							<div class="card-hero">
+								<div class="card-image card-image--size-185" data-url="{{ post.card-image }}"></div>
+							</div>
+							<div class="card-footer">
+								<div class="card-footer-wrapper" layout="row bottom-left">
+									<div class="card-type is-notShownIfHover">{{ post.date | date: "%F"}}</div>
+									<div class="card-tag is-notShownIfHover">@{{ site.author }}</div>
+									<div class="card-tag is-shownIfHover">
+										{% for tag in post.tags %}
+											{{ tag }} &nbsp;&nbsp;
+										{% endfor %}
+									</div>
+									<div class="card-logo is-shownIfHover" self="right"></div>
+								</div>
+							</div>
+						 </div>
+					</a>
+				</li>
+				{% endif %}
+				{% endfor %}
+			</ul>
+		</div>
+	</div>
+</div>

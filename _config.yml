@@ -1,1 +1,26 @@
-baseurl: /jekyllBlog
+# Basic
+title: 月色的部落格
+author: Andrew
+description: 我们来到这个世界上，只是为了看一看月亮
+
+url: "https://formoon.github.io/jekyllBlog/"
+
+permalink: /:year/:month/:title/
+
+# Format
+highlighter: plain
+markdown: redcarpet
+redcarpet:
+  extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink", "strikethrough", "superscript", tables]
+
+# Pagination
+gems: [jekyll-paginate]
+paginate: 15
+paginate_path: "pages/:num/"
+
+# Social
+social:
+    weibo: u/1401281474
+    github: formoon
+    wechat: Andrew0Wang
+    mail: AndrewWang@sina.com

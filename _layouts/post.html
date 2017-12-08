@@ -1,0 +1,14 @@
+---
+layout: default
+---
+
+<link rel="stylesheet" type="text/css" href="{{ "/assets/css/article.css" | prepend: site.baseurl }}">
+
+<div class="page-wrapper">
+    <div class="container--text">
+        {{ content }}
+    </div>
+</div>
+
+{% include comments.html %}
+{% include read-more.html %}

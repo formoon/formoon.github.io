@@ -1,0 +1,12 @@
+<div class="container--call-to-action" style="text-align: center; margin: 0px 0 30px 0;">
+    {% if paginator.previous_page %}
+    <a href="{{ paginator.previous_page_path }}">
+        <button class="button button--active button--header">上一页</button>
+    </a>
+    {% endif %}
+    {% if paginator.next_page %}
+    <a href="{{ paginator.next_page_path }}">
+        <button class="button button--active button--header">下一页</button>
+    </a>
+    {% endif %}
+</div>

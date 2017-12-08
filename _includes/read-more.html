@@ -1,0 +1,121 @@
+<div class="related_posts-container" style="max-width: 790px;">
+    <p class="related_posts-header">RELATED ARTICLES</p>
+
+    <div layout="rows center-spread">
+
+        {% if page.previous %}
+        {% assign current = page.previous %}
+        {% if current.post-card-type == 'article' %}
+            <a href="{{ current.url }}">
+                <div class="card card--article not-visible">
+                    <div class="card-body">
+                        <div class="card-title card-title--articleIfNoImage">{{ current.title }}</div>
+                        <p class="card-description card-description--clamp-14">“{{ current.subtitle }}”</p>
+                        <p class="card-description card-article-preview">
+                            {{ current.content | strip_html | strip_newlines | truncate: 350 }}
+                        </p>
+                        <p></p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-footer-wrapper" layout="row bottom-left">
+                            <div class="card-type is-notShownIfHover">{{ current.date | date: "%F"}}</div>
+                            <div class="card-tag is-notShownIfHover">@{{ site.author }}</div>
+                            <div class="card-tag is-shownIfHover">
+                                {% for tag in current.tags %}
+                                    {{ tag }} &nbsp;&nbsp;
+                                {% endfor %}
+                            </div>
+                            <div class="card-logo is-shownIfHover" self="right"></div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        {% endif %}
+        {% if current.post-card-type == 'image' %}
+            <a href="{{ current.url }}">
+                <div class="card card--article not-visible" >
+                    <div class="card-body">
+                        <div class="card-title">{{ current.title }}</div>
+                        <div class="card-description card-description--clamp-0">
+                            {{ current.content | strip_html | strip_newlines | truncate: 200 }}
+                        </div>
+                    </div>
+                    <div class="card-hero">
+                        <div class="card-image card-image--size-185" data-url="{{ current.card-image }}"></div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-footer-wrapper" layout="row bottom-left">
+                            <div class="card-type is-notShownIfHover">{{ current.date | date: "%F"}}</div>
+                            <div class="card-tag is-notShownIfHover">@{{ site.author }}</div>
+                            <div class="card-tag is-shownIfHover">
+                                {% for tag in current.tags %}
+                                    {{ tag }} &nbsp;&nbsp;
+                                {% endfor %}
+                            </div>
+                            <div class="card-logo is-shownIfHover" self="right"></div>
+                        </div>
+                    </div>
+                 </div>
+            </a>
+        {% endif %}
+        {% endif %}
+
+        {% if page.next %}
+        {% assign current = page.next %}
+        {% if current.post-card-type == 'article' %}
+            <a href="{{ current.url }}">
+                <div class="card card--article not-visible">
+                    <div class="card-body">
+                        <div class="card-title card-title--articleIfNoImage">{{ current.title }}</div>
+                        <p class="card-description card-description--clamp-14">“{{ current.subtitle }}”</p>
+                        <p class="card-description card-article-preview">
+                            {{ current.content | strip_html | strip_newlines | truncate: 350 }}
+                        </p>
+                        <p></p>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-footer-wrapper" layout="row bottom-left">
+                            <div class="card-type is-notShownIfHover">{{ current.date | date: "%F"}}</div>
+                            <div class="card-tag is-notShownIfHover">@{{ site.author }}</div>
+                            <div class="card-tag is-shownIfHover">
+                                {% for tag in current.tags %}
+                                    {{ tag }} &nbsp;&nbsp;
+                                {% endfor %}
+                            </div>
+                            <div class="card-logo is-shownIfHover" self="right"></div>
+                        </div>
+                    </div>
+                </div>
+            </a>
+        {% endif %}
+        {% if current.post-card-type == 'image' %}
+            <a href="{{ current.url }}">
+                <div class="card card--article not-visible" >
+                    <div class="card-body">
+                        <div class="card-title">{{ current.title }}</div>
+                        <div class="card-description card-description--clamp-0">
+                            {{ current.content | strip_html | strip_newlines | truncate: 200 }}
+                        </div>
+                    </div>
+                    <div class="card-hero">
+                        <div class="card-image card-image--size-185" data-url="{{ current.card-image }}"></div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="card-footer-wrapper" layout="row bottom-left">
+                            <div class="card-type is-notShownIfHover">{{ current.date | date: "%F"}}</div>
+                            <div class="card-tag is-notShownIfHover">@{{ site.author }}</div>
+                            <div class="card-tag is-shownIfHover">
+                                {% for tag in current.tags %}
+                                    {{ tag }} &nbsp;&nbsp;
+                                {% endfor %}
+                            </div>
+                            <div class="card-logo is-shownIfHover" self="right"></div>
+                        </div>
+                    </div>
+                 </div>
+            </a>
+        {% endif %}
+        {% endif %}
+
+    </div>
+</div>
