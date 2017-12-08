@@ -6,7 +6,7 @@
         {% if page.previous %}
         {% assign current = page.previous %}
         {% if current.post-card-type == 'article' %}
-            <a href="{{ current.url }}">
+            <a href="{{ current.url | prepend: site.baseurl }}">
                 <div class="card card--article not-visible">
                     <div class="card-body">
                         <div class="card-title card-title--articleIfNoImage">{{ current.title }}</div>
@@ -32,7 +32,7 @@
             </a>
         {% endif %}
         {% if current.post-card-type == 'image' %}
-            <a href="{{ current.url }}">
+            <a href="{{ current.url | prepend: site.baseurl }}">
                 <div class="card card--article not-visible" >
                     <div class="card-body">
                         <div class="card-title">{{ current.title }}</div>
@@ -63,7 +63,7 @@
         {% if page.next %}
         {% assign current = page.next %}
         {% if current.post-card-type == 'article' %}
-            <a href="{{ current.url }}">
+            <a href="{{ current.url | prepend: site.baseurl }}">
                 <div class="card card--article not-visible">
                     <div class="card-body">
                         <div class="card-title card-title--articleIfNoImage">{{ current.title }}</div>
@@ -89,7 +89,7 @@
             </a>
         {% endif %}
         {% if current.post-card-type == 'image' %}
-            <a href="{{ current.url }}">
+            <a href="{{ current.url | prepend: site.baseurl }}">
                 <div class="card card--article not-visible" >
                     <div class="card-body">
                         <div class="card-title">{{ current.title }}</div>

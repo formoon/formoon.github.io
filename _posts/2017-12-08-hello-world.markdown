@@ -1,5 +1,5 @@
 ---
-layout:         post
+layout:         page
 title:          Hello World
 subtitle:       遇见可遇不可求的美好
 card-image:     http://www.sinaimg.cn/dy/slidenews/1_img/2017_49/88490_1549047_316946.jpg
@@ -8,6 +8,7 @@ tags:           life
 post-card-type: image
 ---
 世界你好。
+![](http://www.sinaimg.cn/dy/slidenews/1_img/2017_49/88490_1549047_316946.jpg)
 
 流浪已久，终于，再次有了一个可以栖身的空间。
 
