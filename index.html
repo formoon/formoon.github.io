@@ -10,7 +10,7 @@ subtitle:   我们来到这个世界上，只是为了看一看月亮
         {% for post in paginator.posts %}
         {% if post.post-card-type == 'article' %}
         <li class="mix" style="display: inline-block;" data-bound="">
-            <a href="{{ post.url }}">
+            <a href="{{ post.url | prepend: site.baseurl }}">
                 <div class="card card--article not-visible">
                     <div class="card-body">
                         <div class="card-title card-title--articleIfNoImage">{{ post.title }}</div>
@@ -38,7 +38,7 @@ subtitle:   我们来到这个世界上，只是为了看一看月亮
         {% endif %}
         {% if post.post-card-type == 'image' %}
         <li class="mix">
-            <a href="{{ post.url }}">
+            <a href="{{ post.url | prepend: site.baseurl }}">
     			<div class="card card--article not-visible" >
     				<div class="card-body">
     					<div class="card-title">{{ post.title }}</div>
