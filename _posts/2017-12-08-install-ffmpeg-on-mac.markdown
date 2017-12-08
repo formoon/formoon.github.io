@@ -1,7 +1,7 @@
 ---
 layout:         post
 title:          在Mac上安装ffmpeg
-subtitle:       遇见可遇不可求的美好
+subtitle:       
 card-image:     
 date:           2017-12-08
 tags:           video&audio
