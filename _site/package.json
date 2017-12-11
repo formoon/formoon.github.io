@@ -8,12 +8,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/formoon/jekyllBlog.git"
+    "url": "git+https://github.com/formoon/formoon.github.io.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
     "url": ""
   },
-  "homepage": "https://formoon.github.io/jekyllBlog/"
+  "homepage": "https://formoon.github.io/"
 }
