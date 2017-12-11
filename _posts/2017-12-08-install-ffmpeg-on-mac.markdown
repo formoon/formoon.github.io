@@ -144,6 +144,6 @@ brew reinstall ffmpeg --with-chromaprint --with-fdk-aac --with-fontconfig --with
 使用基本安装ffmpeg很容易，但进阶的完整安装，则会自动重新编译ffmpeg软件包，这就需要系统提前安装好了苹果电脑的开发工具Xcode。<br>
 此外如果操作系统本身升级或者关键软件比如Xcode的升级，都可能导致ffmpeg/ffplay不能使用，这时候需要使用上面说过的重新安装方法重新安装ffmpeg软件包。
 
-
+*参考资源：ffmpeg[文档链接](https://www.ffmpeg.org/documentation.html)
 
 
