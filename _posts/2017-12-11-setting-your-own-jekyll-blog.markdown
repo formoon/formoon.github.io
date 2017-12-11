@@ -65,7 +65,8 @@ _site/
 * CNAME文件，如果你设置dns指向了github pages,要把这个文件的内容写上自己的域名。如果没有设置dns,记着这个文件要置空，来保证username.github.io域名正常工作。
 * 好了，作为一个基本框架，现在已经可以正常工作了，建议你使用浏览器访问http://127.0.0.1:4000/，检查检查是否工作正常，如果正常的话，下面把我们的blog部署到github pages:
 ```bash
-git commit -am "fist blog"
+git add .
+git commit -m "fist blog"
 git push
 ```
 这个操作，在每次修改完，本地检查无误后，都要做一遍，用于同步到github pages服务器。其中git命令的操作，如果你不熟悉的话，推荐你尽快阅读[git指南文档](https://git-scm.com/doc)。也可以在搜索引擎寻找大量的入门文档。  
@@ -85,6 +86,9 @@ git push
 	* 如果baseurl非空，那页面中所有对本站绝对资源的访问，都应当使用类似{{ "/assets/css/main.css" | prepend: site.baseurl }}这样的形式，否则都会报404错。
 	* css文件中不接受Liquid变量，也即{{}}这种方式，这时候只能把其中对资源的引用，明文的写成“/blog/assets/...”这样的形式。
 	
+* git commit 注意事项
+	* 尽量使用git add .之后接着git commit -m,而不是习惯上的git commit -am,因为每次添加博文，实际上增加了一个新文件，而这个文件没有在git stage中，所以git commit -am并不能像我们平常维护代码那样直接提交入库，这种情况下，git add命令实际是不能省略的，直接git commit -am就没意义了。
+
 #### 其它
 * jekyll可以接受那些文件？  
 当前可以支持HTML文件（后缀html或者htm)以及markdown文件（后缀md或者markdown)。事实上markdown文件中也可以嵌入html代码来表现一些更复杂的效果，比如插入一个表格。比如使用\<br>来代表换行，看起来可能比markdown中最后加两个空格代表换行更直观。
