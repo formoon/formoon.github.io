@@ -4,7 +4,7 @@ title:          使用Jekyll和github搭建自己的个人博客
 subtitle:       不断更新的Jekyll入门帖
 card-image:     http://n.sinaimg.cn/news/1_img/upload/cf3881ab/w1200h674/20171208/1Lw0-fypnsip0186049.jpg
 date:           2017-12-11
-tags:           Jekyll
+tags:           jekyll
 post-card-type: image
 ---
 ![](http://n.sinaimg.cn/news/1_img/upload/cf3881ab/w1200h674/20171208/1Lw0-fypnsip0186049.jpg)
