@@ -14,8 +14,8 @@ Kindle底层的Linux比Android保持了更多的linux兼容性，可以使用GTK
 ```bash
 sudo apt-get install pkg-config gcc-arm-linux-gnueabi libgtk2.0-dev
 ```
-接着我们来写一个hello world来验证功能：(文件名:testGtk.c)
-```c
+接着我们来写一个hello world来验证功能：(文件名:testGtk.c)  
+{% highlight c %}
 #include <gtk/gtk.h>
 
 static void hello( GtkWidget *widget,gpointer data ) {
@@ -51,14 +51,14 @@ int main( int   argc, char *argv[] ) {
     gtk_main ();
     return 0;
 }
-```
+{% endhighlight %}
 接着现在桌面Linux电脑上编译来试一下：
 ```bash
 gcc -o testGtk testGtk.c `pkg-config gtk+-2.0 --cflags --libs`
 ```
 在电脑上执行./testGtk，可以看到结果正确。  
 交叉编译kindle的版本则相对比较复杂，我们还是直接写一个Makefile吧，避免手工输入太长容易出错，同时Makefile中也增加了macos的编译部分。gtk虽然看上去很陈旧、落伍，但是跨平台用起来，其实比很多主流应用还要顺畅。  
-```Makefile
+{% highlight Makefile%}
 GCC=gcc
 ARMGCC=arm-linux-gnueabi-gcc
 ARMLIBS=`pkg-config gtk+-2.0 --cflags` -L/usr/arm-linux-gnueabi/lib/ -L/home/andrew/dev/kindleLib/ -lgtk-x11-2.0 -lgdk-x11-2.0 -lXrender -lXinerama -lXext -lgdk_pixbuf-2.0 -lpangocairo-1.0 -lXdamage -lXfixes -latk-1.0 -lcairo -lpixman-1 -lpng12 -lxcb-shm -lxcb-render -lX11 -lxcb -lXau -lXdmcp -lgio-2.0 -lpangoft2-1.0 -lpango-1.0 -lfontconfig -lfreetype -lz -lexpat -lgobject-2.0 -lffi -lgmodule-2.0 -lgthread-2.0 -lglib-2.0
@@ -77,7 +77,7 @@ osx:
 	export PKG_CONFIG_PATH=/usr/X11/lib/pkgconfig && gcc -o testGtk testGtk.c `pkg-config gtk+-2.0 --cflags --libs` 
 clean:
 	rm $(keys) testGtk
-```
+{% endhighlight %}
 项目的源码已经上传到[github](https://github.com/formoon/kindleGtkDemo),有兴趣的可以下载试试。  
 咳。。。不好意思，原谅我把最重要的放到最后说，在kindle上测试这个程序，需要越狱kindle,在KPW2之间的版本，在网上搜索，有软件的方法越狱。之后的版本就复杂了，可能还需要拆机引串口线的方式。  
 不过总感觉kindle的越狱还是很有意义的，主要是原生系统对于纯文本的排版水平实在太差，我就是越狱后装了再也见不到更新的多看系统。

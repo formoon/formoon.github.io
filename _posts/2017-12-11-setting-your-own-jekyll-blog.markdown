@@ -72,6 +72,37 @@ git push
 这个操作，在每次修改完，本地检查无误后，都要做一遍，用于同步到github pages服务器。其中git命令的操作，如果你不熟悉的话，推荐你尽快阅读[git指南文档](https://git-scm.com/doc)。也可以在搜索引擎寻找大量的入门文档。  
 * 提交到github之后，需要过几分钟等github pages渲染完你的页面，就可以使用https://你的用户名.github.io/来访问你的博客了。
 
+#### 语法高亮
+首先，当前版本（jekyll 3)的语法高亮在github只支持[rouge](https://github.com/jneen/rouge),所以第一个设置就是要把_config.yaml中的高亮设置调整成：
+{% highlight html %}
+highlighter: rouge
+{% endhighlight %}
+随后页面markdown文件中，当然仍然可以使用原来的markdown代码语法  
+{% highlight html %}
+'''ruby  
+  这里是你的源代码  
+'''
+{% endhighlight %}
+但是建议你改成jekyll内置的方式：  
+```html
+{% raw %}
+{% highlight html %}
+你的源代码
+{% endhighlight %}
+{% endraw %}
+```
+这种形式对于多种语言的支持明显要更好一点。  
+最后一点，要使用rouge命令行工具生成一个css文件，并且引用到自己的页面中，生成方法：
+{% highlight bash %}
+rougify style github > syntax.css
+{% endhighlight %}
+命令行中的github是指使用github风格的代码高亮，rouge官网的例子是使用一种暗色背景效果更好的：monokai.sublime，用哪中完全是自己的喜好，可以参考rouge官网的文档。  
+生成的css文件要引入到自己的页面模板中，高亮效果才能显示出来，每个人用的模板不同，但一般的语法都是： 
+{% highlight html %}
+	<link rel="stylesheet" type="text/css" href="/assets/css/syntax.css">
+{% endhighlight %}
+
+
 #### 那些爬过的坑
 * ruby的坑，事实上几乎建站过程中出现的问题，跟ruby及ruby包管理相关的占到90%。
 	* 最常见的一个是比如你安装了某个包的某个新版本，而jekyll需要老的一个版本，这种情况非常多。通常的做法是使用gem uninstall 卸载然后，gem install 使用-v指定安装对应的版本。不过对于一个有大量依赖包的应用，这样的工作非常繁重，这时候可以在工作目录执行：bundle update刷新一次，就可以解决jekyll的版本依赖问题。  
