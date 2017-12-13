@@ -1,6 +1,6 @@
 ---
 layout:         page
-title:          K60智能车大赛随手记
+title:          K60平台智能车开发工作随手记
 subtitle:       IAR开发
 card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513083187762&di=91f1f47b50bbd41bf6875e9453fa5c14&imgtype=0&src=http%3A%2F%2Fxfjy.chd.edu.cn%2F_mediafile%2Fzerui24%2F2017%2F04%2F12%2F2jawp8ae2v.jpg
 date:           2017-12-11
@@ -27,7 +27,7 @@ post-card-type: image
 上述所有资料下载链接：https://pan.baidu.com/s/1nv5QH1R  密码：c6t9  
 
 
-#### 厂商提供的demo程序操作入门：
+#### 厂商demo程序，IAR编译上手记录
 * 解压到自己的工作目录，不要破坏原有的目录结构。
 * 顶层目录中的fire_Kinetis_demo.eww文件就是总工程文件，双击就可以用IAR打开。
 * 打开后左上角是项目文件列表，首先右键点击工程文件（默认是fire_demo-Debug)字样。在左侧列表中选择Linker,右侧的路径中有原开发者的路径，一般情况下这同你的项目文件是不一致的，点选你项目文件夹下面/iar_config_files/LPLD_BOOT_K60DN512.icf文件。然后OK退出设置。
