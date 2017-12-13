@@ -83,9 +83,12 @@ git push
 * site.baseurl变量的使用
 	* 一般来说，直接建立了“用户名.github.io”代码库，使用https://用户名.github.io域名访问博客的方式，是不用在_config.yaml中设置baseurl参数的，这个值回默认为空。
 	* 如果采用了https://用户名.github.io/blog或类似这样的形式来访问的博客，则需要在_config.yaml中设置baseurl参数，以此为例应当设置为"/blog"。
-	* 如果baseurl非空，那页面中所有对本站绝对资源的访问，都应当使用类似{{ "/assets/css/main.css" | prepend: site.baseurl }}这样的形式，否则都会报404错。
-	* css文件中不接受Liquid变量，也即{{}}这种方式，这时候只能把其中对资源的引用，明文的写成“/blog/assets/...”这样的形式。
-	
+	* 如果baseurl非空，那页面中所有对本站绝对路径资源的访问，都应当使用类似下面这样的形式，否则都会报404错：  
+```jekyll
+	{% raw %} {{ "/assets/css/main.css" | prepend: site.baseurl }} {% endraw %}
+```
+	* css文件中不接受Liquid变量，也即{{}}这种方式，这时候只能把其中对资源的引用，明文的写成“/blog/assets/...”这样的形式，/blog是你的baseurl。
+	* 正文中如果有跟jekyll转义符冲突的地方，可以用jekyll的转义符函数raw即endraw，参考这篇文章：http://xiaohuang.rocks/2016/03/16/b-jekyll/  
 * git commit 注意事项
 	* 尽量使用git add .之后接着git commit -m,而不是习惯上的git commit -am,因为每次添加博文，实际上增加了一个新文件，而这个文件没有在git stage中，所以git commit -am并不能像我们平常维护代码那样直接提交入库，这种情况下，git add命令实际是不能省略的，直接git commit -am就没意义了。
 
