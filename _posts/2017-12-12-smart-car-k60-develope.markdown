@@ -48,4 +48,7 @@ post-card-type: image
 * common:其它一些必须的、共用的、也是基础的功能，类似基本的i/o,输入输出、内存测试等，这些既是系统必须的，又严重依赖当前的设备从而无法归类到通用的库、驱动、操作系统中。
 * app:终于切入了正题，这里面是我们真正自己要开发的部分，也就是我们应用的主程序。在其中的main.c则又是我们程序的入口。
 
+#### 拉普兰德开源Kinetis固件库使用
+拉普兰德开源Kinetis固件库地址：https://github.com/LPLDTeam/LPLD_OSKinetis  
+项目README.md已经有比较清楚的说明，所有的演示代码及自己的项目，应当放在project中，github上project中还提供了一个windows可执行的exe文件来帮助用户建立基于拉普兰德开源库的项目，自动生成可供iar系统使用的工程文件。
 
