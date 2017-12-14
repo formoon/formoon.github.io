@@ -17,7 +17,7 @@ cnpm install ng4-device-detector --save
 {% endhighlight %}
  使用cnpm安装而不是原来的npm，原因是如果你在国内，因为众所周知的原因，下载国外的包资源可能会很慢并且有被封掉的可能，cnpm是使用阿里的镜像站下载，速度会快很多。
  
-2.因为变更了控件包，原因的app.module.ts应当变更为：
+2.因为变更了控件包，原有的app.module.ts应当变更为：
 {% highlight javascript %}
   import { NgModule } from '@angular/core';
   import { Ng4DeviceDetectorModule } from 'ng4-device-detector';
@@ -68,6 +68,24 @@ cnpm install ng4-device-detector --save
 <SourcePage *ngIf="!isMobile"></SourcePage>
 <SourcePageMobile *ngIf="isMobile"></SourcePageMobile>
 {% endhighlight %}
+
+3.ng4-device-detector的大坑  
+都知道正常的ng4项目编译，是使用`ng build`命令。  
+这样产生的目标文件比较大，所以如果是为了服务器生产部署，应当是用`ng build -prod`,这样产生的文件，大约只有平常的1/6容量，速度也会快很多。  
+但是引入了ng4-device-detector或者ng2-device-detector，使用`ng build -prod`会报错，（使用`ng build`及`ng server`调试没有问题）：
+```
+ERROR in Error encountered resolving symbol values statically. Calling function 'ɵmakeDecorator', function calls are not supported. Consider replacing the function or lambda with a reference to an exported function, resolving symbol Injectable in /Users/andrew/dev/html/angular/educast-local/node_modules/ng4-device-detector/node_modules/@angular/core/core.d.ts, resolving symbol ɵe in /Users/andrew/dev/html/angular/educast-local/node_modules/ng4-device-detector/node_modules/@angular/core/core.d.ts, resolving symbol ɵe in /Users/andrew/dev/html/angular/educast-local/node_modules/ng4-device-detector/node_modules/@angular/core/core.d.ts
+
+ERROR in ./src/main.ts
+Module not found: Error: Can't resolve './$$_gendir/app/app.module.ngfactory' in '/Users/andrew/dev/html/angular/educast-local/src'
+ @ ./src/main.ts 4:0-74
+ @ multi ./src/main.ts
+```
+主要是新系统对于lambda函数的使用限制造成的，也有说是angular5的bug,虽然修改代码可以解决问题，但是也可以关闭编译器的aot属性来完成编译：
+{% highlight html %}
+ng build -prod --aot false
+{% endhighlight %}
+这样可以顺利完成编译，并且测试没有问题。
 
 ————————————————————————————————————————————
 
