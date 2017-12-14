@@ -52,7 +52,7 @@ int main( int   argc, char *argv[] ) {
     return 0;
 }
 {% endhighlight %}
-接着现在桌面Linux电脑上编译来试一下：
+接着先在桌面Linux电脑上编译来试一下：
 ```bash
 gcc -o testGtk testGtk.c `pkg-config gtk+-2.0 --cflags --libs`
 ```
