@@ -4,7 +4,7 @@ title:          Unix程序员的Win10二三事
 subtitle:       Win10 Linux子系统安装使用
 card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513248027391&di=5d8f7582ab897de33541b1d645c5d495&imgtype=0&src=http%3A%2F%2Fup.enterdesk.com%2Fedpic%2Ff3%2F0f%2F11%2Ff30f115e8cffca53cf25e87f300652c0.jpg
 date:           2017-12-14
-tags:           golang 
+tags:           win10 linux
 post-card-type: image
 ---
 ![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513248027391&di=5d8f7582ab897de33541b1d645c5d495&imgtype=0&src=http%3A%2F%2Fup.enterdesk.com%2Fedpic%2Ff3%2F0f%2F11%2Ff30f115e8cffca53cf25e87f300652c0.jpg)
@@ -65,7 +65,7 @@ Win10下面Linux子系统的日常维护跟标准的Linux系统一样，比如Ub
 * tcpdump之类的工具，在linux子系统上是无法正常执行的，因此如果要抓包，估计你只能借助windows下的软件了，不过无论如何可能达不到tcpdump这样方便。sad...
 * 上面提到过，类似关机、重启之类这样的操作，在linux子系统中无法实现，这样的功能，还是需要真机调试。
 
-
+(你有没有好奇今天的题头图我没有说图文无关？事实上这幅图片是Win10预置的桌面壁纸之一，不算无关吧？)
 
 
 
