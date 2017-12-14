@@ -58,7 +58,7 @@ brew update
 brew upgrade 
 brew cleanup
 ```
-brew update :是更新Homebrew系统本身，以便更新自己的脚本及得到软件包的最新信息。<br>
-brew upgrade :更新所有需要更新的软件包，在最新的Homebrew系统中，这一步中会自动先进行update操作，所以实际上上一条命令不需要了。<br>
-brew cleanup :清理旧的软件包及安装文件，下载一半后放弃的软件包也会被清理。
+`brew update` :是更新Homebrew系统本身，以便更新自己的脚本及得到软件包的最新信息。<br>
+`brew upgrade` :更新所有需要更新的软件包，在最新的Homebrew系统中，这一步中会自动先进行update操作，所以实际上上一条命令不需要了。<br>
+`brew cleanup` :清理旧的软件包及安装文件，下载一半后放弃的软件包也会被清理。
 
