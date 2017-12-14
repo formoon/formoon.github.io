@@ -4,7 +4,7 @@ title:          Angular2+的两个小技巧
 subtitle:       检测浏览器以及热键绑定
 card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513236363921&di=321ac235a6c875971dbd8a384129a30e&imgtype=0&src=http%3A%2F%2F5xruby.tw%2Fuploads%2Fpost%2Fimage%2F6%2Fangularjs.png
 date:           2017-12-14
-tags:           life
+tags:           angularJS html
 post-card-type: image
 ---
 ![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513236363921&di=321ac235a6c875971dbd8a384129a30e&imgtype=0&src=http%3A%2F%2F5xruby.tw%2Fuploads%2Fpost%2Fimage%2F6%2Fangularjs.png)
