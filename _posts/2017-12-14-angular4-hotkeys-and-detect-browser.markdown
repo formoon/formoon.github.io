@@ -69,10 +69,10 @@ cnpm install ng4-device-detector --save
 <SourcePageMobile *ngIf="isMobile"></SourcePageMobile>
 {% endhighlight %}
 
-3.ng4-device-detector的大坑  
+4.ng4-device-detector的大坑  
 都知道正常的ng4项目编译，是使用`ng build`命令。  
 这样产生的目标文件比较大，所以如果是为了服务器生产部署，应当是用`ng build -prod`,这样产生的文件，大约只有平常的1/6容量，速度也会快很多。  
-但是引入了ng4-device-detector或者ng2-device-detector，使用`ng build -prod`会报错，（使用`ng build`及`ng server`调试没有问题）：
+但是引入了ng4-device-detector或者ng2-device-detector，使用`ng build -prod`会报错，（使用`ng build`及`ng server`调试没有问题）,错误信息为：
 ```
 ERROR in Error encountered resolving symbol values statically. Calling function 'ɵmakeDecorator', function calls are not supported. Consider replacing the function or lambda with a reference to an exported function, resolving symbol Injectable in /Users/andrew/dev/html/angular/educast-local/node_modules/ng4-device-detector/node_modules/@angular/core/core.d.ts, resolving symbol ɵe in /Users/andrew/dev/html/angular/educast-local/node_modules/ng4-device-detector/node_modules/@angular/core/core.d.ts, resolving symbol ɵe in /Users/andrew/dev/html/angular/educast-local/node_modules/ng4-device-detector/node_modules/@angular/core/core.d.ts
 
