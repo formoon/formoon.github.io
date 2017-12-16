@@ -4,7 +4,7 @@ title:          Ubuntu16.04LTS appstreamcli报错的处理
 subtitle:       
 card-image:     
 date:           2017-12-15
-tags:           ubuntu
+tags:           linux
 post-card-type: article
 ---
 某台机重装两次ubuntu16.04 LTS版本都有开机报错，但一闪而过难以看清，后来尝试`apt update`,在下载完更新索引之后报错,从而确定了报错信息：  
