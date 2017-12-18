@@ -98,7 +98,7 @@ packihx test.ihx > test.hex
 ```bash
 sdobjcopy -I ihex -O binary test.ihx test.bin
 #-I指定的是输入格式，-O指定的是输出格式
-#最后两个分辨是输入、输出的文件名
+#最后两个参数分别是输入、输出的文件名
 #sdobjcopy不带任何参数执行有更详细的帮助可以参考
 ```
 .hex/.bin文件，并非是必须的，特别是在mac上工作，只是交流的时候如果需要，可以用上面的方法转换出来。  
@@ -159,6 +159,6 @@ stcflash.py test.ihx
 参考资料链接：  
 sdcc官网：<http://sdcc.sourceforge.net/>，建议以官方文档为主。  
 sdcc简单说明：<http://blog.csdn.net/baskmmu/article/details/43683289>，因版本问题，此文档中有一些错误，请甄别性的阅读。  
-使用SDCC在Linux/macOS上开发51单片机程序:<https://lonord.name/article/580cb1f67240257ec13293fb>
+使用SDCC在Linux/macOS上开发51单片机程序:<https://lonord.name/article/580cb1f67240257ec13293fb>  
 烧录软件：<https://github.com/laborer/stcflash>  
 
