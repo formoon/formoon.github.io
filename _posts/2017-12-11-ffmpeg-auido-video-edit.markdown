@@ -4,7 +4,7 @@ title:          使用ffmpeg做简单的音视频剪辑
 subtitle:       写给小白的入门文
 card-image:     http://n.sinaimg.cn/tech/5_img/upload/22e162b7/w800h636/20171211/vved-fypnsip5943640.jpg
 date:           2017-12-11
-tags:           video&audio toSeven
+tags:           videoaudio toSeven
 post-card-type: image
 ---
 ![](http://n.sinaimg.cn/tech/5_img/upload/22e162b7/w800h636/20171211/vved-fypnsip5943640.jpg)

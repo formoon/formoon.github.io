@@ -4,7 +4,7 @@ title:          在Mac上安装ffmpeg
 subtitle:       
 card-image:     
 date:           2017-12-08
-tags:           video&audio
+tags:           videoaudio
 post-card-type: article
 ---
 [ffmpeg](https://www.ffmpeg.org)是目前开源社区最牛逼的视、音频处理工具，没有之一。<br>
