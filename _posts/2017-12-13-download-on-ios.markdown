@@ -4,7 +4,7 @@ title:          苹果手机上下载的文件在哪里？
 subtitle:       Finding your files in IOS
 card-image:     http://n.sinaimg.cn/news/transform/w1000h500/20171212/dOoP-fypnsip9130896.jpg
 date:           2017-12-13
-tags:           ios unix jailbreak
+tags:           ios
 post-card-type: image
 ---
 ![](http://n.sinaimg.cn/news/transform/w1000h500/20171212/dOoP-fypnsip9130896.jpg)

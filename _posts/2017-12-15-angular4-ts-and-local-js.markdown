@@ -4,7 +4,7 @@ title:          AngularJS2+调用原有的js脚本
 subtitle:       AngularJS脚本跟本地原有脚本之间的关系
 card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513315573892&di=9458085c39f14f85134039e992199711&imgtype=0&src=http%3A%2F%2Fpic.58pic.com%2F58pic%2F17%2F61%2F05%2F556d6c669b2a6_1024.jpg
 date:           2017-12-14
-tags:           angularJS html
+tags:           html
 post-card-type: image
 ---
 ![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513315573892&di=9458085c39f14f85134039e992199711&imgtype=0&src=http%3A%2F%2Fpic.58pic.com%2F58pic%2F17%2F61%2F05%2F556d6c669b2a6_1024.jpg)

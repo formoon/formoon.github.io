@@ -4,7 +4,7 @@ title:          在Mac电脑编译c51程序
 subtitle:       sdcc基本使用方法
 card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513587702717&di=bcbf3ccac47e31a8ec356751b4c44e8d&imgtype=0&src=http%3A%2F%2Ff.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2Fb219ebc4b74543a9bfc173651b178a82b8011444.jpg
 date:           2017-12-18
-tags:           c51 sdcc toSeven
+tags:           embed toSeven
 post-card-type: image
 ---
 ![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513587702717&di=bcbf3ccac47e31a8ec356751b4c44e8d&imgtype=0&src=http%3A%2F%2Ff.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2Fb219ebc4b74543a9bfc173651b178a82b8011444.jpg)

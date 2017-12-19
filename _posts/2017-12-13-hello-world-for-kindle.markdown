@@ -4,7 +4,7 @@ title:          在Ubuntu上搭建kindle gtk开发环境
 subtitle:       以及kindle gtk样本程序
 card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513158912465&di=b075ed914ce5796fb5cf2584d9fe3a61&imgtype=jpg&src=http%3A%2F%2Fimg2.imgtn.bdimg.com%2Fit%2Fu%3D381617887%2C3941446456%26fm%3D214%26gp%3D0.jpg
 date:           2017-12-13
-tags:           linux kindle gtk
+tags:           linux
 post-card-type: image
 ---
 ![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513158912465&di=b075ed914ce5796fb5cf2584d9fe3a61&imgtype=jpg&src=http%3A%2F%2Fimg2.imgtn.bdimg.com%2Fit%2Fu%3D381617887%2C3941446456%26fm%3D214%26gp%3D0.jpg)

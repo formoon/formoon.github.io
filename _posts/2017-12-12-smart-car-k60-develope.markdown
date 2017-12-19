@@ -4,7 +4,7 @@ title:          K60平台智能车开发工作随手记
 subtitle:       IAR开发
 card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513083187762&di=91f1f47b50bbd41bf6875e9453fa5c14&imgtype=0&src=http%3A%2F%2Fxfjy.chd.edu.cn%2F_mediafile%2Fzerui24%2F2017%2F04%2F12%2F2jawp8ae2v.jpg
 date:           2017-12-11
-tags:           k60 iar toSeven
+tags:           embed toSeven
 post-card-type: image
 ---
 ![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513083187762&di=91f1f47b50bbd41bf6875e9453fa5c14&imgtype=0&src=http%3A%2F%2Fxfjy.chd.edu.cn%2F_mediafile%2Fzerui24%2F2017%2F04%2F12%2F2jawp8ae2v.jpg)
