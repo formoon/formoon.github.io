@@ -1,0 +1,155 @@
+---
+layout:         page
+title:          批量自动重命名音乐文件
+subtitle:       分享两个自制的小工具
+card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513741255092&di=39709260c127eba9393581b0564b6779&imgtype=0&src=http%3A%2F%2Fimg.25pp.com%2Fuploadfile%2Fsoft%2Fimages%2F2015%2F0505%2F20150505102709218.jpg
+date:           2017-12-20
+tags:           python
+post-card-type: image
+---
+![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513741255092&di=39709260c127eba9393581b0564b6779&imgtype=0&src=http%3A%2F%2Fimg.25pp.com%2Fuploadfile%2Fsoft%2Fimages%2F2015%2F0505%2F20150505102709218.jpg)
+有个不好意思的坏习惯，经常在网上下载一些MP3音乐，大家可别学我，请努力支持正版。  
+很多不同时间、不同来源的MP3，一般采用了不同的命名规则，或者干脆就是混乱的命名，比如一串谁也看不懂的数字，感觉这些起名字的人实在是不走心。  
+但管理起来或者欣赏起来，这些杂乱的名字就实在太令人恼火了。自己写了一个小程序，读取MP3音乐中的标签(Taginfo)信息，这些信息一般是压制MP3的时候直接从CD中得到并且保存到MP3文件的，然后用这些信息重新命名MP3文件，我当前采用的方式是“艺术家+曲名.mp3”,源码内很清楚，如果有不同的需求可以自己再修改。  
+```python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#usage: ./mp3rename.py  ~/mp3/*mp3
+#prepare: pip install mutagen
+
+import sys
+import os
+import locale
+from struct import *
+
+from optparse import OptionParser
+from mutagen.mp3 import MP3
+
+def hexdump(s):
+    for b in xrange(0, len(s), 16):
+        lin = [c for c in s[b : b + 16]]
+        hxdat = ' '.join('%02X' % ord(c) for c in lin)
+        pdat = ''.join((c if 32 <= ord(c) <= 126 else '.' )for c in lin)
+        print '  %04x: %-48s %s' % (b, hxdat, pdat)
+    print
+
+def ustr2str(s):
+	tstr = b''
+	for c in s:
+		n=ord(c)
+		tstr = tstr+chr(n)
+	return tstr
+			
+def gb2utf(sstr):
+	return ustr2str(sstr).decode('gbk').encode('utf-8')
+
+def muReadMp3ID(filename):
+    audio = MP3(filename)
+    if 'TPE1' in audio:
+        s1Artist=audio['TPE1'].text[0]
+    else:
+        s1Artist=""
+    if 'TIT2' in audio: 
+        s1Title=audio['TIT2'].text[0]
+    else:
+        s1Title=""
+    try:
+    	sArtist=gb2utf(s1Artist)
+    	sTitle=gb2utf(s1Title)
+    except:
+    	sArtist=s1Artist
+    	sTitle=s1Title
+    sArtist=sArtist.replace(' ','')
+    sTitle=sTitle.replace(' ','')
+    sArtist=sArtist.replace('/','_')
+    sTitle=sTitle.replace('/','_')
+    sArtist=sArtist.replace(':','_')
+    sTitle=sTitle.replace(':','_')
+    if sTitle=="":
+        sTitle=os.path.splitext(os.path.basename(filename)).[0]
+
+    #print audio["TRCK"].text[0]
+    pathname=os.path.dirname(filename)
+    if pathname != "":
+        newname=pathname+"/"+sArtist+"_"+sTitle+".mp3"
+    else:
+        newname=sArtist+"_"+sTitle+".mp3"
+    #print filename," ",newname
+    os.rename(filename,newname)
+    
+def main(argv):
+    parser = OptionParser()
+    (options, args) = parser.parse_args(argv[1:])
+    if not args:
+        raise SystemExit(parser.print_help() or 1)
+
+    for filename in args:
+			muReadMp3ID(filename)	
+
+if __name__ == "__main__":
+    main(sys.argv)
+```
+因为使用了mutagen代码包，所以使用之前要先安装一下`pip install mutagen`。另外要注意，有个别歌曲内置就没有taginfo,当然现在这种情况很少见，我只见过2首特别情况，这种情况的话，程序将只在源文件名之前增加"_"。  
+
+很多使用目前比较火的音乐app下载的歌曲，后缀是m4a,是MP4标准中的音频格式。这种方式有很多优点，诸如压缩率更高、同样容量音质更好，可以加密等等，这里不做技术科普，网上有很多。然后为了应对这种文件的情况，改写了类似程序来完成m4a文件的批量改名，考虑很多的随身听实际上是以mp3为主的，这里就不合并到一个程序了。m4arename.py分享如下：  
+```python
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+#./m4arename.py  ~/m4a/*
+#prepare: pip install mutagen
+
+
+import sys
+import os
+import locale
+import struct
+
+from optparse import OptionParser
+from mutagen.mp4 import MP4
+
+def hexdump(s):
+    for b in xrange(0, len(s), 16):
+        lin = [c for c in s[b : b + 16]]
+        hxdat = ' '.join('%02X' % ord(c) for c in lin)
+        pdat = ''.join((c if 32 <= ord(c) <= 126 else '.' )for c in lin)
+        print '  %04x: %-48s %s' % (b, hxdat, pdat)
+    print
+
+def ustr2str(s):
+	tstr = b''
+	for c in s:
+		n=ord(c)
+		tstr = tstr+chr(n)
+	return tstr
+			
+def gb2utf(sstr):
+	return ustr2str(sstr).decode('gbk').encode('utf-8')
+
+
+def m4afilename(filename):
+	if not filename.endswith('.m4a'):
+		print "Error filetype, only .m4a allowed"
+		return
+	audio=MP4(filename)
+	stitle=audio['\xa9nam'][0]
+	sartist=audio['\xa9ART'][0]
+	newfilename=sartist+stitle+".m4a"
+	newfilename=newfilename.replace("/","-")
+	print "["+newfilename+"]"	
+	os.rename(filename,newfilename)
+	#os.system(doCmdStr)
+	
+
+    
+def main(argv):
+    parser = OptionParser()
+    (options, args) = parser.parse_args(argv[1:])
+    if not args:
+        raise SystemExit(parser.print_help() or 1)
+
+    for filename in args:
+			m4afilename(filename)	
+
+if __name__ == "__main__":
+    main(sys.argv)
+```
