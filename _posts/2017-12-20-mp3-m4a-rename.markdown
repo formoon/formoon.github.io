@@ -26,12 +26,12 @@ from optparse import OptionParser
 from mutagen.mp3 import MP3
 
 def hexdump(s):
-    for b in xrange(0, len(s), 16):
-        lin = [c for c in s[b : b + 16]]
-        hxdat = ' '.join('%02X' % ord(c) for c in lin)
-        pdat = ''.join((c if 32 <= ord(c) <= 126 else '.' )for c in lin)
-        print '  %04x: %-48s %s' % (b, hxdat, pdat)
-    print
+	for b in xrange(0, len(s), 16):
+	    lin = [c for c in s[b : b + 16]]
+	    hxdat = ' '.join('%02X' % ord(c) for c in lin)
+	    pdat = ''.join((c if 32 <= ord(c) <= 126 else '.' )for c in lin)
+	    print '  %04x: %-48s %s' % (b, hxdat, pdat)
+	print
 
 def ustr2str(s):
 	tstr = b''
@@ -44,50 +44,45 @@ def gb2utf(sstr):
 	return ustr2str(sstr).decode('gbk').encode('utf-8')
 
 def muReadMp3ID(filename):
-    audio = MP3(filename)
-    if 'TPE1' in audio:
-        s1Artist=audio['TPE1'].text[0]
-    else:
-        s1Artist=""
-    if 'TIT2' in audio: 
-        s1Title=audio['TIT2'].text[0]
-    else:
-        s1Title=""
-    try:
-    	sArtist=gb2utf(s1Artist)
-    	sTitle=gb2utf(s1Title)
-    except:
-    	sArtist=s1Artist
-    	sTitle=s1Title
-    sArtist=sArtist.replace(' ','')
-    sTitle=sTitle.replace(' ','')
-    sArtist=sArtist.replace('/','_')
-    sTitle=sTitle.replace('/','_')
-    sArtist=sArtist.replace(':','_')
-    sTitle=sTitle.replace(':','_')
-    if sTitle=="":
-        sTitle=os.path.splitext(os.path.basename(filename)).[0]
+	audio = MP3(filename)
+	if 'TPE1' in audio:
+	    s1Artist=audio['TPE1'].text[0]
+	else:
+	    s1Artist=""
+	if 'TIT2' in audio: 
+	    s1Title=audio['TIT2'].text[0]
+	else:
+	    s1Title=""
+	try:
+		sArtist=gb2utf(s1Artist)
+		sTitle=gb2utf(s1Title)
+	except:
+		sArtist=s1Artist
+		sTitle=s1Title
+	if sTitle=="":
+	    sTitle=os.path.splitext(os.path.basename(filename)).[0]
 
-    #print audio["TRCK"].text[0]
-    pathname=os.path.dirname(filename)
-    if pathname != "":
-        newname=pathname+"/"+sArtist+"_"+sTitle+".mp3"
-    else:
-        newname=sArtist+"_"+sTitle+".mp3"
-    #print filename," ",newname
-    os.rename(filename,newname)
+	#print audio["TRCK"].text[0]
+	pathname=os.path.dirname(filename)
+	if pathname != "":
+	    newname=pathname+"/"+sArtist+"_"+sTitle+".mp3"
+	else:
+	    newname=sArtist+"_"+sTitle+".mp3"
+	newname = newname.sub('[ /:]','_',s)
+	#print filename," ",newname
+	os.rename(filename,newname)
     
 def main(argv):
-    parser = OptionParser()
-    (options, args) = parser.parse_args(argv[1:])
-    if not args:
-        raise SystemExit(parser.print_help() or 1)
+	parser = OptionParser()
+	(options, args) = parser.parse_args(argv[1:])
+	if not args:
+	    raise SystemExit(parser.print_help() or 1)
 
-    for filename in args:
-			muReadMp3ID(filename)	
+	for filename in args:
+		muReadMp3ID(filename)	
 
 if __name__ == "__main__":
-    main(sys.argv)
+	main(sys.argv)
 ```
 因为使用了mutagen代码包，所以使用之前要先安装一下`pip install mutagen`。另外要注意，有个别歌曲内置就没有taginfo,当然现在这种情况很少见，我只见过2首特别情况，这种情况的话，程序将只在源文件名之前增加"_"。  
 
