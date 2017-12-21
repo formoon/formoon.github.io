@@ -3,4 +3,5 @@
 git add . 
 git commit -m "$1"
 git push
+qshell qupload qshellupload.conf
 
