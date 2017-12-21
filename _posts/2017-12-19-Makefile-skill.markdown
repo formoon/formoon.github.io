@@ -26,7 +26,8 @@ TMPSDIR = objs
 VPATH=src
 
 #扫描所有的c源码，这里默认src中所有文件都是相当于库文件，最终编译为.o
-OBJSSOURCE = $(wildcard src/*.c)  
+#搜索出来的文件包含了src路径，这里也去掉，便于后面编译到临时目录
+OBJSSOURCE = $(notdir $(wildcard src/*.c))  
 OBJS = $(patsubst %.c,%.o,$(OBJSSOURCE))  
 
 #主程序名
@@ -37,8 +38,9 @@ DEPS  = $(addprefix $(TMPSDIR)/,$(OBJS))
 all:$(OBJS) $(KEYS) 
 
 #编译所有的库文件由.c至.o
+#因为VPATH的存在，源文件会自动检索src目录
 $(filter %.o,$(OBJS)) : %.o : %.c
-	$(CC) $(CFLAGS) -c -o $(TMPSDIR)/$(notdir $@) $<
+	$(CC) $(CFLAGS) -c -o $(TMPSDIR)/$@ $<
 
 #利用所有的库文件编译主程序		
 $(KEYS): $(DEPS)
@@ -65,7 +67,7 @@ TMPSDIR = objs
 
 VPATH=src
 
-OBJSSOURCE = $(wildcard src/*.c)  
+OBJSSOURCE = $(notdir $(wildcard src/*.c))  
 OBJS = $(patsubst %.c,%.o,$(OBJSSOURCE))  
 DEPS  = $(addprefix $(TMPSDIR)/,$(OBJS))  
 
@@ -77,7 +79,7 @@ all:$(OBJS) $(KEYS)
 
 #编译所有的库文件由.c至.o
 $(filter %.o,$(OBJS)) : %.o : %.c
-	$(CC) $(CFLAGS) -c -o $(TMPSDIR)/$(notdir $@) $<
+	$(CC) $(CFLAGS) -c -o $(TMPSDIR)/$@ $<
 
 #将.o文件打包为库
 libcallfunctions.a : $(DEPS)
@@ -89,9 +91,9 @@ clean:
 	-rm $(OUTSDIR)/* $(TMPSDIR)/*
 
 ```
-在主要的编译环节，还有下面这种常用的办法，但是有一个bug是不能自动检测单个依赖文件的更新，因此只对发行版本每次都是全部重新编译才有意义，这里也贴出来仅供参考，不建议使用：  
+在主要的编译环节，还有下面这种常用的办法,只是自己运算得到了源文件名而没有用Make系统的自动搜索功能而已：  
 ```make
 %.o:
-	$(CC) $(CFLAGS) -c -o $(TMPSDIR)/$(notdir $@) common/$(patsubst %.o,%.c,$(notdir $@))
+	$(CC) $(CFLAGS) -c -o $(TMPSDIR)/$@ src/$(patsubst %.o,%.c,$@)
 ```
-对于更复杂的编译模式，建议把每个编译环节定义成子程序来执行，可以具备更多的灵活性。  
+对于更复杂的编译模式，建议把每个编译环节定义成子程序来执行，可以具备更多的灵活性。另外当前这个脚本有一个bug就是每次编译实际上所有的.o文件都会完整重新编译一遍，而没有判断源文件是否更新并忽略没有更新的源文件，所以不适合大的系统。  
