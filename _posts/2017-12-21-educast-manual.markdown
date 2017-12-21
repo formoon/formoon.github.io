@@ -2,7 +2,7 @@
 layout:         post
 title:          Educast视频直播控制台使用说明
 subtitle:       Educast manual
-card-image:     http://p1avd6u2z.bkt.clouddn.com/201712/21/educast_main.png
+card-image:     http://p1avd6u2z.bkt.clouddn.com/201712/21/16_9.png
 date:           2017-12-21
 tags:           videoaudio manual
 post-card-type: image
