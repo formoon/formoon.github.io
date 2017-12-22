@@ -4,7 +4,7 @@ title:          MacPro4,1升级到MacPro5,1
 subtitle:       MacPro4,1 firmware patch and upgrade 
 card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1514534533&di=0c6ea22bff1630d62b5d095ff7470481&imgtype=jpg&er=1&src=http%3A%2F%2Fmac.tgbus.com%2Fmacpro%2Fimages%2Fdesign_io_hero20080108.png
 date:           2017-12-22
-tags:           life
+tags:           mac
 post-card-type: image
 ---
 ![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1514534533&di=0c6ea22bff1630d62b5d095ff7470481&imgtype=jpg&er=1&src=http%3A%2F%2Fmac.tgbus.com%2Fmacpro%2Fimages%2Fdesign_io_hero20080108.png)

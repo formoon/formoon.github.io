@@ -4,7 +4,7 @@ title:          七牛对象存储的使用
 subtitle:       兼说在jekyll页面中添加照片引用
 card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1514451286&di=667dd6643fdb29539489c69b82d47449&imgtype=jpg&er=1&src=http%3A%2F%2Fg-search4.alicdn.com%2Fbao%2Fuploaded%2Fi2%2F36023082%2FTB2v0dnkXXXXXcMXXXXXXXXXXXX_%21%2136023082.png
 date:           2017-12-21
-tags:           life
+tags:           mac jekyll
 post-card-type: image
 ---
 ![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1514451286&di=667dd6643fdb29539489c69b82d47449&imgtype=jpg&er=1&src=http%3A%2F%2Fg-search4.alicdn.com%2Fbao%2Fuploaded%2Fi2%2F36023082%2FTB2v0dnkXXXXXcMXXXXXXXXXXXX_%21%2136023082.png)
