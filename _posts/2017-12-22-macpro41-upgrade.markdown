@@ -19,7 +19,7 @@ post-card-type: image
 * 如果你已经有一台web服务器是最好的，但是如果你没有，可以考虑在本地临时设置一台web服务器，比如使用python内置的SimpleHTTPServer。下面假设我们在本地设置一台web服务器。
 * 首先确定一个工作目录，在其下根据上面URL的方式设置两个文件夹：`mkdir -P downloads/DL989/en_US/`及`mkdir -P downloads/DL1321/en_US/`,将刚才下载的两个文件，对应分别放入目录，再次强调，因为文件名是相同的，别放错。
 * 修改本地hosts文件，把support.apple.com网址指向127.0.0.1。看到这里你会不会说“咦？刚才下载的时候命名网址可以访问啊？”，不过可惜啊，这个升级工具它下载不下来，猜测的原因一开始就说过了。
-* 在当前文件夹执行：`sudo python -m SimpleHTTPServer 80`，这是在80端口启动了web服务。接着，再次执行升级工具试试，至少在我这里，可以顺利的将系统升级了。
+* 在当前文件夹执行：`sudo python -m SimpleHTTPServer 80`，这是在80端口启动了web服务,使用sudo的原因是80端口只能使用root权限启动。接着，再次执行升级工具试试，至少在我这里，可以顺利的将系统升级了。
 ![](http://p1avd6u2z.bkt.clouddn.com/201712/22/macpro.jpg)（升级成功的对比）
 
 系统升级后，再安装macos sierra及high sierra就都不会有问题了。而且在新版本系统安装的时候，检测到固件的版本会比较老，会自动为你升级MacPro5,1的新固件，新固件工作起来一切正常。
