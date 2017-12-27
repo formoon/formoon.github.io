@@ -4,7 +4,7 @@ title:          自己动手，装一个液晶电视
 subtitle:       LCD TV DIY
 card-image:     http://p1avd6u2z.bkt.clouddn.com/201712/25/DSCO07091900586s-full.jpg
 date:           2017-12-25
-tags:           DIY
+tags:           diy
 post-card-type: image
 ---
 ![](http://p1avd6u2z.bkt.clouddn.com/201712/25/DSCO07091900586s-full.jpg)
