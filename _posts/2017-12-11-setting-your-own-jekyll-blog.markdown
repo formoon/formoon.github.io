@@ -111,6 +111,19 @@ rougify style github > syntax.css
 	 
 * Markdown的坑
 	* jekyll内部使用的Markdown渲染器会强制要求Markdown标记同正文之间有一个空格，否则会当做正文一起渲染，比如标题的#标记，*的列表标记，都要跟后面的正文有一个空格，否则在本地的Markdown编辑器中看起来正常，渲染出来的页面则失去了所有的效果。
+	* \`是常用的源代码引用符，要显示单引号它自己，可以在反单引号两边，各加两个连续的反单引号:\`\` \` \`\`,使用\\进行转义也是可以的。总结可以使用\\进行转义的字符共计包括：\\ \` \* \_ \{ \} \[ \] \( \) \# \+ \- \. \!
+{% assign openTag = '{%' %}
+* Jekyll/Liquid 转义符
+	* 其实是一个转义指令，在指令之中的模板命令、变量都不被解释：` {{ openTag }} raw %}   这之中的指令不被解释，比如 {% raw %}{{ abc }}{% endraw %} {{ openTag }} endraw %}   `  
+	* 如果再想显示Liquid转义符自身则比较复杂，需要定义一个Liquid变量，然后引用变量达成显示转义符自身的效果：  
+{% raw %}```jekyll
+先定义变量来构成命令起始标志：
+{{ openTag }} assign openTag = '{%' %}
+然后在需要的地方引用这个变量这样不会造成转义为liquid指令:
+{{ openTag }} raw %}   {{ openTag }} endraw %}
+```
+{% endraw %}
+
 * site.baseurl变量的使用
 	* 一般来说，直接建立了“用户名.github.io”代码库，使用https://用户名.github.io域名访问博客的方式，是不用在_config.yaml中设置baseurl参数的，这个值回默认为空。
 	* 如果采用了https://用户名.github.io/blog或类似这样的形式来访问的博客，则需要在_config.yaml中设置baseurl参数，以此为例应当设置为"/blog"。

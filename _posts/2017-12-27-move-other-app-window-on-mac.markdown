@@ -87,79 +87,68 @@ void getTitleList1(){
 }
 
 void getTitleList2(){
-    @autoreleasepool {
-     // Get all the windows
-     CFArrayRef windowListAll = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
-     NSArray* arr = CFBridgingRelease(windowListAll);
-	 NSUInteger count = [arr count]; //CFArrayGetCount(arr);
-     // Loop through the windows
-     //for (NSMutableDictionary* entry in arr)		//可以直接使用这种面向对象的循环方法，下面采用传统的c语言for循环只是当时调试方便
-	 NSLog(@"count:%lu",count);
-     for (int i=0;i < count;i++){
-		 NSLog(@"entry i:%d",i);
-         NSMutableDictionary *entry = arr[i];
-		 if (entry == nil){
-			 break;
-		 }
-		 //NSLog(@"enter:%@",entry);
-         // Get window PID
-         pid_t pid = [[entry objectForKey:(id)kCGWindowOwnerPID] intValue];
-         // Get AXUIElement using PID
-         AXUIElementRef appRef = AXUIElementCreateApplication(pid);
-         NSLog(@"Ref = %@",appRef);
-
-         // 再次获得该应用的窗口列表，其实跟获取全部窗口列表是重复的，只是为了更多的控制功能
-         CFArrayRef windowList;
-         AXUIElementCopyAttributeValue(appRef, kAXWindowsAttribute, (CFTypeRef *)&windowList);
-         NSLog(@"WindowList = %@", windowList);
-		 CFRelease(appRef);
-
-		 if (!windowList){
-			 NSLog(@"windowList is nil");
-             continue;
-		 }
-         if (CFArrayGetCount(windowList)<1){
-			 NSLog(@"No windowList");
-			 CFRelease(windowList);
-             continue;
-         }
-		 
-		 NSString *appTitle = nil;
-         AXUIElementCopyAttributeValue(appRef, kAXTitleAttribute, (void *)&appTitle);
-         if (!appTitle) {
-		     continue;
-		 }
-         NSLog(@"appTitle = %@", appTitle);
-					 
-         //只取该应用的第一个窗口
-         AXUIElementRef windowRef = (AXUIElementRef) CFArrayGetValueAtIndex( windowList, 0);
-		 NSLog(@"windowRef:%@",windowRef);
-
-         CFTypeRef position;
-         CGPoint point;
-
-         // Get the position attribute of the window (maybe something is wrong?)
-         AXUIElementCopyAttributeValue(windowRef, kAXPositionAttribute, (CFTypeRef *)&position);
-         AXValueGetValue(position, kAXValueCGPointType, &point);
-		 CFRelease(position);
-         // Debugging (always zeros?)
-         NSLog(@"point=%f,%f", point.x,point.y);   //当前的坐标
-         // Create a point
-         CGPoint newPoint;
-         newPoint.x = 0;
-         newPoint.y = 0;
-         NSLog(@"Create new position");
-         position = (CFTypeRef)(AXValueCreate(kAXValueCGPointType, (const void *)&newPoint));
-         // 尝试设置新坐标,注意这会将遍历到的所有窗口都放到屏幕左上角
-         //NSLog(@"SetAttribute");
-         AXUIElementSetAttributeValue(windowRef, kAXPositionAttribute, position);
-         sleep(5);
-		 CFRelease(position);
-		 CFRelease(windowRef);
-		 NSLog(@"end a loop ----------------------------");
-     }
-	 }
- }
+	@autoreleasepool {
+	// Get all the windows
+	CFArrayRef windowListAll = CGWindowListCopyWindowInfo(kCGWindowListOptionOnScreenOnly, kCGNullWindowID);
+	NSArray* arr = CFBridgingRelease(windowListAll);
+	NSUInteger count = [arr count]; //CFArrayGetCount(arr);
+	// Loop through the windows
+	for (NSMutableDictionary* entry in arr){
+		if (entry == nil){
+			break;
+		}
+		NSLog(@"enter:%@",entry);
+		NSString *wndName=[entry objectForKey:(id)kCGWindowName];
+		NSInteger wndNumber=[[entry objectForKey:(id)kCGWindowNumber] intValue];
+		NSLog(@"wndName:%@ number:%ld",wndName,wndNumber);
+		if (![wndName isEqualToString: @"~/test.txt"]){
+			//不是自己想要的窗口继续下一个循环
+			continue;
+		}
+		//下面这个方法是手册中最先查到的，但仅对属于自己app的窗口有效，其它app的窗口无效，所以不能采用
+		//NSWindow * wind=[NSApp windowWithWindowNumber: wndNumber];
+		//NSLog(@"wnd:%@",wind);
+		CGRect bounds;
+	    CGRectMakeWithDictionaryRepresentation((CFDictionaryRef)[entry objectForKey:@"kCGWindowBounds"], &bounds);
+	    NSLog(@"bounds: %@",NSStringFromRect(bounds));   
+		//根据pid获取窗口所属的app
+        pid_t pid = [[entry objectForKey:(id)kCGWindowOwnerPID] intValue];
+        AXUIElementRef appRef = AXUIElementCreateApplication(pid);
+        NSLog(@"Ref = %@",appRef);
+		//获取app所有的窗口
+        CFArrayRef windowList;
+        AXUIElementCopyAttributeValue(appRef, kAXWindowsAttribute, (CFTypeRef *)&windowList);
+        //NSLog(@"WindowList = %@", windowList);
+		CFRelease(appRef);
+		if (!windowList){
+			//NSLog(@"windowList is nil");
+			continue;
+		}
+		for (int i=0;i<CFArrayGetCount(windowList);i++){
+			//遍历app所有窗口，查找跟全局遍历所获得窗口的实体
+			AXUIElementRef windowRef = (AXUIElementRef) CFArrayGetValueAtIndex( windowList, i);
+			NSLog(@"windowRef:%@",windowRef);
+			CGWindowID application_window_id = 0;
+			_AXUIElementGetWindow(windowRef, &application_window_id);
+			if (application_window_id == wndNumber){
+				//找到
+				NSLog(@"Found a wnd that number is:%u",application_window_id);
+				//根据需要来操作窗口的位置，仅用作示例，这里可以修改成其它操作
+	            CFTypeRef position;
+	            CGPoint newPoint;
+	            newPoint.x = 0;
+	            newPoint.y = 0;
+	            NSLog(@"Create new position");
+	            position = (CFTypeRef)(AXValueCreate(kAXValueCGPointType, (const void *)&newPoint));
+				//setting new position
+				AXUIElementSetAttributeValue(windowRef, kAXPositionAttribute, position);
+			}
+			CFRelease(windowRef);
+		}
+	 NSLog(@"end a loop ----------------------------");
+	} //for windowListAll
+	} //autorelease
+}
 
 int main(int argc, char **argv){
 	getTitleList1();	//第一种方法，重点在遍历
@@ -168,10 +157,10 @@ int main(int argc, char **argv){
 	return 0;	
 }
 ```
-重点的内容直接看注释，其中的第二种方法可控性要好很多，不过程序也复杂一些。大概流程是先遍历所有屏幕的窗口->然后根据窗口获取该窗口所属的应用->再次获取应用所属的窗口->控制，第二部的确做的重复了，不过从提供的api上这样才能够控制窗口。  
+重点的内容直接看注释，其中的第二种方法可控性要好很多，不过程序也复杂一些。大概流程是先遍历所有屏幕的窗口->然后根据窗口获取该窗口所属的应用->再次获取应用所属的所有窗口->在这些窗口中找到自己想要的->控制，第二步的确做的会有大量重复遍历，不过从提供的api上看，目前只有这个办法才能够控制窗口。代码中有大量的日志信息，正式使用的话调试完成可以删掉。  
 这段代码使用object-c和c混编，后缀为.m,因为只是测试代码，没有建立xcode项目，是在命令行编译的，编译方法可能有的人不太熟悉，也贴出来：  
 ```bash
-clang -fobjc-arc  -o sdljob sdljob.m -framework CoreGraphics -framework AppKit
+clang -fobjc-arc  -o wndjob wndjob.m -framework CoreGraphics -framework AppKit
 ```
 
 参考链接：  
