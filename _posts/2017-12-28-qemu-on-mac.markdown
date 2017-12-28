@@ -12,7 +12,7 @@ post-card-type: image
 时至今日，几乎没有一台服务器不是用虚拟化的方式管理和维护了。每个人的电脑上，VMware的虚机或者Docker组成的诸多大大小小、错综复杂的微服务容器已经充斥生活。还有人记得QEMU吗？  
 QEMU是虚机鼻祖式的应用，正是从QEMU开始，虚拟化、云服务才一日紧似一日的迅猛发展，一统江湖。  
 其实在今天，真正还在使用QEMU的用户已经比较少了，如果不是Android模拟器还在勉强的撑着门面，跌破1%的占有率恐怕也不会令人奇怪。最次也会是运行QEMU-KVM虚拟环境吧。  
-主要的区别，是QEMU是一个应用程序，运行在用户空间，采用纯软件模拟的方式来仿真CPU出来，在虚拟环境中运行虚拟操作系统；而QEMU-KVM的KVM部分，或者Docker/VMWare等其它虚机系统，会有一部分运行在内核层，特别是提供真实的CPU执行能力，当然其它硬件层的访问，也会有非常大的提速。对于真正使用虚拟环境的用户，毋庸置疑会选择后者。  
+主要的区别，是QEMU是一个应用程序，运行在用户空间，采用纯软件模拟的方式来仿真CPU出来，在虚拟环境中运行虚拟操作系统；而QEMU-KVM的KVM部分，或者Docker/VMWare等其它虚机系统，会有一部分运行在内核层，特别是提供真实的CPU执行能力，当然其它硬件层的访问，也会有非常大的提速。对于真正使用虚拟环境的用户，毋庸置疑会选择后者。所以OpenStack年代，很多用户都是将QEMU-KVM当做主力单元。    
 但是QEMU的这种特性也会有一个其它虚拟化所不具有的优点，就是可以虚拟真正的异构CPU环境。比如我们使用的Android模拟器，内核就是QEMU,提供了一个真实的ARM环境（当然现在也有很多x86的Andoid及x86的Android模拟器）来运行Android环境及调试应用程序，很多人评论Android模拟器运行效果慢，不如mac上面iPhone模拟器快速精致。究其根本原因，就是因为Android的模拟器是跑在ARM真实的模拟环境下，软件的每个字节都要被QEMU从ARM翻译到主机的x86代码，然后再执行，所以尽管有这样那样的缺点，模拟结果的可靠性却是iPhone模拟器所不能媲美的。  
 
 进入我们的正式话题，我们来尝试一下在mac电脑上，用QEMU搭建一个PowerPC环境来进行PowerPC的开发工作。首先执行`brew install qemu`安装qemu系统。qemu是开源软件，可以免费使用。  
@@ -81,6 +81,44 @@ qemu-system-x86_64 -kernel bzImage \
 ```bash
 qemu-system-x86_64 -kernel bzImage
 ```
+有了这些功能，进行linux定制开发的时候简直是太方便了，比如我们制作一个最简单的hello world应用，代码如下：
+```c
+/*helloworld.c*/  
+#include <stdio.h>    
+  
+void main()  
+{  
+    printf("Hello World - from QEMU environment\n");  
+	//强制刷新输出，不然可能打印不出来  
+    fflush(stdout);
+	//锁死程序，不然也可能一闪而过  
+    while(1);
+} 
+```
+把程序静态编译，注意必须静态，不然基本内核起来，并不存在其它的链接库：
+```bash
+#以下工作要在Linux环境进行，因为我们是测试linux内核的启动
+#静态编译
+gcc -static -o helloworld helloworld.c  
+#打包为rootfs
+echo helloworld | cpio -o --format=newc > rootfs 
+
+#　使用qemu启动  
+qemu-system-x86_64   \  
+     -kernel ./bzImage \  
+     -initrd ./rootfs  \  
+     -append "root=/dev/ram rdinit=/helloworld"  
+```
+运行结果的贴图就不放了，效果就是在kernel信息限时完成后，下面有一行“Hello World - from QEMU environment”。  
+还可能更基础吗？当然是可以的，<https://github.com/lucasysfeng/lucasOS>，这是操作系统基本原理的一个教学实验项目，其中有自己直接操作显示缓存区，实现显示，来模拟一个操作系统内核启动过程的代码，代码很短，有兴趣可以去看看，最后的实践环节也是把编译的内核放到QEMU中去执行。  
+
+
+最后说一说qemu虚机的日常维护，其实就是虚拟磁盘文件的维护，在VMWare中也有一个压缩硬盘未用空间的功能。类似的qemu可以用磁盘映像转换工具来达到类似的功能：
+```bash
+#-p 显示进度，-O是指定输出格式，-c启用压缩
+qemu-img convert -p -c -O qcow2 debian-wheezy-powerpc.qcow2 shrinked.qcow2
+```
+这个工具本身是将各种磁盘映像文件进行格式转换，这里我们输入输出都是相同的格式，其实就是让工具将输入的磁盘重新输出成为一个新的文件，从而压缩了碎片空间，也就减小了整体映像文件尺寸。
 
 QEMU官网链接：<https://www.qemu.org>
 

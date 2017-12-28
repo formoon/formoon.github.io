@@ -48,6 +48,9 @@ git add .
 git commit -m "$1"
 git push
 qshell qupload qshellupload.conf
+#此外，qshell还可以增加一个线程数参数，来并行上传加快速度，比如下面这条8线程上传：
+#qshell qupload 8 qshellupload.conf
+
 ```
 
 
