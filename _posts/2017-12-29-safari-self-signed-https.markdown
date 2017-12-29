@@ -20,5 +20,8 @@ Safari浏览器中，设置->隐私->Manage Website Data->Remove ALL，注意必
 有一个办法可以加快这个速度：  
 Safari->设置->Advanced,选中在菜单条中显示开发者菜单。这时候菜单中会多一项开发者菜单。随后点击开发者菜单，选中Empty Caches，之后会根据你的使用量，大概1分钟左右清空。随后再去设置菜单Remove All Website Data速度就很快了。  
 
+参考文档：  
+<https://discussions.apple.com/thread/7449937>  
+<https://discussions.apple.com/thread/7845285>  
 
 

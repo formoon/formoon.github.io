@@ -24,3 +24,10 @@ social:
     github: formoon
     wechat: Andrew0Wang
     mail: AndrewWang@sina.com
+
+sitemap:
+  lastmod: 2017-12-31
+  priority: 0.7
+  changefreq: 'weekly'
+  exclude: 'yes'
+  
