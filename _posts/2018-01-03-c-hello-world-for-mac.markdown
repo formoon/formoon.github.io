@@ -8,7 +8,7 @@ tags:           mac toSeven
 post-card-type: image
 ---
 ![](https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2550540489,2603653507&fm=27&gp=0.jpg)
-本文是写给Mac电脑开发新手的入门帖，各神请退散。  
+本文是写给Mac电脑开发新手的入门帖，诸神请退散。  
 
 #### C语言
 C语言可说是电脑环境中的“镇国神器”，从发明至今，虽然C语言的使用者缓慢的减少，但从当前市场应用情况看，尚无一台电脑能够摆脱C语言的支撑而生存。  
