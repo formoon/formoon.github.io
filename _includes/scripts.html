@@ -25,5 +25,10 @@
       $( "#wechatDlg" ).dialog( "open" );
 	  return (false);
     });
+	
+	var u = navigator.userAgent;
+	if (u.indexOf('Android') > -1 || u.indexOf('iPhone') > -1 || u.indexOf('iPad') > -1){
+		$("a").addClass("hover");
+	}
   });
 </script>
