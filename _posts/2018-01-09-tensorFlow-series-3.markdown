@@ -7,15 +7,16 @@ date:           2018-01-09
 tags:           ml toSeven
 post-card-type: image
 ---
-#### Python和TensorFlow
+#### 剖析第一个例子
 学习《机器学习》，很多IT高手是直接去翻看TensorFlow文档，但碰壁的很多。究其原因，TensorFlow的文档跨度太大了，它首先假设你已经对“机器学习”和人工智能非常熟悉，所有的文档和样例，都是用于帮助你从以前的计算平台迁移至TensorFlow，而并不是一份入门教程。  
-所以本文至少在开始部分，保持了一个比较缓慢的节奏和阶梯，希望弥合这种距离。本文定位并非取代TensorFlow文档,而是希望通过对照本文和TensorFlow文档，帮助你更顺利的进入Google的机器学习世界。  
+所以本文尽力保持一个比较缓慢的节奏和阶梯，希望弥合这种距离。本文定位并非取代TensorFlow文档,而是希望通过对照本文和TensorFlow文档，帮助你更顺利的进入Google的机器学习世界。  
 基于这个思路，这一节开始对上一节的例子做一个更详细的讲解。  
 ```python
 import tensorflow as tf
 import numpy as np
 ```
-代码一开始，引入了两个python扩展库，第一个是我们的主角tensorflow,第二个是一个数学计算库，numpy。数学计算通常有有两个方向，一个是符号计算，或者叫化简公式；我们这里用到的是另外一个方向，就是数值计算，也就是不管公式多么复杂，最后的结果是不是无限不循环的小数，最终都计算出来具体的数值结果。所以习惯上也称numpy库叫做数值计算库。有心人可能想到了，这个库跟前面提到的大计算器“Octave”功能是对应的。这里可以额外举一个使用python配合numpy解前面五元一次方程的例子：  
+代码一开始，引入了两个python扩展库，第一个是我们的主角tensorflow,第二个是一个数学计算库，numpy。数学计算通常有有两个方向，一个是符号计算，或者叫化简公式；我们这里用到的是另外一个方向，就是数值计算，也就是不管公式多么复杂，最后的结果是不是无限不循环的小数，最终都计算出来具体的数值结果。所以习惯上也称numpy库叫做数值计算库。  
+有心人可能想到了，这个库跟前面提到的大计算器“Octave”功能是对应的。这里可以额外举一个使用python配合numpy解前面五元一次方程的例子：  
 ```python
 #!/usr/bin/env python 
 # -*- coding=UTF-8 -*-
@@ -106,6 +107,69 @@ for step in xrange(0, 200):
 * 每次sess.run()都会返回tensorflow数学模型中的某个值，可能是函数的返回值，也可能是变量的值，总之都是使用sess.run()反馈回来的。忽略掉返回值就好像是一个调用，但实际都是一回事。
 
 这个例子可以说是机器学习中，最简单的一个实验。但是麻雀虽小，五脏俱全，希望你大致弄清楚了tensorflow的工作模式。  
+至此第一个例子源代码部分我们算完整的讲解了一遍，如果感觉已经明白了，建议你跳过下一节直接看第二个例子，否则，下面准备了一些真正基础的内容，相信可以帮你解惑。  
+#### TensorFlow基础入门
+习惯上学习一种新技术或者新语言，都是从Hello World入门，如果不是“机器学习”的很多概念需要更多篇幅和影响本文的结构的话，我们也是应当从这里开始的，不过我想从这里补上也不晚，毕竟机器学习本身可能更重要。  
+好的代码会说话，我们直接列代码在这里。为了节省篇幅，4个相关的基础示例我们放到同一个源码中展示，并加上详细的注释来帮助你理解：  
+```python
+#!/usr/bin/env python
+# -*- coding=UTF-8 -*-
+
+import tensorflow as tf
+
+#----------------------------------------------------
+#Hello World 示例
+#在tf中定义一个常量
+#前一个例子中我们使用了变量
+#这里的常量跟通常编程中的常量含义是相同的，也就是其中的值不可再改变
+hello = tf.constant('Hello World from TensorFlow!')
+#启动一个任务
+sess = tf.Session()
+#运行任务并返回hello常量的值
+print sess.run(hello)
+#在屏幕输出：Hello World from TensorFlow!
+
+#----------------------------------------------------
+#一个简单的整数常量计算示例
+a = tf.constant(4)
+b = tf.constant(7)
+with tf.Session() as sess:
+    print "a=4 / b=7"
+    print "a + b = %i" % sess.run(a+b)
+    print "a * b = %i" % sess.run(a*b)
+#屏幕输出：
+#  a=4 / b=7
+#  a + b = 11
+#  a * b = 28
+#----------------------------------------------------
+# 矩阵常量运算的例子
+matrix1 = tf.constant([[3., 3.]])
+matrix2 = tf.constant([[2.],[2.]])
+product = tf.matmul(matrix1, matrix2)
+with tf.Session() as sess:
+    result = sess.run(product)
+    print result
+#屏幕输出：
+# [[12.]]
+#----------------------------------------------------
+#占位符placeholder示例
+x = tf.placeholder(tf.int16)
+y = tf.placeholder(tf.int16)
+add = tf.add(x, y)
+mul = tf.multiply(x, y)
+
+with tf.Session() as sess:
+    print "12 + 36 = %i" % sess.run(add, feed_dict={x:12,y:36})
+    print "12 * 36 = %i" % sess.run(mul, feed_dict={x:12,y:36})
+#屏幕输出：
+# 12 + 36 = 48
+# 12 * 36 = 432
+```
+相信你看起来应当不困难，看起来这几个小例子简单，但是排除了“机器学习”算法方面的复杂性，tensorflow的主要特点也就是这些。  
+所以入门的难度，主要还是集中在“机器学习”本身上。  
+关于上面4个例子，唯一我认为需要解释的就是，因为我们是把4段独立的代码集成过来，所以tf.Session我们实际上是初始化了4次。  
+也就是4个例子，都在各自的Session中运行的。在这个例子中，看不出来任何问题和副作用，但是如果在大的项目中你应当理解，这几个Session，互相是不同的任务，其中定义的任务，同样也是互相是不干扰的，这个特征跟在tensorflow中定义几个不同的图是同样的意思。图的例子我们后面会涉及到。  
+#### 第二个例子
 作为加深印象，我们把tensorflow官方文档中最简单的一个例子列在下面。同样是梯度下降法求解，略微增加了数据的维度，配以逐句的注释，让你再熟悉一遍。  
 ```python
 #!/usr/bin/env python 
@@ -195,4 +259,5 @@ for step in xrange(0, 401):
 [大数据与多维度](http://www.raincent.com/content-108-8449-1.html)  
 [多元线性回归模型公式](https://wenku.baidu.com/view/9560b9334a7302768e9939d0.html?from=search)  
 [梯度下降法](https://www.cnblogs.com/pinard/p/5970503.html)  
-
+[numpy官网](http://www.numpy.org)  
+[TensorFlow中文社区](http://www.tensorfly.cn)  
