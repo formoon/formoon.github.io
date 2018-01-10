@@ -25,4 +25,11 @@ sudo dpkg -i /tmp/appstream_0.9.4-1ubuntu1_amd64.deb /tmp/libappstream3_0.9.4-1u
 之后再运行一次apt的升级操作，因为appstream肯定有了新的升级包。之后就可以正常使用了。  
 
 参考：<https://askubuntu.com/questions/774986/appstreamcli-hanging-with-100-cpu-usage-during-update>
+------------------------------
+补充：  
+1. 用同一个U盘装过很多台Linux,都没有出现过类似现象。    
+2. 本台电脑日常偶尔还会出现其它的异常情况。  
+3. 经过一段时间之后，这台电脑频繁崩溃，经过仔细检测，都是硬盘文件损坏。  
+4. 最终判断硬盘有较为隐性的故障，更换硬盘后各种异常都消失了。  
+
 
