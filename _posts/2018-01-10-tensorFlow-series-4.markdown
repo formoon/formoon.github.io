@@ -195,7 +195,7 @@ sess.run(init)
 
 #循环进行1000个批次的训练
 for i in range(1000):
-  #随机抽取一个批次的训练数据，抽全算法才考input_data.py
+  #随机抽取一个批次的训练数据，抽取算法参考input_data.py
   batch_xs, batch_ys = mnist.train.next_batch(100)
   #开始训练
   sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})
@@ -215,6 +215,9 @@ accuracy = tf.reduce_mean(tf.cast(correct_prediction, "float"))
 #显示验证组标签信息
 print mnist.test.labels
 #执行验证组正确率运算
+#在这个tensorflow任务执行前，一定要理解一个概念，
+#就是这个任务，在同一个session中执行，跟上面学习过程的任务是接着的，
+#所以实际上计算的核心是相同的一个公式
 print sess.run(accuracy, feed_dict={x: mnist.test.images, y_: mnist.test.labels})
 ```
 这个模型最后的识别正确率在92%左右，虽然并不高，但是几行代码就能得到这样的结果，还是很不错的了，在很多机器学习应用中，这样的正确率已经达到应用水平。  

@@ -3,5 +3,7 @@
 git add . 
 git commit -m "$1"
 git push
-qshell qupload 8 qshellupload.conf
+if [ "$2" = "upload" ]; then
+	qshell qupload 8 qshellupload.conf
+fi
 
