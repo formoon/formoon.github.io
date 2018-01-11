@@ -82,7 +82,7 @@ post-card-type: image
 这样的图片样本，本例数据集中一共是60000幅，保存在`mnist.train.images`之中，排列起来如下所示：  
 ![](http://www.tensorfly.cn/tfdoc/images/mnist-train-xs.png)  
 
-作为监督学习，每幅图片我们都有一个人为标注，指明这幅图片是哪个数字。我们刚才讲过了，这实际是一种分类算法，计算的结果并不是直接得到0-9数字，而是得到一个分类信息。在这种表述方式中，数字n将表示成一个只有在第n维度（从0开始）数字为1的10维向量。比如，标签3将表示成([0,0,0,1,0,0,0,0,0,0,0])。因此， mnist.train.labels 是一个 [60000, 10] 的数字矩阵：  
+作为监督学习，每幅图片我们都有一个人为标注，指明这幅图片是哪个数字。我们刚才讲过了，这实际是一种分类算法，计算的结果并不是直接得到0-9数字，而是得到一个分类信息,本例就是分成10类。在这种表述方式中，数字n将表示成一个只有在第n维度（从0开始）数字为1的10维向量。比如，标签3将表示成([0,0,0,1,0,0,0,0,0,0,0])。因此， mnist.train.labels 是一个 [60000, 10] 的数字矩阵：  
 ![](http://www.tensorfly.cn/tfdoc/images/mnist-train-ys.png)  
 
 #### 分类算法
@@ -115,10 +115,8 @@ import matplotlib.pyplot as plt
 #没有的话去网上下载，并保存在指定目录
 #已经下载了数据的话，将数据读入内存，保存到mnist对象中
 mnist = input_data.read_data_sets("MNIST_data/", one_hot=True)
-#使用交互模式初始化tf库，
-#注意我们前一个例子使用的是tf.Session()初始化，
-#标准初始化必须在全部建立完成数学模型之后，才可以初始化tf执行
-#使用交互模式就灵活一些，可以一边构建模型，一边做一些运算
+#sess = tf.Session()
+#使用交互模式初始化tf库
 sess = tf.InteractiveSession()
 
 def toImage(image,filename):
@@ -137,7 +135,8 @@ def toImage(image,filename):
 	#打开图像文件并写出
     f = open(filename, "wb+")
 	#注意这里就是tf运行的部分，交互模式下，可以使用.eval的方式运行而不是通常的sess.run
-    f.write(im.eval(session = sess))
+    #f.write(im.eval(session = sess))
+    f.write(im.eval())
     f.close()
 
 #将样本数据测试集的前三个样本保存为图片    
@@ -148,13 +147,21 @@ toImage(babe[0],"./digital2.jpeg")
 babe = mnist.test.next_batch(1)
 toImage(babe[0],"./digital3.jpeg")
 ```
-这里我们展示了python跟外界数据集互动的方式，希望可以加深你对机器学习的理解。这个例子中，新用户在读取数据集那一行属于碰到问题最多，主要原因是我们在国内一个网络高度不稳定的环境下。我的办法是采用合法方式获得了数据文件，自己保存在本地目录，并且稍微修改了源代码指向固定目录而不是临时目录，防止每次启动重新下载数据。我这里四个数据文件的列表如下：  
+这里我们展示了python跟外界数据集互动的方式，希望可以加深你对机器学习的理解。这个例子中，新用户在读取数据集那一行属于碰到问题最多，主要原因是我们在国内一个网络高度不稳定的环境下。我的办法是采用其它方式获得了数据文件，保存在指定目录，省去启动后再次下载数据。我这里四个数据文件的列表如下：  
 ```bash
 -rw-r--r--  1 andrew  staff   1.6M Jan  6  2017 t10k-images-idx3-ubyte.gz
 -rw-r--r--  1 andrew  staff   4.4K Jan  6  2017 t10k-labels-idx1-ubyte.gz
 -rw-r--r--  1 andrew  staff   9.5M Jan  6  2017 train-images-idx3-ubyte.gz
 -rw-r--r--  1 andrew  staff    28K Jan  6  2017 train-labels-idx1-ubyte.gz
 ```
+下载数据的方法可以参考input_data.py脚本，也可以用上面给出的文件名在网上搜索，有国内的下载点。  
+程序中使用了互动模式初始化TensorFlow,也就是这一行：
+```python
+sess = tf.InteractiveSession()
+```
+官方文档中只是解释这种互动式的初始化一般用在交互方式，同前一个例子用的tf.Session()相比，Session()初始化必须在数学模型全部构建完成之后，交互模式可以一边构建模型，一边做一些运算比如插入一些图。  
+实际上官方开发人员在咨询问答中又给了更精确的一个解释，它们唯一的区别在于：tf.InteractiveSession()把它自身作为默认的session，tensor.eval()和operation.run()运行的时候，在后面不需要给出session的参数，直接使用默认session运行。而如果使用Session()初始化的话，上述两类函数的执行，必须在后面显示的给出使用哪一个session执行该操作。上面源码中Session初始化及最后写出图像数据的两行，你可以用注释掉的内容自行测试一下就明白了。  
+
 程序生成的三幅图片文件跟本篇第一幅图片示例中左侧的原图样式完全一致，这里就不再贴图了。这个例子的根本目的还是让你对tensorflow加深了解，并且更多的理解数据文件内容的来龙去脉。  
 
 #### 初级mnist源码
