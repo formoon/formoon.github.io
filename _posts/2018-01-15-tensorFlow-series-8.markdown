@@ -277,7 +277,8 @@ vgg19的网络看上面展开的图反而不一定容易理解，我再转帖一
 以及一副普通的照片:  
 ![](https://raw.githubusercontent.com/anishathalye/neural-style/master/examples/1-content.jpg)  
 合成为一副风格相似的艺术作品：  
-![](https://raw.githubusercontent.com/anishathalye/neural-style/master/examples/1-style.jpg)  
+![](https://raw.githubusercontent.com/anishathalye/neural-style/master/examples/1-output.jpg)  
+可以看到，这种合成的水平，跟平常的Photoshop滤镜效果可强太多了。当然，合成过程因为是实时机器学习、拟合的过程，时间也相当长。  
 源码很长，请直接异步到作者github网页去看，这里只做一个简单的讲解。
 
 首先也是用vgg.py定义了vgg网络，因为网络不是用于识别的，所以取消了最后的3个全连接层及相关激活层还有softmax分类层。这部分对照我们上面的实现来看容易理解，几乎都是相同的。  
