@@ -270,6 +270,22 @@ vgg19的网络看上面展开的图反而不一定容易理解，我再转帖一
 同样是图像识别，用这个程序进行图像识别，跟使用百度之类的云API有什么区别吗？都学到第八篇了，这种区别无论如何你也应当能说得出来，不然我要伤心死了:)。云API是所有工作架构在云端，提供接口调用，按使用数量付费。使用这里的程序则是要自己搭建服务器，定义、实现接口，在自己的服务器上运行。  
 讲解就到这里，建议再多下载几张图片样本，识别来试一试吧。
 
+#### 另一个脑洞
+用作图像识别的深度卷机网络，还可以做一些很有意思的事情，这里就是一个例子。  
+[A Neural Algorithm of Artistic Style](https://arxiv.org/abs/1508.06576),这篇论文认为，既然深度学习网络识别图片的主要工作，是找出图片的各项特征。那这些特征，同艺术品的绘画风格是否有共通性呢？随后证明的确是可行的。在[这里](https://github.com/anishathalye/neural-style)有了一个完整的实现，用于将一副风格鲜明的艺术品：
+![](https://raw.githubusercontent.com/anishathalye/neural-style/master/examples/1-style.jpg)  
+以及一副普通的照片:  
+![](https://raw.githubusercontent.com/anishathalye/neural-style/master/examples/1-content.jpg)  
+合成为一副风格相似的艺术作品：  
+![](https://raw.githubusercontent.com/anishathalye/neural-style/master/examples/1-style.jpg)  
+源码很长，请直接异步到作者github网页去看，这里只做一个简单的讲解。
+
+首先也是用vgg.py定义了vgg网络，因为网络不是用于识别的，所以取消了最后的3个全连接层及相关激活层还有softmax分类层。这部分对照我们上面的实现来看容易理解，几乎都是相同的。  
+neural_style.py是主程序，主要定义了命令行参数和大量的常量用于优化合成的效果。网上还有很多其它实现，但这个实现效果最好，跟这些复杂的参数有很大关系，因为显然作者使用这些配置灵活的参数已经进行了长时间的算法调优。  
+stylize.py是算法实现的主要部分，具体的实现如果有兴趣，建议先读一下论文，才能理解算法是如何实现的。  
+大概方法是：首先从隐藏层中抽出接近内容原图的隐藏层和接近风格图特征的隐藏层。然后使用vgg19网络抽取两张图片的特征，抽取的时候公式是不同的。随后使用算法完成两张图的合成图（结果图片），在过程中，通过刚才说的抽取的隐藏层来累加计算代价函数值，并以此值使用同样的反向传播算法拟合风格图+内容图与结果图之差（代价）。当代价函数值最小的时候，最终合成图同时最接近风格图片以及内容原图。从而得到一张艺术品化的照片。  
+下面的引文中有一篇稍微详细的用中文解释了一下这个算法，但是主要的部分还是建议你读英文论文。如果数学公式读不懂的话也没关系，在需要的时候把这些程序拿来用就好了。  
+
 (待续...)
 
 #### 引文及参考  
@@ -277,5 +293,6 @@ vgg19的网络看上面展开的图反而不一定容易理解，我再转帖一
 [使用tensorflow实现VGG19网络](http://blog.csdn.net/accepthjp/article/details/70170217)  
 [CNN的发展史](https://www.cnblogs.com/52machinelearning/p/5821591.html)  
 [vgg model](http://www.robots.ox.ac.uk/~vgg/research/very_deep/)  
+[深入理解Neural Style](https://zhuanlan.zhihu.com/p/22493132)  
 
 
