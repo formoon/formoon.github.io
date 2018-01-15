@@ -10,9 +10,9 @@ post-card-type: image
 #### 说说计划
 不知不觉写到了第七篇，理一下思路：
 1. 学会基本的概念，了解什么是什么不是，当前的位置在哪，要去哪。这是第一篇希望做到的。同时第一篇和第二篇的开始部分，非常谨慎的考虑了非IT专业的读者。希望借此沟通技术人员和产品人员，甚至管理和销售人员。我信服“上下同欲者胜”，所以也非常害怕因为大家对概念完全不同的理解而影响到团队的合作。
-2. 从最简单的部分入手，由概念到代码，完成破冰。这是第二、三篇希望做到的。
+2. 从最简单的部分入手，由概念到代码，完成技术破冰。这是第二、三篇希望做到的。
 3. 逐步迭代，从简单概念到复杂概念，从简单算法到复杂算法，接触到机器学习现实最常用的技术。这是四、五、六篇希望做到的。如果不是人工智能专门人员或公司，在这个基础上开始把机器学习技术导入到自己的业务，已经可以开始动手了。
-4. 了解围绕在算法周边的模块和功能，把算法包装到程序，学习机器学习类程序开发中可能碰到的问题和解决手段。这是本篇想完成的。这篇之后，应当也是最基本的一个开发循环可以开始尝试了。
+4. 了解围绕在算法周边的模块和功能，把算法包装到程序，了解机器学习类程序开发中可能碰到的问题和解决手段。这是本篇想完成的。这篇之后，应当也是最基本的一个完整开发循环可以开始尝试了。
 5. 开始逐步了解其它领域、其它常见问题所用到的算法及代码，每一篇有兴趣的可以读，没兴趣的也可跳过。这是下一步的连载计划。目标是为学习提供更多参考的案例。
 
 #### 从算法到产品
@@ -29,7 +29,7 @@ TensorFlow是一个快速迭代中的产品，欣欣向荣的同时，作为尝�
 
 如果是以学习为目的，我觉得定期关注官方网站、官方的文档，根据自己的进度适时更新还是很重要的。  
 从我的体验上，TensorFlow对于版本的更新对API的影响控制的还是非常好的。其实前面所讲解的那些例子，很多来自于0.7.x版本的TensorFlow，基本上不加修改或者很少修改就顺利运行在当前1.4.x的TensorFlow中。这一点可比革命彻底的swift 1.0/2.0一直到最新的4.x强多了，swift的每个版本几乎都是再重新学一遍 :)。  
-从这一篇开始说这个问题主要原因也是，其实TensorFlow在主要的算法部分在各版本保持了很好的一致性。而在周边的功能部分变化还是比较大的，比如说程序推荐的框架结构、对GPU的支持、新增的特征比如JIT XLA等。所以我建议开发使用的版本至少是选用TensorFlow 1.x之后的版本来入手。  
+从这一篇开始说这个问题主要原因也是，其实TensorFlow在主要的算法部分在各版本保持了很好的一致性。而在周边的功能部分变化还是比较大的，比如说XLA、对GPU的支持、整合Keras等特征。所以我建议开发使用的版本至少是选用TensorFlow 1.x之后的版本来入手。  
 
 #### 用源码来说话
 在第四篇中我们介绍了一个最简单的机器学习算法，主体是线性回归方程接softmax分类。  
@@ -339,27 +339,172 @@ with tf.name_scope("pic_samples"):
 with tf.name_scope("weight"):
     W = tf.Variable(tf.zeros([784, 10]))
 ```
-注意：`with tf.name_scope("pic_samples"):`这种形式，其实就是TensorFlow中的变量作用域。  
+注意：`with tf.name_scope("pic_samples"):`这种形式，其实也是TensorFlow中的变量作用域的定义。  
 因为机器学习中的变量一般都占用了比较大的空间，我们肯定希望尽可能重复使用变量，所以如果在大系统中，会存在很多变量。这时候就需要有作用域在对变量做出管理。这方面的功能，初学肯定用到不到，用到的时候看看手册就够了，这里不多说。  
 我们既然监控了变量、常量，必然需要tensorflow的运算才能得到这些值，虽然这些值只是输出到事件文件中的。所以记住一点，只要使用了任何的summary操作，我们就需要在FileWriter定义的同时，定义一个运算操作,并在之后在Session.run中运算这个操作,随后把返回的结果添加到事件文件中去,这样才能真正把监控的值输出到事件文件中去：  
 ```
+  	#注意这一行应当在所有需要监控的变量、常量、图片等都设置好后，最后运行
+	#此语句之后定义的观察器将都不会被输出到时间文件。也就无法被查看了
     merged = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter('logs/train', sess.graph)
 	...
     summary,_ = sess.run([merged,train_step], feed_dict={x: batch_xs, y_: batch_ys})
     train_writer.add_summary(summary, i)
 ```
-因为定义了placeholder,所以每次sess.run()都是需要喂数据的。即便我们定义的merged这个操作并不需要数据。所以如果单独运行这个操作，附带喂入数据肯定是很不经济。所以通常的方法，都是跟主要的操作一起运行。同时运行多个操作，并且同时得到多个返回值的语法既是python的语言特色，也是TensorFlow支持的功能。  
+因为定义了placeholder,所以每次sess.run()都是需要喂数据的。即便我们定义的merged这个操作并不需要数据。所以如果单独运行这个操作，附带喂入数据肯定是很不经济。因此通常的方法，都是跟主要的操作一起运行。同时运行多个操作，并且同时得到多个返回值的语法既是python的语言特色，也是TensorFlow支持的功能。  
 现在重复运行程序，得到新的事件文件，再次启动tensorboard然后用浏览器查看，我们可以看到更多的内容了：  
 ![](http://p1avd6u2z.bkt.clouddn.com/201801/ml/tensorboard5.png) 
 请注意看两个命名的节点，都已经有更友好的节点名了。  
 ![](http://p1avd6u2z.bkt.clouddn.com/201801/ml/tensorboard6.png) 
-我们监控的变量，能清晰的看到代价函数的值逐渐变小，表示逐渐趋于收敛。  
-本例中的常量监控实际没有什么意义，因为程序只在最后做了一组预测预算并得到了1个识别率的精度值，那在tensorboard中看的时候，就只有一个点，这里就不贴这张图了。  
+我们监控的变量，能清晰的看到代价函数的值逐渐变小，表示逐渐趋于收敛。（请忽略这个粗糙示例中的抖动，这里仅是为了示例可视化的效果。）  
+其它监控的各种值基本类似，这里就不一一贴出图片了，建议你把源码执行一下然后看看效果。  
 
+TensorBoard功能非常强大，很多功能超乎我们的想象。前面我们介绍过一个小程序，自己把输入的数据图形化，然后写出到一个图片文件。  
+这样的功能，如果使用TensorBoard将更加容易，比如下面代码监控输入矩阵及计算的权重值，并以图片的形式显示出来：  
+```python
+x = tf.placeholder(tf.float32, [None, 784])
+image_shaped_input = tf.reshape(x, [-1, 28, 28, 1])
+tf.summary.image('input_images', image_shaped_input, 10)
+...
+W = tf.Variable(tf.zeros([784, 10]))
+Wt=tf.transpose(W)	#因为权重值跟图片数据定义不同，要先转置一下，再转成图片
+image_shaped_weight = tf.reshape(Wt, [-1, 28, 28, 1])
+tf.summary.image('weight_images', image_shaped_weight, 10)
+```
+最终生成图片的样子我们前面的内容中见过，这里也不贴图了。  
+其中权重部分，因为不是[None,784]这样的形式，而是[784,10],所以要先使用tf.transpose转换成[10,784]的形式，再reshape成28x28的图片，最后才能以图片的方式显示出来。  
 
+这一节的最后部分，把上面示例的完整代码列出来，以供你参考实验，因为上面讲解都很详细了，例子中就没有加过多的注释。请注意这个例子因为经历了多次的补丁和无逻辑意义的作用域定义，程序结构上比较混乱，大家在正式的项目中可千万不要模仿。  
+```python
+#!/usr/bin/env python
+# -*- coding=UTF-8 -*-
 
+# ==============================================================================
+# Copyright 2015 The TensorFlow Authors. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# ==============================================================================
 
+"""A very simple MNIST classifier.
+
+See extensive documentation at
+https://www.tensorflow.org/get_started/mnist/beginners
+"""
+
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+
+import argparse
+import sys,os
+
+from tensorflow.examples.tutorials.mnist import input_data
+import tensorflow as tf
+
+FLAGS = None
+
+datafile='data/softmax_data.tfdata'
+def datafile_exist():
+    return os.path.exists(datafile+".index")
+
+def main(_):    
+    # Import data
+    mnist = input_data.read_data_sets(FLAGS.data_dir)
+
+    # Create the model
+    with tf.name_scope("pic_samples"):
+        x = tf.placeholder(tf.float32, [None, 784])
+        image_shaped_input = tf.reshape(x, [-1, 28, 28, 1])
+        tf.summary.image('input_images', image_shaped_input, 10)
+    with tf.name_scope("weight"):
+        W = tf.Variable(tf.zeros([784, 10]))
+        Wt=tf.transpose(W)
+        image_shaped_weight = tf.reshape(Wt, [-1, 28, 28, 1])
+        tf.summary.image('weight_images', image_shaped_weight, 10)
+    b = tf.Variable(tf.zeros([10]))
+    tf.summary.histogram('bias', b)
+    y = tf.matmul(x, W) + b
+
+    # Define loss and optimizer
+    y_ = tf.placeholder(tf.int64, [None])
+
+    cross_entropy = tf.losses.sparse_softmax_cross_entropy(labels=y_, logits=y)
+    tf.summary.histogram('cost', cross_entropy)
+    train_step = tf.train.GradientDescentOptimizer(0.5).minimize(cross_entropy)
+
+    filesaver = tf.train.Saver()
+    
+    
+    sess = tf.InteractiveSession()
+    tf.global_variables_initializer().run()
+    
+    correct_prediction = tf.equal(tf.argmax(y, 1), y_)
+    accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+    tf.summary.scalar('accuracy', accuracy)
+
+    merged = tf.summary.merge_all()
+    train_writer = tf.summary.FileWriter('logs/train', sess.graph)
+
+    if FLAGS.train or (not datafile_exist()):
+        # Train
+        for i in range(1000):
+            batch_xs, batch_ys = mnist.train.next_batch(100)
+            sess.run(train_step, feed_dict={x: batch_xs, y_: batch_ys})
+            summary,_ = sess.run([merged,train_step], feed_dict={x: batch_xs, y_: batch_ys})
+            train_writer.add_summary(summary, i)
+            # Test trained model
+            if (i % 100 == 0):
+                summary1,ac = sess.run([merged,accuracy], feed_dict={x: mnist.test.images,
+                                              y_: mnist.test.labels})
+                train_writer.add_summary(summary1,i)
+        print("Training finished, data write to file.")
+        
+        filesaver.save(sess,datafile)
+        print(ac)   
+
+        train_writer.close()
+    if (not FLAGS.train) and datafile_exist():
+        print("Restore data...")
+        filesaver.restore(sess,datafile)
+        # Test trained model
+        correct_prediction = tf.equal(tf.argmax(y, 1), y_)
+        accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+        
+        print(sess.run(accuracy, feed_dict={x: mnist.test.images,
+                                      y_: mnist.test.labels}))
+
+        
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--data_dir', type=str, default='MNIST_data',
+                      help='Directory for storing input data')
+    parser.add_argument('-t','--train', action='store_true',default=False,
+                      help='Force do train')
+    FLAGS, unparsed = parser.parse_known_args()
+    tf.app.run(main=main, argv=[sys.argv[0]] + unparsed)
+```
+注意程序运行的时候要使用-t参数，因为图示部分的代码主要加在了训练环节。  
+读完了这个程序，再去读官方的示例应当容易很多，非常建议你以官方程序为范例仔细阅读。  
+#### 团队合作
+作为实践环节的最后一部分，介绍一下通常机器学习项目的一般工作流程和团队。  
+* 几乎大多数的项目都是从确定需求入手的。最初的需求可能来自于内、外部客户，如果能明确到文档化这就是最幸福的开始了。不过还有很多不是这样，很多公司可能只是为了赶时髦建立了一个小团队开始人工智能的尝试。这时候往往还不知道要做什么，许多也只能模仿成熟业界流行的应用入手。或者从一大堆漫无目标、或者不属于人工智能甚至当前技术还无法做到的需求中去梳理、寻找最基本的需求。  
+* 随后一般就需要算法的专家上场。不过大多数公司在开始都没有这样的人才，因此更多的可能是程序人员代替，或者太独特的项目就需要外援专家。这一环节一般是根据需求，来确定初步的数学模型，如果是比较生僻的项目，一般需要进行大量的数学实验最后确定几个可能的模型来进行规模化测试。在正规的IT公司一般是聘请比较资深的数学专家配合技术人员完成这部分工作。  
+* 接下来会根据数学模型的要求，确定需要收集的数据，并预估数据量。大多数情况都需要组建数据小组，有专门技术人员带领，编写数据收集的代码，开始收集数据。数据的预处理和标注通常能用程序解决一部分，但最终一般还是要人工进行标注，最终汇总成规范化的数据集。
+* 跟数据组并行，会有程序人员把数学的算法代码化。如果是图像识别等比较成熟的例子当然容易了很多，一般用成熟的框架就能够工作。但不管哪种情况，一般最初的模型都需要监控尽可能多的指标，以供效果评估和调优。  
+* 最后实现的训练代码会在预先挑选的小数据集上工作，对算法进行调优和最终算法的选择。这部分工作一般需要数学的专家和程序人员配合一起完成。所以这时候程序人员要多听取算法人员的意见，挑选更能说明算法问题的监控环节。调优完成后一般可以去掉大部分耗时的监视代码，只留下算法核心的部分。  
+* 最终完成的机器学习内核部分，会一边进行正式的训练进程，一边由前端人员完成产品化和用户体验优化的工作，最终达成一个可输出的产品。  
+ 
+稍微成熟的公司，一般都已经有自己规范的研发流程和管理方式，此处列出的流程仅供参考。其实主要是强调算法专家的角色和数据收集的工作。这两组人员在一般的项目中是没有或者位置并不是很重要的。但是在机器学习项目中，往往是核心部分。在图像识别等监督学习领域，数据收集、标注成本往往占了最主要的预算。  
 (待续...)
 
 #### 引文及参考  
@@ -367,6 +512,7 @@ with tf.name_scope("weight"):
 [tensorflow里面name_scope, variable_scope等如何理解？](https://www.zhihu.com/question/54513728)  
 [python argparse用法总结](https://www.jianshu.com/p/fef2d215b91d)  
 [谷歌官博详解XLA：可在保留TensorFlow灵活性的同时提升效率](http://www.sohu.com/a/128440204_465975)  
+[完整机器学习项目的工作流程](https://ask.julyedu.com/question/7013)  
 
 #### 另请参考官方示例源码：
 ```bash  
