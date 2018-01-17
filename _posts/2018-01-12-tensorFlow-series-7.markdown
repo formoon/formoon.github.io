@@ -287,7 +287,7 @@ if __name__ == '__main__':
 在机器学习领域，学习算法做练习问题不大，实际应用，无论性能多强的电脑你都总是感觉慢。  
 JIT XLA是TensorFlow推出的一项新特征，就是运行时编译器。主要功能是把数学模型部分进行运行时编译，融合可组合的op以提高性能，内存需求也会降低很多。  
 XLA全称：Accelerated Linear Algebra，也就是加速线性代数。  
-使用XLA非常容易只要在Session初始化的时候添加如下代码：  
+使用XLA非常容易，只要在Session初始化的时候添加如下代码：  
 ```python
 config = tf.ConfigProto()
 jit_level = tf.OptimizerOptions.ON_1
@@ -344,7 +344,7 @@ with tf.name_scope("weight"):
 我们既然监控了变量、常量，必然需要tensorflow的运算才能得到这些值，虽然这些值只是输出到事件文件中的。所以记住一点，只要使用了任何的summary操作，我们就需要在FileWriter定义的同时，定义一个运算操作,并在之后在Session.run中运算这个操作,随后把返回的结果添加到事件文件中去,这样才能真正把监控的值输出到事件文件中去：  
 ```
   	#注意这一行应当在所有需要监控的变量、常量、图片等都设置好后，最后运行
-	#此语句之后定义的观察器将都不会被输出到时间文件。也就无法被查看了
+	#此语句之后定义的观察器将都不会被输出到事件文件。也就无法被查看了
     merged = tf.summary.merge_all()
     train_writer = tf.summary.FileWriter('logs/train', sess.graph)
 	...
