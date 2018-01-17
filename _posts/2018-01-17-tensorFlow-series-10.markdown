@@ -482,7 +482,6 @@ def gen_poetry_with_head(head,phase):
                 x = np.array([list(map(word_num_map.get, word))])
                 [probs_, state_] = sess.run([probs, last_state], feed_dict={input_data: x, initial_state: state_})
                 word = to_word(probs_)
-                #time.sleep(1)
             if i % 2 == 0:
                 poem += '，\n'
             else:
@@ -501,6 +500,7 @@ def main(_):
         genTrainData(64)
         print("poems: ",len(poetrys))
         train_neural_network()
+        exit()
     if datafile_exist():
         genTrainData(1)
         if FLAGS.generate:
