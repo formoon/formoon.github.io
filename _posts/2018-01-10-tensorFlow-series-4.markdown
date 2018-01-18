@@ -123,7 +123,7 @@ def toImage(image,filename):
 	#刚才我们讲过了，样本数据是784长的向量数据，这里重定义成28x28的图片，每个点1个数据
     x_image = tf.reshape(image, [28, 28, 1])
 
-	#将规范化后0-1的浮点数，重新编程0-255的数据集
+	#将规范化后0-1的浮点数，重新变成0-255的数据集
     x_image = 256 * x_image
 	#取整
     x_image = tf.floor(x_image)
