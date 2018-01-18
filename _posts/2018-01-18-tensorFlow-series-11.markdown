@@ -98,6 +98,17 @@ python -m nmt.nmt \
 ```bash
 cat ./nmt_model/output_infer
 ```
+翻译的效果其实看训练过程中的输出会更有直观印象，因为其中是越南文原文、英文对照和NMT的翻译结果3行对照输出的，这里摘两行例子：  
+```
+    src: Bạn có biết bạn thực hiện bao nhiêu sự lựa chọn trong 1 ngày ?
+    ref: Do you know how many choices you make in a typical day ?
+    nmt: Do you know how much choices you do in a day ?
+	
+    src: Có người nói với chúng tôi rằng như bình thường , để xây dựng lên một phần mềm sẽ phải mất ít nhất 2 năm và tiêu tốn khoảng hai triệu đô-la .
+    ref: We were told afterward that if that had gone through normal channels , it would have taken at least two years and it would have cost about two million dollars .
+    nmt: There &apos;s a man who says to us that as usual , to build the software , to take the least two years , and the cost of the two million dollars .
+```
+样本量所限，翻译结果也就是有那么些意思吧。数据才永远是核心啊。  
 
 #### TensorFlow剩下的那些话题
 我们不断的重复，机器学习本质就是以数学为代表的最新成就在计算机算法上的展现，因此TensorFlow也好，Matlab/Octave也好，所有的机器学习软件包，都具备非常强悍的数学计算能力。  
