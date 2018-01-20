@@ -97,7 +97,8 @@ a = tf.Variable(np.float32(0.3))
 y_value = tf.multiply(x,a) + b
 
 # 这里是代价函数，同我们文中所讲的唯一区别是用平方来取代求绝对值，
-#功能完全相同，平方计算起来会更快更容易
+#目标都是为了得到一个正数值，功能完全相同，
+#平方计算起来会更快更容易,这种方式也称为“方差“
 loss = tf.reduce_mean(tf.square(y_value - y))
 # TensorFlow内置的梯度下降算法，每步长0.5
 optimizer = tf.train.GradientDescentOptimizer(0.5)
