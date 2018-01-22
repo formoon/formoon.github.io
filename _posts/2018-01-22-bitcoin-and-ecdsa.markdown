@@ -1,0 +1,124 @@
+---
+layout:         page
+title:          比特币核心算法ECDSA电子签名在线演示
+subtitle:       纯JS版本签名库
+card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1516271087446&di=b7e915316b121a2301e2dc786c16a8d1&imgtype=0&src=http%3A%2F%2Fimg.mp.itc.cn%2Fq_mini%2Cc_zoom%2Cw_640%2Fupload%2F20170809%2F2fb6e062e1f54d5897b44766fdfecd80_th.jpg
+date:           2018-01-22
+tags:           toSeven
+post-card-type: image
+---
+<script language="JavaScript" type="text/javascript" src="https://kjur.github.io/jsrsasign/jsrsasign-all-min.js"></script>
+![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1516271087446&di=b7e915316b121a2301e2dc786c16a8d1&imgtype=0&src=http%3A%2F%2Fimg.mp.itc.cn%2Fq_mini%2Cc_zoom%2Cw_640%2Fupload%2F20170809%2F2fb6e062e1f54d5897b44766fdfecd80_th.jpg)  
+上一篇中说过，ECDSA是BITCOIN的安全性核心，保证了任何人发布的信息不可篡改。而区块链，只是保证了每个人发布合法信息的权利。  
+电子签名说了这么久，很多人也在无意识间使用过，但仍然不知道电子签名到底是怎么回事，这个页面就做一个真正、实际上的ECDSA签名算法的演示。  
+电子签名算法有很多种，ECDSA并不是最先进的，只是随着比特币和区块链一起沾光走红而已。  
+
+=====================分割线========================
+
+<br>
+<script language="JavaScript" type="text/javascript">
+function doGenerate() {
+  var f1 = document.form1;
+  var curve = f1.curve1.value;
+  var ec = new KJUR.crypto.ECDSA({"curve": curve});
+  var keypair = ec.generateKeyPairHex();
+  f1.prvkey1.value = keypair.ecprvhex;
+  f1.pubkey1.value = keypair.ecpubhex;
+}
+function doSign() {
+  var f1 = document.form1;
+  var prvkey = f1.prvkey1.value;
+  var curve = f1.curve1.value;
+  var sigalg = f1.sigalg1.value;
+  var msg1 = f1.msg1.value;
+  var sig = new KJUR.crypto.Signature({"alg": sigalg});
+  sig.init({d: prvkey, curve: curve});
+  sig.updateString(msg1);
+  var sigValueHex = sig.sign();
+  f1.sigval1.value = sigValueHex;
+}
+function doVerify() {
+  var f1 = document.form1;
+  var pubkey = f1.pubkey1.value;
+  var curve = f1.curve1.value;
+  var sigalg = f1.sigalg1.value;
+  var msg1 = f1.msg1.value;
+  var sigval = f1.sigval1.value;
+  var sig = new KJUR.crypto.Signature({"alg": sigalg, "prov": "cryptojs/jsrsa"});
+  sig.init({xy: pubkey, curve: curve});
+  sig.updateString(msg1);
+  var result = sig.verify(sigval);
+  if (result) {
+    alert("有效的ECDSA签名，信息确认为正确发布人签署！");
+  } else {
+    alert("无效的ECDSA签名，原始信息或者签名信息被修改过！");
+  }
+}
+</script>
+
+### EDCSA签名演示
+#### (第一步)生成签名用的秘钥（打开网页会自动生成）：
+<form name="form1">
+<select name="curve1" style="display:none;">
+<option value="secp256r1">secp256r1 (= NIST P-256, P-256, prime256v1)
+<option value="secp256k1">secp256k1
+<option value="secp384r1" selected>secp384r1 (= NIST P-384, P-384)
+</select>
+<input type="button" value="generate EC key pair" onClick="doGenerate();"  style="display:none;"/>
+私钥（信息发出人严格保存，用于发布信息时候的签名）: <input type="text" name="prvkey1" value="" size="100"/><br/>
+公钥（公开于网上，供他人验证信息时候使用）: <input type="text" name="pubkey1" value="" size="100"/><br/>
+
+<h4>(第二部) 对信息进行签名</h4>
+注意签名不是加密，通常加密是对要保密的信息，而签名是对公开的信息。签名的作用是防止公开的信息被篡改。
+<select name="sigalg1" style="display:none;" >
+<option value="SHA256withECDSA" selected>SHA256withECDSA
+<option value="SHA1withECDSA">SHA1withECDSA
+</select><br/>
+要被签名的信息，可以随你的喜好修改: 
+<input type="text" name="msg1" value="孔子学院，汉语教学！" size="100"/><br/>
+<input type="button" value="对上面信息进行签名" onClick="doSign();"/><br/>
+
+
+签名结果: <input type="text" name="sigval1" value="" size="100"/><br/>
+签名结果将同原始信息一起发布在公开网络上，以供他人阅读。他人对信息有疑问的时候，会使用消息发布人的公钥（一般会同发布人的个人资料及地址信息一起公开）及信息的签名结果信息一起验证。信息如果未被篡改会验证通过。信息被修改哪怕1个字节都会导致信息验证失败，从而确保信息在网上公开、流传的过程中未被篡改。（本签名算法有多个具体版本，早期版本有缺陷，在该缺陷中，信息修改仅一个字符仍然可以校验通过。本页面演示版本没有这个问题。）
+
+<h4>(第三步)验证签名</h4>
+<input type="button" value="开始验证签名信息" onClick="doVerify();"/>
+
+正常情况下，你直接点击“开始验证签名信息”按钮会验证通过，这时候你可以在原始信息中随意修改，然后再来验证签名看看效果。
+<script>
+doGenerate();
+</script>	
+
+
+
+
+<h4>参考链接</h4>
+<a href="https://kjur.github.io/jsrsasign/sample/sample-ecdsa.html">原始作者项目主页</a>  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
