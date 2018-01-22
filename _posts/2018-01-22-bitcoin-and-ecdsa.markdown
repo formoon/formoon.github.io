@@ -65,8 +65,8 @@ function doVerify() {
 <option value="secp384r1" selected>secp384r1 (= NIST P-384, P-384)
 </select>
 <input type="button" value="generate EC key pair" onClick="doGenerate();"  style="display:none;"/>
-私钥（信息发出人严格保存，用于发布信息时候的签名）: <input type="text" name="prvkey1" value="" size="100"/><br/>
-公钥（公开于网上，供他人验证信息时候使用）: <input type="text" name="pubkey1" value="" size="100"/><br/>
+私钥（信息发出人严格保存，用于发布信息时候的签名）: <input type="text" name="prvkey1" value="" size="50"/><br/>
+公钥（公开于网上，供他人验证信息时候使用）: <input type="text" name="pubkey1" value="" size="50"/><br/>
 
 <h4>(第二部) 对信息进行签名</h4>
 注意签名不是加密，通常加密是对要保密的信息，而签名是对公开的信息。签名的作用是防止公开的信息被篡改。
@@ -75,11 +75,11 @@ function doVerify() {
 <option value="SHA1withECDSA">SHA1withECDSA
 </select><br/>
 要被签名的信息，可以随你的喜好修改: 
-<input type="text" name="msg1" value="孔子学院，汉语教学！" size="100"/><br/>
+<input type="text" name="msg1" value="孔子学院，汉语教学！" size="50"/><br/>
 <input type="button" value="对上面信息进行签名" onClick="doSign();"/><br/>
 
 
-签名结果: <input type="text" name="sigval1" value="" size="100"/><br/>
+签名结果: <input type="text" name="sigval1" value="" size="50"/><br/>
 签名结果将同原始信息一起发布在公开网络上，以供他人阅读。他人对信息有疑问的时候，会使用消息发布人的公钥（一般会同发布人的个人资料及地址信息一起公开）及信息的签名结果信息一起验证。信息如果未被篡改会验证通过。信息被修改哪怕1个字节都会导致信息验证失败，从而确保信息在网上公开、流传的过程中未被篡改。（本签名算法有多个具体版本，早期版本有缺陷，在该缺陷中，信息修改仅一个字符仍然可以校验通过。本页面演示版本没有这个问题。）
 
 <h4>(第三步)验证签名</h4>
@@ -94,7 +94,7 @@ doGenerate();
 
 
 <h4>参考链接</h4>
-<a href="https://kjur.github.io/jsrsasign/sample/sample-ecdsa.html">原始作者项目主页</a>  
+<a href="https://github.com/kjur/jsrsasign">jsrsasign github page</a>  
 
 
 
