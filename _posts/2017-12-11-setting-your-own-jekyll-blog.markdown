@@ -41,7 +41,9 @@ sudo gem update --system	#刷新gem系统
 ```
 * 安装jekyll系统及相关包管理器
 ```bash
-sudo gem install jekyll bundler
+sudo gem install jekyll bundler -n /usr/local/bin
+#gem默认安装包执行文件到/usr/bin,
+#新版本macOS中/usr/bin是不可写的，所以指定安装路径
 ```
 这时候实际上可以使用jekyll从头建站了，不过我仍然建议你上网选择一个心仪的模板，然后使用模板开始建立自己的个人博客。
 比如你喜欢我当前使用这个模板，则可以：
