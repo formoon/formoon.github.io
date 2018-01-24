@@ -72,8 +72,30 @@ sudo mount -t msdos /dev/disk0s1 /Volumes/efi
 ```
 11. 有一些小工具想加到Finder工具栏中，是按住⌘键不松手，然后用鼠标拖动到Finder工具栏。  
 12. Messager短信应用删除信息太麻烦，option+⌘+backspace可以无提示框直接删。  
+13. 开机启动脚本，有以下几个路径可以放置开机启动脚本的引导配置文件，
+```bash
+#以.plist配置文件的方式
+/Library/LaunchAgents/
+/Library/LaunchDaemons/
+/System/Library/LaunchAgents/
+/System/Library/LaunchDaemons/
+#以文件夹的方式，文件夹内放置配置文件.plist及相关脚本
+/Library/StartupItems/
+/System/Library/StartupItems/
+```
+LaunchDaemons是在系统引导时执行(boot)，LaunchAgents是在用户登录的时候执行（login)。  
+/System/Library下的是macOS系统进程使用。/Library是所有用户使用。  
+对应的，~/Library中的，上面没有列，一般用的少，是对应某一个用户的。  
+通常用户自己设置的，需要开机就执行的一些进程一般是放在/Library/LaunchDaemons/之下，有2点需要注意：  
+	 * 拥有者权限必须是root:wheel
+	 * 权限644    
+	 
 
 先这些吧，想到再补充。  
+
+#### 参考资料：
+[了解LaunchDaemons](https://afoo.me/posts/2014-12-12-understanding-launch-daemons-of-macosx.html)  	 
+
 
 
 
