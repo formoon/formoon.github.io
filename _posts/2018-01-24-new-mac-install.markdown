@@ -89,7 +89,24 @@ LaunchDaemons是在系统引导时执行(boot)，LaunchAgents是在用户登录�
 通常用户自己设置的，需要开机就执行的一些进程一般是放在/Library/LaunchDaemons/之下，有2点需要注意：  
 	 * 拥有者权限必须是root:wheel
 	 * 权限644    
-	 
+14. 新机有时候Spotlight搜索不到刚刚安装的应用，一般可能是刚刚同时安装了大量新的应用及拷贝进入了大量新的数据，系统仍然在进行索引。等待一段时间之后如果还搜不到，那可能是有问题了。几个可能的解决方法，必有一款适于你：  
+```bash
+#方法1,删除索引并重做：
+sudo mdutil -E /Applications
+#----------------------------------
+#方法2，重新建某目录索引：
+mdimport /Applications/
+#----------------------------------
+#方法3,重新载入系统matedata数据：
+	#关闭spotlight
+sudo mdutil -a -i off
+	#上传数据
+sudo launchctl unload -w /System/Library/LaunchDaemons/com.apple.metadata.mds.plist
+	#载入数据
+sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.metadata.mds.plist
+	#打开spotlight
+sudo mdutil -a -i on
+```
 
 先这些吧，想到再补充。  
 
