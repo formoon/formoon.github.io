@@ -1,6 +1,6 @@
 ---
 layout:         page
-title:          新麦装机两三事
+title:          新麦装机问题汇
 subtitle:       特别是研发人员的MAC装机注意问题
 card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1516767979953&di=b3bad354b2f4bb314d17684135fc434a&imgtype=0&src=http%3A%2F%2Fimage.kejixun.com%2F2017%2F0405%2F20170405094250332.jpg
 date:           2018-01-24
@@ -70,9 +70,9 @@ mkdir /Volumes/efi
 sudo mount -t msdos /dev/disk0s1 /Volumes/efi
 #后面就可以做自己的事情了
 ```
-11. 有一些小工具想加到Finder工具栏中，是按住⌘键不松手，然后用鼠标拖动到Finder工具栏。  
-12. Messager短信应用删除信息太麻烦，option+⌘+backspace可以无提示框直接删。  
-13. 开机启动脚本，有以下几个路径可以放置开机启动脚本的引导配置文件，
+12. 有一些小工具想加到Finder工具栏中，是按住⌘键不松手，然后用鼠标拖动到Finder工具栏。  
+13. Messager短信应用删除信息太麻烦，option+⌘+backspace可以无提示框直接删。  
+14. 开机启动脚本，有以下几个路径可以放置开机启动脚本的引导配置文件，
 ```bash
 #以.plist配置文件的方式
 /Library/LaunchAgents/
@@ -89,7 +89,7 @@ LaunchDaemons是在系统引导时执行(boot)，LaunchAgents是在用户登录�
 通常用户自己设置的，需要开机就执行的一些进程一般是放在/Library/LaunchDaemons/之下，有2点需要注意：  
 	 * 拥有者权限必须是root:wheel
 	 * 权限644    
-14. 新机有时候Spotlight搜索不到刚刚安装的应用，一般可能是刚刚同时安装了大量新的应用及拷贝进入了大量新的数据，系统仍然在进行索引。等待一段时间之后如果还搜不到，那可能是有问题了。几个可能的解决方法，必有一款适于你：  
+15. 新机有时候Spotlight搜索不到刚刚安装的应用，一般可能是刚刚同时安装了大量新的应用及拷贝进入了大量新的数据，系统仍然在进行索引。等待一段时间之后如果还搜不到，那可能是有问题了。几个可能的解决方法，必有一款适于你：  
 ```bash
 #方法1,删除索引并重做：
 sudo mdutil -E /Applications
@@ -107,6 +107,43 @@ sudo launchctl load -w /System/Library/LaunchDaemons/com.apple.metadata.mds.plis
 	#打开spotlight
 sudo mdutil -a -i on
 ```
+16. 默认截图路径修改  
+Mac屏幕截图默认是存在桌面，如果不喜欢可以改一下，方法如下：  
+```bash
+#参数请修改为自己的目录，这个是保存在我的下载目录
+defaults write com.apple.screencapture location /Users/andrew/Downloads/
+#如果想关闭截图的阴影还可以加上这一行
+defaults write com.apple.screencapture disable-shadow -bool TRUE
+#重启界面服务
+killall SystemUIServer
+```
+17. 让Finder显示隐藏文件  
+```bash
+defaults write com.apple.finder AppleShowAllFiles -bool true 
+```
+18. 命令行swift无法执行，报错缺少一堆库：  
+	```bash
+	warning: Swift error in module repl_swift.
+	Debug info from this module will be unavailable in the debugger.
+
+	warning: Swift error in module dyld.
+	Debug info from this module will be unavailable in the debugger.
+
+	warning: Swift error in module libz.1.dylib.
+	Debug info from this module will be unavailable in the debugger.
+
+	warning: Swift error in module libcompression.dylib.
+	Debug info from this module will be unavailable in the debugger.
+
+	warning: Swift error in module libSystem.B.dylib.
+	Debug info from this module will be unavailable in the debugger.
+	...
+
+	warning: Swift error in module libxslt.1.dylib.
+	Debug info from this module will be unavailable in the debugger.
+	```
+解决办法:打开Xcode，Preferences->Locations->Command Line Tools，选中当前安装的版本，正常应当只有一个。如果还没有安装，赶快安装一个，正常情况下如果没有装的话，启动Xcode就会提示你安装。  
+19. 有些程序开机就启动，有需要的有不需要的。部分是放在System Preferences/Users&Groups->LoginItems中，直接可以删除，还有些在上面说过的启动项目文件夹里面，比如Creative CLoud图标，在/Library/LaunchAgents/com.adobe.AdobeCreativeCloud.plist，可以移出来备份到某处，就不会开机自动启动了。
 
 先这些吧，想到再补充。  
 
