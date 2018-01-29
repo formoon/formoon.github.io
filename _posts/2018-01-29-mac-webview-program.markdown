@@ -4,7 +4,7 @@ title:          macOS webview编程
 subtitle:       老树依然有新发
 card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1517214955029&di=db8c16635139ada629988c5bd1351150&imgtype=0&src=http%3A%2F%2Fi2.sinaimg.cn%2FIT%2Fmobile%2Fn%2Fapple%2F2015-01-16%2FU10175P2T1D9966574F13DT20150116090315.jpg
 date:           2018-01-29
-tags:           toSeven
+tags:           mac
 post-card-type: image
 ---
 好像是macOS10.10之后，以及iOS8之后，新出现的WKWebview组件就迅速的替代了Webview及UIWebView。后者的确存在一些无法解决的bug,诸如架构导致的速度缓慢和内存泄漏。  
