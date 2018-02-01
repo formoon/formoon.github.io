@@ -29,7 +29,7 @@ sudo vi /etc/apt/apt.conf.d/10periodic
 ```
 其中最后所有的值，`"1"`都要修改成`"0"`。  
 ```bash
-vi /etc/apt/apt.conf.d/50unattended-upgrades 
+sudo vi /etc/apt/apt.conf.d/50unattended-upgrades 
 ```  
 其中`Unattended-Upgrade::Allowed-Origins`一节的内容，没有注释的，全部用`//`注释起来。  
 
@@ -38,6 +38,7 @@ vi /etc/apt/apt.conf.d/50unattended-upgrades
 ```bash
 sudo apt-get autoremove --purge nvidia-*  
 ```
+卸载前有可能需要停掉Ubuntu的GUI界面，参考下面第5项。  
 4. 关闭Nouveau，因为跟CUDA不兼容：  
 	```bash
 	#建立一个参数文件
@@ -59,7 +60,7 @@ sudo service lightdm stop
 ```
 6. 执行安装：  
 ```bash
-sh cuda_9.1.85_387.26_linux.run 
+sudo sh cuda_9.1.85_387.26_linux.run 
 ```
 各项参数基本上是用默认值，然后该确认确认，该选Yes就选一下。如果你做好了前面那些准备工作，这里安装不会有什么问题。  
 安装完成建议重启一次。  
@@ -73,7 +74,7 @@ sh cuda_9.1.85_387.26_linux.run
  sudo dpkg -i libcudnn7-doc_7.0.5.15-1+cuda9.1_amd64.deb
 ```
 8. 设定环境参数
-`vi /etc/environment`在最后添加下面两句，随后使用的用户需要重新登录一遍。  
+`sudo vi /etc/environment`在最后添加下面两句，随后使用的用户需要重新登录一遍。  
 ```
 export LD_LIBRARY_PATH="$LD_LIBRARY_PATH:/usr/local/cuda/lib64:/usr/local/cuda/extras/CUPTI/lib64"
 export CUDA_HOME=/usr/local/cuda
@@ -143,7 +144,7 @@ sudo python -m pip install -U tensorflow_pkg/tensorflow-1.5.0-cp27-cp27mu-linux_
 	[[22. 28.]
 	 [49. 64.]]
 	```  
-上面信息明显分配到了GPU:0在执行，表示GPU正常工作了。  
+上面信息可以看出计算明显分配到了GPU:0在执行，表示GPU正常工作了。  
 7. 一些坑：  
 错误信息：  
 ```bash
