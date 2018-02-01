@@ -116,7 +116,7 @@ bazel-bin/tensorflow/tools/pip_package/build_pip_package ./tensorflow_pkg
 ```bash
 sudo pip install ./tensorflow_pkg/tensorflow-1.5.0-cp27-cp27mu-linux_x86_64.whl
 ```
-如果碰到报错：`xxxx is not a supported wheel on this platform.`，可以使用下面方式安装,导致的原因不知：  
+如果碰到报错：`xxxx is not a supported wheel on this platform.`，原因可能是pip默认链接到了python3的pip，可以尝试pip2安装或者参考下面的方法：  
 ```bash
 sudo python -m pip install -U tensorflow_pkg/tensorflow-1.5.0-cp27-cp27mu-linux_x86_64.whl
 ```
