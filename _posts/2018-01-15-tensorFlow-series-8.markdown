@@ -27,6 +27,11 @@ VGG-19是2014年在ImageNet大赛中夺冠的算法，整体模型定义超过�
 训练数据下载：[点击下载](http://www.vlfeat.org/matconvnet/models/beta16/imagenet-vgg-verydeep-19.mat)  
 分类标签下载：[点击查看](https://github.com/sh1r0/caffe-Android-demo/blob/master/app/src/main/assets/synset_words.txt)，请跳转页面后手工下载txt文件。  
 两个文件下载后不要修改文件名，直接放置到./data/目录。  
+**注意的准备事项**  
+本篇的代码中又多用了一些第三方的扩展库需要在运行之前先安装，跟前面安装的newpy是一样的，可以使用pip安装：  
+```bash
+pip2 install scipy pillow
+```
 
 #### 先看源码
 源文件分为两个文件，一个是`vgg.py`,用于实现vgg的模型，并且提供接口用于预测图片；另一个是主程序文件，用什么名字都没关系，我用的是`picRegn.py`。  
