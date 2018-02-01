@@ -11,13 +11,13 @@ post-card-type: image
 #### 安装CUDA和CUDNN
 
 重要的事情先说：  
-1. CUDA对内核各版本依赖度非常高，随后的TensorFlow等编译时间也比较长，所以建议先安装本设备需要的其它软件系统。之后就关闭apt的自动更新，避免系统更新后CUDA不能使用。以当前`cuda_9.1.85_387.26`为例，经测试只能支持到内核版本`4.10.0-28-generic`。已经升级到更新版本的，请使用apt卸载，比如：  
+1. CUDA对内核各版本依赖度非常高，随后的TensorFlow等编译时间也比较长，所以建议先安装本设备需要的其它软件系统。之后就关闭apt的自动更新，避免系统更新后CUDA不能使用。以当前`cuda_9.1.85_387.26`为例，经测试只能支持到内核版本`4.10.0-28-generic`。已经升级到新版本的，请使用apt卸载，比如：  
 ```bash
 sudo apt-get purge linux-image-4.13.0-32-generic
 sudo apt-get purge linux-headers-4.13.0-32-generic
 ```
 CUDA及Kernel的更新都很快，所以估计你安装的时候，两个版本应当都已经变化了，尝试一下，有问题降级估计是必须的。  
-这种情况，错误一般是出现在运行官方.run安装包的时候，最后会报安装失败，错误信息是英文，大意为找不到kernel的源码，即便你为安装程序指定了kernel源码路径`/usr/src/xxx`也依然报同样错误，这时候往往是因为cuda与kernel版本不匹配造成的。  
+错误一般是出现在运行官方.run安装包的时候，最后会报安装失败，错误信息`unable to locate the kernel source`，即便你为安装程序指定了kernel源码路径`/usr/src/xxx`也依然报同样错误，这时候往往是因为cuda与kernel版本不匹配造成的。  
 系统需要的其它软件根据自己的需求决定。下面工作需要用到的主要是基本编译系统、内核开发库等，如下安装：  
 ```bash
 sudo apt install build-essential  linux-headers-$(uname -r) swig python-pip python3-pip
@@ -38,7 +38,7 @@ vi /etc/apt/apt.conf.d/50unattended-upgrades
 ```bash
 sudo apt-get autoremove --purge nvidia-*  
 ```
-4. 关闭Nouveau，跟CUDA不兼容：  
+4. 关闭Nouveau，因为跟CUDA不兼容：  
 	```bash
 	#建立一个参数文件
 	vi /etc/modprobe.d/blacklist-nouveau.conf
