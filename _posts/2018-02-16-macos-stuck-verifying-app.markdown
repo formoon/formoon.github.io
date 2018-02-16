@@ -1,0 +1,26 @@
+---
+layout:         page
+title:          mac应用启动时卡死在“验证...”
+subtitle:       Stuck on verifying app
+card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1518786348681&di=24164c9cae589ea48e64a4f803cbc9b6&imgtype=0&src=http%3A%2F%2Fi4.ask.fd.zol-img.com.cn%2Fg5%2FM00%2F01%2F0F%2FChMkJ1gJw0yIMsJrAAFk7QRNkHsAAXE9ADjFJkAAWUF824.jpg
+date:           2018-02-16
+tags:           mac
+post-card-type: image
+---
+macOS的应用安装很简单，通常是把.app应用拷贝到/Applications文件夹就算安装完成。  
+但也经常有几个小坑，最常见的要数无法启动或者报错应用已损坏再不就是闪退。  
+在10.13版本以后通常在系统设置->安全设置->通用中，最下面会有一个选项允许xxx.app运行，确认允许即可。  
+在10.12以前的版本，则是有三个选项，允许运行来自：App Store/可识别的开发者/任意来源，通常选择为任意来源就可以顺利的运行所有应用。  
+当然注意上面的允许，都是在你确定软件来源的时候，如果软件本身就有问题，比如包含病毒，允许执行将成为很危险的一件事情。  
+10.12版本比较繁琐一点，在安全设置中只有两个选项，没有“任何来源”的选项，这时候需要到macOS终端中执行：  
+```bash
+sudo spctl --master-disable
+```
+随后输入登录密码，就打开了系统保护，重新打开安全设置的控制面板，任何来源选项出现了。  
+
+还有一种很小几率见到的故障，通常都是软件的发行版本有些小问题，比如软件包过于庞大或者软件的目录结构中有系统无法识别的循环链接，这将导致app启动的时候卡在“验证xxxapp”对话框很长时间而无法运行。这时候最好的办法当然是耐心等待验证结束，如果你有把握软件本身没有问题，也可以在终端中执行：
+```bash
+xattr -d com.apple.quarantine  /Applications/xxxx.app
+```
+命令执行后，再运行该app,就不会再出现验证窗口了。  
+
