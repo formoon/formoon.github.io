@@ -2,7 +2,7 @@
 layout:         page
 title:          GreenPlum无法远程访问解决
 subtitle:       关闭Centos防火墙
-card-image:     http://img.zgxue.com/ospic/uploads/space/2013/0603/182019_jOyF_141159.png
+card-image:     https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=1902981751,836848215&fm=27&gp=0.jpg
 date:           2018-02-08
 tags:           linux
 post-card-type: image
