@@ -84,7 +84,7 @@ Nearest neighbors:
  ```
  **slim:** TF-slim是一个对Tensorflow库(tensorflow.contrib.slim)的轻量级、高抽象层的实现。用于定义、训练、评估更复杂的模型。  
  **swivel:** 同样是一个单词向量化的实现，基于旋转算法(Swivel algorithm)。  
- **syntaxnet:** Google花费大量的投资研究如何让计算机更智能的理解人类的语言，也就是自然语言理解（Natural Language Understanding）(NLU) ，最终成果就是SyntaxNet/DRAGNN。
+ **syntaxnet:** Google花费大量的投资研究如何让计算机更智能的理解人类的语言，也就是自然语言理解（Natural Language Understanding）(NLU) ，最终成果就是SyntaxNet/DRAGNN。  
 **tcn:** 基于时间对比网络（Time Contrastive Networks）实现了一个多视角视频自监督学习的算法模型。算法的描述示意图如下：  
 ![](https://camo.githubusercontent.com/e3117fa6594808e84d2475caa0855762c57fc497/68747470733a2f2f7365726d616e65742e6769746875622e696f2f74636e2f646f63732f666967732f6d7654434e2e706e67)  
 **textsum:** 基于带有注意力机制的Sequence-to-Sequence模型实现的文本摘要自动生成算法。注意力机制的Sequence-to-Sequence模型也是谷歌翻译模型NMT算法的核心部分。算法文档中给出了一些示例：  
