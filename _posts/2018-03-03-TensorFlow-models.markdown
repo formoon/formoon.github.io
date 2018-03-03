@@ -54,9 +54,9 @@ post-card-type: image
 **neural_gpu:** 一组高性能的GPU神经计算的代码库，实现了排序、检索等常用算法可供直接调用。  
 **neural_programmer:** 一个神经网络编程的具体实现。  
 **next_frame_prediction:** 通过交叉卷积网络来学习一个动画帧序列，并预测合成最可能的未来帧。比如基于一个已有的动画帧序列：  
-![](https://raw.githubusercontent.com/tensorflow/models/master/research/next_frame_prediction/g3doc/cross_conv.png)  
+<img width='65' height='256' style='max-width:65px;max-height:256px' src="https://raw.githubusercontent.com/tensorflow/models/master/research/next_frame_prediction/g3doc/cross_conv.png">  
 可能得到这样的结果：  
-![](https://raw.githubusercontent.com/tensorflow/models/master/research/next_frame_prediction/g3doc/cross_conv2.png)  
+<img style='max-width:65px;max-height:256px'  src='https://raw.githubusercontent.com/tensorflow/models/master/research/next_frame_prediction/g3doc/cross_conv2.png'>  
 **object_detection:** 这个是我见到普及范围最广的一个案例，没有之一。最近两个月就见到了最少3家公司在使用这个模型来为自己的产品提高智能程度。本应用允许用户在图片上标定物件，形成训练数据集。随后可以使用数据集在给定的照片中识别出来是否包含物件及坐标位置，如下图示例：  
 ![](https://raw.githubusercontent.com/tensorflow/models/master/research/object_detection/g3doc/img/kites_detections_output.jpg)  
 **pcl_rl:** 几个强化学习（RL）的代码示例，包括路径一致性学习(PCL)模型。  
@@ -96,7 +96,7 @@ Nearest neighbors:
 **transformer:** 空间变换网络，允许操作数据进行空间变换，案例使用了MNIST数据集，将原始图片进行空间变换从而具有更好的可识别度：  
 ![](https://camo.githubusercontent.com/bb81d6267f2123d59979453526d958a58899bb4f/687474703a2f2f692e696d6775722e636f6d2f4578474456756c2e706e67)  
 **video_prediction:** 前面已经有了两个类似的例子，同样是在一个视频序列中根据前面的视频帧预测后续的帧图像：  
-![](https://camo.githubusercontent.com/e20728d90a3531a6a5324e4864b00529288bd7b7/68747470733a2f2f73746f726167652e676f6f676c65617069732e636f6d2f707573685f67656e732f6e6f76656c67656e67696673392f315f33382e676966)  
+<img style='max-width:256px;max-height:256px' src='https://camo.githubusercontent.com/e20728d90a3531a6a5324e4864b00529288bd7b7/68747470733a2f2f73746f726167652e676f6f676c65617069732e636f6d2f707573685f67656e732f6e6f76656c67656e67696673392f315f33382e676966'>  
 
 #### 小结：
 实际上很多机器学习工作，都不需要你从头干起。这也恰恰是现在如此多机器学习框架纷纷出炉的目的。这些丰富的模型中，相信总能找到接近你需求的一款。  
