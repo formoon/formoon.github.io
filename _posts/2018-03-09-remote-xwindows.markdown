@@ -31,5 +31,22 @@ X11DisplayOffset 10
 ![](http://p1avd6u2z.bkt.clouddn.com/201803/09/dnn_face_reg.png)
 看起来跟在本地运行没有什么两样 :)  
 
+补充：  
+有些主机，或者有的时候，ssh连接过去后，执行x11应用会报错:`Error: Can't open display: localhost:10.0`，这时候仔细观察ssh命令执行后的第一条提示，有可能会是`X11 forwarding request failed on channel 0`。这表示实际本地和远端没有能建立起来X11协议的转发体系，原因可能有很多，比如连接端口不是10.0，或者认证没通过等等。  
+可以做以下的尝试：  
+方法一：  
+检查ping localhost是否能ping通，有可能是`/etc/hosts`中，没有把localhost指向127.0.0.1本机地址。这种情况可以设置显示到127.0.0.1:10.0就可以。  
 
-  
+方法二：  
+在`sudo vi /etc/ssh/sshd_config`增加一行：`X11UseLocalhost yes`，接着`sudo service sshd restart`。然后ssh重新连过来再试试。  
+
+方法三：
+1. 去掉自己设置$DISPLAY环境参数的脚本，比如我通常设置在.bashrc中最后一条，把这个设置删除，使用系统的自动设置功能。  
+2. `sudo vi /etc/ssh/sshd_config`,把刚才增加的`X11UseLocalhost yes`改成：`X11UseLocalhost no`，接着`sudo service sshd restart`   
+3. `sudo apt purge xauth`然后`sudo apt install xauth`重新安装xauth授权。  
+4. 断开ssh连接，使用`ssh -AX username@ip地址`重新连过来，-A的意思是使用X11认证授权方式，这样连接之后，linux主机会生成一个`~/.Xauthority`保存授权允许连接的远程终端信息。  
+5. `echo $DISPLAY`可以显示当前xauth自动生成的显示端口，比如我这里是：`ubuntu:10.0`,ubuntu是我的linux主机名，其实在我这里ubuntu跟localhost是一样的。  
+6. 再次尝试执行x11应用，比如xclock，应当能成功了。  
+7. 以后连接远程主机的时候，使用`ssh -X ...`或者`ssh -Y ...`而不用增加-A选项了，我们使用-A只是为了生成`~/.Xauthority`授权文件。  
+
+
