@@ -69,7 +69,30 @@ vs-code重启之后，选择左侧快捷栏最上面的图标，这就回到了�
 通常只有中部的command及args两个选项需要你改，你能看出来当前实际上是调用gcc命令来编译test.c文件，你可以根据你的工程修改成其它的方式。修改完成村盘后，下次再从菜单选择Run Build Task就可以直接执行脚本，把你的代码编译完成了。  
 6. 调试配置  
 在Mac,调试通常就是指使用gdb或者lldb进行程序调试。不过一直做服务器端的程序，这个功能我也用的很少。  
-配置方法是这样，在Debug菜单选择Add Configurations，同样会新打开一个窗口，并给你一个基本的模板，这个模板基本算可以直接用了。只要在program一节后面修改成"${workspaceFolder}/你编译后的可执行文件名"这种形式存盘就可以使用了。  
+配置方法是这样，在Debug菜单选择Add Configurations，同样会新打开一个窗口，并给你一个基本的模板，这个模板基本算可以直接用了。只要在program一节后面修改成"${workspaceFolder}/你编译后的可执行文件名"这种形式存盘就可以使用了。下面是我用的一个模板：  
+```json
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "(lldb) Launch",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/test",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "launchCompleteCommand": "exec-run",
+            "MIMode": "lldb"
+        }
+    ]
+}
+```
 以后想调试程序，只要菜单选择Start Debug,或者F5快捷键，都可以开始调试。  
 vs-code的c/c++插件的调试有一个坑需要注意，就是你使用的默认shell环境必须是bash，因为这个插件依赖了大量的直接脚本来调用系统调试程序及返回运行结果。如果是使用了跟bash兼容性不佳的其它环境，比如fish，则调试程序即便设置正确也无法启动。  
 以上...祝用起来开心。  
