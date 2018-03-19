@@ -4,7 +4,7 @@ title:          iPhone多次输入错误密码锁机后恢复
 subtitle:       刷机恢复（原内容丢失）
 card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1521456757141&di=b2fa78b70da3462399ab37f050d69fdd&imgtype=0&src=http%3A%2F%2Fpic.paopaoche.net%2Fup%2F2014-11%2F2014111008403546128.jpg
 date:           2018-03-18
-tags:           mac
+tags:           ios
 post-card-type: image
 ---
 ![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1521456757141&di=b2fa78b70da3462399ab37f050d69fdd&imgtype=0&src=http%3A%2F%2Fpic.paopaoche.net%2Fup%2F2014-11%2F2014111008403546128.jpg)
