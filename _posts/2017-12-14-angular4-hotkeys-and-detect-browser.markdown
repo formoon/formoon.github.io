@@ -2,12 +2,12 @@
 layout:         page
 title:          Angular2+的两个小技巧
 subtitle:       检测浏览器以及热键绑定
-card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513236363921&di=321ac235a6c875971dbd8a384129a30e&imgtype=0&src=http%3A%2F%2F5xruby.tw%2Fuploads%2Fpost%2Fimage%2F6%2Fangularjs.png
+card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1521563892190&di=e2d1bbf77ab139e26fd6c930001984c2&imgtype=jpg&src=http%3A%2F%2Fimg4.imgtn.bdimg.com%2Fit%2Fu%3D3939126519%2C2958197558%26fm%3D214%26gp%3D0.jpg
 date:           2017-12-14
 tags:           html
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513236363921&di=321ac235a6c875971dbd8a384129a30e&imgtype=0&src=http%3A%2F%2F5xruby.tw%2Fuploads%2Fpost%2Fimage%2F6%2Fangularjs.png)
+![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1521563892190&di=e2d1bbf77ab139e26fd6c930001984c2&imgtype=jpg&src=http%3A%2F%2Fimg4.imgtn.bdimg.com%2Fit%2Fu%3D3939126519%2C2958197558%26fm%3D214%26gp%3D0.jpg)
 Angular2以后已经非常充分的面向对象化，所以很多原来在javascript中积累的技巧，都需要做出相应的调整。  
 检测当前浏览器类型、版本及设备类型，推荐使用：[https://github.com/KoderLabs/ng2-device-detector](https://github.com/KoderLabs/ng2-device-detector)。github页面的介绍已经写的很详细，请直接阅读原文文档。这里只讲几个重点：
 
