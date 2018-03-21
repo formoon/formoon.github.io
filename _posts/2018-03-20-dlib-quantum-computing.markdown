@@ -13,7 +13,7 @@ IT是一个悲催的行业，层出不穷的新概念让人应接不暇，几乎
 
 量子计算机是一个炒的比较热的概念，目前还处于上升期，感觉上已经到了爆发的边缘，似乎随时可以呼之欲出。  
 通常对于量子计算机的理解就是，因为量子计算机的存储特征，可以处理很大的数据，而不是像传统计算机那样只是处理1、0二进制数，因此计算效率更高。从而有可能颠覆现有的计算机架构，甚至现有的所有的加密算法，因为新的、高速的量子计算机的出现，都将因为可能会被快速的解密而失去效用。  
-这个概念对，但也不全对，并且可能丢失了很多重要的内容。所以这里试图更通俗的解释一翻。  
+这个概念对，但也不全对，并且可能丢失了很多重要的内容。所以这里试图更通俗的解释一番。  
 
 #### 传统计算机
 说量子计算之前，我们首先要看一下传统的计算机是如何工作的：
@@ -429,7 +429,7 @@ g++ -std=c++11 -O3 -o quantum_computing_ex quantum_computing_ex.cpp -l dlib -l c
 
 macOS:  
 ```bash
-g++ -std=c++11 -O3 -o quantum_computing_ex quantum_computing_ex.cpp `pkg-config --cflags --libs dlib`
+g++ -std=c++11 -O3 -o quantum_computing_ex quantum_computing_ex.cpp (pkg-config --cflags --libs dlib-1) -l cblas
 ```
 
 
