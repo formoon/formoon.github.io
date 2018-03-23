@@ -1,7 +1,7 @@
 ---
 layout:         page
-title:          macOS的OPENCL高性能计算
-subtitle:       OPENCL的简要入门
+title:          macOS的OpenCL高性能计算
+subtitle:       OpenCL的简要入门
 card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1521809086836&di=e3db1a69c289403e4a4611082cfcabae&imgtype=0&src=http%3A%2F%2Fsoomal.com%2Fimages%2Fdoc%2F20121219%2F00025793.jpg
 date:           2018-03-23
 tags:           mac
