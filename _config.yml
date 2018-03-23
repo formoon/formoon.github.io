@@ -14,7 +14,7 @@ linenos: true
 #  extensions: ["no_intra_emphasis", "fenced_code_blocks", "autolink", "strikethrough", "superscript", tables]
 
 # Pagination
-gems: [jekyll-paginate]
+plugins: [jekyll-paginate]
 paginate: 15
 paginate_path: "pages/:num/"
 
