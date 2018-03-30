@@ -4,7 +4,7 @@ title:          图像识别基本算法之SURF
 subtitle:       寻找图像中的SURF points
 card-image:		http://www.elecfans.com/uploads/allimg/151126/1965345-1511261149440-L.jpg
 date:           2018-03-30
-tags:           mac
+tags:           ml
 post-card-type: image
 ---
 ![](http://www.elecfans.com/uploads/allimg/151126/1965345-1511261149440-L.jpg)
