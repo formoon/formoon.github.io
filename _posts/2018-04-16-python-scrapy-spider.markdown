@@ -325,8 +325,8 @@ Hello World https://formoon.github.io/2017/12/08/hello-world/ 2017-12-08
 ```
 
 #### 进阶爬虫，items和pipeline
-对大多数用户来讲，到了上面一步，已经能够满足基本的需求。但仍然有两个机制可以让爬虫工作的更清晰流畅、功能也更强大。  
-item是scrapy处理数据的基本单位，实际上在爬虫的parse的方法中，应当返回1个item对象，来表达一个基本数据单元。  
+对大多数用户来讲，到了上面一步，已经能够满足基本的需求。但仍然有两个机制可以让爬虫程序结构更清晰、运行更流畅、功能也更强大。  
+Item是scrapy处理数据的基本单位，实际上在爬虫的parse的方法中，应当返回1个item对象，来表达一个基本数据单元。  
 使用item，首先修改`<工程目录>/formoon/items.py`文件，定义我们自己的数据结构：  
 ```python
 # -*- coding: utf-8 -*-
@@ -374,7 +374,7 @@ class FormoonPipeline(object):
         print u"共",self.total,u"篇文章"
         print "close spider ..."
 ```
-有了上面两个基本定义，还要将item和pipeline连接起来，这个配置在settings.py文件中，通常是被屏蔽的，表示平常不适用item及pipeline机制，将注释符号删除就可以开启：  
+有了上面两个基本定义，还要将item和pipeline连接起来，这个配置在settings.py文件中，通常是被屏蔽的，表示不使用item及pipeline机制，将注释符号删除就可以开启：  
 ```python
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
