@@ -15,7 +15,7 @@ post-card-type: image
 let appDelegate = NSApplication.shared.delegate as? AppDelegate
 appDelegate?.methodName()
 ```
-接着发现还是不稳定，从经验上感觉通常都是由于线程的不可冲入或者冲突造成的，再给两边加上异步的队列调用方式：  
+接着发现还是不稳定，从经验上感觉通常都是由于线程的不可重入或者冲突造成的，再给两边加上异步的队列调用方式：  
 ```swift
 //从AppDelegate调用到后台类
 let background = DispatchQueue.global()
