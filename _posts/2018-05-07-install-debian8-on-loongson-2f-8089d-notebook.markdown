@@ -4,7 +4,7 @@ title:          在龙芯小本上安装Debain8.10
 subtitle:      	安装过程流水账
 card-image:		https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525697405827&di=13fb5f05342d68bc8f014ea7a194ab87&imgtype=0&src=http%3A%2F%2Fimg.ruanman.net%2Ffiles%2F201411%2F26%2F201411260913378153.jpg
 date:           2018-05-07
-tags:           Linux
+tags:           linux
 post-card-type: image
 ---
 ![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525697405827&di=13fb5f05342d68bc8f014ea7a194ab87&imgtype=0&src=http%3A%2F%2Fimg.ruanman.net%2Ffiles%2F201411%2F26%2F201411260913378153.jpg)  
