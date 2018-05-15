@@ -1,0 +1,22 @@
+---
+layout:         page
+title:          一条命令解决mac版本python IDLE无法输入中文问题
+subtitle:      	IDLE for mac 
+card-image:		https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1526365772558&di=6450399eaeab63857e96e140e4209b8a&imgtype=0&src=http%3A%2F%2F7xk83p.com2.z0.glb.qiniucdn.com%2Flogo%252155068d37e564e51d743af52a.png
+date:           2018-05-15
+tags:           mac
+post-card-type: image
+---
+![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1526365772558&di=6450399eaeab63857e96e140e4209b8a&imgtype=0&src=http%3A%2F%2F7xk83p.com2.z0.glb.qiniucdn.com%2Flogo%252155068d37e564e51d743af52a.png)  
+安装完Python通常自动就有了一个简易的集成环境IDLE，但在mac上，无法在IDLE中使用中文。  
+通常故障有两种情况：  
+1. 在IDLE中，中文输入法根本无法工作，不会弹出输入框，所有的输入都被当做英文对待。  
+这种情况是由于IDLE使用了Tkinter 图形库，Tkinter使用的依赖库Tcl/Tk，在macOS中已经有了一个较低的内置版本，这造成了中文无法输入的问题，解决办法可以重新安装使用高版本Tcl/Tk编译的python,在Homebrew下只需要一条命令：  
+```bash
+brew reinstall python3 --with-tcl-tk
+```
+python2的用户请将上面命令中的"python3"换成"python2"。随后在IDLE中就可以使用中文了。  
+
+2. 在IDLE中输入中文或者查看含有中文的字符串会报错： "Unsupported characters in input"  
+这种情况在最新的python2.7.15及python3.6.5中已经不会有这个问题了。各别情况可以查看一下系统语言是否设置为中文。  
+
