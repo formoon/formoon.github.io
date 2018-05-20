@@ -22,14 +22,13 @@ $$ y = \sqrt{1-(\left| x \right|-1)^2}, arccos(1-\left| x \right|)-\pi $$
 否则只是搜心形函数，肯定会得到一大票各式各样，但不吻合题意的图片，比如：  
 ![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1526750623357&di=8b18bef5ed15eb5c28180013e1b09c56&imgtype=0&src=http%3A%2F%2Fimg5.duitang.com%2Fuploads%2Fitem%2F201406%2F16%2F20140616214851_JsMwt.jpeg)
 
-验证这个公式用mathmatics最方便，不过刚换了电脑，刚好没装。  
+验证这个公式用mathmatic最方便，不过刚换了电脑，刚好没装。  
 
 最近在做python3方面的事情，5分钟用python3写了一个验证程式，源码附上：  
 ```python
 #!/usr/bin/env python3
 
 import matplotlib.pyplot as plt
-from matplotlib.font_manager import FontProperties
 import numpy as np
 
 
