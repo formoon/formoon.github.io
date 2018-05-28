@@ -46,4 +46,4 @@ plt.show()
 绘制的结果就是题头图。  
 程序用到了matplotlib和numpy两个库，运行前需要先用pip3安装一下。  
 #### 参考资料
-https://www.quora.com/What-is-the-equation-that-gives-you-a-heart-on-the-graph
+<https://www.quora.com/What-is-the-equation-that-gives-you-a-heart-on-the-graph>
