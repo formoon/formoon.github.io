@@ -17,7 +17,7 @@ post-card-type: image
 其实就是这样一个个生动而又如同就在身边的故事，累计在一起，造就了mac的不同吧。  
 
 跟Grapher比起来，Python的兼容性和普及度无疑会更好，所以上一篇中我给出了用Python绘制心形的方法。使用Python，不管是mac/Linux亦或Win,都能很顺畅的绘制出函数图形。  
-但是如果说操作简单、效果直观，Grapher出山，无人敢领其锋。至于我上篇中说到的mathmatic，那是很贵的好不好？  
+但是如果说操作简单、效果直观，Grapher出山，无人敢领其锋。至于我上篇中说到的mathmatica，那是很贵的好不好？  
 ![](http://p1avd6u2z.bkt.clouddn.com/201805/28/heartofgrapher.png)  
 
 Grapher打开，选择2D/Default模式，就可以在界面上输入公式了。公式的输入大致有以下几种情况：  
