@@ -1,0 +1,58 @@
+html{line-height:1.6;font-size:16px;}
+body{margin: 0 0;font-size:16px;background-image:none;background-size: cover;background-repeat: no-repeat;line-height:inherit}
+body,h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6{font-family: "Helvetica Neue",Helvetica,"Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif}
+a:hover, a:focus {text-decoration: none;}
+.tags-filter a {margin: 0px 0px;padding: 5px 8px;display: inline-block;color: #777;text-decoration: underline;}
+.tags-filter a.active{color: #E84E0F;background-color:transparent;text-decoration: none;border: 1px solid #E84E0F;border-radius: 4px;}
+.style-list{margin-bottom:20px;box-shadow: 0 0 3px rgba(172,165,150,0.5);background:#f4f4f4;padding:0px;position:relative;border-radius:2px;    overflow: hidden;}
+.style-list:hover{z-index:20;box-shadow: 0 0 5px rgba(172,165,150,0.65);}
+.style-list:hover .tools{display:block;}
+.style-list .content{background:#ffffff;padding:13px;max-height:240px;overflow:hidden; } /*width: 370px;*/
+.style-list .tools{text-align:left;width:100%;padding:15px;}
+.style-list .info{text-align:left;color:#aaa;font-size: 12px;line-height: 2.5em;}
+.style-list .info p{margin:0;}.style-list .info small{display: inline-block;}    
+.style-list .tools a,.style-list .tools a:hover{text-decoration: none;color:#999;font-size:13px;}
+.style-list .tools .title{line-height:24px;}
+.editor-style-content {overflow: hidden;font-size:16px;word-break: break-word; }/*transform: scale(0.72);
+    transform-origin: left top;*/
+.editor-style-content * {max-width: 100%!important;box-sizing: border-box!important;-webkit-box-sizing: border-box!important;font-size:inherit;margin:0;padding:0;font-style: normal;}
+.editor-style-content p{margin:0 0;clear:both;min-height:1em;}
+.editor-style-content h1,.editor-style-content h2,.editor-style-content h3,.editor-style-content h4,.editor-style-content h5,.editor-style-content h6{font-size:18px;}
+.btn-primary,.style-list .tools .label-info{font-size:12px;background:#e6dfd0 !important;color:#3a3332 !important;font-weight: normal;border:0 none;}
+.style-list .tools .label-info{background:#ddd !important;margin: 2px 0;display: inline-block;padding: 2px 5px;}
+.btn-primary:hover,.style-list .tools .label-info:hover{font-size:12px;background:#E84E0F !important;color:#FFF !important;font-weight: normal;}
+/* fix Firefox - max-width images not working within fieldset */
+fieldset img{width: 100%;max-width: -moz-fit-content;max-width: -webkit-fit-content;}
+
+.btn-red,.btn-red:hover,.btn-red:focus{font-size:16px;color:#ed603a !important;}
+
+.style-list .origin{position:absolute;top:0;right:0;height:32px;color:#FFF;font-weight:bold;padding:5px}
+.nav-pills > li.active > a:hover,.nav-pills > li.active > a,.nav-pills > li > a:hover{color:#f8f5ef !important;background:#E84E0F !important;border:0 none;}
+.nav-pills > li >a {background:#e6dfd0;color:#3a3332;padding:5px 15px;margin-right:25px;border-radius:3px;border:0 none;}
+.nav-pills {border-bottom: 0 none;}
+
+body.boxed{width: 1100px;}
+.container{width:1100px;max-width:1100px;padding:0px; }
+.col-md-4,.col-md-3{padding-left:10px;padding-right:10px;}
+.template-cover{width:340px;height:480px;max-width: 100%;}
+.color-swatch{width:30px;height:30px;border-radius:3px;font-size:12px;cursor: pointer;display: inline-block;margin:4px 4px 0px 0;}
+.color-swatch:hover,.color-swatch.active {	
+	-webkit-transform:scale(1.1);-moz-transform:scale(1.1);-ms-transform:scale(1.1);
+	-o-transform:scale(1.1);transform:scale(1.1);
+	-webkit-box-shadow:inset 1px 1px 1px #5b616d,0 0 5px #45bcda;
+	-moz-box-shadow:inset 1px 1px 1px #5b616d,0 0 5px #45bcda;
+	box-shadow:inset 1px 1px 1px #5b616d,0 0 5px #45bcda;
+}
+.tooltip-inner{text-align:left;padding:10px 15px;}
+.footer-top {
+    background: #f2f2f2;
+}
+.hoverimg:hover{background:#000;}
+.transparent{background:transparent !important;}
+.ui-portlet-header .title{border-top:0 none;}
+#link-urls{
+	margin-top: 20px;
+}
+#link-urls a{ height:40px;width:120px;text-align:left;display:inline-block;}
+#maincontent ~ div iframe {display: none;opacity:0;}
+.modal-body div iframe ,.mh_dialog iframe,#cvd_iframe,#qiframe{display: inline-block !important;opacity: 1 !important;width: 100%;}
