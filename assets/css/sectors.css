@@ -31,8 +31,8 @@ fieldset img{width: 100%;max-width: -moz-fit-content;max-width: -webkit-fit-cont
 .nav-pills > li >a {background:#e6dfd0;color:#3a3332;padding:5px 15px;margin-right:25px;border-radius:3px;border:0 none;}
 .nav-pills {border-bottom: 0 none;}
 
-body.boxed{width: 1100px;}
-.container{width:1100px;max-width:1100px;padding:0px; }
+body.boxed{}
+.container{padding:0px; }
 .col-md-4,.col-md-3{padding-left:10px;padding-right:10px;}
 .template-cover{width:340px;height:480px;max-width: 100%;}
 .color-swatch{width:30px;height:30px;border-radius:3px;font-size:12px;cursor: pointer;display: inline-block;margin:4px 4px 0px 0;}
