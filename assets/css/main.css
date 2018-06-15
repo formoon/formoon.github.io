@@ -883,7 +883,7 @@ keyframes inf-bounce {
 		margin: 0px 14px 0 0;
 	}
 	.container--header {
-		text-align: center;
+		text-align: left;
 		width: 80%;
 	}
 }

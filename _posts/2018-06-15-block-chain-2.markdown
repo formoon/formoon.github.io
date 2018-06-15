@@ -1,7 +1,7 @@
 ---
 layout:         page
-title:          再谈区块链：让我来为“区块链”添把火
-subtitle:      	正在改变世界的区块链
+title:          让我来为“区块链”添把火
+subtitle:      	再谈区块链：正在改变世界的区块技术
 card-image:		https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1529056339174&di=269f27bbde8448306b9fa765798205f0&imgtype=0&src=http%3A%2F%2Fimg.jrzj.com%2Fuploadfile%2F2017%2F0510%2F20170510050308265.png
 date:           2018-06-15
 tags:           life
