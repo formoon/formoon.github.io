@@ -76,7 +76,7 @@ NODE_API_MODULE(addon, Init)
 ```
 程序中引入napi.h头文件，使用Napi的namespace还有最后的NODE_API_MODULE(addon,Init)都是模板化的，照抄过来不用动。  
 Init函数中，使用`exports.Set()`引出要暴露给nodejs调用的函数。如果有多个需要引出的函数，就写多行。  
-Hello函数式我们主要演示的部分，这里很简单，只是用字符串的方式返回一个“hello”。  
+Hello函数是我们主要完成工作的部分，本例中很简单，只是用字符串的方式返回一个“world”。  
 
 以上democpp.cc/binding.gyp/package.json三个文件准备好之后，在命令行执行：`npm install`，顺利的话会得到这样的输出信息：  
 ```bash
