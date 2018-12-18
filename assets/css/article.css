@@ -201,9 +201,6 @@ tbody td {
 td:last-child {
   padding-right: 10px; }
 
-hr {
-  border: none; }
-
 .page-wrapper{
     max-width: 1185px;
     margin: 0 auto;
