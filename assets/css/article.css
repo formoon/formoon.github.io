@@ -139,21 +139,25 @@ ul {
   list-style-type: disc; }
 
 code {
+	/*
   padding: .4em;
   padding-top: .2em;
   padding-bottom: .1em;
+  */
   background: #e8f2fb;
+  /* background: #122b3b; */
   border: 1px solid #c9e1f6;
   border-radius: 3px;
   font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
-  font-size: .9em;
+  font-size: .9em; 
   vertical-align: middle;
   word-wrap: break-word; }
 
 pre {
   margin-bottom: 1.3em;
-  padding: 1em 2.5%;
+  padding: 0.3em 0.3em;
   background: #e8f2fb;
+  /* background: #122b3b; */
   border: 1px solid #c9e1f6;
   border-radius: 3px;
   font-family: Consolas, Menlo, Monaco, Lucida Console, Liberation Mono, DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New, monospace, serif;
@@ -161,7 +165,7 @@ pre {
   font-weight: normal;
   line-height: 1.3em;
   overflow: auto; }
-  pre code {
+pre code {
     padding: 0;
     background: none;
     border: none;
@@ -173,9 +177,13 @@ table {
   text-align: center;
   line-height: 40px;
   border-spacing: 0;
-  border: 2px solid #92121e;
-  width: 90%;
-  margin: 50px auto; }
+  border: none;
+	height: 100%;
+/*  border: 0px solid #92121e; */
+  width: 100%;
+  margin: 0px auto;
+  }
+
 
 thead tr:first-child {
   background-color: #92121e;
@@ -201,6 +209,54 @@ tbody td {
 td:last-child {
   padding-right: 10px; }
 
+tbody {
+	width:100%;
+	height:100%;
+	border:none;
+}
+
+td.gutter {
+  padding: 0px;
+  padding-right: 0px;
+  background: none;
+	width: 30px;
+	border: 0px;
+	margin: 0px auto;
+}
+td.rouge-gutter {
+  padding: 0px;
+  padding-right: 0px;
+  background: none;
+	width: 30px;
+	border: 0px;
+	margin: 0px auto;
+}
+
+td pre {
+	  border: none;
+}
+
+table.rouge-table {
+  font-size: 1.3em; 
+}
+pre.lineno {
+	width:20px;
+  margin: 0 auto;
+}
+td.code {
+	padding: 0px;
+	padding-left: 0px;
+	width: 100%;
+  margin: 0 auto;
+  text-align: left;
+}
+td.rouge-code {
+	padding: 0px;
+	padding-left: 0px;
+	width: 100%;
+  margin: 0 auto;
+  text-align: left;
+}
 .page-wrapper{
     max-width: 1185px;
     margin: 0 auto;
@@ -315,3 +371,4 @@ td:last-child {
 .container--header h1 {
     margin: 60px 0 16px 0;
 }
+
