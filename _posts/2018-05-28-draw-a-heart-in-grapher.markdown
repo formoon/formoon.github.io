@@ -2,12 +2,12 @@
 layout:         page
 title:          Grapher--寂寞无名的神器
 subtitle:      	Draw a heart in Grapher
-card-image:		http://p1avd6u2z.bkt.clouddn.com/201805/19/heart1.png
+card-image:		http://files.17study.com.cn/201805/19/heart1.png
 date:           2018-05-28
 tags:           mac
 post-card-type: image
 ---
-![](http://p1avd6u2z.bkt.clouddn.com/201805/19/heart1.png)  
+![](http://files.17study.com.cn/201805/19/heart1.png)  
 <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'></script>
 承自上一篇中的函数图形，有人问，能不能别把画个图搞那么复杂，我说当然，只要你有一台mac。  
 话说出来很潇洒的样子，充斥着一股迷之自信。  
@@ -18,7 +18,7 @@ post-card-type: image
 
 跟Grapher比起来，Python的兼容性和普及度无疑会更好，所以上一篇中我给出了用Python绘制心形的方法。使用Python，不管是mac/Linux亦或Win,都能很顺畅的绘制出函数图形。  
 但是如果说操作简单、效果直观，Grapher出山，无人敢领其锋。至于我上篇中说到的mathmatica，那是很贵的好不好？  
-![](http://p1avd6u2z.bkt.clouddn.com/201805/28/heartofgrapher.png)  
+![](http://files.17study.com.cn/201805/28/heartofgrapher.png)  
 
 Grapher打开，选择2D/Default模式，就可以在界面上输入公式了。公式的输入大致有以下几种情况：  
 * 通常的符号可以直接输入，类似y=。  

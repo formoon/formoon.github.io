@@ -134,9 +134,9 @@ for user in zipuser:
 plt2.show()#直接画出矩阵，只打了点，下面对图plt1进行一些设置
 ```
 以上代码会得到两张图，电影主题分布：  
-![](http://p1avd6u2z.bkt.clouddn.com/201804/25/files-distribution.png)
+![](http://files.17study.com.cn/201804/25/files-distribution.png)
 用户倾向主题分布：  
-![](http://p1avd6u2z.bkt.clouddn.com/201804/25/user_distribution.png)
+![](http://files.17study.com.cn/201804/25/user_distribution.png)
 从图中可以看到，我们分类比较少，数据也不是很准确，导致分布偏差比较大，但基本上是分成两类的。  
 
 #### 电影推荐
