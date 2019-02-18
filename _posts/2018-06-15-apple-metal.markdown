@@ -2,12 +2,12 @@
 layout:         page
 title:          Metal并行计算
 subtitle:      	命令行编译、执行Metal Performance Shaders
-card-image:		https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1529043391156&di=da2c09b1dde89fcc450696b18bb8fdbc&imgtype=0&src=http%3A%2F%2Fimg0.tuicool.com%2FRfInUvu.jpg%2521web
+card-image:		http://img.itools.hk/upload/77/27/8b543124-66a9-4372-ab5e-99fd841f7382.jpg
 date:           2018-06-15
 tags:           mac
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1529043391156&di=da2c09b1dde89fcc450696b18bb8fdbc&imgtype=0&src=http%3A%2F%2Fimg0.tuicool.com%2FRfInUvu.jpg%2521web)
+![](http://img.itools.hk/upload/77/27/8b543124-66a9-4372-ab5e-99fd841f7382.jpg)
 本来Cuda用的挺好，为了Apple，放弃Cuda，改投OpenCl。好不容易OpenCl也算熟悉了，WWDC2018又宣布了Metal2，建议大家放弃OpenCl，使用Metal Performance Shaders。  
 Apple是一个富有“革命性”创新力的公司，很多创新，会彻底的放弃原有的积累。不断带来新能力的同时，也让人又爱又恨。  
 

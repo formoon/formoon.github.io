@@ -2,12 +2,12 @@
 layout:         page
 title:          一条命令解决mac版本python IDLE无法输入中文问题
 subtitle:      	IDLE for mac 
-card-image:		https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1526365772558&di=6450399eaeab63857e96e140e4209b8a&imgtype=0&src=http%3A%2F%2F7xk83p.com2.z0.glb.qiniucdn.com%2Flogo%252155068d37e564e51d743af52a.png
+card-image:		http://www.xz7.com/up/2017-8/20178417457.jpg
 date:           2018-05-15
 tags:           mac
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1526365772558&di=6450399eaeab63857e96e140e4209b8a&imgtype=0&src=http%3A%2F%2F7xk83p.com2.z0.glb.qiniucdn.com%2Flogo%252155068d37e564e51d743af52a.png)  
+![](http://www.xz7.com/up/2017-8/20178417457.jpg)  
 安装完Python通常自动就有了一个简易的集成环境IDLE，但在mac上，无法在IDLE中使用中文。  
 通常故障有两种情况：  
 1. 在IDLE中，中文输入法根本无法工作，不会弹出输入框，所有的输入都被当做英文对待。  

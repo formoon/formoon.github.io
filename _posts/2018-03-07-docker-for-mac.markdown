@@ -2,12 +2,19 @@
 layout:         page
 title:          Docker for mac上使用Kubernetes
 subtitle:       手工在Docker for mac上安装Kubernetes
-card-image:     http://s1.51cto.com/wyfs02/M01/A4/BC/wKioL1mwsliiyT3mAADTLwwd_fQ095.jpg-wh_651x-s_1105890065.jpg
+card-image:     http://www.fgkj.cc/uploads/allimg/180322/1-1P3220SQJM.jpg
 date:           2018-03-07
 tags:           mac
 post-card-type: image
 ---
-![](http://s1.51cto.com/wyfs02/M01/A4/BC/wKioL1mwsliiyT3mAADTLwwd_fQ095.jpg-wh_651x-s_1105890065.jpg)
+![](http://www.fgkj.cc/uploads/allimg/180322/1-1P3220SQJM.jpg)
+本文成文较早，当前已经有更好的解决办法，请参考：
+https://github.com/AliyunContainerService/k8s-for-docker-desktop
+
+(此下为原文)
+
+---
+
 通常开发都是使用单机版的Docker环境，不太操心Docker集群的事情。  
 而在这种单机环境下，命令行操作Docker觉得很好用了，如果碰到解决不了的问题，还有脚本，如果说有什么事是一个脚本解决不了的。。。那就是两个。。。 :)  
 久而久之，很多事情都习惯了用Docker的角度去思考，比如服务发现、负载均衡，直接使用Docker的端口映射配合HAPROXY感觉就足够了。然后在这方面的知识也就固化在了这个点，再也没有更新。  
