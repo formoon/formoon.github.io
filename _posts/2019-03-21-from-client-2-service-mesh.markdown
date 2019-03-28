@@ -1966,6 +1966,11 @@ Istio在辅助调试方面，可以在流量中注入指定的错误信息、对
 在安全性方面，Istio主要是采用证书签名机制和TLS连接。支持TLS连接的版本，同本文中我们示例安装的版本不是同一个。如果有需求，请在Istio集群安装时就注意选择对应的配置文件来启动。详情请至官方文档学习。  
 Istio的使用实验中，每个配置实验完成，如果配置不再需要，记着使用kubectl delete -f xxx.yaml的方式来删除。因为不同于k8s的随机映射端口出来，Istio通常都使用默认导出的80或者443端口。这样不同配置之间忘记删除难免会造成冲突。这时候可以手工删除，可以参考一下Bookinfo中的 samples/bookinfo/platform/kube/cleanup.sh 脚本。基本做法是使用kubectl get遍历下面三类对象：
 destinationrules virtualservices gateways，其中的内容全部删除。  
+在删除Pods的时候，视服务程序清理工作的任务不同，有些可能需要需要一些时间才可以退出，这时候可以使用Linux内置的watch工具来监控退出过程：  
+```bash
+watch kubectl get pods
+```
+watch的退出是ctrl-c键。  
 
 #### 结语
 本文以用户需求的演进为导向，面向实际应用串讲了服务器端企业级运维的流行技术和流行概念。  

@@ -2,11 +2,12 @@
 layout:         page
 title:          Ubuntu16包依赖故障解决
 subtitle:       APT包依赖故障
-card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1517814710109&di=f055929af50c43ff27db2c6202da49c1&imgtype=jpg&src=http%3A%2F%2Fimg3.imgtn.bdimg.com%2Fit%2Fu%3D679397518%2C3843256769%26fm%3D214%26gp%3D0.jpg
+card-image:		http://files.17study.com.cn/201903/28/dependent-chain.jpeg
 date:           2018-02-05
 tags:           linux
 post-card-type: image
 ---
+![](http://files.17study.com.cn/201903/28/dependent-chain.jpeg)  
 Linux一个令人赞叹的优点就是浩如烟海的开源软件。  
 工作中碰到的大多数问题，往往都能找到一个优秀的开源软件包来解决，从而节省了自己从头开发的时间和金钱。  
 然而也带来了一个附加问题，大量依赖前人成果的后续开发，导致层层叠叠俨如梦魇的包依赖，很多初入门的Linux新手折戟于此。  
