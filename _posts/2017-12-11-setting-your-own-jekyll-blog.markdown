@@ -34,9 +34,9 @@ post-card-type: image
 * 默认情况下，mac电脑的ruby/gem都是安装好的，如果使用windows或者Linux电脑，请仔细搜索相关文章，安装相应软件。
 * 因为国内访问限制问题，修改gem的源地址为：https://gems.ruby-china.org ，方法：  
 ```bash
-gem source -l    #看看当前有哪些源，如果不是gems.ruby-china.org建议删除
+gem source -l    #看看当前有哪些源，如果不是gems.ruby-china.com建议删除
 gem sources --remove https://ruby.taobao.org/	#删除一个当前源，一定要全部删除
-gem sources --add https://gems.ruby-china.org/  #增加我们需要的gems源
+gem sources --add https://gems.ruby-china.com/  #增加我们需要的gems源
 sudo gem update --system	#刷新gem系统
 ```
 * 安装jekyll系统及相关包管理器
@@ -107,7 +107,7 @@ rougify style github > syntax.css
 
 #### 那些爬过的坑
 * ruby的坑，事实上几乎建站过程中出现的问题，跟ruby及ruby包管理相关的占到90%。
-	* 最常见的一个是比如你安装了某个包的某个新版本，而jekyll需要老的一个版本，这种情况非常多。通常的做法是使用gem uninstall 卸载然后，gem install 使用-v指定安装对应的版本。不过对于一个有大量依赖包的应用，这样的工作非常繁重，这时候可以在工作目录执行：bundle update刷新一次，就可以解决jekyll的版本依赖问题。  
+	* 最常见的一个是比如你安装了某个包的某个新版本，而jekyll需要老的一个版本，这种情况非常多。通常的做法是使用gem uninstall 卸载然后，gem install 使用-v指定安装对应的版本。不过对于一个有大量依赖包的应用，这样的工作非常繁重，这时候可以考虑使用新一代的包管理器bundle。在工作目录执行：bundle update刷新一次，就可以批量解决jekyll的版本依赖问题。  
 	* bundle第一次运行的时候，通常会自动安装到系统全局路径，这样本机上所有的用户都能使用，这也是我们需要的模式。但这需要输入sudo密码，如果没有正确输入，bundle可能会切换到把各类扩展包安装到当前目录。这种情况是不行的，上传到github的页面将无法渲染。如果已经安装到了当前目录，通常是vendor目录，可以rm -rf vender删除，然后使用bundle --system重新安装即可。  
 	* 运行jekyll serve的时候，可能会有很多的依赖包警告信息，大多是安装了多个不同版本造成的，可以置之不理，不影响使用。也可以在工作目录使用sudo gem cleanup来清理掉没用的包。  
 	* 有的时候按照上面说明安装了jekyll和bundle，但执行jekyll仍然报错找不到这个命令，这时候有可能是因为gem没有给jekyll建立可执行文件的软连接造成的，通常是因为本地安装了ruby的多个版本造成的。熟悉mac的可以自己找一下安装的路径，一般是在/usr/local/lib/ruby/gems/2.3.0/gems/jekyll，然后在可执行目录比如/usr/local/bin中建立软连接。也可以直接使用bundle exec jekyll serve来启动jekyll本地服务器。
