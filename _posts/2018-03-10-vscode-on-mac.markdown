@@ -79,17 +79,17 @@ vs-code重启之后，选择左侧快捷栏最上面的图标，这就回到了�
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "(lldb) Launch",
+            "name": "clang build and debug active file",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/test",
+            "program": "${fileDirname}/${fileBasenameNoExtension}",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
-            "externalConsole": true,
-            "launchCompleteCommand": "exec-run",
-            "MIMode": "lldb"
+            "externalConsole": false,
+            "MIMode": "lldb",
+            "preLaunchTask": "clang build active file"
         }
     ]
 }
