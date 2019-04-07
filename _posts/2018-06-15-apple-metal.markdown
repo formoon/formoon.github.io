@@ -132,6 +132,8 @@ kernel void parsum(const device DataType* data [[ buffer(0) ]],
 给一个在命令行使用的编译脚本：
 ```bash
 #!/bin/bash
+# 补充：如果遇到Invalid bitcode signature错误，可能需要加上-c参数
+#xcrun metal -c -o shader.air shader.metal
 xcrun metal -o shader.air shader.metal
 xcrun metal-ar rcs shader.metal-ar shader.air
 xcrun metallib -o default.metallib shader.metal-ar

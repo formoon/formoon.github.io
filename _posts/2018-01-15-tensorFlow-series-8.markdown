@@ -25,7 +25,7 @@ VGG-19是2014年在ImageNet大赛中夺冠的算法，整体模型定义超过�
 ![](http://files.17study.com.cn/201801/ml-nn/vgg.png)    
 这里选择这个案例有三个原因：一是可以从上图看到，虽然模型很复杂，但没有超过我们现在掌握的基础算法，所有用到的算法我们都已经学过；二是这个复杂的模型完成ImageNet学习用时很长，但网上已经有完整的训练数据可以直接下载使用，从而大大的降低使用门槛。也就是说，我们搭建好模型，就可以用来对图片进行识别预测；三则是这是真正广泛应用的模型，在吻合的领域完全可以直接用于商用化。    
 训练数据下载：[点击下载](http://www.vlfeat.org/matconvnet/models/beta16/imagenet-vgg-verydeep-19.mat)  
-分类标签下载：[点击查看](https://github.com/sh1r0/caffe-Android-demo/blob/master/app/src/main/assets/synset_words.txt)，请跳转页面后手工下载txt文件。  
+分类标签下载：[点击查看](https://github.com/sh1r0/caffe-android-demo/raw/master/app/src/main/assets/synset_words.txt)  
 两个文件下载后不要修改文件名，直接放置到./data/目录。  
 **注意的准备事项**  
 本篇的代码中又多用了一些第三方的扩展库需要在运行之前先安装，跟前面安装的newpy是一样的，可以使用pip安装：  
