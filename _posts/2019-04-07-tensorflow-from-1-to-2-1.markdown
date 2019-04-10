@@ -133,7 +133,7 @@ tf.disable_v2_behavior()
 #### 使用迁移工具来自动迁移1.x代码到2.0
 TensorFlow 2.0中提供了命令行迁移工具，来自动的把1.x的代码转换为2.0的代码。工具使用方法如下(假设我们的程序文件名称为first-tf.py)：  
 ```python
-tf_upgrade_v2 --infile first-tf.py --outfile first-tf-v2.py
+$ tf_upgrade_v2 --infile first-tf.py --outfile first-tf-v2.py
 ```
 迁移工具还可以对整个文件夹的程序做升级，请参考工具自身的帮助文档。  
 使用迁移工具升级的代码，实质上也是使用了tensorflow.compat.v1兼容包来提供在TensorFlow 2.0环境中执行1.x的代码。这里贴出自动转换后的新代码供你对比参考：  
