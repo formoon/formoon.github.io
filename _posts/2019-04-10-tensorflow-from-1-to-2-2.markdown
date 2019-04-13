@@ -1,13 +1,13 @@
 ---
 layout:         page
 title:          TensorFlow从1到2（二）
-subtitle:       续讲从锅炉工到AI专家
-card-image:		http://files.17study.com.cn/201801/ml/tensorflowlogo.jpg
+subtitle:       样本可视化和神经网络识别手写数字
+card-image:		http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-04-10
 tags:           html
 post-card-type: image
 ---
-![](http://files.17study.com.cn/201801/ml/tensorflowlogo.jpg)  
+![](http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png)  
 #### 图片样本可视化
 [原文第四篇](http://blog.17study.com.cn/2018/01/10/tensorFlow-series-4/)中，我们介绍了官方的入门案例MNIST，功能是识别手写的数字0-9。这是一个非常基础的TensorFlow应用，地位相当于通常语言学习的"Hello World!"。  
 我们先不进入TensorFlow 2.0中的MNIST代码讲解，因为TensorFlow 2.0在Keras的帮助下抽象度比较高，代码非常简单。但这也使得大量的工作被隐藏掉，反而让人难以真正理解来龙去脉。特别是其中所使用的样本数据也已经不同，而这对于学习者，是非常重要的部分。模型可以看论文、在网上找成熟的成果，数据的收集和处理，可不会有人帮忙。  
