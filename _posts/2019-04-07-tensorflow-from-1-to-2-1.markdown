@@ -208,7 +208,7 @@ init = tf.compat.v1.global_variables_initializer()
 推荐的演进方式，当然还是学习TensorFlow 2.0的相关特征，重构原有代码为新版本代码才是正路。平心而论，毕竟绝大多数系统的升级都是为了提供更多功能和降低使用门槛。TensorFlow 2.0也是大幅的降低了使用门槛的。大多数的工作比起1.x版本来，都能使用更少的代码量来完成。  
 首先了解一下TensorFlow 2.0同1.x之间的重要区别：  
 * 在API层面的类、方法有了较大的变化，这个需要在使用中慢慢熟悉
-* 取消了Session机制，每一条命令直接执行，而不需要等到Session.run
+* 取消了Session机制，每一条命令直接执行(Eager execution)，而不需要等到Session.run
 * 因为取消了Session机制，原有的数学模型定义，改为使用Python函数编写。原来的feed_dict和tf.placeholder，成为了函数的输入部分；原来的fetches，则成为了函数的返回值。  
 * 使用keras的模型体系对原有的TensorFlow API进行高度的抽象，使用更容易
 * 使用tf.keras.Model.fit来替代原有的训练循环。  
