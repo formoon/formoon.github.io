@@ -1,7 +1,7 @@
 ---
 layout:         page
 title:          TensorFlow从1到2（七）
-subtitle:       回归模型预测汽车油耗以及过程优化
+subtitle:       回归模型预测汽车油耗以及训练过程优化
 card-image:		http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-04-24
 tags:           html
