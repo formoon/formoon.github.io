@@ -4,7 +4,7 @@ title:          TensorFlow从1到2（九）
 subtitle:       迁移学习
 card-image:		http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-04-28
-tags:           html
+tags:           tensorflow
 post-card-type: image
 ---
 ![](http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png)  

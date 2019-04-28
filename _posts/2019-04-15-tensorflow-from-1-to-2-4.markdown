@@ -4,7 +4,7 @@ title:          TensorFlow从1到2（四）
 subtitle:       时尚单品识别和保存、恢复训练数据
 card-image:		http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-04-15
-tags:           html
+tags:           tensorflow
 post-card-type: image
 ---
 ![](http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png)  

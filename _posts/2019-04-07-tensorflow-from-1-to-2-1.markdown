@@ -4,7 +4,7 @@ title:          TensorFlow从1到2（一）
 subtitle:       续讲从锅炉工到AI专家
 card-image:		http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-03-27
-tags:           html
+tags:           tensorflow
 post-card-type: image
 ---
 ![](http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png)  

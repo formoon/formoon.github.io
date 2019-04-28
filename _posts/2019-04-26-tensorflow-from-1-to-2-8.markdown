@@ -4,7 +4,7 @@ title:          TensorFlow从1到2（八）
 subtitle:       过拟合和欠拟合的优化
 card-image:		http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-04-26
-tags:           html
+tags:           tensorflow
 post-card-type: image
 ---
 ![](http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png)  

@@ -4,7 +4,7 @@ title:          TensorFlow从1到2（五）
 subtitle:       图片内容识别和自然语言语义识别
 card-image:		http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-04-17
-tags:           html
+tags:           tensorflow
 post-card-type: image
 ---
 ![](http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png)  

@@ -4,7 +4,7 @@ title:          TensorFlow从1到2（二）
 subtitle:       样本可视化和神经网络识别手写数字
 card-image:		http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-04-10
-tags:           html
+tags:           tensorflow
 post-card-type: image
 ---
 ![](http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png)  

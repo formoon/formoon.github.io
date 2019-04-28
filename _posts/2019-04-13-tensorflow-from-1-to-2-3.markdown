@@ -4,7 +4,7 @@ title:          TensorFlow从1到2（三）
 subtitle:       数据预处理和卷积神经网络
 card-image:		http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-04-13
-tags:           html
+tags:           tensorflow
 post-card-type: image
 ---
 ![](http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png)  

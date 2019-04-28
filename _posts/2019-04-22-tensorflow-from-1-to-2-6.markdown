@@ -4,7 +4,7 @@ title:          TensorFlow从1到2（六）
 subtitle:       结构化数据预处理和心脏病预测
 card-image:		http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-04-22
-tags:           html
+tags:           tensorflow
 post-card-type: image
 ---
 ![](http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png)  
