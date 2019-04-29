@@ -2,7 +2,7 @@
 layout:         page
 title:          新麦装机问题汇
 subtitle:       特别是研发人员的MAC装机注意问题
-card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1516767979953&di=b3bad354b2f4bb314d17684135fc434a&imgtype=0&src=http%3A%2F%2Fimage.kejixun.com%2F2017%2F0405%2F20170405094250332.jpg
+card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1556543661530&di=250cc986ab53f9c91b262522e7243653&imgtype=0&src=http%3A%2F%2Fimg.hexun.com%2F2008-12-10%2F112193455.jpg
 date:           2018-01-24
 tags:           toSeven
 post-card-type: image
