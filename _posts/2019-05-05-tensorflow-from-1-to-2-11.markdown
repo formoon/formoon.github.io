@@ -10,7 +10,7 @@ post-card-type: image
 ![](http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png)  
 
 #### 基本概念
-“变分自动编码器”的概念来自Diederik P Kingma和Max Welling的论文[《Auto-Encoding Variational Bayes》](https://arxiv.org/abs/1312.6114)。现在有了很广泛的应用，应用范围已经远远超出了当时论文的设想。不过看起来似乎，国内还没有见到什么相关产品出现。  
+“变分自动编码器”(Variational Autoencoders，缩写:VAE)的概念来自Diederik P Kingma和Max Welling的论文[《Auto-Encoding Variational Bayes》](https://arxiv.org/abs/1312.6114)。现在有了很广泛的应用，应用范围已经远远超出了当时论文的设想。不过看起来似乎，国内还没有见到什么相关产品出现。  
 
 作为普及型的文章，介绍“变分自动编码器”，要先从编码说起。  
 简单说，编码就是数字化，前面第六篇我们已经介绍了一些常见的编码方法。比如对于一句话：“It is easy to be wise after the event.”。使用序列编码的方式，我们可以设定1代表it,2代表is,3代表easy,以此类推，就好像我们机器翻译程序中第一步编码做的那样。图片也是一样，比如我们可以让1代表猫猫的照片，2代表狗狗的照片。  
