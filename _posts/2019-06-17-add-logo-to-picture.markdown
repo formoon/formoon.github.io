@@ -241,7 +241,7 @@ struct option longopts[] = {
     { "scale",      required_argument, NULL, 's'},
     { "position",   required_argument, NULL, 'p'},
     { "logo",   required_argument, NULL, 'l'},
-    { "copy",   required_argument, NULL, 'c'},
+    { "copy",   no_argument, NULL, 'c'},
     { 0, 0, 0, 0},
 };
 
