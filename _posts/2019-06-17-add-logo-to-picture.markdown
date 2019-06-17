@@ -209,7 +209,7 @@ $ ./wmv2 IMG_20190521_125150.jpg IMG_20190521_125150-logoed.jpg logo.png 150 100
 * 水印的位置。刚才一个版本有了高度的自由，实际上并不好用。我们只要指定水印在目标图片的四角之一就够了。这也能避免用户无法知道目标图片中，水印图片坐标的问题。  
 * 水印方式，默认使用水印图片和目标图片混合的方式，也可以指定水印图片覆盖目标图片的方式。  
 
-梳理完修改需求，再次印证了上面的话，这些修改内容，跟核心的技术完全没有关系。现在你知道“码农”这个词所为何来了吧？  
+梳理完修改的需求，再次印证了上面的话，这些修改内容，跟核心的技术完全没有关系。现在你知道“码农”这个词所为何来了吧？  
 ```cpp
 #include <stdio.h>
 #include <stdlib.h>
@@ -429,7 +429,7 @@ $
 ```
 这是最简的运行模式，只需要一个输入文件。水印文件自动缩放到目标图片宽度的30%，然后透明叠加在右下角：  
 ![](http://files.17study.com.cn/201906/waterMark/DSCF2183_wite.jpg)  
-简单实用-c参数，可以用覆盖的方式叠加水印：  
+简单使用-c参数，可以用覆盖的方式叠加水印：  
 ```bash
 $ ./wmv3 -i DSCF2183.jpg -c
 input:DSCF2183.jpg
@@ -449,9 +449,9 @@ logo:logo1.png
 scale:0.300000
 postion:0
 copy:0
-$ ./wmv3 -i DSCF2183.jpg --logo logo1.png -o DSCF2183_red.jpg -c
+$ ./wmv3 -i DSCF2183.jpg --logo logo1.png -o DSCF2183_red_copy.jpg -c
 input:DSCF2183.jpg
-out:DSCF2183_red.jpg
+out:DSCF2183_red_copy.jpg
 logo:logo1.png
 scale:0.300000
 postion:0
