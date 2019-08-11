@@ -257,6 +257,7 @@ fd.close()
 
 ```python
 import sys
+import common
 
 if len(sys.argv) != 2:
     print("参数错误,程序退出！")
