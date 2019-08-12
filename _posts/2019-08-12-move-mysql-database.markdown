@@ -4,7 +4,7 @@ title:          MySQL数据库文件的移动
 subtitle:       数据库文件移动和权限设置
 card-image:		https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1440923339,67641147&fm=26&gp=0.jpg
 date:           2019-08-12
-tags:           html
+tags:           linux mysql
 post-card-type: image
 ---
 ![](https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1440923339,67641147&fm=26&gp=0.jpg)  
