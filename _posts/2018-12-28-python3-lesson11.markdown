@@ -301,7 +301,6 @@ $$
 = x^2 + y^2
 $$  
 上面是手工来化简的结果。下面到了让sympy上场的时间了：
-
 ```python
 #引入扩展库
 from sympy import *
@@ -310,7 +309,7 @@ from sympy import *
 x,y = symbols("x y")
 
 #化简函数simplify()
-simplify((x+(2*x*y)**Rational(1, 2)+y)*(x-(2*x*y)**Rational(1, 2)+y))
+print(simplify((x+(2*x*y)**Rational(1, 2)+y)*(x-(2*x*y)**Rational(1, 2)+y)))
 #执行结果
  x**2 + y**2
 ```
@@ -351,7 +350,7 @@ a = Eq((2.5+2)*x+2.5*y,36)
 b = Eq(3*x+(3+2)*y,36)
 
 #使用sympy.solve函数解方程组
-solve([a,b],[x,y])
+print(solve([a,b],[x,y]))
 
 #运行结果：
 {x: 6.00000000000000, y: 3.60000000000000}

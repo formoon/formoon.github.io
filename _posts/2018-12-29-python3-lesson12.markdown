@@ -181,7 +181,7 @@ t.pencolor('red')
 for x in range(100):
     #向前走x步
     t.forward(x)
-    #左转90度
+    #左转95度
     t.left(95)
 turtle.done()
 ```
