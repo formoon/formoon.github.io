@@ -208,6 +208,10 @@ def list2():
 @app.route('/list3')
 def list3():
     return jsonify(data) #JSON格式
+
+#如果是主程序而不是模块，运行整个应用
+if __name__ == '__main__':
+    app.run()
 ```
 
 上面的程序中，除了Flask框架模板之外，我们定义了一个列表：data,其中包含4个字符串元素。  
