@@ -2,12 +2,12 @@
 layout:         page
 title:          解决mac上每次升级nodejs都要重新安装扩展包的问题
 subtitle:       npm在mac上的配置优化
-card-image:		https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1549081744359&di=537a14e817fd9ceb224a134ddb0664e3&imgtype=0&src=http%3A%2F%2Fwww.bccn.net%2Fmedia%2Fnews%2F2017%2F01%2F16%2F1484556320_99662422.jpg
+card-image:		https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1572062381572&di=25993d51c55cdd07440236d752788584&imgtype=0&src=http%3A%2F%2Ftimgsa.baidu.com%2Ftimg%3Fimage%26quality%3D80%26size%3Db9999_10000%26sec%3D1549081744359%26di%3D537a14e817fd9ceb224a134ddb0664e3%26imgtype%3D0%26src%3Dhttp%3A%2F%2Fwww.bccn.net%2Fmedia%2Fnews%2F2017%2F01%2F16%2F1484556320_99662422.jpg
 date:           2019-02-02
 tags:           html
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1549081744359&di=537a14e817fd9ceb224a134ddb0664e3&imgtype=0&src=http%3A%2F%2Fwww.bccn.net%2Fmedia%2Fnews%2F2017%2F01%2F16%2F1484556320_99662422.jpg)  
+![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1572062381572&di=25993d51c55cdd07440236d752788584&imgtype=0&src=http%3A%2F%2Ftimgsa.baidu.com%2Ftimg%3Fimage%26quality%3D80%26size%3Db9999_10000%26sec%3D1549081744359%26di%3D537a14e817fd9ceb224a134ddb0664e3%26imgtype%3D0%26src%3Dhttp%3A%2F%2Fwww.bccn.net%2Fmedia%2Fnews%2F2017%2F01%2F16%2F1484556320_99662422.jpg)  
 虽然有了一些新生派竞品比如yarn，但使用或者习惯了npm的开发者仍然大有人在。  
 
 以前用起来没注意到这个现象，最近一段时间发现，每次随着使用brew upgrade自动升级了nodejs版本，原来安装的nodejs扩展包就不起作用了，还需要重新安装一遍。再加上一些扩展包存储网站被墙的问题，这个过程真是令人痛不欲生。  

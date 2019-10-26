@@ -2,12 +2,12 @@
 layout:         page
 title:          macOS的OpenCL高性能计算
 subtitle:       OpenCL的简要入门
-card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1521809086836&di=e3db1a69c289403e4a4611082cfcabae&imgtype=0&src=http%3A%2F%2Fsoomal.com%2Fimages%2Fdoc%2F20121219%2F00025793.jpg
+card-image:     http://files.17study.com.cn/201910/titlepic/opencl.png
 date:           2018-03-23
 tags:           mac
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1521809086836&di=e3db1a69c289403e4a4611082cfcabae&imgtype=0&src=http%3A%2F%2Fsoomal.com%2Fimages%2Fdoc%2F20121219%2F00025793.jpg)
+![](http://files.17study.com.cn/201910/titlepic/opencl.png)
 随着深度学习、区块链的发展，人类对计算量的需求越来越高，在传统的计算模式下，压榨GPU的计算能力一直是重点。  
 NV系列的显卡在这方面走的比较快，CUDA框架已经普及到了高性能计算的各个方面，比如Google的TensorFlow深度学习框架，默认内置了支持CUDA的GPU计算。  
 AMD(ATI)及其它显卡在这方面似乎一直不够给力，在CUDA退出后仓促应对，使用了开放式的OPENCL架构，其中对CUDA应当说有不少的模仿。开放架构本来是一件好事，但OPENCL的发展一直不尽人意。而且为了兼容更多的显卡，程序中通用层导致的效率损失一直比较大。而实际上，现在的高性能显卡其实也就剩下了NV/AMD两家的竞争，这样基本没什么意义的性能损失不能不说让人纠结。所以在个人工作站和个人装机市场，通常的选择都是NV系列的显卡。  

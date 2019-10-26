@@ -2,12 +2,12 @@
 layout:         page
 title:          NMF学习练习：做电影推荐
 subtitle:      	Non-negative Matrix Factorization
-card-image:		https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1524652034538&di=d40c1d9b5d218a63cff645b62a426813&imgtype=0&src=http%3A%2F%2Fwww.itfish.net%2FHome%2FModules%2FImages%2Fitfish_64087_0.jpg
+card-image:		http://files.17study.com.cn/201910/titlepic/NMF.jpg
 date:           2018-04-25
 tags:           AI
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1524652034538&di=d40c1d9b5d218a63cff645b62a426813&imgtype=0&src=http%3A%2F%2Fwww.itfish.net%2FHome%2FModules%2FImages%2Fitfish_64087_0.jpg)
+![](http://files.17study.com.cn/201910/titlepic/NMF.jpg)
 NMF是很久以前学的，基本快忘没了，昨天YX提出来一个关于NMF(同音同字不同义)的问题，才又想起来。  
 自己的学习笔记写的比较乱，好在网上资料多，摘了一篇，补充上自己笔记的内容，留此助记。  
 

@@ -2,12 +2,12 @@
 layout:         page
 title:          Mac版AppStore无法下载、升级错误处理
 subtitle:       This item is temporarily unavailable Error solution
-card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1521349624592&di=a31db7f21706c2d9da8e7614798990ec&imgtype=0&src=http%3A%2F%2Fh.hiphotos.baidu.com%2Fbaike%2Fc0%253Dbaike60%252C5%252C5%252C60%252C20%2Fsign%3D9bec16405bb5c9ea76fe0bb1b450dd65%2F9e3df8dcd100baa1626667f04710b912c8fc2e36.jpg
+card-image:     http://files.17study.com.cn/201910/titlepic/appstore.jpeg
 date:           2018-03-18
 tags:           mac
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1521349624592&di=a31db7f21706c2d9da8e7614798990ec&imgtype=0&src=http%3A%2F%2Fh.hiphotos.baidu.com%2Fbaike%2Fc0%253Dbaike60%252C5%252C5%252C60%252C20%2Fsign%3D9bec16405bb5c9ea76fe0bb1b450dd65%2F9e3df8dcd100baa1626667f04710b912c8fc2e36.jpg)
+![](http://files.17study.com.cn/201910/titlepic/appstore.jpeg)
 在mac版本AppStore下载软件的时候，有时会出现“This item is temporarily unavailable, Try again later”错误提示，当然等一会儿或者不断重新尝试都是无法下载的。  
 [StackOverFlow](http://stackoverflow.com/questions/27073615/trouble-downloading-xcode-6-1-on-mac-os-x-yosemite)上找到一个解法：  
 Mac App Store --> Store --> Check for Unfinished Downloads...  

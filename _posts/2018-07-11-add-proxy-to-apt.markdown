@@ -2,12 +2,12 @@
 layout:         page
 title:          给apt设置代理的正确姿势
 subtitle:      	三种方式给apt设置代理
-card-image:		https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1531283026187&di=b2ff62c0963ab15655143b331fd749b7&imgtype=0&src=http%3A%2F%2Fwww.51xdn.net%2Fuploads%2Fallimg%2F160821%2F140210I29_0.jpg
+card-image:		https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1572063349844&di=d346936845115e5fac65c6c6fe5f704f&imgtype=0&src=http%3A%2F%2Fimgphoto.gmw.cn%2Fattachement%2Fjpg%2Fsite2%2F20160202%2Fd02788d8df10181a53d62e.jpg
 date:           2018-07-11
 tags:           linux
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1531283026187&di=b2ff62c0963ab15655143b331fd749b7&imgtype=0&src=http%3A%2F%2Fwww.51xdn.net%2Fuploads%2Fallimg%2F160821%2F140210I29_0.jpg)
+![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1572063349844&di=d346936845115e5fac65c6c6fe5f704f&imgtype=0&src=http%3A%2F%2Fimgphoto.gmw.cn%2Fattachement%2Fjpg%2Fsite2%2F20160202%2Fd02788d8df10181a53d62e.jpg)
 为什么设置代理，你懂得。  
 
 有很多第三方工具可以用，比如proxychains，非常好用，不过今天这不是正题。因为有可能没有代理，上网你都做不到，更别提下载软件了。想一想方法还是告诉你，免得你万一必须用：`sudo apt install proxychains`  
