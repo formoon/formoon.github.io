@@ -817,7 +817,7 @@ troyfontaine/arm64v8_min-alpinelinux   Minimal 64-bit ARM64v8 Alpine Linux Image
 arm64v8/hylang                         Hy is a Lisp dialect that translates express…   0                                       
 arm64v8/perl                           Perl is a high-level, general-purpose, inter…   0                             
 ```
-你会发现，比起来丰饶的x86社区，arm服务器的资源是在是少的可怜，而且大多是基础性的映像。  
+你会发现，比起来丰饶的x86社区，arm服务器的资源实在是少的可怜，而且大多是基础性的映像。  
 这恐怕是没有办法的事情了，用户少，资源也就少。好在，有了基础映像，自己添加应用，也没有什么不能接受。想一想，哪一个关键应用你敢直接完整使用社区映像？  
 同样因为Docker Hub在架构区分上准备不足的问题，现在使用`docker search`命令直接搜索映像已经很不方便了。因为除了映像的关键字，我们又多了一个架构的限定。  
 所以建议直接到对应网页搜索：  
