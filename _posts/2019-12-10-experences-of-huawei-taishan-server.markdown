@@ -677,7 +677,7 @@ Transfer/sec:      4.39MB
 ```
 哇咔咔...有没有惊掉眼球？真是没有对比就没有伤害。在5秒的测试中，Intel Xeon只承受了7552个请求，发送数据21.97MB。作为一个老牌的CPU大厂，Intel你丢不丢“芯”？  
 
-`index.html`只是一个静态页面，我们换一个动态链接再来看看，这样数据库的部分也就能一起提现了。  
+`index.html`只是一个静态页面，我们换一个动态链接再来看看，这样数据库的部分也就能一起体现了。  
 下面测试的就是一个Restful接口，用于列出文章内容的：  
 ```bash
 $ curl http://127.0.0.1:8000/api/articles
@@ -874,7 +874,7 @@ ae55899885f1: Pull complete
 Digest: sha256:c67410e8deeb6e165c867131c7669155e43b532d441120df2bbf4f12a3710cd7
 Status: Downloaded newer image for arm64v8/mariadb:latest
 ```
-随后先执行数据库映像，执行的时候在环境参数设定root账号密码、新建普通用户账号、还有为WordPress单独见一个库。我们不会在宿主机操作数据库，所以就不再映射端口出来了：  
+随后先执行数据库映像，执行的时候在环境参数设定root账号密码、新建普通用户账号、还有为WordPress单独建一个库。我们不会在宿主机操作数据库，所以就不再映射端口出来了：  
 ```bash
 # docker run -e MYSQL_ROOT_PASSWORD=rootpassword -e MYSQL_USER=wpuser -e MYSQL_PASSWORD=wpuserpassword -e MYSQL_DATABASE=wordpressdb --name wordpressdb -d arm64v8/mariadb
 51e6d43af860e00c45cce81bed1918ae3c2a5c91bdcfca18203b0486d8f2783d
