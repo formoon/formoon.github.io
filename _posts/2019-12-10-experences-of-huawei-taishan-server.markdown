@@ -499,7 +499,6 @@ Ubuntu的软件源中已经集成了一些，不过我选用了Wrk，从源码�
 $ git clone https://github.com/wg/wrk
 # 编译
 $ cd wrk
-$ make
 $ time make
 Building LuaJIT...
 make[1]: Entering directory '/home/andrew/dev/wrk/obj/LuaJIT-2.1.0-beta3'
