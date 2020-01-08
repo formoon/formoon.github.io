@@ -74,7 +74,7 @@ if __name__ == '__main__':
 ```
 Keras库载入图片文件的代码间接引用了pillow库，所以程序执行前请先安装：`pip3 install pillow`。  
 仍然使用原文中的图片尝试识别：  
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1516012022966&di=f7718d5a4c2261e9275497523f56d483&imgtype=0&src=http%3A%2F%2Fpic33.photophoto.cn%2F20141126%2F0035035013530625_b.jpg)  
+![](http://files.17study.com.cn/201904/tensorFlow2/bigcat.jpeg)  
 ```python
 $ ./pic-recognize.py -i pics/bigcat.jpeg 
 [('n02128385', 'leopard', 0.9778516), ('n02130308', 'cheetah', 0.008372171), ('n02128925', 'jaguar', 0.007467962)]
