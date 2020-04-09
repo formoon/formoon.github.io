@@ -2,12 +2,12 @@
 layout:         page
 title:          为OPENCV添加freetype支持并显示中文字符
 subtitle:       在mac上编译opencv及contrib库
-card-image:		http://files.17study.com.cn/201810/opencv-freetype-demo.png
+card-image:		http://115.182.41.123/files/201810/opencv-freetype-demo.png
 date:           2018-10-10
 tags:           mac opencv
 post-card-type: image
 ---
-![](http://files.17study.com.cn/201810/opencv-freetype-demo.png)
+![](http://115.182.41.123/files/201810/opencv-freetype-demo.png)
 　　在mac电脑上管理这些gnu的库一般都使用Homebrew，但总有一些你个性化的需要是官方的Homebrew配方无法满足的。比如在屏幕的输出中使用中文字符。  
 　　在OPENCV中输出UTF8字符集早已经有人完成过类似的工作，方法是使用freetype的支持，程序中选择使用的字库，从而在屏幕上输出任意的字符。但官方的Homebrew OPENCV的配方中，并不包含freetype的支持。这时候，只好自己来编译OPENCV及contrib库，因为freetype的支持就在contrib库中。  
 #### 编译安装

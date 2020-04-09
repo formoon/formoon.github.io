@@ -2,12 +2,12 @@
 layout:         page
 title:          TensorFlow从1到2（十三）
 subtitle:       图片风格迁移
-card-image:		http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png
+card-image:		http://115.182.41.123/files/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-05-09
 tags:           tensorflow
 post-card-type: image
 ---
-![](http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png)  
+![](http://115.182.41.123/files/201904/tensorFlow2/tf-logo-card-2.png)  
 #### 风格迁移
 [《从锅炉工到AI专家(8)》](http://blog.17study.com.cn/2018/01/15/tensorFlow-series-8/)中我们介绍了一个“图片风格迁移”的例子。因为所引用的作品中使用了TensorFlow 1.x的代码，算法也相对复杂，所以文中没有仔细介绍风格迁移的原理。  
 今天在TensorFlow 2.0的帮助，和新算法思想的优化下，实现同样功能的代码量大幅减少，结构也越发清晰。所以今天就来讲讲这个话题。  
@@ -27,10 +27,10 @@ post-card-type: image
 风格迁移原理基于论文[《A Neural Algorithm of Artistic Style》](https://arxiv.org/abs/1508.06576)。  
 虽然论文中并没有明说，但采用卷积神经网络做图像的风格迁移应当属于一个实验科学的成果而非单纯的理论研究。  
 我们再引用一张前系列讲解CNN时候的图片：  
-![](http://files.17study.com.cn/201801/ml-nn/cnn1.png)  
+![](http://115.182.41.123/files/201801/ml-nn/cnn1.png)  
 一张图片数据所形成的矩阵，在经过卷积网络的时候，图像中边缘等视觉特征会被放大、强化，从而形成一种特殊的输出。通常我们只关心数据结果，并没有把这些数据还原为图片来观察。而论文作者不仅这样做了，恐怕还进行了大量的实验。  
 这些神经网络中间结果图片具有如此典型的特征，可以脱离出主题内容而成为单纯风格的描述。被敏锐的作者抓住深入研究也就不奇怪了。  
-![](http://files.17study.com.cn/201904/tensorFlow2/nst-cnn1.jpg)
+![](http://115.182.41.123/files/201904/tensorFlow2/nst-cnn1.jpg)
 最终研究成果确立了卷积神经网络进行图片迁移的两大基础算法：  
 * 在神经网络中，确定的抽取某些层代表内容的数字描述，以及另外一些层代表风格的数字描述。  
 * 多个层的输出数据，通过公式的计算，拟合到同输入图像相同的色域空间。这个公式即能用于代价函数中原始风格同目标风格之间的对比，也可以变形后通过组合多个风格层，生成新的目标图片。  
@@ -280,7 +280,7 @@ file_name = 'newart1.png'
 mpl.image.imsave(file_name, image[0])
 ```
 程序的输出结果如下图：  
-![](http://files.17study.com.cn/201904/tensorFlow2/nst-newart1.png)
+![](http://115.182.41.123/files/201904/tensorFlow2/nst-newart1.png)
 看起来基本达到了设计要求，不过再仔细观察，似乎效果虽然都有了，但画面看上去有一点不干净，有很多小的噪点甚至有了干涉纹。  
 这是因为，在照片原图和艺术作品原图中，肯定天然就存在有噪点以及图片中本身应当有的小而频繁的花纹。这些内容在通过卷积加强后，两幅照片再叠加，这些噪声就被强化了，从而在生成的图片中体现的非常明显。  
 这个问题如果在传统算法中可以使用高通滤波。在卷积神经网络中则更容易，是统计总体变分损失值(Total Variation Loss)，在代价函数中，让这个损失值降到最小，就抑制了这种噪点的产生。也相当于神经网络具有了降噪的效果。  
@@ -349,7 +349,7 @@ file_name = 'newart1.png'
 mpl.image.imsave(file_name, image[0])
 ```
 再次执行，所得到的输出图片如下：  
-![](http://files.17study.com.cn/201904/tensorFlow2/nst-newart2.png)
+![](http://115.182.41.123/files/201904/tensorFlow2/nst-newart2.png)
 效果不错吧？可以换上自己的照片还有自己心仪的艺术作品来试试。  
 程序中限制了图片宽、高最大值是512，如果设备性能比较好，或者有更大尺寸的需求，可以修改程序中的常量。  
 

@@ -2,13 +2,13 @@
 layout:         page
 title:          梯度下降法公式推导过程
 subtitle:       再次补充:导数部分化简
-card-image:		http://files.17study.com.cn/201906/gradient/gradient-descent.jpeg
+card-image:		http://115.182.41.123/files/201906/gradient/gradient-descent.jpeg
 date:           2019-06-24
 tags:           html
 post-card-type: image
 ---
 <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'></script>
-![](http://files.17study.com.cn/201906/gradient/gradient-descent.jpeg)  
+![](http://115.182.41.123/files/201906/gradient/gradient-descent.jpeg)  
 前面一篇就是基础性的推导过程。从反馈的情况看，总体还是讲明白了。但是在导数的部分，仍有不少的存疑。  
 其实在数学方面，我也是学渣。所以尽我所能，希望再次的补充能讲的明白。若有谬误，期盼指正。  
 ### 基础公式
@@ -44,7 +44,7 @@ $$
 化简上面的式子，需要微积分导数的一些知识，我抄录用到的部分于此，以方便对照查看：  
 #### 导数
 导数的目的是求得在给定点的切线方向，以保证梯度下降的下一步会向收敛方向（也即上面的损失函数最小化方向）迭代一个步长α。这个很多教程都讲过了，这里不再废话。  
-![](http://files.17study.com.cn/201906/gradient/gradient-descent-derivative.jpg)  
+![](http://115.182.41.123/files/201906/gradient/gradient-descent-derivative.jpg)  
 (偷懒从网上搜了张图，侵删。图中的W实际是我们公式中的θ，J(W)就是我们讲的J(θ))
 <p>
 首先公式\(\frac∂{∂θ_j}\)就是求导数的意思，别当做普通的分式，直接分子、分母把∂化简掉成为\(\frac1{θ_j}\)。当然大多数人不会这样做了，我只是见过这样的情况，说出来以防万一。</p><p>事实上，你把\(\frac∂{∂θ_j}\)换成常用的函数描述\(f(θ_j)\)可能更贴切。  

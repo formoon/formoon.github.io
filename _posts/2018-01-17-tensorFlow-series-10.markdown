@@ -2,7 +2,7 @@
 layout:         page
 title:          从锅炉工到AI专家(10)
 subtitle:       TensorFlow实务
-card-image:     http://files.17study.com.cn/201801/ml/tensorflowlogo.jpg
+card-image:     http://115.182.41.123/files/201801/ml/tensorflowlogo.jpg
 date:           2018-01-17
 tags:           ml toSeven
 post-card-type: image
@@ -11,7 +11,7 @@ post-card-type: image
 如同word2vec中提到的，很多数据的原型，前后之间是存在关联性的。关联性的打破必然造成关键指征的丢失，从而在后续的训练和预测流程中降低准确率。  
 除了提过的自然语言处理(NLP)领域，自动驾驶前一时间点的雷达扫描数据跟后一时间点的扫描数据、音乐旋律的时间性、股票前一天跟后一天的数据，都属于这类的典型案例。  
 因此在传统的神经网络中，每一个节点，如果把上一次的运算结果记录下来，在下一次数据处理的时候，跟上一次的运算结果结合在一起混合运算，就可以体现出上一次的数据对本次的影响。  
-![](http://files.17study.com.cn/201801/ml-nn/rnn0.jpg)  
+![](http://115.182.41.123/files/201801/ml-nn/rnn0.jpg)  
 如上图所示，图中每一个节点就相当于神经网络中的一个节点，t-1 、 t 、 t+1是指该节点在时间序列中的动作，你可以理解为第n批次的数据。  
 所以上面图中的3个节点，在实现中实际是同1个节点。  
 指的是，在n-1批次数据到来的时候，节点进行计算，完成输出，同时保留了一个state。  

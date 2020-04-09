@@ -2,12 +2,12 @@
 layout:         page
 title:          TensorFlow从1到2（六）
 subtitle:       结构化数据预处理和心脏病预测
-card-image:		http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png
+card-image:		http://115.182.41.123/files/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-04-22
 tags:           tensorflow
 post-card-type: image
 ---
-![](http://files.17study.com.cn/201904/tensorFlow2/tf-logo-card-2.png)  
+![](http://115.182.41.123/files/201904/tensorFlow2/tf-logo-card-2.png)  
 
 #### 结构化数据的预处理
 前面所展示的一些示例已经很让人兴奋。但从总体看，数据类型还是比较单一的，比如图片，比如文本。  

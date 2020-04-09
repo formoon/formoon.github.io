@@ -42,8 +42,8 @@ SURF算法的一般步骤为：
 3. 精确定位特征点；  
 4. 主方向确定；  
 
-![](http://files.17study.com.cn/201803/30/building1.png)
-![](http://files.17study.com.cn/201803/30/building2.png)
+![](http://115.182.41.123/files/201803/30/building1.png)
+![](http://115.182.41.123/files/201803/30/building2.png)
 
 跟TensorFlow中碰到的情况一样，目前这些常用的算法，在大多的机器学习框架中都已经封装完成了。使用者已经不需要详细的了解内在算法就可以直接使用。  
 

@@ -2,12 +2,12 @@
 layout:         page
 title:          Android程序中，内嵌ELF可执行文件
 subtitle:       Android开发C语言混合编程总结
-card-image:		http://files.17study.com.cn/201906/android_jni/android_java_c.jpeg
+card-image:		http://115.182.41.123/files/201906/android_jni/android_java_c.jpeg
 date:           2019-06-14
 tags:           html
 post-card-type: image
 ---
-![](http://files.17study.com.cn/201906/android_jni/android_java_c.jpeg)  
+![](http://115.182.41.123/files/201906/android_jni/android_java_c.jpeg)  
 #### 前言
 都知道的，Android基于Linux系统，然后覆盖了一层由Java虚拟机为核心的壳系统。跟一般常见的Linux+Java系统不同的，是其中有对硬件驱动进行支持，以避开GPL开源协议限制的HAL硬件抽象层。    
 大多数时候，我们使用JVM语言进行编程，比如传统的Java或者新贵Kotlin。碰到对速度比较敏感的项目，比如游戏，比如视频播放。我们就会用到Android的JNI技术，使用NDK的支持，利用C++开发高计算量的模块，供给上层的Java程序调用。  
@@ -17,19 +17,19 @@ post-card-type: image
 第一个配置是安装Android的SDK，这是开发Android程序必须的。  
 进入Android Studio的设置界面，Mac的快捷键是`Command`+`,`，Windows和Linux版本请自行从菜单中选择。  
 在设置界面中，从左侧顺序选择：Appearance&Behavior -> System Settings -> Android SDK，可以进入到SDK的设置。  
-![](http://files.17study.com.cn/201906/android_jni/sdk_setting.png)  
+![](http://115.182.41.123/files/201906/android_jni/sdk_setting.png)  
 右侧的SDK版本列表中，最前面显示了✔️或者后面显示了Installed，表示该版本的SDK已经安装。通常如果没有特殊需要，只安装1个最新版本的SDK即可。图中我是因为某些项目特殊的要求，安装了两个特定不同版本的SDK。  
 希望安装某版本的SDK,只要点选相应行最前面的多选框，然后单击右下角确认按钮即可安装。  
 如果不是自己从头开始，而是接手了其他开发人员的源码，源码中可能指定了特定版本的SDK。这时候可以修改其项目配置文件中版本的设置，到你安装的SDK版本。更简单的方法是直接在这里安装对应的SDK，防止因为版本依赖出现的很多繁琐问题。  
 
 第二个配置的是NDK，还在刚才SDK设置的界面中，点击界面上侧中间的“SDK Tools”标签，可以进入到NDK设置的界面。  
-![](http://files.17study.com.cn/201906/android_jni/ndk_setting.png)  
+![](http://115.182.41.123/files/201906/android_jni/ndk_setting.png)  
 NDK的设置没有那么多的选择，只要安装就好，已经安装碰到有新版本，也可以随性选择更新或者使用老版本继续。NDK不同版本间的兼容性都还不错，大多都不用担心。  
 NDK的设置是Android开发中，Java/C混合编程需要的。  
 
 第三个配置是增加一个外部工具javah，这个工具是将Java编写的“包装”文件，转换一个C/C++的.h文件。虽然Java/C++都是面向对象语言，但两者的面向对象实现是不同的。所以在Java中某个类的方法，转换到C++的世界中，是使用很长的函数名来做区分。这种情况使用手工编写虽然效果一样，但很容易出错，使用javah工具则能自动完成。  
 在Android Studio设置界面左侧的列表中，顺序选择Tools -> External Tools，单击右侧界面左下角的“+”，新建一个工具，比如就叫"javah"。  
-![](http://files.17study.com.cn/201906/android_jni/javah_setting.png)  
+![](http://115.182.41.123/files/201906/android_jni/javah_setting.png)  
 其中三个需要设置的内容分别是：  
 * javah程序路径：`$JDKPath$/bin/javah`，这个跟jdk安装的路径有关。  
 * 命令行参数：`-classpath . -jni -d $ModuleFileDir$/src/main/jni $FileClass$`，主要指定输出路径。
@@ -41,14 +41,14 @@ NDK的设置是Android开发中，Java/C混合编程需要的。
 
 #### 先准备一个基本的Android程序
 在Android Studio界面选择New Project，如果是在开始界面，直接点击主界面上的按钮；也可以在文件菜单中选择。  
-![](http://files.17study.com.cn/201906/android_jni/new-project.png)  
+![](http://115.182.41.123/files/201906/android_jni/new-project.png)  
 选择基本的Empty Activity就好。  
-![](http://files.17study.com.cn/201906/android_jni/config-project.png)  
+![](http://115.182.41.123/files/201906/android_jni/config-project.png)  
 接着是项目的设置，项目名称、存储位置这些都不用说了，最低的API版本决定了你的程序可以在最低什么版本的Android手机上执行，如果没有特殊需要，尽量可以低一点，毕竟Android手机的升级比例，比iOS是低了好多倍的。  
 这样，项目就建立完成，Android Studio使用标准模板，对项目做了初始化。我们可以在这个基础上再添加自己的内容。  
 
 从屏幕左侧项目文件的列表中，选择app -> res -> layout -> acitvity_main.xml文件，文件会在右侧打开，模式是交互式的界面设计器。在其中，按照下图的样子，我们增加一个TextView控件和一个按钮。文本框是为了将来显示输出的结果，按钮当然就是开始执行的触发器。  
-![](http://files.17study.com.cn/201906/android_jni/layout_setting.png)  
+![](http://115.182.41.123/files/201906/android_jni/layout_setting.png)  
 TextView控件我们修改一下名字，叫textView1。按钮的名字改为button1，另外为按钮的onClick属性增添一个调用：bt1_click。  
 界面部分就完成了，记着存盘，然后可以关掉这个文件。  
 
@@ -107,9 +107,9 @@ public class MainActivity extends AppCompatActivity {
 程序完成，可以从Build菜单选择Make Project编译项目。然后在Run菜单选择Run 'app'。  
 如果是第一次使用Android Studio，你还可能会被提醒需要你新建一个Android模拟器来执行程序。当然也可以把打开了调试功能的Android手机插在电脑上进行真机调试。  
 执行的结果如图：  
-![](http://files.17study.com.cn/201906/android_jni/base_run1.png)  
+![](http://115.182.41.123/files/201906/android_jni/base_run1.png)  
 点击两次按钮后，画面变为：  
-![](http://files.17study.com.cn/201906/android_jni/base_run2.png)  
+![](http://115.182.41.123/files/201906/android_jni/base_run2.png)  
 好了，我们的基本实验平台准备完成，下面才是进入正题。  
 
 #### 调用JNI库
@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity {
 作为一个简单的演示，我们的JNI库功能很简单，从Java封装的角度看，我们有一个名为JniLib的Java类，其中包含一个方法，叫callToCpp，这个方法，将会在C++中来实现。  
 在文件列表中，选择MainActivity.java所在的包名，点击右键，选择New->Java Class。  
 一切选用默认设置，类名为JniLib。  
-![](http://files.17study.com.cn/201906/android_jni/new-java-class.png)  
+![](http://115.182.41.123/files/201906/android_jni/new-java-class.png)  
 Android Studio会自动生成并打开一个JniLib.java文件。其中只有一个而空白的类定义。我们在其中继续编写自己的内容。  
 这个封装类的代码非常简单，我们直接列出全部：  
 ```java
@@ -140,7 +140,7 @@ public class JniLib {
 ##### 由封装类生成C++头文件
 下面是利用这个JniLib类，生成C++使用的.h头文件。  
 在Android Studio界面的左侧列表中，用鼠标右键点击JniLib文件，弹出菜单中选择External Tools -> javah，这个javah就是我们前面建立的附加工具。  
-![](http://files.17study.com.cn/201906/android_jni/external-tools-javah.png)  
+![](http://115.182.41.123/files/201906/android_jni/external-tools-javah.png)  
 此时最好将Android Studio左侧的视图从默认的“Android”方式修改到“Project”方式，这样能更清晰的看到目录层次关系。  
 随后左侧列表中，跟Java文件夹同级，会出现一个jni文件夹，其中有一个文件：com_test_calljni_JniLib.h，这就是刚才由javah自动生成的。  
 头文件生成到src/main/jni目录，这是我们在javah扩展工具设定的时候所确定下来的。  
@@ -272,12 +272,12 @@ JNI库的效果，还要修改一下我们程序的MainActivity类，才能体�
     }
 ```
 现在可以完整的编译一遍了，如果没有错误发生，就在模拟器中执行来测试。  
-![](http://files.17study.com.cn/201906/android_jni/second_run1.png)  
+![](http://115.182.41.123/files/201906/android_jni/second_run1.png)  
 点击CALLJNI按钮后，文本框显示的信息表示JNI正常执行了。  
 
 ##### 解析包含JNI库的APK安装文件
 先上一张apk包的文件结构图片吧：  
-![](http://files.17study.com.cn/201906/android_jni/apk-structure1.png)  
+![](http://115.182.41.123/files/201906/android_jni/apk-structure1.png)  
 包含JNI库的安装包，比平常的安装包多一个lib文件夹。其中按照支持的CPU类型，再细致分类。最终里面是JNI库的二进制文件。  
 在我们这个例子中，就是libJniLib.so，如同前面说过的。  
 APK包安装的时候，根据确定的硬件平台，实际只有一个对应的.so文件会被安装的设备上。  
@@ -346,7 +346,7 @@ sourceSets.main.assets.srcDirs的设置实际是一个数组，可以包含多�
 其实我个人常用的方式，是直接用Release方式编译一遍整个项目，然后release文件夹中就会有二进制编译结果。随后Gradle的设置，就一直保持在release版本的打包。反正你也不可能用Android Studio对C/C++代码进行调试，那个工作你肯定是使用另外的开发工具完成的。  
 
 然后事情并没有结束，我们打开编译结果的文件夹看一看，是类似下面的样子：  
-![](http://files.17study.com.cn/201906/android_jni/compile-rs1.png)  
+![](http://115.182.41.123/files/201906/android_jni/compile-rs1.png)  
 其中同样会根据CPU类型不同，分为几个文件夹，这是预料之中的。但中间除了有我们需要的hello可执行文件，还会有本已打包的JNI库.so文件，以及一些编译输出信息和中间文件。而这些，就成为了我们的垃圾文件，需要排除在外。  
 可以把下面代码，添加在app/build.gradle中，externalNativeBuild上面的位置，跟externalNativeBuild处在同一级：  
 ```bash
@@ -357,7 +357,7 @@ sourceSets.main.assets.srcDirs的设置实际是一个数组，可以包含多�
 这里要吐槽一下Android Studio Gradle脚本的设计。通常讲，ignoreAssetsPattern关键词已经有了“忽略、排除”的含义，是个否定词。而在其中的设置中，又对每个需要排除的内容，前面增加“!”否定，实在是反人类啊......  
 
 现在如果编译一遍，看看打包的结果，当然也只是完成了打包，我们还没有执行这个程序。  
-![](http://files.17study.com.cn/201906/android_jni/apk-structure2.png)  
+![](http://115.182.41.123/files/201906/android_jni/apk-structure2.png)  
 APK中多了一个assets文件夹，其中根据CPU类型分类，hello已经在里面了。  
 
 ##### 把可执行程序拷贝到Android系统
@@ -484,7 +484,7 @@ public class CopyElfs {
 ##### 执行对Elf执行文件的调用
 做了这么多准备性工作，开始真正对程序的调用。  
 首先还是修改布局文件，再增加一个按钮，名称叫button3，显示字符串是“CALLELF”，onClick的事件处理函数是bt3_click。  
-![](http://files.17study.com.cn/201906/android_jni/layout1.png)  
+![](http://115.182.41.123/files/201906/android_jni/layout1.png)  
 这次要添加的代码不仅仅是bt3_click方法，还要对调用命令行程序以及获取其结果单独抽象为一个方法。  
 考虑到还要增加一些对应的类成员变量，和库文件的引用。我们把完整的MainActivity.java代码列出来：  
 ```java
@@ -547,10 +547,10 @@ public class MainActivity extends AppCompatActivity {
 }
 ```
 现在已经完整了，可以编译然后在模拟器执行来尝试一下。  
-![](http://files.17study.com.cn/201906/android_jni/3_run1.png)  
+![](http://115.182.41.123/files/201906/android_jni/3_run1.png)  
 
 还可以详细探究可执行文件，拷贝到Android设备之后的细节。这个使用adb工具连接到设备上就能看出来，请看下面执行的截图：  
-![](http://files.17study.com.cn/201906/android_jni/cmd1.png)  
+![](http://115.182.41.123/files/201906/android_jni/cmd1.png)  
 
 #### 编译带有扩展库的可执行文件
 前面的例子，我们已经认识到了NDK的强大。而ndk-build编译工具，基本属于一个Makefile的工作方式。  
@@ -639,7 +639,7 @@ include $(BUILD_EXECUTABLE)
 * $(TARGET_ARCH_ABI)是根据目标CPU的ABI不同，选择不同的库文件和C语言头文件。  
 
 想必你也想到了，还要在MainActivity.java中，增加调用md5的代码，当然还有layout文件：  
-![](http://files.17study.com.cn/201906/android_jni/layout2.png)  
+![](http://115.182.41.123/files/201906/android_jni/layout2.png)  
 按键响应代码：  
 ```java
     public void bt4_click(View view){
@@ -656,7 +656,7 @@ include $(BUILD_EXECUTABLE)
 ```
 不得不承认，有了上一小节的基础，增加个可执行程序或者第三方库，都不算什么工作量。  
 程序的执行结果如下：  
-![](http://files.17study.com.cn/201906/android_jni/4_run1.png)  
+![](http://115.182.41.123/files/201906/android_jni/4_run1.png)  
 还可以在台式电脑中验证一下计算的结果：  
 ```bash
 $ echo -n "testString" | md5

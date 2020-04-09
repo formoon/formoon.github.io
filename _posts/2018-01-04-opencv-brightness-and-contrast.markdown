@@ -2,7 +2,7 @@
 layout:         page
 title:          OpenCV中的亮度对比度调整及其自动均衡
 subtitle:       详说亮度对比度自动调整的原理
-card-image:     http://files.17study.com.cn/201801/04/opencvp1.jpg
+card-image:     http://115.182.41.123/files/201801/04/opencvp1.jpg
 date:           2018-01-04
 tags:           videoaudio
 post-card-type: image
@@ -39,9 +39,9 @@ RGBA:同RGB相比，多了一个遮罩图层，在高清图中，A除了遮罩�
 #### 什么样算好？
 好了我们已经知道了亮度对比度调整的技术层面原理。那么一副照片，调整到什么时候算效果最好呢？其实这才是本文的主题。   
 照片的调整，从来都是有主观性的，我们先来看两幅照片：  
-![](http://files.17study.com.cn/201801/04/mcsjz.jpg)（国产电视剧《琅琊榜》剧照）
+![](http://115.182.41.123/files/201801/04/mcsjz.jpg)（国产电视剧《琅琊榜》剧照）
 
-![](http://files.17study.com.cn/201801/04/xqdzjz.jpg)（《星球大战》某前传剧照）  
+![](http://115.182.41.123/files/201801/04/xqdzjz.jpg)（《星球大战》某前传剧照）  
 这两幅照片都是出品方原图，转帖未经任何处理，也就是说符合各自出品方对于照片处理的规范要求。  
 先说第一幅照片。应当说看上去很美，在同时代不管是国产电视剧、电影，又或影楼的婚纱照，基本都是这样一个感觉。干净、完美、阳光、靓丽或者很多这样可以罗列的形容词。  
 接着我们看第二幅照片，如果按照第一幅照片的标准来说，这实在是太糟糕了。衣服脏兮兮的，脸脏兮兮的，手套脏到可以感觉到那种油腻，机器人满身划痕......这样的形容词一样可以列出很多，但是且慢，这些感觉，为什么如此真实？好像照片中描述的未来世界，难道真实存在的吗？  
@@ -255,7 +255,7 @@ int main(int argc,char **argv){
 
 ```
 程序以一副照片为参数执行。先显示出来原图，窗口名称为“org”,随后以5%为抛弃比例做亮度、对比度自动均衡，结果图片显示于窗口"photo"，同时在窗口为用户提供了进一步调整亮度对比度的两个工具条。下图是运行的截图:  
-![](http://files.17study.com.cn/201801/04/opencvp1.jpg)
+![](http://115.182.41.123/files/201801/04/opencvp1.jpg)
 参考链接：  
 <http://blog.csdn.net/c80486/article/details/52505061>  
 <http://answers.opencv.org/question/75510/how-to-make-auto-adjustmentsbrightness-and-contrast-for-image-android-opencv-image-correction/>  

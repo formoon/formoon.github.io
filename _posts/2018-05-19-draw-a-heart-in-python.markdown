@@ -2,18 +2,18 @@
 layout:         page
 title:          就算会用python画颗心，可你依然还是只单身狗
 subtitle:      	Draw a heart in python
-card-image:		http://files.17study.com.cn/201805/19/heart1.png
+card-image:		http://115.182.41.123/files/201805/19/heart1.png
 date:           2018-05-19
 tags:           python seven
 post-card-type: image
 ---
-![](http://files.17study.com.cn/201805/19/heart1.png)  
+![](http://115.182.41.123/files/201805/19/heart1.png)  
 <script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'></script>
 :) 标题是开玩笑的，千万别认真。
 
 随着AI的飞速发展，有志于此行的码农也是急剧的增加，带来的就是大家对算法、数学的兴趣也格外升高。  
 本文的来历是这样，今天某老同事在朋友圈发了一张屏拍，求公式。  
-![](http://files.17study.com.cn/201805/19/heart0.jpeg)  
+![](http://115.182.41.123/files/201805/19/heart0.jpeg)  
 看了一下还是难度不大，上半部分基本是两个半圆，下半部分是两个旋转了的反余弦函数。  
 不过我的数学也比较渣，看到这个步骤后面也就倒腾不清了，不过到这种程度在互联网上搜一搜找到答案还是不难的，很快就找到了正确的公式(以y=0为界限，肯定是需要两组解)：  
 <p>

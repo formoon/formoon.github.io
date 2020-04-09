@@ -70,7 +70,7 @@ post-card-type: image
 而对于大多数应用来说，其规模远远小于操作系统本身，往往是为了执行一个只有几十M容量的应用，首先要部署一个上G容量的操作系统。系统启动过程所耗费的时间也是远超应用本身。这种情况下，虚拟化对于计算资源的消耗更是变得尤为突出。  
 容器则是使用了完全不同的思路，在容器中，每个应用都共享了实体主机的操作系统本身。只是利用内核提供的隔离技术，完全无法发现其它应用的存在，同样实现了“独占”的效果。  
 在容器中执行的应用，所有操作实际上并不是被虚拟化的，跟直接在实体机上的执行从效率上说没有区别。
-![](http://files.17study.com.cn/201903/vm-docker/VM-LXC.png)
+![](http://115.182.41.123/files/201903/vm-docker/VM-LXC.png)
 容器技术的缺点也是明显的，就是容器无法支持实体主机上的多种操作系统，容器中的操作系统，跟宿主机上的操作系统必须是一致的。  
 比如在Ubuntu主机上的容器中，可能出现Centos/Ubuntu,但不可能出现Windows容器。  
 容器技术发展迅猛，即便系统软件巨头微软也无法忽略，传闻微软在Windows的容器化上投入了巨大的资源，但截至今日，尚未有说服力的产品出现。  
@@ -120,7 +120,7 @@ sudo apt install docker.io
 _Container_: 容器，相当于一台虚机，可能正在执行，也可能执行结束已经退出（关机）。  
 _Image_: 映像。这个是新手容易困惑的。因为在VMWare中没有这个概念，比较接近的，可以理解为已经安装好的操作系统模板，每次启动一个容器（虚机），实际是复制一份映像，然后在映像上执行。前面已经说过，容器本质上是跟宿主机共享内核，映像则相当于硬盘的文件系统，当然是建立在某目录下的根文件系统，只是文件本身，并不是磁盘的克隆。  
 _Docker_: Docker是这套容器系统的产品名称，也是命令行管理工具的名称（命令行工具要使用全小写字符）。所有对Docker系统的操作，都可以通过命令行完成。直接执行`docker`，可以得到概要帮助文档。  
-![](http://files.17study.com.cn/201903/vm-docker/dockerhub.png)  
+![](http://115.182.41.123/files/201903/vm-docker/dockerhub.png)  
 （本文的代码块中，命令前面的#符号是系统root状态的提示符，不需要用户输入）
 ```bash
 # docker
@@ -881,8 +881,8 @@ token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2V
 ```
 现在使用https协议访问主控节点IP地址的32767端口就能看到控制台登录界面了：<https://10.96.200.150:32767>，因为使用了私有的证书，所以还要确认忽略掉浏览器的警告信息窗口。  
 登录Dashboard控制台使用Token模式，这个Token就是我们刚才建立用户的时候所获得的TOKEN，跟前面加入工作节点所使用token的不是同一个东西。  
-![](http://files.17study.com.cn/201903/vm-docker/k8s-dashboard-login.png)
-![](http://files.17study.com.cn/201903/vm-docker/k8s-dashboard-namespaces.png)
+![](http://115.182.41.123/files/201903/vm-docker/k8s-dashboard-login.png)
+![](http://115.182.41.123/files/201903/vm-docker/k8s-dashboard-namespaces.png)
 Dashboard还可以安装一些酷炫的插件，用于图形化的显示系统的负载、使用情况，有兴趣可以参考此文：<https://iamchuka.com/install-kubernetes-dashboard-part-iii/>  
 
 至此，集群的安装全部结束。  
@@ -1249,7 +1249,7 @@ k8s在企业级运维的占用率快速的增长，然而新的需求继续出�
 但是即便在这种高可用的模式下，仍然需要配置负载均衡机制，比如HAProxy，放置在控制群组之前，这无可避免的成为了又一个单点瓶颈。  
 此外还有一些需求，比如对容器的监控功能不足，调试容器的配置问题需要研发团队配合输出大量的日志信息。再比如红黑发布的导流控制等。  
 在开源社区中，只要有需求，就有大量的团队为此努力，开发出同样大量的产品或者插件。在其中，这次是Istio脱颖而出。  
-![](http://files.17study.com.cn/201903/vm-docker/istio.png)
+![](http://115.182.41.123/files/201903/vm-docker/istio.png)
 简单来说，Istio采用了比较新的思路来解决问题。最主要的就是，原本每个容器，需要同管理节点之间建立通讯连接，沟通容器状态及接受控制信息。因为这种机制，管理节点的健康状况和负载能力，成为了整个系统的瓶颈。  
 Istio同样也是在容器上配置自己的组件（Sidecar），但这些控制数据流，不再沟通到某个具体的管理节点，而是所有节点直接互相沟通，组成了一个服务网格（ServiceMesh）。网格中任意一个容器出现问题，并不影响整个网格的信息传递和控制，故障的容器同样也会在服务支持下被删除，并被新生成的容器替代。系统不再存在单点瓶颈。  
 Sidecar的核心是代理机制，接管了所有进出容器的通讯流。在这种机制的帮助下，在流量管理、安全性、控制、和监控方面，显然有了更可靠的手段。因此在Istio首页（<https://istio.io>）上，这四个特征成为了主要的卖点：  
@@ -1952,7 +1952,7 @@ docker pull istio/examples-bookinfo-reviews-v3:1.8.0
 docker pull istio/examples-bookinfo-productpage-v1:1.8.0
 ```
 
-![](http://files.17study.com.cn/201903/vm-docker/prometheus_query_result.png)
+![](http://115.182.41.123/files/201903/vm-docker/prometheus_query_result.png)
 在Istio安装的过程中，已经预置了Prometheus和Grafana指标可视化工具，使用Kubectl工具的端口转发功能把服务端口开放出来就可以使用，比如：  
 ```bash
 $ kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=prometheus -o jsonpath='{.items[0].metadata.name}') --address 0.0.0.0 9090:9090 &
@@ -1960,7 +1960,7 @@ $ kubectl -n istio-system port-forward $(kubectl -n istio-system get pod -l app=
 ```
 上面两条转发命令中的`--address 0.0.0.0`是为了把端口开放给节点主机之外的电脑来访问，因为通常节点服务器上不具备图形界面。但这也会带来安全性的问题，所以注意要使用完即时关闭。  
 这部分请参考官方文档：<https://istio.io/zh/docs/tasks/telemetry/metrics/querying-metrics/>  
-![](http://files.17study.com.cn/201903/vm-docker/grafana-istio-dashboard.png)  
+![](http://115.182.41.123/files/201903/vm-docker/grafana-istio-dashboard.png)  
 Istio在辅助调试方面，可以在流量中注入指定的错误信息、对数据包进行延迟、中断等，用于模拟实际故障发生的可能性，从而帮助研发人员、运维人员对系统进行优化。具体使用方法请参考官方文档。  
 监控功能和辅助调试同样也是借助了Sidecar对所有数据流的代理功能得以实现的。  
 在安全性方面，Istio主要是采用证书签名机制和TLS连接。支持TLS连接的版本，同本文中我们示例安装的版本不是同一个。如果有需求，请在Istio集群安装时就注意选择对应的配置文件来启动。详情请至官方文档学习。  

@@ -2,7 +2,7 @@
 layout:         page
 title:          OpenCV中的照片剪裁
 subtitle:       从概念到成品
-card-image:     http://files.17study.com.cn/201801/04/opencvp2.jpg
+card-image:     http://115.182.41.123/files/201801/04/opencvp2.jpg
 date:           2018-01-04
 tags:           videoaudio
 post-card-type: image
@@ -166,7 +166,7 @@ int main(int argc,char **argv){
 * main主函数中，do - while循环中主要处理了原始照片缩放级别的加大和缩小
 
 使用示例：  
-![](http://files.17study.com.cn/201801/04/opencvp2.jpg)
+![](http://115.182.41.123/files/201801/04/opencvp2.jpg)
 至此关于使用OpenCV进行自动化照片处理的三篇系列就全部完成了，希望对你有用。  
 
 参考链接：<http://blog.csdn.net/skeeee/article/details/16844937>
