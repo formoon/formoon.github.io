@@ -8,11 +8,11 @@ tags:           html
 post-card-type: image
 ---
 ![](https://www.mathjax.org/badge/mj-logo.svg)
-<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 网页显示数学公式不是一个大问题，问题的关键是要易用、兼容性好。兼容性好有两个评价标准，一个是支持常见浏览器，另外一项则是支持业界文档最常用没有之一的Latex语法。  
 这里推荐的MathJax就算不错的选择，官网地址：<https://www.mathjax.org>。使用方法首先引入js库：  
 ```html
-<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'></script>
+<script src="https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 ```
 随后网页就可以嵌入一个数学公式试一下：  
 ```latex

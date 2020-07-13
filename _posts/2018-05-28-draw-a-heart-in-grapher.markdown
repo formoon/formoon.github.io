@@ -8,7 +8,7 @@ tags:           mac
 post-card-type: image
 ---
 ![](http://115.182.41.123/files/201805/19/heart1.png)  
-<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'></script>
+<script src='https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML'></script>
 承自上一篇中的函数图形，有人问，能不能别把画个图搞那么复杂，我说当然，只要你有一台mac。  
 话说出来很潇洒的样子，充斥着一股迷之自信。  
 

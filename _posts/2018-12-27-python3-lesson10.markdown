@@ -8,7 +8,7 @@ tags:           python
 post-card-type: image
 ---
 ![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1545112916052&di=d2428f9e946cda2d7df3f0ca9ff3def8&imgtype=0&src=http%3A%2F%2Finsights.thoughtworkers.org%2Fwp-content%2Fuploads%2F2015%2F07%2F718-%25E4%25BD%259F%25E8%25BE%25BE-%25E5%2585%25A8%25E6%25A0%2588%25E5%25BC%2580%25E5%258F%2591%25E8%25AF%25AD%25E8%25A8%2580Python-1024x724.png)
-<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'></script>
+<script src='https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML'></script>
 ### 《从零开始PYTHON3》第十讲
 
 截至上一讲，我们已经完成了Python语言的基本部分。我们用了三讲来讨论Python语言的控制结构，用了两讲来介绍Python的基本数据类型。可以说仅就语法和语言关键字的部分来讲，当前所学已经足以完成大多数工作。  

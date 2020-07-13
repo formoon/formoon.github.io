@@ -1,0 +1,24 @@
+I"�
+<p><img src="https://www.mathjax.org/badge/mj-logo.svg" alt="" />
+<script src="https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js"></script>
+网页显示数学公式不是一个大问题，问题的关键是要易用、兼容性好。兼容性好有两个评价标准，一个是支持常见浏览器，另外一项则是支持业界文档最常用没有之一的Latex语法。<br />
+这里推荐的MathJax就算不错的选择，官网地址：<a href="https://www.mathjax.org">https://www.mathjax.org</a>。使用方法首先引入js库：</p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;script </span><span class="na">src=</span><span class="s">'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'</span><span class="nt">&gt;&lt;/script&gt;</span>
+</code></pre></div></div>
+<p>随后网页就可以嵌入一个数学公式试一下：</p>
+<div class="language-latex highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  When <span class="p">\(</span><span class="nb">a </span><span class="nv">\ne</span><span class="nb"> </span><span class="m">0</span><span class="p">\)</span>, there are two solutions to <span class="p">\(</span><span class="nb">ax</span><span class="p">^</span><span class="m">2</span><span class="nb"> </span><span class="o">+</span><span class="nb"> bx </span><span class="o">+</span><span class="nb"> c </span><span class="o">=</span><span class="nb"> </span><span class="m">0</span><span class="p">\)</span> and they are
+  <span class="p">$$</span><span class="nb">x </span><span class="o">=</span><span class="nb"> </span><span class="p">{</span><span class="o">-</span><span class="nb">b </span><span class="nv">\pm</span><span class="nb"> </span><span class="nv">\sqrt</span><span class="p">{</span><span class="nb">b</span><span class="p">^</span><span class="m">2</span><span class="o">-</span><span class="m">4</span><span class="nb">ac</span><span class="p">}</span><span class="nb"> </span><span class="nv">\over</span><span class="nb"> </span><span class="m">2</span><span class="nb">a</span><span class="p">}</span><span class="nb">.</span><span class="p">$$</span>
+</code></pre></div></div>
+<p>这段文字经过js实时转换后的效果是这样的：</p>
+<p>
+  When \(a \ne 0\), there are two solutions to \(ax^2 + bx + c = 0\) and they are
+  $$x = {-b \pm \sqrt{b^2-4ac} \over 2a}.$$
+</p>
+<p>再比如：</p>
+<pre><code class="language-letex">\[ J_\alpha(x)=\sum_{m=0}^\infty \frac{(-1)^m}{m!\Gamma(m+\alpha+1)}{\left({\frac{x}{2}}\right)}^{2m+\alpha} \]
+</code></pre>
+<p>渲染结果是：</p>
+<p>
+\[ J_\alpha(x)=\sum_{m=0}^\infty \frac{(-1)^m}{m!\Gamma(m+\alpha+1)}{\left({\frac{x}{2}}\right)}^{2m+\alpha} \]
+</p>
+:ET

@@ -2,12 +2,12 @@
 layout:         page
 title:          Javascript已加入AppleScript全家桶
 subtitle:       jxa快速入门
-card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513683611066&di=3515b8e1e3c953e4d812c7d851de5fed&imgtype=0&src=http%3A%2F%2Fpic18.nipic.com%2F20111209%2F5694091_165129635199_2.jpg
+card-image:     http://115.182.41.123/files/201712/automator.jpeg
 date:           2017-12-19
 tags:           mac
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513683611066&di=3515b8e1e3c953e4d812c7d851de5fed&imgtype=0&src=http%3A%2F%2Fpic18.nipic.com%2F20111209%2F5694091_165129635199_2.jpg)
+![](http://115.182.41.123/files/201712/automator.jpeg)
 
 因为工作环境基本是以跨平台为主，所以纯mac本地化的AppleScript一直关注是不够的，前几天找资料发现AppleScript也在迅速的进步着，目前已经对Javascript做了比较好的支持------当然早就支持，现在只是感觉上更好了。这项技术的全称是JavaScript for Automation，算一项比较新的技术，简称JXA。  
 本博不是学术研究性的，因此完全从实用出发，力求给出自己的实用性见解而不是长篇大论引用官方文字。这里给出我总结的几个特点：  

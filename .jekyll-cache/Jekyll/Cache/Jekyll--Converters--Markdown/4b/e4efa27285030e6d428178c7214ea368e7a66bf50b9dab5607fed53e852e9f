@@ -1,0 +1,267 @@
+I"Rv<p><img src="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1545112916052&amp;di=d2428f9e946cda2d7df3f0ca9ff3def8&amp;imgtype=0&amp;src=http%3A%2F%2Finsights.thoughtworkers.org%2Fwp-content%2Fuploads%2F2015%2F07%2F718-%25E4%25BD%259F%25E8%25BE%25BE-%25E5%2585%25A8%25E6%25A0%2588%25E5%25BC%2580%25E5%258F%2591%25E8%25AF%25AD%25E8%25A8%2580Python-1024x724.png" alt="" />
+<script src="https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script></p>
+<h3 id="从零开始python3第十四讲">《从零开始PYTHON3》第十四讲</h3>
+
+<p>通常来说，Python解释执行，运行速度慢，并不适合完整的开发游戏。随着电脑速度的快速提高，这种情况有所好转，但开发游戏仍然不是Python的重点工作。<br />
+大多应用是利用Python开发效率高的特点，进行游戏原型验证，或者在大的游戏系统中，使用Python进行地图、场景等定制。还有就是使用游戏开发的技术和理念,将Python用于商业视觉展示、工程效果展示。</p>
+
+<blockquote>
+  <p>原型验证：指的是有了一个好的游戏想法，完整的开发出来肯定需要大量的人员、费用、时间，利用Python编程简单高效的特点，先模拟完成一部分游戏的功能，从而能够展示给投资人、客户，获取大家的认可，进而得到经费投入。<br />
+地图、场景定制：游戏的开发肯定需要很多专业技术方面的高精尖人才，但游戏的运营、地图的设计、故事情节等。这都是商业或者艺术方面的专业强项，而这些人员不大可能使用c/c++等常用的游戏开发工具来做这些工作。因此，游戏开发过程中，通常完成Python语言的接口，让这些商业、艺术工作人员也能使用比较方便的手段进行游戏功能的调整。</p>
+</blockquote>
+
+<p>此外，现代的游戏开发已经是一个大团队合作的产物，已经非常难以单打独斗完成一款游戏。所以学习游戏编程的目标并不是希望自己独立完成一个游戏，而是用这种思路来解决具体问题。<br />
+通常游戏开发的工作分工是这样的：<br />
+<img src="/assets/cimages/201901/python314/gameRD.png" alt="gameRD" />
+其中音效、画面都会由更专业的团队完成。最后由程序人员集成在游戏中。在游戏中，音乐音效、操作控制、游戏逻辑、画面几个部分，都是并行在同时进行的。它们必须共同生效，游戏才会好玩。</p>
+
+<hr />
+
+<h4 id="pygame编程和音乐播放">Pygame编程和音乐播放</h4>
+
+<p>Pygame是一个强大的游戏扩展包，首先也是安装：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#使用管理员模式启动cmd命令行，然后执行：
+</span><span class="n">pip</span> <span class="n">install</span> <span class="n">pygame</span>  <span class="c1">#某些系统是pip3 install pygame
+</span></code></pre></div></div>
+
+<p>这个安装扩展包的过程，我们重复了很多遍，这个算是最后一遍了。因为Pygame是我们课程讲解的最后一个扩展包。比起来其它的软件，Python的扩展包，只要你知道了名字，安装几乎都是相同的。即便不同的操作系统，差别也不大。</p>
+
+<p>在这一讲，我们会采用跟以前不同的方法来讲述Pygame扩展包的使用。原因是Python有非常多的扩展包。即便官方内置的扩展包，也量非常大。如果完全等待别人教你使用这种方式是不可能的，此外即便是别人教过了，Python和扩展包的升级也非常的快。原有的使用方法，很可能现在已经不适用了。这些都要求你有自己探索的能力，在Python基本技能的学习掌握之后，根据自己的编程需求，选择相应的扩展包，查找资料、文档。在网上资料的帮助下，掌握扩展包的使用方法。</p>
+
+<p>从目前行业内的使用情况看，最大的障碍在于目前主要的文档来源都是英文的，这要求我们具备一定的英文阅读能力。此外，虽然版本的更新对扩展包的使用有一些差别，但这种差别毕竟不算大。所以在国内一些相对较早的文档帮助下，再对应国外新版本的文档，也能降低你的学习门槛。</p>
+
+<hr />
+
+<p>只是播放mp3，Python有很多扩展包可以选，很多操作起来也更简便。不过pygame是为了游戏设计，除了背景音乐，音效、与画面的协作也考虑的更多。所以虽然用起来复杂一些，我们依然还是选择学习用Pygame播放mp3音乐。目的，更多是期望学习者除了学习python相关的知识，也更多理解现代计算机并发多任务和多种约束条件下的编程思维。</p>
+
+<p>拿到一个新的扩展包，通常你有这样几种途径了解它的使用：</p>
+
+<ul>
+  <li>
+    <p>到官网查看官方文档（通常是英文）</p>
+  </li>
+  <li>
+    <p>在搜索引擎网站比如百度搜索中文的资料，这种情况比较多见，因为大多情况下，你之所以知道这个扩展包，也是在网上搜索相关资料的时候，别人介绍的。而通常这种情况下，都已经有包简单实用的介绍。</p>
+  </li>
+  <li>
+    <p>使用Python内置的dir()/help()函数，当前还是英文资料，适合已经了解扩展包的基本架构，只是在函数选择、调用的时候查找资料</p>
+
+    <p>所以，实际上，通过搜索引擎查找相关资料，应当是你上手的最优选择。以pygame为例，通过查找中文的资料，总结之后，应当能写出这样的程序：</p>
+  </li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#MP3播放器
+</span>
+<span class="c1">#引入扩展库
+</span><span class="kn">import</span> <span class="nn">pygame</span>
+    
+<span class="c1">#歌曲文件
+</span><span class="nb">file</span><span class="o">=</span><span class="s">'rongHua.mp3'</span>
+
+<span class="c1">#初始化声音库
+</span><span class="n">pygame</span><span class="p">.</span><span class="n">mixer</span><span class="p">.</span><span class="n">init</span><span class="p">(</span><span class="n">frequency</span><span class="o">=</span><span class="mi">44100</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"播放音乐-绒花"</span><span class="p">)</span>
+
+<span class="c1">#载入音乐文件
+</span><span class="n">pygame</span><span class="p">.</span><span class="n">mixer</span><span class="p">.</span><span class="n">music</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+<span class="c1">#播放声音
+</span><span class="n">pygame</span><span class="p">.</span><span class="n">mixer</span><span class="p">.</span><span class="n">music</span><span class="p">.</span><span class="n">play</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>程序每一条语句都有注释，大概的框架上看，应当也是顺序执行的。有一些参数可能你还不能明白，比如<code class="language-plaintext highlighter-rouge">frequency=44100</code>，不过应当不影响你抄过来用。这个是指定音频库使用的采样频率，44100一般已经是高保真音乐的采样频率了。通常mp3文件都是这种格式。另外忘了交代，rongHua.mp3是我们要播放的声音文件名称，记得要提前准备好，放到程序同一个目录。</p>
+
+<p>执行程序之后发现，诡异的事情发生了，程序只显示了一行文字：“播放音乐-绒花”，然后就退出了，并没有事情发生，也没有音乐播放出来。</p>
+
+<p>一开始就说过了，本讲重点不完全是播放一首音乐，而是希望能引导大家使用探索的方式，来了解一个新的扩展包如何学习和使用。所以不要等待着我说出答案，而是积极的思考，判断出现了什么问题，并且尝试去解决。</p>
+
+<p>首先要说明的是，程序本身引入pygame库、库的初始化还有播放语句语句本身都并没有什么错误。通常在网上查找资料的时候，只要认真阅读，比较容易保证这一点。难以马上学会并应用到编程中的，是关于某个库“架构”方面的内容，也就是影响程序结构方面的内容。如果觉得这句话比较抽象的话，你可以回忆一下上一讲我们尝试过的flask网络编程框架。框架、架构，这两个词在这里基本可以划等号了。</p>
+
+<p>我们的程序没有能播放出来音乐，也是这方面的原因。<br />
+通常游戏程序要包含至少4部分的内容，我们用本讲开始的那张图来说明，音乐、画面、操控、逻辑这四部分内容是并行运行，相互配合，才能展现给用户一个图文并茂、流畅、吸引人的游戏。<br />
+因此作为游戏的一部分，音乐的播放也不可能像我们前面学过的绘图、计算等操作一样，在音乐没有播放完成前，程序停止在那里一直等待。事实上通常游戏的做法都是，发出播放音乐的命令之后，命令本身马上返回，让程序有能力并行去处理按键输入、绘图等动作。<br />
+而在我们上面的程序中，播放这个命令肯定是发出去了，但没有等音乐声响起，程序就已经结束退出了。程序的结束退出将自动的释放程序打开的各项资源，清理运行的痕迹，从而音乐也就不可能再放出来了。<br />
+这仅仅是我们推测分析的结果，我们来证明一下，方法就是在程序最后增加一行语句：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#程序等待5秒钟
+</span><span class="n">pygame</span><span class="p">.</span><span class="n">time</span><span class="p">.</span><span class="n">delay</span><span class="p">(</span><span class="mi">1000</span><span class="o">*</span><span class="mi">5</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>使用这样语句的目的是，如果我们上面的推测成立，那肯定要对程序做结构上的调整。这个工作量会比较大，所以我们先使用简单的语句来验证一下我们的思考。<br />
+再次运行程序，你会听到音乐响了5秒钟，然后程序退出，音乐也停止了。<br />
+这基本可以证明，我们的思考正确。此外似乎还有些别的问题，比如音乐一开始有一个“破音”，这让人感觉不好。而且程序似乎有的时候能正常播放，有的时候还是不稳定，无法播放成功。<br />
+下面要如何改进程序呢？</p>
+
+<p>通常我们会继续在网上搜索pygame模块使用的案例，阅读别人的程序，有的时候运气好，你碰到的程序代码，跟你想写的代码是完全相同的功能，这时候你可以拷贝过来直接使用。但大多时候，你只能找到功能相近的代码，所以仍然需要你阅读别人的程序，并从其中学习对你有用的部分。<br />
+比如，你可能搜索到我们第一讲演示的游戏，其中当然也有声音处理的部分，你会重点阅读这部分的代码，来找出同自己程序的区别，以求解决问题。</p>
+
+<p>在这个过程中，我们又做出了一些判断，当然这些判断依然需要大量程序的经验，所以并不能要求初学者也能轻易做到。但复杂的做不到，你可以从简单的入手，逐渐积累。这里只是想告诉你正确的学习思路：</p>
+
+<ul>
+  <li>Pygame作为一个游戏开发库，声音的播放需要依赖一个窗口，也就是游戏的画面。没有窗口的情况下，播放进程无法稳定的工作。这一项原因推测来自于，很多网上找到的代码，在声音处理上并没有太多不同，但能正常工作，所以会有这样的猜测。</li>
+  <li>Python的各个功能，初始化一般意味着建立各项必须的资源，完成工作后，退出之前，应当释放掉这些资源，特别是系统公用的声音、显示等，如果程序只是退出，没有释放，就可能导致再次运行的时候，声音无法正确完成初始化，毕竟一个系统的设备，是被所有程序所公用的。</li>
+  <li>系统本身原因，不能快速的连续的初始化及释放，两次运行之间应当等待片刻。这个判断，在多次运行程序，查找规律的过程中，能很快的发现，当然需要你足够的细心观察。</li>
+  <li>“破音”是因为在声音设备初始化后，尚未稳定之前就开始发送音频数据，此时的数据无法被正常解析，造成破音。这仅为猜测，需要实验的证实。</li>
+</ul>
+
+<p>验证思考最好的办法就是修改程序，然后再次运行实验，因此我们再完成一版程序：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#引入扩展库
+</span><span class="kn">import</span> <span class="nn">pygame</span>
+    
+<span class="c1">#歌曲文件
+</span><span class="nb">file</span><span class="o">=</span><span class="s">'rongHua.mp3'</span>
+
+<span class="c1">#初始化pygame显示库
+</span><span class="n">pygame</span><span class="p">.</span><span class="n">display</span><span class="p">.</span><span class="n">init</span><span class="p">()</span>
+<span class="c1">#打开一个窗口
+</span><span class="n">screen</span> <span class="o">=</span> <span class="n">pygame</span><span class="p">.</span><span class="n">display</span><span class="p">.</span><span class="n">set_mode</span><span class="p">([</span><span class="mi">200</span><span class="p">,</span><span class="mi">100</span><span class="p">])</span>
+<span class="c1">#初始化pygame声音库
+</span><span class="n">pygame</span><span class="p">.</span><span class="n">mixer</span><span class="p">.</span><span class="n">init</span><span class="p">(</span><span class="n">frequency</span><span class="o">=</span><span class="mi">44100</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"播放音乐-绒花"</span><span class="p">)</span>
+<span class="c1">#载入音乐文件
+</span><span class="n">pygame</span><span class="p">.</span><span class="n">mixer</span><span class="p">.</span><span class="n">music</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="nb">file</span><span class="p">)</span>
+<span class="c1">#保存当前音量
+</span><span class="n">v</span> <span class="o">=</span> <span class="n">pygame</span><span class="p">.</span><span class="n">mixer</span><span class="p">.</span><span class="n">music</span><span class="p">.</span><span class="n">get_volume</span><span class="p">()</span>
+<span class="c1">#设置为静音，防止开始的爆破音
+</span><span class="n">pygame</span><span class="p">.</span><span class="n">mixer</span><span class="p">.</span><span class="n">music</span><span class="p">.</span><span class="n">set_volume</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1">#播放声音
+</span><span class="n">pygame</span><span class="p">.</span><span class="n">mixer</span><span class="p">.</span><span class="n">music</span><span class="p">.</span><span class="n">play</span><span class="p">()</span>
+<span class="c1">#延时0.2秒打开声音，避过爆破音
+</span><span class="n">pygame</span><span class="p">.</span><span class="n">time</span><span class="p">.</span><span class="n">delay</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+<span class="n">pygame</span><span class="p">.</span><span class="n">mixer</span><span class="p">.</span><span class="n">music</span><span class="p">.</span><span class="n">set_volume</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+<span class="c1">#播放5秒钟
+</span><span class="n">pygame</span><span class="p">.</span><span class="n">time</span><span class="p">.</span><span class="n">delay</span><span class="p">(</span><span class="mi">1000</span><span class="o">*</span><span class="mi">5</span><span class="p">)</span>
+<span class="c1">#停止播放
+</span><span class="n">pygame</span><span class="p">.</span><span class="n">mixer</span><span class="p">.</span><span class="n">music</span><span class="p">.</span><span class="n">stop</span><span class="p">()</span>
+<span class="c1">#退出声音库和显示库
+</span><span class="n">pygame</span><span class="p">.</span><span class="n">mixer</span><span class="p">.</span><span class="n">quit</span><span class="p">()</span>
+<span class="n">pygame</span><span class="p">.</span><span class="n">display</span><span class="p">.</span><span class="n">quit</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>每一行代码都有注释，我只讲解跟上一版不同的代码：</p>
+
+<ul>
+  <li>初始化的时候打开一个窗口，虽然什么也没有显示，但让播放器有了载体。</li>
+  <li>一开始关闭声音，延时再打开音量，避开一开始的爆破音。</li>
+  <li>程序退出前关闭播放，释放各项资源。</li>
+</ul>
+
+<p>此外这些工作中，用到了很多新的函数，这些函数一开始你并不可能知道。这些函数的学习一般是两个方向，一是概要的浏览pygame的手册或者帮助，在心中有一个粗的概念，这样用到什么功能的时候，你会想起来可能有某个函数能完成这个功能，然后再精细查看。第二是希望用到某个功能，在网上查找使用Python或者pygame如何做到这个功能。当然还有另外一种渠道，有可能你直接搜索到了功能相近的代码，从中间直接抄过来使用。</p>
+
+<p>试运行之后我们开心的发现，稳定性问题和爆破音都解决了，剩下最关键的，如何完整的播放音乐文件？<br />
+这涉及到了我们前面讲过的程序结构问题，也是一个框架型的程序库对程序结构的要求。这一部分一般没有好办法，只能通过阅读官方的文档或者阅读其它程序的成熟代码来获取，这个过程一般会较长。好在我们大多情况下不会上来就碰到这么复杂的问题，都是循序渐进。并且大多的扩展包只是增加功能性的函数，并不要求程序的结构有多少改变。</p>
+
+<p>我们通过一张对比图来说明pygame对程序结构的要求：<br />
+<img src="/assets/cimages/201901/python314/python3-14.001.jpeg" alt="python3-14.001" />
+传统程序虽然我们不怎么熟悉声音处理，但结构我们都比较熟悉。程序中可能有循环，但总体是串行执行的，完成一件事情，才去做另外一件。<br />
+从外观上看，右侧的游戏程序结构，跟左侧不过多了一个循环。但你要记得，这里面每一项都是并行执行的，每一个步骤并不会等待这一项工作做完，就会返回接受新的命令，所以程序的声音、图像、程序逻辑、键盘控制，才可能一起发生作用。<br />
+这种并行处理的程序，同传统的程序比，有很多不可协调的理念区别，pygame为了做到并行，采用了“事件驱动”的理念来完成这种控制。<br />
+事件驱动实际是存在很久的编程方式了，一般传统的Windows程序，都使用微软公司提供的消息循环，来处理所有的窗口事件。Python pygame的事件处理，也是采用类似的机制。<br />
+总结一下使用事件驱动的方式来编写pygame程序的要点：</p>
+
+<ul>
+  <li>声音、图像、键盘鼠标输入、游戏逻辑必须并行进行，任何一个局部不能长时间无限制的执行（网络编程实际也是并行的，但在小型网站项目中，没有体现那么清晰和严格）</li>
+  <li>各个环节之间的同步、配合，都是通过互相发送消息的方式来完成的。从独立一个功能（模块）角度来看，往往是得到某个消息之后，开始进行某项任务，这种方式叫做事件驱动</li>
+  <li>各种消息都是通过核心的消息传递模块完成的，程序的主循环一般就是不停的读取消息，根据消息的定义分发给不同模块，并执行不同功能，也称为消息循环</li>
+</ul>
+
+<p>我们根据刚才这些理念，重新改写程序，这个程序最终形成code4.py，这里只介绍重点的消息循环部分：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#... 初始化及基本播放代码忽略...
+#自定义一条消息(一个事件)用于表示播放结束
+#pygame.USEREVENT是pygame中预定义的用户消息起始值
+</span><span class="n">MUSIC_END</span> <span class="o">=</span> <span class="n">pygame</span><span class="p">.</span><span class="n">USEREVENT</span> <span class="o">+</span> <span class="mi">1</span>
+<span class="c1">#设置当前音乐播放完成后，发送自定义的消息
+</span><span class="n">pygame</span><span class="p">.</span><span class="n">mixer</span><span class="p">.</span><span class="n">music</span><span class="p">.</span><span class="n">set_endevent</span><span class="p">(</span><span class="n">MUSIC_END</span><span class="p">)</span>
+
+<span class="c1">#延时0.2秒打开声音，避过爆破音
+</span><span class="n">pygame</span><span class="p">.</span><span class="n">time</span><span class="p">.</span><span class="n">delay</span><span class="p">(</span><span class="mi">200</span><span class="p">)</span>
+<span class="n">pygame</span><span class="p">.</span><span class="n">mixer</span><span class="p">.</span><span class="n">music</span><span class="p">.</span><span class="n">set_volume</span><span class="p">(</span><span class="n">v</span><span class="p">)</span>
+
+<span class="c1">#定义一个退出程序标志
+</span><span class="n">requireQuit</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="c1">#程序主循环
+</span><span class="k">while</span> <span class="ow">not</span> <span class="n">requireQuit</span><span class="p">:</span>
+    <span class="c1">#循环接受各种事件
+</span>    <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">pygame</span><span class="p">.</span><span class="n">event</span><span class="p">.</span><span class="n">get</span><span class="p">():</span>
+        <span class="c1">#如果是自定义的播放完成消息
+</span>        <span class="k">if</span> <span class="n">event</span><span class="p">.</span><span class="nb">type</span> <span class="o">==</span> <span class="n">MUSIC_END</span><span class="p">:</span>
+            <span class="n">requireQuit</span><span class="o">=</span><span class="bp">True</span>  <span class="c1">#退出
+</span>            <span class="k">break</span>
+        <span class="c1">#界面窗口菜单关闭申请
+</span>        <span class="k">elif</span> <span class="n">event</span><span class="p">.</span><span class="nb">type</span> <span class="o">==</span> <span class="n">pygame</span><span class="p">.</span><span class="n">QUIT</span><span class="p">:</span>
+            <span class="n">requireQuit</span><span class="o">=</span><span class="bp">True</span>
+            <span class="k">break</span>
+        <span class="c1">#有键盘抬起
+</span>        <span class="k">elif</span> <span class="n">event</span><span class="p">.</span><span class="nb">type</span> <span class="o">==</span> <span class="n">pygame</span><span class="p">.</span><span class="n">KEYUP</span><span class="p">:</span>
+            <span class="c1">#q键
+</span>            <span class="k">if</span> <span class="n">event</span><span class="p">.</span><span class="n">key</span> <span class="o">==</span> <span class="n">pygame</span><span class="p">.</span><span class="n">K_q</span><span class="p">:</span>
+                <span class="n">requireQuit</span><span class="o">=</span><span class="bp">True</span>
+                <span class="k">break</span>
+<span class="c1">#... 退出操作 ...
+</span></code></pre></div></div>
+
+<p>程序中，我们自己定义了一条消息。所谓消息，并不是平常人类喜闻乐见的一条短信或者语音，其实就是一个整数数字。为了容易记忆，我们当然自己定义了一个变量名来代表它，但实际它就是一个数字。<br />
+原因是对计算机来讲，其实一切都是数字，我们用一个字符串反而让计算机执行的更慢。<br />
+随后，因为我们的消息循环中肯定还可能嵌套循环，一个break语句只能打破内部的循环，并不能让外部循环也退出，所以我们定义了一个bool的变量，来表示程序是否需要退出循环。<br />
+这里的消息循环从技术上并没有啥难度，主要是你需要适应这么多新的函数和预定义的变量（这里当然当做常量来用，比如表示pygame需要退出）。<br />
+在内部循环中，我们判断了三种可能需要退出的消息。一是自己定义的，如果音乐播放结束，应当退出；二是用户用鼠标关闭窗口，程序应当退出；三是按q键表示用户希望退出播放。<br />
+按下按键游戏采取相应动作是很常见的游戏处理工作，我们在这里等待用户按下按键然后再松开的这一刻退出，这样防止用户按下q键一直没有松手所导致的程序退出后，屏幕上还会出现很多q字符的情况。</p>
+
+<p>现在的程序已经能正常的播放音乐了，实际上我们的程序还能进一步优化。比如1.添加播放的时间显示；2.向前向后跳转播放。<br />
+这两个功能都可以在消息循环中处理，这样程序才是并行的。现在你可能感觉到了，实际上消息循环中，才是程序的主要逻辑。的确如此，其实所有的游戏基本都是在消息循环中做所有的主要工作，当然具体工作细节，都是由已经定义好的函数或叫子程序来具体执行完成的，在主循环中，只是对这些函数的组织、管理和调用。</p>
+
+<p>显示播放位置：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#程序主循环
+</span><span class="k">while</span> <span class="ow">not</span> <span class="n">requireQuit</span><span class="p">:</span>
+    <span class="c1">#获取当前播放位置
+</span>    <span class="n">pos</span><span class="o">=</span><span class="n">pygame</span><span class="p">.</span><span class="n">mixer</span><span class="p">.</span><span class="n">music</span><span class="p">.</span><span class="n">get_pos</span><span class="p">()</span>
+    <span class="c1">#显示
+</span>    <span class="k">print</span><span class="p">(</span><span class="s">"Playing:"</span><span class="p">,</span> <span class="n">pos</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s">'</span><span class="se">\r</span><span class="s">'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>消息循环中，在按键部分添加代码：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="c1">#如果是向右键，则前跳10秒
+</span>   <span class="k">elif</span> <span class="n">event</span><span class="p">.</span><span class="n">key</span> <span class="o">==</span> <span class="n">pygame</span><span class="p">.</span><span class="n">K_LEFT</span><span class="p">:</span>
+      <span class="n">pygame</span><span class="p">.</span><span class="n">mixer</span><span class="p">.</span><span class="n">music</span><span class="p">.</span><span class="n">set_pos</span><span class="p">(</span><span class="n">pos</span><span class="o">/</span><span class="mi">1000</span><span class="o">-</span><span class="mi">10</span><span class="p">)</span>
+  <span class="c1">#如果是向左键，则后跳10秒
+</span>   <span class="k">elif</span> <span class="n">event</span><span class="p">.</span><span class="n">key</span> <span class="o">==</span> <span class="n">pygame</span><span class="p">.</span><span class="n">K_RIGHT</span><span class="p">:</span>
+      <span class="n">pygame</span><span class="p">.</span><span class="n">mixer</span><span class="p">.</span><span class="n">music</span><span class="p">.</span><span class="n">set_pos</span><span class="p">(</span><span class="n">pos</span><span class="o">/</span><span class="mi">1000</span><span class="o">+</span><span class="mi">10</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>这样的功能增加，依赖于你对pygame扩展库越来越熟悉，通过阅读文档，发现pygame扩展库能提供什么样的功能。而这个功能你又需要，就可以加入到程序中。</p>
+
+<hr />
+
+<h4 id="练习时间">练习时间</h4>
+
+<p>其实本讲可以说从开始到现在都是挑战，因此没有再设置单独的挑战环节。</p>
+
+<p>我们直接进入练习的环节：</p>
+
+<ul>
+  <li>以本讲前面最终版代码code5.py为蓝本，修改程序，实现由命令行参数接受mp3文件名，并播放</li>
+  <li>除了q键之外，请设定ESC键也作为退出按键。提示，ESC键的代码为：pygame.K_ESCAPE</li>
+</ul>
+
+<hr />
+
+<h4 id="本讲小结">本讲小结</h4>
+
+<ul>
+  <li>python并不是很适合进行游戏编程，但游戏编程的学习能让你的程序更友好，并具有丰富的表现力</li>
+  <li>并行、事件驱动的编程思想，是现代程序开发的前沿思想，对于提高程序的效率和稳定性有重要的帮助</li>
+  <li>在一个新模块的学习中，循序渐进，逐步完善代码是常用的一种手段。在本讲，我们更侧重讲述，你接触到一个新的扩展包，如何查找资料、分析问题，最终掌握它的使用</li>
+</ul>
+
+<hr />
+
+<h4 id="练习答案">练习答案</h4>
+
+<p>请参考mp3Player.py程序。<br />
+（所有本系列中出现、使用过的源码将会在连载完成后统一整理提供下载。）</p>
+
+:ET

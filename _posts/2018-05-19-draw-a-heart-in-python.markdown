@@ -8,7 +8,7 @@ tags:           python seven
 post-card-type: image
 ---
 ![](http://115.182.41.123/files/201805/19/heart1.png)  
-<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'></script>
+<script src='https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML'></script>
 :) 标题是开玩笑的，千万别认真。
 
 随着AI的飞速发展，有志于此行的码农也是急剧的增加，带来的就是大家对算法、数学的兴趣也格外升高。  

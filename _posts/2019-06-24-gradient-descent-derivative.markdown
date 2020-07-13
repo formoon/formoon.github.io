@@ -7,7 +7,7 @@ date:           2019-06-24
 tags:           html
 post-card-type: image
 ---
-<script src='https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML'></script>
+<script src='https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML'></script>
 ![](http://115.182.41.123/files/201906/gradient/gradient-descent.jpeg)  
 前面一篇就是基础性的推导过程。从反馈的情况看，总体还是讲明白了。但是在导数的部分，仍有不少的存疑。  
 其实在数学方面，我也是学渣。所以尽我所能，希望再次的补充能讲的明白。若有谬误，期盼指正。  
