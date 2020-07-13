@@ -1,0 +1,6 @@
+I"0<p><img src="http://115.182.41.123/files/201901/python3.jpeg" alt="" />
+<script src="https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script></p>
+<h3 id="从零开始python3第六讲">《从零开始PYTHON3》第六讲</h3>
+<p>几乎但凡接触过一点编程的人都知道for循环，在大多数语言的学习中，这也是第一个要学习的循环模式。<br />
+但是在Python中，我们把for循环放到了while循环的后面。原因是，Python中的for循环已经完全不是你知道的样子了。</p>
+:ET

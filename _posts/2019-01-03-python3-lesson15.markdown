@@ -2,12 +2,12 @@
 layout:         page
 title:          从零开始学习PYTHON3讲义（十五）
 subtitle:       让画面动起来
-card-image:		https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1545112916052&di=d2428f9e946cda2d7df3f0ca9ff3def8&imgtype=0&src=http%3A%2F%2Finsights.thoughtworkers.org%2Fwp-content%2Fuploads%2F2015%2F07%2F718-%25E4%25BD%259F%25E8%25BE%25BE-%25E5%2585%25A8%25E6%25A0%2588%25E5%25BC%2580%25E5%258F%2591%25E8%25AF%25AD%25E8%25A8%2580Python-1024x724.png
+card-image:		http://115.182.41.123/files/201901/python3.jpeg
 date:           2019-01-03
 tags:           python
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1545112916052&di=d2428f9e946cda2d7df3f0ca9ff3def8&imgtype=0&src=http%3A%2F%2Finsights.thoughtworkers.org%2Fwp-content%2Fuploads%2F2015%2F07%2F718-%25E4%25BD%259F%25E8%25BE%25BE-%25E5%2585%25A8%25E6%25A0%2588%25E5%25BC%2580%25E5%258F%2591%25E8%25AF%25AD%25E8%25A8%2580Python-1024x724.png)
+![](http://115.182.41.123/files/201901/python3.jpeg)
 ### 《从零开始PYTHON3》第十五讲
 
 虽然看起来绘图和音乐并不相关，但是听过了上一讲的内容你一定知道，这是游戏编程中四个需要处理内容的两部分，这两部分必须同时、并行的处理，不能因为某一项计算的拖延，导致另外一方程序的停滞。要知道人对声音的断续和游戏的卡顿是很敏感的。

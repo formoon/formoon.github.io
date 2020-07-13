@@ -2,12 +2,12 @@
 layout:         page
 title:          从零开始学习PYTHON3讲义（八）
 subtitle:       列表类型跟冒泡排序
-card-image:		https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1545112916052&di=d2428f9e946cda2d7df3f0ca9ff3def8&imgtype=0&src=http%3A%2F%2Finsights.thoughtworkers.org%2Fwp-content%2Fuploads%2F2015%2F07%2F718-%25E4%25BD%259F%25E8%25BE%25BE-%25E5%2585%25A8%25E6%25A0%2588%25E5%25BC%2580%25E5%258F%2591%25E8%25AF%25AD%25E8%25A8%2580Python-1024x724.png
+card-image:		http://115.182.41.123/files/201901/python3.jpeg
 date:           2018-12-25
 tags:           python
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1545112916052&di=d2428f9e946cda2d7df3f0ca9ff3def8&imgtype=0&src=http%3A%2F%2Finsights.thoughtworkers.org%2Fwp-content%2Fuploads%2F2015%2F07%2F718-%25E4%25BD%259F%25E8%25BE%25BE-%25E5%2585%25A8%25E6%25A0%2588%25E5%25BC%2580%25E5%258F%2591%25E8%25AF%25AD%25E8%25A8%2580Python-1024x724.png)
+![](http://115.182.41.123/files/201901/python3.jpeg)
 <script src='https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML'></script>
 ### 《从零开始PYTHON3》第八讲
 

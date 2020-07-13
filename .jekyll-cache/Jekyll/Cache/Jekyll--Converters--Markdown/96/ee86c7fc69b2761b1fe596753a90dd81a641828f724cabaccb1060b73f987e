@@ -1,0 +1,299 @@
+I"�u<p><img src="http://115.182.41.123/files/201901/python3.jpeg" alt="" /></p>
+<h3 id="从零开始python3第十五讲">《从零开始PYTHON3》第十五讲</h3>
+
+<p>虽然看起来绘图和音乐并不相关，但是听过了上一讲的内容你一定知道，这是游戏编程中四个需要处理内容的两部分，这两部分必须同时、并行的处理，不能因为某一项计算的拖延，导致另外一方程序的停滞。要知道人对声音的断续和游戏的卡顿是很敏感的。</p>
+
+<p>在Pygame中进行并行处理的主要手段，一是Pygame中的各种函数，大多是不等待工作完成，只要工作开始进行，就返回主程序，等待下一条命令，而任务会在看不到的后端继续执行，并不停止；另外则是各个并行的任务之间，会通过“消息事件”的方式跟主程序沟通，从而让主程序能够统一调度各项任务的进程。</p>
+
+<p>这是复习上一讲的内容。</p>
+
+<blockquote>
+  <p>并行：指的是在硬件的帮助下，多个任务同时进行，互不影响，最终完成任务的过程。完成的时间取决于最慢的任务。这个硬件帮助，通常是指多核CPU、显卡计算配合CPU计算以及数据传输中的多通道。<br />
+串行：指的是完成一项工作，才进行另外一项工作，最后完成的时间是所有任务完成的总和。</p>
+</blockquote>
+
+<hr />
+
+<h4 id="游戏绘图">游戏绘图</h4>
+
+<h5 id="绘图模式">绘图模式</h5>
+
+<p>同我们前面学过的科学绘图和海龟绘图相比，游戏绘图在绘图的模式上有较大的区别。</p>
+
+<p>传统程序绘图是顺序方式，每画一笔可以认为这一笔一直都在，直到程序退出或者擦除画面。你可以回忆一下我们在科学绘图和海龟绘图时候所学习的内容。<br />
+游戏绘图更类似拍照，一个个角色进入画面，摆好姿态，等待快门按下，这样完成一帧。随后会根据游戏逻辑和输入，调整画面，再拍摄下一张，这样至少达到每秒30帧，才能达成一个动画的效果。</p>
+
+<p>从逻辑上讲，游戏绘图采用的方式似乎应当慢于传统方式。实际上因为这种方式能够得到CPU/显卡以及很多新技术的帮助。很多绘图任务发出后，实际上是进入显卡完成运算的，这时候CPU已经在处理其它内容。这样并行计算的方式，再加上显卡更善于处理图形、图像相关的工作。最终这种方式效率才会高很多。</p>
+
+<p>我们前面讲的科学绘图和海龟绘图，新版本的实现有很多是使用游戏绘图的方式，通过并行的方式完成计算。但因为用户编程接口的兼容性，所以至少从我们编程时所感受到的方式上，还是串行处理的。</p>
+
+<h5 id="坐标系">坐标系</h5>
+
+<p>科技绘图（matplotlib）：采用数学坐标系，同显示设备无关,通常原点在屏幕中心。绘图包会自动调整数学坐标系跟窗口分辨率的比例（窗口分辨率是可以在程序中设置的，只是前面的学习中我们基本使用了默认的设置），从而让显示效果最优。<br />
+海龟绘图（turtle）：原点在窗口中心，跟数学坐标系方向相同，坐标是同显示设备分辨率相关的，但绘图的操作通常是用几何的方式，所以不用太担心显示设备本身的分辨率。<br />
+游戏绘图(pygame):原点在窗口左上角，x轴坐标向右侧增大，y轴坐标向下增大，最大值为屏幕分辨率。还有一些更底层的游戏绘图引擎，比如OpenGL会使用统一的1.0*1.0坐标系，然后在不同设备上映射成不同的分辨率。我们本讲的课程采用Pygame所使用的坐标体系。</p>
+
+<h5 id="颜色">颜色</h5>
+
+<p>在计算机中常用的颜色分类有这么几种：</p>
+
+<ul>
+  <li>二值图：仅有黑白两色，比如字体库</li>
+  <li>灰度图：0-255，共256级灰度，比如黑白照片</li>
+  <li>伪彩色：0-255,共256种颜色，比如GIF动图、微信表情</li>
+  <li>真彩色：RGB红绿蓝三色图，每种颜色0-255，按二进制计算，也称为24位色</li>
+  <li>32位真彩色：RGBA四色，除了红绿蓝之外，A代表透明度，能表现更多的多种颜色互动、遮盖的效果</li>
+</ul>
+
+<p>这些颜色格式Pygame都支持，但最新的游戏通常都已经采用32位真彩色的方式。<br />
+在游戏的显示过程中，如果不考虑透明度A的部分，所有颜色都是使用“三基色”来表达的，也就是红、绿、蓝，每个颜色分量可以的取值分为是0到255。0表示完全没有这个颜色，255表示这个颜色最强。当三个颜色都是0的时候显示为纯黑。当三个颜色都是255的时候，显示为纯白。<br />
+因为是三个颜色，所以通常的颜色都是使用三个值的“元组”的形式表达的。元组我们第九讲学过了。下面举一些例子，我们在程序中，预定义几个常用的颜色：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#黑色
+</span><span class="n">BLACK</span> <span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="c1">#白色
+</span><span class="n">WHITE</span> <span class="o">=</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">)</span>
+<span class="c1">#红色
+</span><span class="n">RED</span> <span class="o">=</span> <span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1">#绿色
+</span><span class="n">GREEN</span> <span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1">#蓝色
+</span><span class="n">BLUE</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">)</span>
+</code></pre></div></div>
+
+<hr />
+
+<h5 id="pygame程序一般结构">Pygame程序一般结构</h5>
+
+<p>上一讲和本讲开始我们都已经讲过，Pygame的主要工作模式是并行处理，其结构同传统的串行程序就必然有一些差别。这个差别并不大，很类似我们学习互联网编程时候的框架模板，即使不够理解，照抄下来用就可以。下面就是一个一般的结构：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#此代码仅为架构示例,没有具体功能
+#作者：Andrew
+</span>
+<span class="c1">#引入扩展库
+</span><span class="kn">import</span> <span class="nn">pygame</span>
+
+<span class="n">width</span><span class="o">=</span><span class="mi">1280</span>
+<span class="n">heigh</span><span class="o">=</span><span class="mi">556</span>
+<span class="n">color</span><span class="o">=</span><span class="mi">32</span>
+
+<span class="c1">#pygame初始化
+</span><span class="n">pygame</span><span class="p">.</span><span class="n">display</span><span class="p">.</span><span class="n">init</span><span class="p">()</span>
+<span class="c1">#创建一个绘图平面,后面参数为设定的窗口分辨率及颜色
+</span><span class="n">screen</span> <span class="o">=</span> <span class="n">pygame</span><span class="p">.</span><span class="n">display</span><span class="p">.</span><span class="n">set_mode</span><span class="p">((</span><span class="n">width</span><span class="p">,</span> <span class="n">heigh</span><span class="p">),</span> <span class="mi">0</span><span class="p">,</span> <span class="n">color</span><span class="p">)</span>
+<span class="c1">#声音系统初始化
+</span><span class="n">pygame</span><span class="p">.</span><span class="n">mixer</span><span class="p">.</span><span class="n">init</span><span class="p">()</span>
+
+<span class="c1">#1...其它自身初始化项目...
+</span>
+<span class="c1">#是否要退出标志
+</span><span class="n">requireQuit</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="c1">#程序主循环，在有退出申请之前一直循环
+</span><span class="k">while</span> <span class="ow">not</span> <span class="n">requireQuit</span><span class="p">:</span>
+    <span class="c1">#2...自己的绘图部分...
+</span>
+    <span class="c1">#处理所有事件
+</span>    <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">pygame</span><span class="p">.</span><span class="n">event</span><span class="p">.</span><span class="n">get</span><span class="p">():</span>
+        <span class="c1">#用户从窗口菜单选择退出
+</span>        <span class="k">if</span> <span class="n">event</span><span class="p">.</span><span class="nb">type</span> <span class="o">==</span> <span class="n">pygame</span><span class="p">.</span><span class="n">QUIT</span><span class="p">:</span>
+            <span class="n">requireQuit</span><span class="o">=</span><span class="bp">True</span>
+            <span class="k">break</span>
+        <span class="c1">#用户是否有按键？
+</span>        <span class="k">elif</span> <span class="n">event</span><span class="p">.</span><span class="nb">type</span> <span class="o">==</span> <span class="n">pygame</span><span class="p">.</span><span class="n">KEYUP</span><span class="p">:</span>
+            <span class="c1">#为了可靠，只处理按键松开的动作
+</span>            <span class="k">if</span> <span class="n">event</span><span class="p">.</span><span class="n">key</span> <span class="ow">in</span> <span class="p">[</span><span class="n">pygame</span><span class="p">.</span><span class="n">K_q</span><span class="p">,</span><span class="n">pygame</span><span class="p">.</span><span class="n">K_ESCAPE</span><span class="p">]:</span>
+                <span class="c1">#用户按了q键
+</span>                <span class="n">requireQuit</span><span class="o">=</span><span class="bp">True</span>
+                <span class="k">break</span>
+        <span class="c1">#3...其它事件处理...
+</span>    <span class="c1">#4...其它程序逻辑...
+</span>
+<span class="c1">#优雅的退出，释放各种资源
+</span><span class="n">pygame</span><span class="p">.</span><span class="n">mixer</span><span class="p">.</span><span class="n">quit</span><span class="p">()</span>
+<span class="n">pygame</span><span class="p">.</span><span class="n">display</span><span class="p">.</span><span class="n">quit</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>上面的代码中，并不包含任何功能，只是一个模板。通常没有特殊需求的程序，只要编写其中的#1/#2/#3/#4部分的程序就可以。
+为了程序更便于理解和阅读，还可以对上面的结构进一步的优化，比如把需要继续编程的部分函数化。当然函数化的时候要考虑到变量作用域，避免增加不必要的麻烦。</p>
+
+<hr />
+
+<h5 id="常用绘图功能">常用绘图功能</h5>
+
+<p>我们介绍几个常用的绘图功能，然后就可以代入到上面的模板代码中来实验了。</p>
+
+<p>一般的几何图形绘制功能，都汇总在pygame.draw包中，比如：</p>
+
+<ul>
+  <li>画圆：pygame.draw.circle</li>
+  <li>矩形：pygame.draw.rect</li>
+  <li>多边形：pygame.draw.polygon</li>
+  <li>画线：pygame.draw.line</li>
+  <li>画弧线：pygame.draw.arc</li>
+  <li>画矩形：pygame.draw.rect</li>
+</ul>
+
+<p>正常情况下，pygame的显示是在一个窗口中显示的（也可以根据需要设置全屏），窗口可以设置一个标题来表示你当前做的工作，这个命令是：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#设置窗口标题
+</span><span class="n">pygame</span><span class="p">.</span><span class="n">display</span><span class="p">.</span><span class="n">set_caption</span><span class="p">(</span><span class="s">'Hello World!'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>用于显示的窗口默认是没有颜色，也就是黑色，可以设置窗口的底色：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#用白色填充窗口，既是设置窗口底色，也是把窗口清空，重新绘制下一帧
+#pygame绘图是像摄影师拍摄每一帧的照片，还记得吗？
+</span><span class="n">screen</span><span class="p">.</span><span class="n">fill</span><span class="p">(</span><span class="n">WHITE</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>还有一些函数的功能，可以参考help(pygame)。help也可以查看某一个具体的子包，比如:help(pygame.draw)。下面我们通过程序示例代码来看看刚才讲的这些功能：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#我们定义一个函数，来完成画面的绘制
+#避免过多的语句挤入到主循环中影响程序的结构
+</span><span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="n">screen</span><span class="p">):</span>
+    <span class="c1">#2...自己的绘图部分...
+</span>    <span class="c1">#用白色填充窗口
+</span>    <span class="n">screen</span><span class="p">.</span><span class="n">fill</span><span class="p">(</span><span class="n">WHITE</span><span class="p">)</span>
+    <span class="c1">#画多边形
+</span>    <span class="n">pygame</span><span class="p">.</span><span class="n">draw</span><span class="p">.</span><span class="n">polygon</span><span class="p">(</span><span class="n">screen</span><span class="p">,</span> <span class="n">GREEN</span><span class="p">,</span> <span class="p">((</span><span class="mi">146</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">291</span><span class="p">,</span> <span class="mi">106</span><span class="p">),</span> <span class="p">(</span><span class="mi">236</span><span class="p">,</span> <span class="mi">277</span><span class="p">),</span> <span class="p">(</span><span class="mi">56</span><span class="p">,</span> <span class="mi">277</span><span class="p">),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">106</span><span class="p">)))</span>
+    <span class="c1">#画线
+</span>    <span class="n">pygame</span><span class="p">.</span><span class="n">draw</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">screen</span><span class="p">,</span> <span class="n">BLUE</span><span class="p">,</span> <span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span> <span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="n">pygame</span><span class="p">.</span><span class="n">draw</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">screen</span><span class="p">,</span> <span class="n">BLUE</span><span class="p">,</span> <span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">60</span><span class="p">),</span> <span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">120</span><span class="p">))</span>
+    <span class="n">pygame</span><span class="p">.</span><span class="n">draw</span><span class="p">.</span><span class="n">line</span><span class="p">(</span><span class="n">screen</span><span class="p">,</span> <span class="n">BLUE</span><span class="p">,</span> <span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">120</span><span class="p">),</span> <span class="p">(</span><span class="mi">120</span><span class="p">,</span> <span class="mi">120</span><span class="p">),</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="c1">#画圆
+</span>    <span class="n">pygame</span><span class="p">.</span><span class="n">draw</span><span class="p">.</span><span class="n">circle</span><span class="p">(</span><span class="n">screen</span><span class="p">,</span> <span class="n">BLUE</span><span class="p">,</span> <span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="c1">#椭圆
+</span>    <span class="n">pygame</span><span class="p">.</span><span class="n">draw</span><span class="p">.</span><span class="n">ellipse</span><span class="p">(</span><span class="n">screen</span><span class="p">,</span> <span class="n">RED</span><span class="p">,</span> <span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">250</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">80</span><span class="p">),</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="c1">#矩形
+</span>    <span class="n">pygame</span><span class="p">.</span><span class="n">draw</span><span class="p">.</span><span class="n">rect</span><span class="p">(</span><span class="n">screen</span><span class="p">,</span> <span class="n">RED</span><span class="p">,</span> <span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">150</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="mi">50</span><span class="p">))</span>
+
+    <span class="c1">#使用直接操作图形缓存的方法在右下角画四个点
+</span>    <span class="c1">#这个功能比较底层，除非需要很专业的操作一般用不到
+</span>    <span class="n">pixObj</span> <span class="o">=</span> <span class="n">pygame</span><span class="p">.</span><span class="n">PixelArray</span><span class="p">(</span><span class="n">screen</span><span class="p">)</span>
+    <span class="n">pixObj</span><span class="p">[</span><span class="mi">480</span><span class="p">][</span><span class="mi">380</span><span class="p">]</span> <span class="o">=</span> <span class="n">BLACK</span>
+    <span class="n">pixObj</span><span class="p">[</span><span class="mi">482</span><span class="p">][</span><span class="mi">382</span><span class="p">]</span> <span class="o">=</span> <span class="n">BLACK</span>
+    <span class="n">pixObj</span><span class="p">[</span><span class="mi">484</span><span class="p">][</span><span class="mi">384</span><span class="p">]</span> <span class="o">=</span> <span class="n">BLACK</span>
+    <span class="n">pixObj</span><span class="p">[</span><span class="mi">486</span><span class="p">][</span><span class="mi">386</span><span class="p">]</span> <span class="o">=</span> <span class="n">BLACK</span>
+    <span class="n">pixObj</span><span class="p">[</span><span class="mi">488</span><span class="p">][</span><span class="mi">388</span><span class="p">]</span> <span class="o">=</span> <span class="n">BLACK</span>
+    <span class="k">del</span> <span class="n">pixObj</span>
+
+    <span class="c1">#显示在屏幕上
+</span>    <span class="n">pygame</span><span class="p">.</span><span class="n">display</span><span class="p">.</span><span class="n">update</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>上面代码只列出了自己定义的绘图部分，其它部分需要融合到框架模板中去。完整的代码可以参考code2.py源文件。
+下面的图片是绘制的效果：<br />
+<img src="/assets/cimages/201901/python315/pygameDraw1.png" alt="pygameDraw1" />
+程序运行之后，可以按q键退出程序，也可以从菜单选择Quit来退出。</p>
+
+<p>老话题，想掌握学习的知识，只能多练习。<br />
+请在上面程序的基础，调整各项参数，增加或者减少绘图的指令，自己练练。看看谁绘制的画面最好看。</p>
+
+<hr />
+
+<h4 id="挑战">挑战</h4>
+
+<p>我们已经掌握了基本的绘图知识。可惜游戏没有这么简单，至少游戏需要是以动画的方式为基础，玩起来才会感觉到真实。</p>
+
+<p>我们早已经说过，现代的游戏开发已经是一个团队配合的产物。不管想达成什么样的动画，一般都需要有美工专业人员完成原画的设计制作，提供成素材，随后才能由程序人员来完成让画面动起来的工作。</p>
+
+<p>我们这里已经从网上下载了几个素材：<br />
+<img src="/assets/cimages/201901/python315/pygameDraw2.png" alt="pygameDraw2" />
+上面包含两个动画元素的素材，上面部分是一只小地鼠，仔细观察这四副图片，他们的脚在不同的位置。四张图片代表动画中的4帧，连续起来，就会出现小地鼠在跑的样子。<br />
+下面的箭比较简单，只需要一帧，箭的图片出现在屏幕不同的位置上，感觉起来就是箭飞到了那个位置。<br />
+如果你还记得第一讲的演示，你应当能看出来这些素材出自游戏Bunny。</p>
+
+<p>下面我们编程序，来实现小地鼠从屏幕右侧快速跑到屏幕左侧的动画，和羽箭从屏幕左侧飞到右侧的动画。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#使用pygame对图片处理的功能，载入图片到变量
+</span><span class="n">arrow</span> <span class="o">=</span> <span class="n">pygame</span><span class="p">.</span><span class="n">image</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="s">"bullet.png"</span><span class="p">)</span>
+<span class="c1">#地鼠因为包含四帧，我们使用列表格式
+</span><span class="n">badguy</span> <span class="o">=</span> <span class="p">[</span><span class="n">pygame</span><span class="p">.</span><span class="n">image</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="s">"badguy.png"</span><span class="p">),</span>
+    <span class="n">pygame</span><span class="p">.</span><span class="n">image</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="s">"badguy2.png"</span><span class="p">),</span>
+    <span class="n">pygame</span><span class="p">.</span><span class="n">image</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="s">"badguy3.png"</span><span class="p">),</span>
+    <span class="n">pygame</span><span class="p">.</span><span class="n">image</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="s">"badguy4.png"</span><span class="p">)]</span>
+<span class="c1">#动画动起来，需要一帧帧的变化，下面的变量用于指当前显示的第几帧
+</span><span class="n">badguyIndex</span> <span class="o">=</span> <span class="mi">0</span>
+
+
+<span class="c1">#定义x1/y1和x2/y2两组坐标，
+#分别用于表示羽箭和小地鼠在屏幕上的位置
+</span>
+<span class="c1">#坐标系还记得吧？左上角是0，y向下变大，x向右变大
+</span><span class="n">x1</span><span class="o">=</span><span class="mi">0</span>   <span class="c1">#羽箭从左侧飞到右侧，开始x坐标是0，表示在左侧
+</span><span class="n">y1</span><span class="o">=</span><span class="n">heigh</span><span class="o">/</span><span class="mi">3</span><span class="c1">#y坐标，在窗口上面的1/3位置
+</span>
+<span class="n">x2</span><span class="o">=</span><span class="n">width</span>    <span class="c1">#小地鼠一开始在屏幕右侧
+</span><span class="n">y2</span><span class="o">=</span><span class="n">heigh</span><span class="o">/</span><span class="mi">3</span><span class="o">*</span><span class="mi">2</span>
+
+<span class="c1">#定义一个函数，用于计算向左移动时候下一个位置的坐标
+</span><span class="k">def</span> <span class="nf">moveLeft</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">x</span> <span class="o">-=</span> <span class="n">dx</span>
+    <span class="k">if</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">x</span> <span class="o">+=</span> <span class="n">width</span>
+    <span class="k">return</span> <span class="n">x</span>
+<span class="c1">#定义一个函数，用于计算向右移动时候下一个位置的坐标
+</span><span class="k">def</span> <span class="nf">moveRight</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">dx</span><span class="p">)</span> <span class="o">%</span> <span class="n">width</span>
+
+<span class="c1">#绘制的函数
+</span><span class="k">def</span> <span class="nf">draw</span><span class="p">(</span><span class="n">screen</span><span class="p">):</span>
+    <span class="n">screen</span><span class="p">.</span><span class="n">fill</span><span class="p">(</span><span class="n">WHITE</span><span class="p">)</span>  <span class="c1">#白色填充窗口
+</span>    <span class="n">screen</span><span class="p">.</span><span class="n">blit</span><span class="p">(</span><span class="n">arrow</span><span class="p">,(</span><span class="n">x1</span><span class="p">,</span><span class="n">y1</span><span class="p">))</span> <span class="c1">#绘制羽箭
+</span>    <span class="n">screen</span><span class="p">.</span><span class="n">blit</span><span class="p">(</span><span class="n">badguy</span><span class="p">[</span><span class="n">badguyIndex</span><span class="p">],(</span><span class="n">x2</span><span class="p">,</span><span class="n">y2</span><span class="p">))</span> <span class="c1">#绘制地鼠
+</span>    <span class="c1">#显示在屏幕上
+</span>    <span class="n">pygame</span><span class="p">.</span><span class="n">display</span><span class="p">.</span><span class="n">update</span><span class="p">()</span>
+    
+<span class="p">...</span>
+
+    <span class="c1">#4...其它程序逻辑...
+</span>    <span class="c1">#移动元素坐标位置的工作，应当放到“其它程序逻辑”中
+</span>    <span class="c1">#这样的方式使得程序逻辑，特别是绘图的逻辑干净易读
+</span>    
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">moveLeft</span><span class="p">(</span><span class="n">x2</span><span class="p">)</span>
+    <span class="n">x1</span> <span class="o">=</span> <span class="n">moveRight</span><span class="p">(</span><span class="n">x1</span><span class="p">)</span>
+    <span class="n">badguyIndex</span> <span class="o">=</span> <span class="p">(</span><span class="n">badguyIndex</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">4</span>  <span class="c1">#地鼠下次使用下一帧
+</span></code></pre></div></div>
+
+<p>上面代码依然去掉了同前面重复的部分，完整的代码请参考code3.py程序。现在运行一下看看吧：
+<img src="/assets/cimages/201901/python315/pygameDraw3.png" alt="pygameDraw3" />
+截图无法展示动态，你一定要亲自动手来试试，才能看到效果。关键点：</p>
+
+<ol>
+  <li>屏幕绘制部分，根据坐标值，绘制指定的图片。</li>
+  <li>在程序逻辑运算的部分，计算下一帧画面的时候，小地鼠和羽箭在屏幕上的新位置。以及地鼠的动画图片下次绘制采用哪一帧图片。</li>
+</ol>
+
+<hr />
+
+<h4 id="练习时间">练习时间</h4>
+
+<ol>
+  <li>修改上面程序的参数，让地鼠的速度加快一倍，而箭的速度保持不变</li>
+  <li>上一讲中的mp3播放器，请实现在播放器播放的时候，显示一张歌曲的封面图片</li>
+</ol>
+
+<hr />
+
+<h4 id="本讲小结">本讲小结</h4>
+
+<ul>
+  <li>本讲介绍了使用pygame绘制基本几何图形和绘制简单动画的方式</li>
+  <li>绘画、动画其实都不难，重要的是画面的设计，只要有了连续的图片，就可以用数组的方式来实现连续动画</li>
+  <li>对于一个规模越来越大的程序，想少出错、容易维护，就需要代码尽量规范、简洁、函数化</li>
+</ul>
+
+<p>本课程至此就全部结束了。作为面对刚刚接触计算机软件编程的初学者课程，我们使用了15讲的篇幅，从Python的安装、命令行的互动计算开始，讲述了数学计算、程序逻辑控制、常用数据类型等基本Python编程的知识。接着又针对科技绘图、互联网编程、游戏编程等专业领域的应用做了讲解。时间所限，我们并没有能够特别深入对所有话题更进一步的学习。课程也没有对当前流行的面向对象编程做讲解，这些有待于学习者在对初级内容有了一段时间的熟悉和体验之后，继续深入学习。<br />
+希望各位同学能在当前学习的基础上，根据自己的爱好和自己的日常学习、生活需要。有选择的做进一步学习，让Python成为我们学习的好助手，生活的得力工具。<br />
+水平所限，课程内容难免疏漏、错误，敬请谅解并欢迎指正。</p>
+
+<hr />
+
+<h4 id="练习答案">练习答案</h4>
+
+<p>请参考代码：mp3Player1.py</p>
+
+<ul>
+  <li>连载正文结束，所有程序源码及练习答案将会整理后在下一期提供下载。</li>
+</ul>
+:ET

@@ -1,0 +1,505 @@
+I"&�<p><img src="http://115.182.41.123/files/201901/python3.jpeg" alt="" />
+<script src="https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+（内容需要，本讲中再次使用了大量在线公式，如果因为转帖网站不支持公式无法显示的情况，欢迎访问原始博客。）</p>
+<h3 id="从零开始python3第十一讲">《从零开始PYTHON3》第十一讲</h3>
+
+<p>第二讲的时候，我们通过Python的交互模式来入门Python基本知识。当时把Python当成了一个计算器使用。随后从第三讲开始，一直到第十讲，我们进入了编程的方式，并且不断的深入，到第九讲，我们已经完成了Python基本语言、语法部分的学习。</p>
+
+<p>每一讲都有大量的编程练习，估计大家也累了，这一讲休息一下，我们回到把Python当做计算器的状态。当然内容还是要更深入一些，介绍一些常用的高级数学运算功能。</p>
+
+<hr />
+
+<h4 id="python的标准数学库">Python的标准数学库</h4>
+
+<p>标准库、内置库、官方库这些词其实说的都是一个意思，就是这个库来自Python官方开发团队，随开发语言一同安装无需另外下载的库。</p>
+
+<p>第二讲的时候我们已经发现了，Python本身似乎只能做一些简单的数学运算，加、减、乘、除、乘方。随后整数运算还额外有取余数、整除等几个特别的运算。实际上Python更复杂的数学运算都在标准数学库math之中。一直到第九讲我们介绍了“库”的概念，我们才能更多的介绍Python更高级的计算能力。</p>
+
+<p>如同上一讲说到sys库的那样，我们也可以使用Python的内部帮助来查看math库的详细情况：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">math</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">dir</span><span class="p">(</span><span class="n">math</span><span class="p">)</span>
+<span class="p">[</span><span class="s">'__doc__'</span><span class="p">,</span> <span class="s">'__file__'</span><span class="p">,</span> <span class="s">'__loader__'</span><span class="p">,</span> <span class="s">'__name__'</span><span class="p">,</span> <span class="s">'__package__'</span><span class="p">,</span> <span class="s">'__spec__'</span><span class="p">,</span> <span class="s">'acos'</span><span class="p">,</span> <span class="s">'acosh'</span><span class="p">,</span> <span class="s">'asin'</span><span class="p">,</span> <span class="s">'asinh'</span><span class="p">,</span> <span class="s">'atan'</span><span class="p">,</span> <span class="s">'atan2'</span><span class="p">,</span> <span class="s">'atanh'</span><span class="p">,</span> <span class="s">'ceil'</span><span class="p">,</span> <span class="s">'copysign'</span><span class="p">,</span> <span class="s">'cos'</span><span class="p">,</span> <span class="s">'cosh'</span><span class="p">,</span> <span class="s">'degrees'</span><span class="p">,</span> <span class="s">'e'</span><span class="p">,</span> <span class="s">'erf'</span><span class="p">,</span> <span class="s">'erfc'</span><span class="p">,</span> <span class="s">'exp'</span><span class="p">,</span> <span class="s">'expm1'</span><span class="p">,</span> <span class="s">'fabs'</span><span class="p">,</span> <span class="s">'factorial'</span><span class="p">,</span> <span class="s">'floor'</span><span class="p">,</span> <span class="s">'fmod'</span><span class="p">,</span> <span class="s">'frexp'</span><span class="p">,</span> <span class="s">'fsum'</span><span class="p">,</span> <span class="s">'gamma'</span><span class="p">,</span> <span class="s">'gcd'</span><span class="p">,</span> <span class="s">'hypot'</span><span class="p">,</span> <span class="s">'inf'</span><span class="p">,</span> <span class="s">'isclose'</span><span class="p">,</span> <span class="s">'isfinite'</span><span class="p">,</span> <span class="s">'isinf'</span><span class="p">,</span> <span class="s">'isnan'</span><span class="p">,</span> <span class="s">'ldexp'</span><span class="p">,</span> <span class="s">'lgamma'</span><span class="p">,</span> <span class="s">'log'</span><span class="p">,</span> <span class="s">'log10'</span><span class="p">,</span> <span class="s">'log1p'</span><span class="p">,</span> <span class="s">'log2'</span><span class="p">,</span> <span class="s">'modf'</span><span class="p">,</span> <span class="s">'nan'</span><span class="p">,</span> <span class="s">'pi'</span><span class="p">,</span> <span class="s">'pow'</span><span class="p">,</span> <span class="s">'radians'</span><span class="p">,</span> <span class="s">'remainder'</span><span class="p">,</span> <span class="s">'sin'</span><span class="p">,</span> <span class="s">'sinh'</span><span class="p">,</span> <span class="s">'sqrt'</span><span class="p">,</span> <span class="s">'tan'</span><span class="p">,</span> <span class="s">'tanh'</span><span class="p">,</span> <span class="s">'tau'</span><span class="p">,</span> <span class="s">'trunc'</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">help</span><span class="p">(</span><span class="n">math</span><span class="p">)</span>
+<span class="p">...</span>   <span class="c1">#将有大量详细的帮助信息，这里略去
+</span></code></pre></div></div>
+
+<p>下面我们介绍一些常用的math内置数学函数：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>函数</th>
+      <th>功能</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>math.pi</td>
+      <td>数学常数π= 3.141592……</td>
+    </tr>
+    <tr>
+      <td>math.e</td>
+      <td>数学常数e = 2.718281….</td>
+    </tr>
+    <tr>
+      <td>math.tau</td>
+      <td>数学常数τ= 6.283185……</td>
+    </tr>
+    <tr>
+      <td>math.ceil(x)</td>
+      <td>返回x的上限，返回最小的整数A  (A&gt;=x)。如math.ceil(3.14)返回的整数为4官网math库</td>
+    </tr>
+    <tr>
+      <td>math.fabs(x)</td>
+      <td>返回绝对值x。</td>
+    </tr>
+    <tr>
+      <td>math.factorial(x)</td>
+      <td>返回 x!。如果x不是积分或者是负的，就会产生ValueError。</td>
+    </tr>
+    <tr>
+      <td>math.floor(x)</td>
+      <td>返回x的下限，返回一个值最大整数A   (A&lt;=x)。如math.floor(3.14)返回的整数为3</td>
+    </tr>
+    <tr>
+      <td>math.exp(x)</td>
+      <td>返回 ex也就是 math.e ** x</td>
+    </tr>
+    <tr>
+      <td>math.pow(x,y)</td>
+      <td>返回x的y次方，即返回 x ** y</td>
+    </tr>
+    <tr>
+      <td>math.sqrt(x)</td>
+      <td>返回 \(\sqrt x\)</td>
+    </tr>
+    <tr>
+      <td>math.degrees(x)</td>
+      <td>将角x从弧度转换成角度。</td>
+    </tr>
+    <tr>
+      <td>math.radians(x)</td>
+      <td>把角x从度转换成弧度。</td>
+    </tr>
+    <tr>
+      <td>math.acos(x)</td>
+      <td>返回 x 的反余弦</td>
+    </tr>
+    <tr>
+      <td>math.asin(x)</td>
+      <td>返回 x 的反正弦。</td>
+    </tr>
+    <tr>
+      <td>math.atan(x)</td>
+      <td>返回 x 的反正切。</td>
+    </tr>
+    <tr>
+      <td>math.cos(x)</td>
+      <td>返回 x 的余弦。</td>
+    </tr>
+    <tr>
+      <td>math.sin(x)</td>
+      <td>返回 x 的正弦。</td>
+    </tr>
+    <tr>
+      <td>math.tan(x)</td>
+      <td>返回 x 的正切。</td>
+    </tr>
+    <tr>
+      <td>math.log(x,a)</td>
+      <td>返回 \(log\;a^x\)，若不提供a参数，默认使用e</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>有了这些函数的帮助，我们一下从小学水平上升到了高中:)，来看几个使用的例子：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">math</span>	<span class="c1">#所有math的函数，使用之前必须引入库，引入一次即可
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">math</span><span class="p">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>    <span class="c1">#1的正弦
+</span><span class="mf">0.8414709848078965</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">math</span><span class="p">.</span><span class="n">pi</span> 	<span class="c1">#π常量
+</span><span class="mf">3.141592653589793</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">math</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="c1">#计算3的平方根
+</span><span class="mf">1.7320508075688772</span>
+<span class="o">&gt;&gt;&gt;</span> 
+</code></pre></div></div>
+
+<p>扩展库和各种函数的学习，通常不需要你一次都记住，而是用的时候查资料会用即可。常用的函数，用的多的自然就记住了。<br />
+随用随查资料这种形式，不同于以前的课堂笔记，一般都是用网页书签来记录下来常用的资料地址，这样才能快速的查询。比如math库的部分常用函数的中文资料：<a href="https://www.cnblogs.com/renpingsheng/p/7171950.html">https://www.cnblogs.com/renpingsheng/p/7171950.html</a>。<br />
+中文资料一般都更新慢一些，并且通常不是很完整，官方的英文资料则更快，但是需要你能阅读英文。立志希望从事信息技术行业的同学，英语的学习也要同时加强。官方英文资料地址：<a href="https://docs.python.org/3/library/math.html">https://docs.python.org/3/library/math.html</a></p>
+
+<hr />
+
+<h4 id="第三方数学库numpy">第三方数学库numpy</h4>
+
+<p>“第三方”是在计算机行业中很常用的概念，指的既不是开发者官方提供的，也不是用户自己开发的。是由其它组织开发并提供服务的内容。可以把两者做一个比较：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th><strong>标准库</strong></th>
+      <th><strong>第三方扩展库</strong></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>同为软件库,相同的使用方法</td>
+      <td>同为软件库，相同的使用方法</td>
+    </tr>
+    <tr>
+      <td>由PYTHON官方或认可的开发团队开发维护</td>
+      <td>通常由世界范围内许多不同公司或组织开发维护</td>
+    </tr>
+    <tr>
+      <td>通常只有一个最稳定的版本</td>
+      <td>同一个功能，可能有很多个团队的不同产品，质量参差不齐</td>
+    </tr>
+    <tr>
+      <td>主要完成常用、基本、必备功能</td>
+      <td>解决各种各样问题</td>
+    </tr>
+    <tr>
+      <td>随PYTHON安装，直接就可以使用，称为标准库</td>
+      <td>需要额外安装，跟不同操作系统可能还有兼容性问题，称为第三方扩展库</td>
+    </tr>
+    <tr>
+      <td>开发规范、命名习惯基本统一</td>
+      <td>各自有各自的标准、规范，互相之间有可能习惯差别很大</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>通常能生存并传播很广泛的第三方扩展库都有惊人强大的功能。在享受这些“超级”功能的同时，每个第三方扩展库都需要安装之后才能被Python程序“引用”和“使用”，是第三方扩展库最大的障碍。<br />
+为此Python发展出了很多扩展库的管理工具来帮助开发人员安装、管理、删除扩展库。我们第一讲介绍了使用最多的pip管理工具。<br />
+使用pip管理工具安装numpy数学库的方法如下：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#在Windows中，首先退出当前的Python软件
+#使用管理员模式执行cmd命令行，然后执行如下命令：
+</span><span class="n">pip</span> <span class="n">install</span> <span class="n">numpy</span>
+<span class="c1">#某些windows系统需要使用pip3
+</span><span class="n">pip3</span> <span class="n">install</span> <span class="n">numpy</span>
+
+<span class="c1">#linux和mac在命令行执行：
+</span><span class="n">sudo</span> <span class="n">pip3</span> <span class="n">install</span> <span class="n">numpy</span>
+</code></pre></div></div>
+<p>使用习惯之后，这样一行的安装命令根本不会对你使用扩展库有什么影响，而且只需要安装一次，不换电脑就可以一直使用。</p>
+
+<p>numpy的使用跟math的使用几乎是相同的，但是相较于只有50多个预置数学函数的math，numpy包含了600多个。只要跟数学相关的，几乎所有需要用到的函数和常量都已经有了。我们举几个例子：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#首先使用之前一样是必须先引用
+</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+    <span class="c1">#as np表示引入后使用np的名字来调用，这样每次都可以少敲几个字母
+</span>
+<span class="n">np</span><span class="p">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>    <span class="c1">#正弦函数
+</span> <span class="o">=&gt;</span> <span class="mf">0.8414709848078965</span>
+<span class="n">np</span><span class="p">.</span><span class="n">pi</span>    <span class="c1">#π常量
+</span> <span class="o">=&gt;</span> <span class="mf">3.141592653589793</span>
+<span class="n">np</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>  <span class="c1">#平方根
+</span> <span class="o">=&gt;</span> <span class="mf">1.7320508075688772</span>
+<span class="n">np</span><span class="p">.</span><span class="n">arccos</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>   <span class="c1">#反余弦函数  
+</span> <span class="o">=&gt;</span> <span class="mf">1.5707963267948966</span>
+
+<span class="c1">#查看帮助
+</span><span class="n">help</span><span class="p">(</span><span class="n">np</span><span class="p">)</span>       <span class="c1">#第一次帮助会从网上获取，速度比较慢
+</span></code></pre></div></div>
+
+<p>第九讲我们曾经讲过了使用列表类型保存矩阵的方式，可惜就基本Python的功能来讲，也只是能保存而已，想要计算，需要自己使用复杂的循环嵌套来完成。但矩阵运算在numpy是直接内置的，比如：
+\(A = \left\{
+  \begin{matrix}
+   2 &amp; 3 &amp; 4 \\
+   5 &amp; 6 &amp; 7 \\
+   8 &amp; 9 &amp; 10
+  \end{matrix}
+   \right\} \times 3\tag{1}\)</p>
+
+<p>我们直接看numpy的计算方式：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">],[</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">],[</span><span class="mi">8</span><span class="p">,</span><span class="mi">9</span><span class="p">,</span><span class="mi">10</span><span class="p">]])</span><span class="o">*</span><span class="mi">3</span>
+<span class="n">array</span><span class="p">([[</span> <span class="mi">6</span><span class="p">,</span>  <span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">15</span><span class="p">,</span> <span class="mi">18</span><span class="p">,</span> <span class="mi">21</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">24</span><span class="p">,</span> <span class="mi">27</span><span class="p">,</span> <span class="mi">30</span><span class="p">]])</span>
+</code></pre></div></div>
+
+<p>np.array函数，实际是numpy中的列表类型。列表的定义跟标准Python很像，是用嵌套的“[]”完成的。随后numpy的类型直接就支持矩阵乘法，所以最后“*3”。执行后输出了矩阵的计算结果。对比的如果使用标准的Python，肯定要使用两个循环嵌套，然后逐项的进行乘法计算。速度会慢很多，编程也复杂很多。</p>
+
+<p>再比较一个例子。第六讲中我们讲了range函数，是跟for循环一起介绍的，大家应当不陌生。当时重点说明了range返回的是一个整数的序列类型，那碰到需要使用小数的序列类型的时候怎么办呢？通常的办法只能在循环体中增加一次整数同浮点小数的乘法运算来生成每次循环使用的小数。比如：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">step</span><span class="o">=</span><span class="mf">0.11</span>
+<span class="n">r</span><span class="o">=</span><span class="p">[]</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">r</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span> <span class="o">*</span> <span class="n">step</span><span class="p">)</span>
+<span class="c1">#结果为：
+</span><span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.11</span><span class="p">,</span> <span class="mf">0.22</span><span class="p">,</span> <span class="mf">0.33</span><span class="p">,</span> <span class="mf">0.44</span><span class="p">,</span> <span class="mf">0.55</span><span class="p">,</span> <span class="mf">0.66</span><span class="p">,</span> <span class="mf">0.77</span><span class="p">,</span> <span class="mf">0.88</span><span class="p">,</span> <span class="mf">0.99</span><span class="p">]</span>
+</code></pre></div></div>
+
+<p>而numpy中，直接有支持小数序列的类型：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#Python内置的range函数
+</span><span class="o">&gt;&gt;&gt;</span> <span class="nb">list</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">))</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]</span>
+
+<span class="c1">#numpy中支持小数序列的linspace
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">np</span><span class="p">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">array</span><span class="p">([</span><span class="mf">1.</span>        <span class="p">,</span> <span class="mf">1.11111111</span><span class="p">,</span> <span class="mf">1.22222222</span><span class="p">,</span> <span class="mf">1.33333333</span><span class="p">,</span> <span class="mf">1.44444444</span><span class="p">,</span>
+       <span class="mf">1.55555556</span><span class="p">,</span> <span class="mf">1.66666667</span><span class="p">,</span> <span class="mf">1.77777778</span><span class="p">,</span> <span class="mf">1.88888889</span><span class="p">,</span> <span class="mf">2.</span>        <span class="p">])</span>
+</code></pre></div></div>
+
+<p>linspace函数的三个参数跟range函数区别比较大，需要注意：第一个参数是指起始数值；第二个参数是指结束数值，注意这里会包含结束数值，而range中是不包含结束数值；第三个参数是指从开始到结束，分为多少份，也就是最后序列的长度。</p>
+
+<p>我们至今所看到的Python数学计算，都属于数值计算的范畴。所谓“数值计算”就是指不管计算过程多么复杂，最终以数值的形式得出计算结果。<br />
+数值计算在实际应用中使用的最多，但缺陷也比较明显。比如从上面linspace的例子就能看出来，看起来所生成的浮点小数序列，并不是很整齐，几乎可以确定有被省略的部分。计算机内部的存储是2进制数，我们平常习惯的计算方式是10进制数，两者之间的转换会有误差,无理数的多次截取也会造成误差。我们可以再举一个更明显的例子：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">math</span>
+<span class="n">math</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">结果</span><span class="err">：</span><span class="mf">2.8284271247461903</span>
+<span class="n">math</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">*</span><span class="n">math</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">结果</span><span class="err">：</span><span class="mf">8.000000000000002</span>
+</code></pre></div></div>
+
+<p>上例中，因为对8开平方的时候数据做了截取，相乘计算回平方值之后，无法做到精确的得出8，只是一个很近似的值。这在存在大量计算而精度又要求比较高的情况下，仔细的考虑化简的时机和计算的方法将会耗费大量的精力。<br />
+这种情况在第三方的numpy数学库中同样是存在的：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="n">np</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">结果</span><span class="err">：</span><span class="mf">2.8284271247461903</span>
+<span class="n">np</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">*</span><span class="n">np</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">结果</span><span class="err">：</span><span class="mf">8.000000000000002</span>
+</code></pre></div></div>
+
+<p>实际上只要是使用数值计算就会出现这种情况，尚无法避免。<br />
+为了应对这种方式，在数学中大量采用了符号计算。我们目前数学课上学到的方程式、多项式基本都属于这个范畴。往往并不需要求出最终的计算结果。化简到一些包含简单符号和算式的结果就可以满足应用。因此符号计算在科研、工程领域都有广泛应用。</p>
+
+<p>Python有一个第三方的符号计算扩展库，名为sympy。安装方式为(以后的安装介绍均以windows为例，不再介绍linux及mac，相信参考windows的方法，在linux和mac安装都不应当有问题):</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#首先使用管理员模式打开cmd命令行，然后执行：
+</span><span class="n">pip</span> <span class="n">install</span> <span class="n">sympy</span>  
+<span class="c1">#实际上pip工具可以同时安装多个扩展库，比如：
+</span><span class="n">pip</span> <span class="n">install</span> <span class="n">numpy</span> <span class="n">sympy</span>
+</code></pre></div></div>
+
+<p>相对熟悉的数值计算，sympy符号计算库理解起来会难一些。Sympy试图建立一整套运算体系，对每次的结果进行符号计算，尽力保持计算的精确度。试图建立一整套体系的原因是这样：在Python中，加、减、乘、除包括等号等等所有字符，基本都已经有了默认的功能，比如通常的数学数值计算。<br />
+我们前面也讲过了，这些符号本身属于保留字的一种，是不能被我们用于其它用途的。因此在不会歧义的位置，会继续使用原有计算符和函数，有歧义的位置，需要使用Sympy自己的函数，比如分数函数Rational（稍后会有讲解）。<br />
+只要算式会被化简从而成为小数的情况，都应当考虑使用Sympy自己的函数，通常都是分数、除法、数学函数的位置，否则就等于使用了原有的数值计算，可能导致精度降低。</p>
+
+<p>sympy的使用方法，先来看一个例子：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#使用内置的数学库
+</span><span class="kn">import</span> <span class="nn">math</span>
+<span class="n">math</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">结果</span><span class="err">：</span><span class="mf">2.8284271247461903</span>
+
+<span class="mi">3</span><span class="o">*</span><span class="mi">5</span><span class="o">*</span><span class="n">math</span><span class="p">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span> <span class="c1">#numpy.sin(7)也是相同的
+</span><span class="n">结果</span><span class="err">：</span><span class="mf">9.854798980781837</span>
+
+<span class="c1">#下面使用sympy
+</span><span class="kn">import</span> <span class="nn">sympy</span>
+<span class="n">sympy</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">结果</span><span class="err">：</span><span class="mi">2</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>   <span class="c1">#注意结果的样式
+</span>
+<span class="mi">3</span><span class="o">*</span><span class="mi">5</span><span class="o">*</span><span class="n">sympy</span><span class="p">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>
+<span class="n">结果</span><span class="err">：</span><span class="mi">15</span><span class="o">*</span><span class="n">sin</span><span class="p">(</span><span class="mi">7</span><span class="p">)</span>   <span class="c1">#注意结果
+</span></code></pre></div></div>
+
+<p>乍看起来，sympy的结果似乎很怪异。其实如果把计算机函数翻译为数学函数，这个结果非常类似我们学习数学的时候公式化间的结果。继续看示例：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">sympy</span>
+
+<span class="c1">#平方根
+</span><span class="n">sympy</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">结果</span><span class="err">：</span><span class="mi">2</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="n">sympy</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span><span class="o">*</span><span class="n">sympy</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">结果</span><span class="err">：</span><span class="mi">8</span>
+
+<span class="mi">2</span><span class="o">*</span><span class="n">sympy</span><span class="p">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">结果</span><span class="err">：</span><span class="mi">2</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1">#正弦函数
+</span><span class="n">sympy</span><span class="p">.</span><span class="n">sin</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">结果</span><span class="err">：</span><span class="n">sin</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1">#π常数
+</span><span class="n">sympy</span><span class="p">.</span><span class="n">pi</span>
+<span class="n">结果</span><span class="err">：</span><span class="n">pi</span>
+
+<span class="c1">#分数
+</span><span class="n">sympy</span><span class="p">.</span><span class="n">Rational</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+<span class="n">结果</span><span class="err">：</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span>
+</code></pre></div></div>
+
+<p>注意上面的计算结果，都没有前缀的sympy，而是直接的sin/sqrt这样的结果。这说明，其实sympy使用的时候，最好使用<code class="language-plaintext highlighter-rouge">from sympy import *</code>，还记得吗？这相当于从sympy把所有可用资源都导入到了当前文件作用域，因此调用的时候可以完全省略sympy前缀。<br />
+继续说符号计算。上面使用的例子，你会发现使用符号计算的方法，因为可能会变成无理数的部分都使用了符号或者公式来表达了。所以两个平方根相乘这样的运算，是可以精确还原到原始值的。</p>
+
+<p>既然是符号计算，直接使用符号量在数学表达式中也是很有特色的功能：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#符号声明
+#在第二讲说变量的时候，
+#我们特别说明变量是“已知数”
+#这里创建的符号变量，其实就是
+#代表数学公式中的未知数
+#当然最后这个未知数，还是使用Python变量来表示的，
+#sympy.Symbol就是一个sympy库中的类型。
+</span><span class="n">x</span> <span class="o">=</span> <span class="n">sympy</span><span class="p">.</span><span class="n">Symbol</span><span class="p">(</span><span class="s">'x'</span><span class="p">)</span>   <span class="c1">#定义未知数x
+</span><span class="n">y</span> <span class="o">=</span> <span class="n">sympy</span><span class="p">.</span><span class="n">Symbol</span><span class="p">(</span><span class="s">'y'</span><span class="p">)</span>	<span class="c1">#未知数y
+</span><span class="n">m</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">z</span> <span class="o">=</span> <span class="n">sympy</span><span class="p">.</span><span class="n">symbols</span><span class="p">(</span><span class="s">'m n z'</span><span class="p">)</span> <span class="c1">#同时定义多个未知数
+</span>
+<span class="c1">#以下是使用定义的未知数，进行带未知数的数学符号计算
+</span><span class="n">m</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="mi">3</span><span class="o">+</span><span class="mi">8</span>
+<span class="n">结果</span><span class="err">：</span><span class="mi">3</span><span class="o">*</span><span class="n">m</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mi">8</span>
+
+<span class="p">(</span><span class="n">x</span><span class="o">+</span><span class="n">y</span><span class="p">)</span><span class="o">*</span><span class="mi">3</span>
+<span class="n">结果</span><span class="err">：</span><span class="mi">3</span><span class="o">*</span><span class="n">x</span> <span class="o">+</span> <span class="mi">3</span><span class="o">*</span><span class="n">y</span>
+</code></pre></div></div>
+
+<p>再强调一下，在sympy中定义的未知数类型，变量的确是Python的变量。所代表的含义可是sympy符号计算中的未知数，而不是我们常见的Python变量。</p>
+
+<hr />
+
+<h4 id="挑战">挑战</h4>
+
+<p>下面我们利用强大的符号计算来进行一个多项式的化简：
+\((x + (2xy)^\frac{1}{2}+y)(x - (2xy)^\frac{1}{2}+y)\)<br />
+建议你自己动手化简一下，虽然我们不是数学课，但数学技能还是很重要的。
+	随后你应当能得到正确答案：<br />
+\(= x^2 + y^2\)<br />
+上面是手工来化简的结果。下面到了让sympy上场的时间了：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#引入扩展库
+</span><span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="c1">#定义x/y两个符号
+</span><span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s">"x y"</span><span class="p">)</span>
+
+<span class="c1">#化简函数simplify()
+</span><span class="k">print</span><span class="p">(</span><span class="n">simplify</span><span class="p">((</span><span class="n">x</span><span class="o">+</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="n">Rational</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="n">y</span><span class="p">)</span><span class="o">*</span><span class="p">(</span><span class="n">x</span><span class="o">-</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">x</span><span class="o">*</span><span class="n">y</span><span class="p">)</span><span class="o">**</span><span class="n">Rational</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="n">y</span><span class="p">)))</span>
+<span class="c1">#执行结果
+</span> <span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span>
+</code></pre></div></div>
+
+<p>其实同第二章一样，这一章的难度，同样是要用Python语言来描述数学公式。上例中的simplify函数式sympy中的一个函数，表示把参数当做数学表达式，然后进行化简操作。加法、乘法、乘方都不会造成小数，也没有语法上的歧义，所以直接使用了标准的数学运算符。1/2这种除法会有可能导致小数，从而有二进制到十进制转换的误差风险；并且1/2会直接使用数值计算，会导致算式过快的求值，导致最后化简失败，所以这里使用sympy内置的分数函数Rational，这个函数有两个参数，分别代表分子和分母。<br />
+经过这些解释，你是不是能看懂了？最后看化简的结果，跟我们手工的过程一模一样。这些新的函数，希望你自己给自己找一些算式多练习，才能更快的掌握。</p>
+
+<hr />
+
+<h4 id="解方程">解方程</h4>
+
+<p>解方程在数学中简直占了半壁江山啊。我们仍然从第二讲的老例子开始：</p>
+
+<blockquote>
+  <p>甲、乙两人相距36千米，相向而行，如果甲比乙先走2小时，那么他们在乙出发2.5小时后相遇；如果乙比甲先走2小时，那么他们在甲出发3小时后相遇，甲、乙两人每小时各走多少千米？（假设甲乙的速度均匀稳定）</p>
+</blockquote>
+
+<p>希望你还记得原来的结题过程，我直接列出来吧，毕竟我们要学习的是Python不是数学：</p>
+
+<blockquote>
+  <ul>
+    <li>假设甲的速度为x千米/小时，假设乙的速度为y千米/小时</li>
+    <li>列方程式(2.5+2)x+2.5y=36，3x+(3+2)y=36</li>
+    <li>根据方程2推导为：x=(36-5y)/3，代入方程1</li>
+    <li>y=(12<em>4.5-36)/(4.5</em>5/3-2.5)</li>
+    <li>最后得：y=3.6,x=6</li>
+  </ul>
+</blockquote>
+
+<p>解方程首先的问题是，“= ”已经被用作了赋值操作，跟前面/的原因一样，不能直接用来描述等式。不然Python会直接报错。</p>
+
+<p>sympy定义了sympy.Eq()函数来描述等式，以上面的两个方程为例，可以写成这个样子：<code class="language-plaintext highlighter-rouge">sympy.Eq((2.5+2) * x+2.5 * y,36)</code>和<code class="language-plaintext highlighter-rouge">sympy.Eq(3 * x+(3+2) * y,36)</code>。逗号隔开的，就是等式两端。其它的注意事项，跟上面“化简”的时候讲的一样。下面看看我们解方程的过程：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#引入扩展库
+</span><span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="c1">#定义两个未知数符号
+</span><span class="n">x</span><span class="o">=</span><span class="n">Symbol</span><span class="p">(</span><span class="s">'x'</span><span class="p">)</span>
+<span class="n">y</span><span class="o">=</span><span class="n">Symbol</span><span class="p">(</span><span class="s">'y'</span><span class="p">)</span>
+
+<span class="c1">#定义两个等式
+</span><span class="n">a</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">((</span><span class="mf">2.5</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">x</span><span class="o">+</span><span class="mf">2.5</span><span class="o">*</span><span class="n">y</span><span class="p">,</span><span class="mi">36</span><span class="p">)</span>
+<span class="n">b</span> <span class="o">=</span> <span class="n">Eq</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">x</span><span class="o">+</span><span class="p">(</span><span class="mi">3</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">y</span><span class="p">,</span><span class="mi">36</span><span class="p">)</span>
+
+<span class="c1">#使用sympy.solve函数解方程组
+</span><span class="k">print</span><span class="p">(</span><span class="n">solve</span><span class="p">([</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">],[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">]))</span>
+
+<span class="c1">#运行结果：
+</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="mf">6.00000000000000</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mf">3.60000000000000</span><span class="p">}</span>
+</code></pre></div></div>
+
+<p>嗯，说不编程序了，实际最后还是编了，好在比较简单:)<br />
+程序中定义未知数符号、描述等式，重点是使用了sympy.solve函数来解方程。函数接受两个参数，两个参数都是列表。第一个列表中是方程式（等式），第二个列表是要求解的未知数。</p>
+
+<p>我们再把程序简化一下：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#引入扩展库
+</span><span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="c1">#在一行中直接定义两个未知数符号
+</span><span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">symbols</span><span class="p">(</span><span class="s">"x y"</span><span class="p">)</span>
+
+<span class="c1">#使用sympy.solve函数解方程组
+</span><span class="n">solve</span><span class="p">([</span><span class="n">Eq</span><span class="p">((</span><span class="mf">2.5</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">x</span><span class="o">+</span><span class="mf">2.5</span><span class="o">*</span><span class="n">y</span><span class="p">,</span><span class="mi">36</span><span class="p">),</span><span class="n">Eq</span><span class="p">(</span><span class="mi">3</span><span class="o">*</span><span class="n">x</span><span class="o">+</span><span class="p">(</span><span class="mi">3</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="n">y</span><span class="p">,</span><span class="mi">36</span><span class="p">)],[</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">])</span>
+
+<span class="n">结果</span><span class="err">：</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="mf">6.00000000000000</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mf">3.60000000000000</span><span class="p">}</span>
+</code></pre></div></div>
+
+<p>这样看起来更清楚了。有没有觉得sympy符号计算很强大？</p>
+
+<hr />
+
+<h4 id="练习时间">练习时间</h4>
+
+<ol>
+  <li>
+    <p>使用symbol解方程组：<br />
+\(\begin{equation}
+\begin{cases}
+2x-y=5 \\
+3x+4y=2
+\end{cases}
+ \end{equation}\)</p>
+  </li>
+  <li>
+    <p>化简表达式：<br />
+\(\frac {\sin(60+\theta)+\cos(120)\sin(\theta)}{ cos(\theta)}\)<br />
+这道题有一些提示：</p>
+
+    <p>\(\theta\) 在Python中很难输入，可以使用一个未知数x代替，不影响结果。</p>
+
+    <p>Python的数学库只接受\(\pi\)角度，也既我们习惯的180度，所以题目中的60度可以表示为\(\pi/3\);120度则表示为\(\pi/3*2\)。</p>
+
+    <p>式子中的分子、分母因为都有未知数，不会引起即时计算影响计算结果，也不会有歧义，所以就是用“/”计算符即可，不用使用Rational函数。</p>
+  </li>
+</ol>
+
+<p>作为一门编程课，本讲并未提供太多的数学算式来帮助你记忆新学的数学函数。建议你从自己的数学学习中寻找一些算式来多做一些练习。</p>
+
+<hr />
+
+<h4 id="本讲小结">本讲小结</h4>
+
+<ul>
+  <li>复杂的数学计算是理工科必备的基本能力，也是最频繁需要的</li>
+  <li>数学计算在计算机应用中，分为求得结果的数值计算及公式化简为主的符号计算，各有用途，都很重要</li>
+  <li>Python在多种扩展库的帮助下有强大的计算能力</li>
+  <li>本讲的重点是公式化简、解方程，要学会使用语言中的运算符、函数等来描述数学公式</li>
+</ul>
+
+<hr />
+
+<h4 id="学习资源">学习资源</h4>
+
+<p>numpy:
+https://docs.scipy.org/doc/numpy/user/quickstart.html
+sympy:
+http://docs.sympy.org/latest/tutorial/index.html</p>
+
+<hr />
+
+<h4 id="练习答案">练习答案</h4>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">solve([Eq(2*x-y,5),Eq(3*x+4*y,2)])</code></li>
+  <li><code class="language-plaintext highlighter-rouge">simplify((sin(pi/3+x)+cos(pi/3*2)*sin(x))/cos(x))</code></li>
+</ol>
+
+<p>最终结果请在Python中试着运行看看，别忘了引入sympy库。</p>
+
+:ET
