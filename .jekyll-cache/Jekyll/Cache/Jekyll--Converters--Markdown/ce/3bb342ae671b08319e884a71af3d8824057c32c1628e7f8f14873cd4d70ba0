@@ -1,0 +1,4 @@
+I"d<p>随着TensorFlow发布的，还有一个models库(仓库地址:<a href="https://github.com/tensorflow/models">https://github.com/tensorflow/models</a>)，里面包含官方及社群所发布的一些基于TensorFlow实现的模型库，用于解决各式各样的机器学习问题。<br />
+很多任务，在其中都能找到相同或者近似功能的实现，这时候无需编程或者只要很少的编程，就可以在已有模型的基础上建立自己的人工智能应用。<br />
+而且models的更新也比较快，因为大量的社群参与者，几乎每天都有模块的更新commit。</p>
+:ET

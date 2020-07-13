@@ -1,0 +1,250 @@
+I"�<p><img src="http://115.182.41.123/files/201910/titlepic/NMF.jpg" alt="" />
+NMF是很久以前学的，基本快忘没了，昨天YX提出来一个关于NMF(同音同字不同义)的问题，才又想起来。<br />
+自己的学习笔记写的比较乱，好在网上资料多，摘了一篇，补充上自己笔记的内容，留此助记。</p>
+
+<p>NMF概念出现的比较早，差不多在电脑还没有开始繁荣起来，NMF及相关的一些算法已经很成熟了。NMF用在电影推荐、商品推荐也并不是很适合，现在大多使用SVD之类的算法。不过这篇只是学习的记录，有个例子总比枯燥的啃概念好的多。</p>
+
+<h4 id="场景">场景</h4>
+<p>让我们假设一个场景。<br />
+相像当前这个档期，有10部电影正在上映，我们把它们放到一个数组中：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">item</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s">'希特勒回来了'</span><span class="p">,</span> <span class="s">'死侍'</span><span class="p">,</span> <span class="s">'房间'</span><span class="p">,</span> <span class="s">'龙虾'</span><span class="p">,</span> <span class="s">'大空头'</span><span class="p">,</span>
+    <span class="s">'极盗者'</span><span class="p">,</span> <span class="s">'裁缝'</span><span class="p">,</span> <span class="s">'八恶人'</span><span class="p">,</span> <span class="s">'实习生'</span><span class="p">,</span> <span class="s">'间谍之桥'</span><span class="p">,</span>
+<span class="p">]</span>
+</code></pre></div></div>
+<p>放入数组这个动作，等于也把这些电影编了号，从0到9，比如电影《实习生》，编号就是8。<br />
+随后我们继续假设我们影院有15个老顾客，同样把它们放置到一个数组：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">user</span> <span class="o">=</span> <span class="p">[</span><span class="s">'五柳君'</span><span class="p">,</span> <span class="s">'帕格尼六'</span><span class="p">,</span> <span class="s">'木村静香'</span><span class="p">,</span> <span class="s">'WTF'</span><span class="p">,</span> <span class="s">'airyyouth'</span><span class="p">,</span>
+        <span class="s">'橙子c'</span><span class="p">,</span> <span class="s">'秋月白'</span><span class="p">,</span> <span class="s">'clavin_kong'</span><span class="p">,</span> <span class="s">'olit'</span><span class="p">,</span> <span class="s">'You_某人'</span><span class="p">,</span>
+        <span class="s">'凛冬将至'</span><span class="p">,</span> <span class="s">'Rusty'</span><span class="p">,</span> <span class="s">'噢！你看！'</span><span class="p">,</span> <span class="s">'Aron'</span><span class="p">,</span> <span class="s">'ErDong Chen'</span><span class="p">]</span>
+</code></pre></div></div>
+<p>他们的编号是0-14。<br />
+接着从用户的观影记录中，我们提取每个用户，对每部电影的打分记录。以电影序号为行号，以用户编号为列号，形成一个矩阵：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">RATE_MATRIX</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>
+<span class="p">)</span>
+</code></pre></div></div>
+<p>从矩阵中，我们可以得到这样几个信息：</p>
+<ol>
+  <li>评分是5分制。</li>
+  <li>用户打分是有个人特点的，比如第一列的用户，也就是“五柳君”，喜欢给电影打5分，:),真是个心宽的家伙。</li>
+  <li>用户没有打分的电影，给分就是0。（通常不会出现真的给某部电影打0分的情况）。</li>
+</ol>
+
+<h4 id="分类">分类</h4>
+<p>我们使用NMF为电影进行主题分类。<br />
+这是一个非常典型的非监督学习方式，也就是我们并不指定主题是什么，只知道主题一定是存在的，因此一定会有两个典型的倾向：</p>
+<ol>
+  <li>任何一部电影，必然倾向某一种或者几种主题。</li>
+  <li>任意一位观众，必然喜爱某一种或者几种主题。</li>
+</ol>
+
+<p>这里的理解重点是在非监督学习中，我们并不指定主题是什么，但只要你联想一下实际情况就容易理解了，比如可能是“爱情”主题，或者“枪战”主题。<br />
+下面代码将使用NMF设定2个关注主题，并通过分类，将电影分类为倾向主题1或者主题2的两类。同时将用户分为喜爱主题1或者喜爱主题2两个分类。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">nmf_model</span> <span class="o">=</span> <span class="n">NMF</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># 设有2个主题
+</span><span class="n">item_dis</span> <span class="o">=</span> <span class="n">nmf_model</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">RATE_MATRIX</span><span class="p">)</span>
+<span class="n">user_dis</span> <span class="o">=</span> <span class="n">nmf_model</span><span class="p">.</span><span class="n">components_</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">'用户的主题分布：'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">user_dis</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'电影的主题分布：'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">item_dis</span><span class="p">)</span>
+</code></pre></div></div>
+<p>使用上面的数据集，会得到如下结果：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">用户的主题分布</span><span class="err">：</span>
+<span class="p">[[</span><span class="mf">0.81240799</span> <span class="mf">0.71153396</span> <span class="mf">0.47062388</span> <span class="mf">0.43807017</span> <span class="mf">1.39456425</span> <span class="mf">2.24323719</span>
+  <span class="mf">1.02417204</span> <span class="mf">1.25356481</span> <span class="mf">1.10517661</span> <span class="mf">1.47624595</span> <span class="mf">1.84626347</span> <span class="mf">0.97437242</span>
+  <span class="mf">1.14921406</span> <span class="mf">0.8159644</span>  <span class="mf">1.14200028</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">2.23910382</span> <span class="mf">1.70186882</span> <span class="mf">1.34300272</span> <span class="mf">1.09192602</span> <span class="mf">0.68045441</span> <span class="mf">0.</span>
+  <span class="mf">0.0542231</span>  <span class="mf">0.</span>         <span class="mf">0.</span>         <span class="mf">0.</span>         <span class="mf">0.04426552</span> <span class="mf">0.12260418</span>
+  <span class="mf">0.34109613</span> <span class="mf">0.51642843</span> <span class="mf">0.6157604</span> <span class="p">]]</span>
+<span class="n">电影的主题分布</span><span class="err">：</span>
+<span class="p">[[</span><span class="mf">2.20401687</span> <span class="mf">1.53852775</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">1.9083879</span>  <span class="mf">0.83214869</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">1.95596132</span> <span class="mf">0.</span>        <span class="p">]</span>
+ <span class="p">[</span><span class="mf">1.87637018</span> <span class="mf">1.65573674</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">2.48959328</span> <span class="mf">1.41632377</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">2.38108536</span> <span class="mf">1.08460665</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span>         <span class="mf">2.29342959</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span>         <span class="mf">2.27353353</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span>         <span class="mf">2.32513876</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span>         <span class="mf">2.23196277</span><span class="p">]]</span>
+</code></pre></div></div>
+<p>这些数据非常不利于观察理解。它们代表的概念是，比较接近的值，代表该影片或者该观众属于（或说喜爱）比较接近的主题。</p>
+
+<h4 id="数据可视化">数据可视化</h4>
+<p>为了观察起来更直观，可以使用绘图的代码把数据显示出来，从而更形象的理解“聚类”。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c1">#显示电影的坐标分布
+</span><span class="n">plt1</span> <span class="o">=</span> <span class="n">plt</span>
+<span class="n">plt1</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">item_dis</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">item_dis</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s">'ro'</span><span class="p">)</span>
+<span class="n">plt1</span><span class="p">.</span><span class="n">draw</span><span class="p">()</span><span class="c1">#直接画出矩阵，只打了点，下面对图plt1进行一些设置
+</span>
+<span class="n">plt1</span><span class="p">.</span><span class="n">xlim</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">plt1</span><span class="p">.</span><span class="n">ylim</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">plt1</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">u'the distribution of items (NMF)'</span><span class="p">)</span><span class="c1">#设置图的标题
+</span>
+<span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">zipitem</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">item_dis</span><span class="p">)</span><span class="c1">#把电影标题和电影的坐标联系在一起
+</span>
+<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">zipitem</span><span class="p">:</span>
+    <span class="n">item_name</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">plt1</span><span class="p">.</span><span class="n">text</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">item_name</span><span class="p">,</span>
+              <span class="n">fontproperties</span><span class="o">=</span><span class="n">fontP</span><span class="p">,</span> 
+              <span class="n">horizontalalignment</span><span class="o">=</span><span class="s">'center'</span><span class="p">,</span>
+              <span class="n">verticalalignment</span><span class="o">=</span><span class="s">'top'</span><span class="p">)</span>
+<span class="n">plt1</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+ <span class="c1">#显示用户的坐标分布
+</span><span class="n">user_dis</span> <span class="o">=</span> <span class="n">user_dis</span><span class="p">.</span><span class="n">T</span> <span class="c1">#把转置用户分布矩阵
+</span><span class="n">plt2</span> <span class="o">=</span> <span class="n">plt</span>
+<span class="n">plt2</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">user_dis</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">user_dis</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s">'ro'</span><span class="p">)</span>
+<span class="n">plt2</span><span class="p">.</span><span class="n">xlim</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">plt2</span><span class="p">.</span><span class="n">ylim</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">plt2</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">u'the distribution of user (NMF)'</span><span class="p">)</span><span class="c1">#设置图的标题
+</span>
+<span class="n">zipuser</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">user_dis</span><span class="p">)</span><span class="c1">#把电影标题和电影的坐标联系在一起
+</span><span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">zipuser</span><span class="p">:</span>
+    <span class="n">user_name</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">plt2</span><span class="p">.</span><span class="n">text</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">user_name</span><span class="p">,</span>
+              <span class="n">fontproperties</span><span class="o">=</span><span class="n">fontP</span><span class="p">,</span> 
+              <span class="n">horizontalalignment</span><span class="o">=</span><span class="s">'center'</span><span class="p">,</span>
+              <span class="n">verticalalignment</span><span class="o">=</span><span class="s">'top'</span><span class="p">)</span>
+<span class="n">plt2</span><span class="p">.</span><span class="n">show</span><span class="p">()</span><span class="c1">#直接画出矩阵，只打了点，下面对图plt1进行一些设置
+</span></code></pre></div></div>
+<p>以上代码会得到两张图，电影主题分布：<br />
+<img src="http://115.182.41.123/files/201804/25/files-distribution.png" alt="" />
+用户倾向主题分布：<br />
+<img src="http://115.182.41.123/files/201804/25/user_distribution.png" alt="" />
+从图中可以看到，我们分类比较少，数据也不是很准确，导致分布偏差比较大，但基本上是分成两类的。</p>
+
+<h4 id="电影推荐">电影推荐</h4>
+<p>采用这种方式，我们指定一个用户名，则可以为该用户推荐他倾向主题的电影。<br />
+本例中的数据偏差比较大，所以计算的结果有点没有说服力，仅供参考。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">filter_matrix</span> <span class="o">=</span> <span class="n">RATE_MATRIX</span> <span class="o">&lt;</span> <span class="mf">1e-8</span>
+<span class="n">rec_mat</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">item_dis</span><span class="p">,</span> <span class="n">user_dis</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'重建矩阵，并过滤掉已经看过的电影'</span><span class="p">)</span>
+<span class="n">rec_filter_mat</span> <span class="o">=</span> <span class="p">(</span><span class="n">filter_matrix</span> <span class="o">*</span> <span class="n">rec_mat</span><span class="p">).</span><span class="n">T</span>
+<span class="k">print</span><span class="p">(</span><span class="n">rec_filter_mat</span><span class="p">)</span>
+
+<span class="n">rec_user</span> <span class="o">=</span> <span class="s">'Rusty'</span>  <span class="c1"># 需要进行推荐的用户
+</span><span class="n">rec_userid</span> <span class="o">=</span> <span class="n">user</span><span class="p">.</span><span class="n">index</span><span class="p">(</span><span class="n">rec_user</span><span class="p">)</span>  <span class="c1"># 推荐用户ID
+</span><span class="n">rec_list</span> <span class="o">=</span> <span class="n">rec_filter_mat</span><span class="p">[</span><span class="n">rec_userid</span><span class="p">,</span> <span class="p">:]</span>  <span class="c1"># 推荐用户的电影列表
+</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'推荐用户的电影：'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">rec_list</span><span class="p">))</span>
+</code></pre></div></div>
+<p>执行结果：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="n">array</span><span class="p">([</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]),)</span>
+</code></pre></div></div>
+<h4 id="完整代码">完整代码</h4>
+<p>上面为了叙述方便，打散、简化并且省略了一些代码。下面是完整的代码，并且因为XJ同学的课程要求，使用了python3代码。嗯，python3对于中文的支持的确好了很多哈。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
+</span>
+<span class="c1">#pip3 install sklearn scipy numpy matplotlib
+</span>
+<span class="kn">from</span> <span class="nn">sklearn.decomposition</span> <span class="kn">import</span> <span class="n">NMF</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.font_manager</span> <span class="kn">import</span> <span class="n">FontProperties</span>
+
+<span class="n">item</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s">'希特勒回来了'</span><span class="p">,</span> <span class="s">'死侍'</span><span class="p">,</span> <span class="s">'房间'</span><span class="p">,</span> <span class="s">'龙虾'</span><span class="p">,</span> <span class="s">'大空头'</span><span class="p">,</span>
+    <span class="s">'极盗者'</span><span class="p">,</span> <span class="s">'裁缝'</span><span class="p">,</span> <span class="s">'八恶人'</span><span class="p">,</span> <span class="s">'实习生'</span><span class="p">,</span> <span class="s">'间谍之桥'</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">user</span> <span class="o">=</span> <span class="p">[</span><span class="s">'五柳君'</span><span class="p">,</span> <span class="s">'帕格尼六'</span><span class="p">,</span> <span class="s">'木村静香'</span><span class="p">,</span> <span class="s">'WTF'</span><span class="p">,</span> <span class="s">'airyyouth'</span><span class="p">,</span>
+        <span class="s">'橙子c'</span><span class="p">,</span> <span class="s">'秋月白'</span><span class="p">,</span> <span class="s">'clavin_kong'</span><span class="p">,</span> <span class="s">'olit'</span><span class="p">,</span> <span class="s">'You_某人'</span><span class="p">,</span>
+        <span class="s">'凛冬将至'</span><span class="p">,</span> <span class="s">'Rusty'</span><span class="p">,</span> <span class="s">'噢！你看！'</span><span class="p">,</span> <span class="s">'Aron'</span><span class="p">,</span> <span class="s">'ErDong Chen'</span><span class="p">]</span>
+<span class="n">RATE_MATRIX</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span>
+    <span class="p">[[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">5</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]]</span>
+<span class="p">)</span>
+
+<span class="n">nmf_model</span> <span class="o">=</span> <span class="n">NMF</span><span class="p">(</span><span class="n">n_components</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span> <span class="c1"># 设有2个主题
+</span><span class="n">item_dis</span> <span class="o">=</span> <span class="n">nmf_model</span><span class="p">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">RATE_MATRIX</span><span class="p">)</span>
+<span class="n">user_dis</span> <span class="o">=</span> <span class="n">nmf_model</span><span class="p">.</span><span class="n">components_</span>
+
+<span class="k">print</span><span class="p">(</span><span class="s">'用户的主题分布：'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">user_dis</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'电影的主题分布：'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">item_dis</span><span class="p">)</span>
+
+<span class="n">filter_matrix</span> <span class="o">=</span> <span class="n">RATE_MATRIX</span> <span class="o">&lt;</span> <span class="mf">1e-8</span>
+<span class="n">rec_mat</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">item_dis</span><span class="p">,</span> <span class="n">user_dis</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'重建矩阵，并过滤掉已经评分的物品：'</span><span class="p">)</span>
+<span class="n">rec_filter_mat</span> <span class="o">=</span> <span class="p">(</span><span class="n">filter_matrix</span> <span class="o">*</span> <span class="n">rec_mat</span><span class="p">).</span><span class="n">T</span>
+<span class="k">print</span><span class="p">(</span><span class="n">rec_filter_mat</span><span class="p">)</span>
+
+<span class="n">rec_user</span> <span class="o">=</span> <span class="s">'Rusty'</span>  <span class="c1"># 需要进行推荐的用户
+#rec_user = '凛冬将至'  # 需要进行推荐的用户
+</span><span class="n">rec_userid</span> <span class="o">=</span> <span class="n">user</span><span class="p">.</span><span class="n">index</span><span class="p">(</span><span class="n">rec_user</span><span class="p">)</span>  <span class="c1"># 推荐用户ID
+</span><span class="n">rec_list</span> <span class="o">=</span> <span class="n">rec_filter_mat</span><span class="p">[</span><span class="n">rec_userid</span><span class="p">,</span> <span class="p">:]</span>  <span class="c1"># 推荐用户的电影列表
+</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'推荐用户的电影：'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">nonzero</span><span class="p">(</span><span class="n">rec_list</span><span class="p">))</span>
+
+
+<span class="c1">######################################################################
+</span><span class="n">fontP</span> <span class="o">=</span> <span class="n">FontProperties</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="s">"/System/Library/Fonts/STHeiti Light.ttc"</span><span class="p">)</span>
+<span class="n">fontP</span><span class="p">.</span><span class="n">set_size</span><span class="p">(</span><span class="s">'small'</span><span class="p">)</span>
+
+<span class="n">plt1</span> <span class="o">=</span> <span class="n">plt</span>
+<span class="n">plt1</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">item_dis</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">item_dis</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s">'ro'</span><span class="p">)</span>
+<span class="n">plt1</span><span class="p">.</span><span class="n">draw</span><span class="p">()</span><span class="c1">#直接画出矩阵，只打了点，下面对图plt1进行一些设置
+</span>
+<span class="n">plt1</span><span class="p">.</span><span class="n">xlim</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">plt1</span><span class="p">.</span><span class="n">ylim</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">plt1</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">u'the distribution of items (NMF)'</span><span class="p">)</span><span class="c1">#设置图的标题
+</span>
+<span class="n">count</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">zipitem</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">item</span><span class="p">,</span> <span class="n">item_dis</span><span class="p">)</span><span class="c1">#把电影标题和电影的坐标联系在一起
+</span>
+<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">zipitem</span><span class="p">:</span>
+    <span class="n">item_name</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">item</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">plt1</span><span class="p">.</span><span class="n">text</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">item_name</span><span class="p">,</span>
+              <span class="n">fontproperties</span><span class="o">=</span><span class="n">fontP</span><span class="p">,</span> 
+              <span class="n">horizontalalignment</span><span class="o">=</span><span class="s">'center'</span><span class="p">,</span>
+              <span class="n">verticalalignment</span><span class="o">=</span><span class="s">'top'</span><span class="p">)</span>
+<span class="n">plt1</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">user_dis</span> <span class="o">=</span> <span class="n">user_dis</span><span class="p">.</span><span class="n">T</span> <span class="c1">#把转置用户分布矩阵
+</span><span class="n">plt2</span> <span class="o">=</span> <span class="n">plt</span>
+<span class="n">plt2</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">user_dis</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">],</span> <span class="n">user_dis</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">],</span> <span class="s">'ro'</span><span class="p">)</span>
+<span class="n">plt2</span><span class="p">.</span><span class="n">xlim</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">plt2</span><span class="p">.</span><span class="n">ylim</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+<span class="n">plt2</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">u'the distribution of user (NMF)'</span><span class="p">)</span><span class="c1">#设置图的标题
+</span>
+<span class="n">zipuser</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="n">user_dis</span><span class="p">)</span><span class="c1">#把电影标题和电影的坐标联系在一起
+</span><span class="k">for</span> <span class="n">user</span> <span class="ow">in</span> <span class="n">zipuser</span><span class="p">:</span>
+    <span class="n">user_name</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">user</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">plt2</span><span class="p">.</span><span class="n">text</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">user_name</span><span class="p">,</span>
+              <span class="n">fontproperties</span><span class="o">=</span><span class="n">fontP</span><span class="p">,</span> 
+              <span class="n">horizontalalignment</span><span class="o">=</span><span class="s">'center'</span><span class="p">,</span>
+              <span class="n">verticalalignment</span><span class="o">=</span><span class="s">'top'</span><span class="p">)</span>
+<span class="n">plt2</span><span class="p">.</span><span class="n">show</span><span class="p">()</span><span class="c1">#直接画出矩阵，只打了点，下面对图plt1进行一些设置
+</span>
+</code></pre></div></div>
+
+<p>特别感谢，代码及数据转自：<a href="https://blog.csdn.net/qq_26225295/article/details/51165858">NMF 非负矩阵分解(Non-negative Matrix Factorization)实践</a>。</p>
+
+:ET

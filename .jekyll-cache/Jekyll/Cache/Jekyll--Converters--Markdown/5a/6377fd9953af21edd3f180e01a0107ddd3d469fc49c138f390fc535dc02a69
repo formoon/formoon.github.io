@@ -1,0 +1,121 @@
+I"�E<p><img src="https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2550540489,2603653507&amp;fm=27&amp;gp=0.jpg" alt="" />
+本文是写给Mac电脑开发新手的入门帖，诸神请退散。</p>
+
+<h4 id="c语言">C语言</h4>
+<p>C语言可说是电脑环境中的“镇国神器”，从发明至今，虽然C语言的使用者缓慢的减少，但从当前市场应用情况看，尚无一台电脑能够摆脱C语言的支撑而生存。<br />
+此外由于大多数主流操作系统都主要使用C语言编写，使得C语言跟操作系统结合最为紧密，从而更容易对整体电脑深入了解。所以对电脑相关类专业的学生，C语言仍然是必修课。<br />
+最后就是近几年，随着物联网、嵌入式开发的进展，效率最高、资源需求最少的C语言，又成为了很多项目的不二选择。</p>
+
+<p>Mac电脑作为类Unix类操作系统的代表，C语言也是天生具备的。很多Mac电脑即便不用于软件开发，也会因为各种免费开源软件的使用，在依赖包中自动安装了gcc的支持，从而具备了C语言的开发环境。</p>
+
+<h4 id="安装开发环境">安装开发环境</h4>
+<p>在Mac电脑上进行C语言开发有两种方式，一是使用图形界面（GUI)进行开发，这种情况使用苹果自主开发的Xcode开发工具。二是使用纯命令行的开发工具gcc或者clang配合vim编辑器。前者适合大规模项目的开发，后者简洁高效，相对来说适合开发小规模的程序或者应急的修修补补。<br />
+安装Xcode唯一合法的方法是在Mac电脑打开App Store程序，在右上角搜索框中输入”Xcode”，从搜索到的结果中一般前1、2位就是Xcode，然后点选“获取”或者“安装”。Xcode容量比较大，一般安装包都在4.5G-6G之间，依据网络的情况，需要等待不短的时间。安装完成后，第一次运行Xcode会提示安装命令行工具，按照提示就会自动安装clang命令行开发工具。命令行开发包一般是100多M,下载安装都会比较快。</p>
+
+<h4 id="概念和选择">概念和选择</h4>
+<p>上一节说到了Xcode是一个图形界面的开发环境，习惯上也叫做集成开发环境（IDE)。因为建立工程、编辑输入代码、编译、测试甚至打包和发布，都在这个统一的图形界面中，大多功能都是动动鼠标就能完成，所以比较适合初学者。<br />
+在Windows电脑上对应的工具是微软Visual Studio系列，事实上在Windows上几乎99%的程序员都只工作在集成开发环境下，大多数人几乎都已经没有能力在命令行下工作了，这种退化害了很多人。<br />
+Mac的命令行C语言开发工具主要有两种，clang及gcc,前者是苹果官方推荐的，Xcode也使用Clang进行编译。后者则是GNU开源社区推荐的，并且被大多数linux支持。两者在语法的兼容性上几乎没有差别，用了几年也只碰到1、2次很小的不同。而Clang在于错误信息、编译速度等方面有很多优势。所以我也建议就用Clang吧，如上所述，安装Xcode，随后安装命令行工具包，所需的这些工具就都有了。在一台电脑中很可能刚才说的Xcode/Clang/Gcc同时都安装了，放心，他们互相不会打架的。<br />
+在命令行状态下，为了完成编程工作，实际上还需要文本编辑软件和工程管理软件，后者可以用以前文章提过的Makefile系统。另外初学者代码量都不会多，一般1、2个文件了不起了，可以先忽略工程方面的问题。文本编辑推荐使用Mac已经内置的vim编辑程序。在社区中还有很高呼声的emacs，但一是考虑初学者上手；二是考虑当前年代C语言的主要用途方向；三则纯属个人偏好，我推荐使用vim。实际上，只要你掌握了这种编程的方式，使用第三方提供的图形化编辑器也是完全可以的，比如常见的UltraEdit/TextMate，都是很优秀的编辑软件。但前提一定是vim你已经真正掌握，牢记于心了，这种看起来不起眼的小能力，将来会大大的扩展你的工作适应空间。<br />
+额外补充一句，虽然上一节我说了Xcode这样的集成环境适合大的项目，命令行适合小的项目或者修修补补，但事实上在开源社区中，命令行所产生的代码量仍然是最高的，几乎你知道的真正大规模系统都是以命令行为主要方式开发出来的，这里只提一个，比如Linux操作系统本身。所以归根结底，工具就是工具，最终还是靠人的能力。</p>
+
+<h4 id="vim简要入门">vim简要入门</h4>
+<p>vim是命令行下重要的文本编辑工具。命令行也就是“终端”app,启动命令行的方式除了在Launchpad中翻找图标之外，也可以在电脑右上角选择放大镜“spotlight”,或者使用SpotLight的快捷键：COMMAND+空格，然后在其中搜索Terminal，搜索到了之后用鼠标点击运行就可以进入命令行。<br />
+<img src="http://115.182.41.123/files/201801/03/terminalp1.jpg" alt="" />(终端.app,也叫Terminal.app、命令行，图标长这样子)<br />
+至少在macOS10.10以后，系统中已经内置了vim工具。如果你的系统没有vim软件，可以使用命令<code class="language-plaintext highlighter-rouge">brew install vim</code>来安装，brew是包管理器，用于管理Mac电脑上的开源软件。brew的安装可以查看以前的文章。<br />
+运行vim的方法是在命令行状态键入命令<code class="language-plaintext highlighter-rouge">vim 要编辑的文本文件名</code>。
+这里插一条命令行操作的知识，当前正在输入的命令行，ctrl-a是将光标移动到当前行头一个字符；ctrl-e是将光标移动到当前行最后一个字符，移动光标是为了在输入命令的时候编辑输入错误的部分。补充在这里，是为了你可以跟下面vim的操作对应区别着记忆。<br />
+vim默认不支持鼠标，具有3种工作状态，分别是“光标状态”、“输入状态”、“命令状态”。刚刚进入vim的时候就是在光标状态，这个状态下有以下几种常见操作：</p>
+<ul>
+  <li>k 向上移动光标</li>
+  <li>h 向左移动光标</li>
+  <li>j 向下移动光标</li>
+  <li>l 向右移动光标</li>
+  <li>Mac电脑，上下左右光标键可以起到跟上面ikjl字母键一样的作用，但字母键操作更快。此外有一些电脑，光标键是不起作用的。</li>
+  <li>ctrl+f 向后翻页</li>
+  <li>ctrl+b 向前翻页</li>
+  <li>$ 移动光标到当前行最后一个字符</li>
+  <li>0 移动光标到当前行第一个字符</li>
+  <li>gg 光标移动到第一行</li>
+  <li>
+    <p>G 光标移动到最后一行</p>
+  </li>
+  <li>i 从当前光标位置字符之前开始插入文本，vim进入“输入状态”</li>
+  <li>a 从当前光标位置字符之后开始追加文本，vim进入“输入状态”</li>
+  <li>
+    <p>o 从当前行之后开始追加一行文本，vim进入“输入状态”</p>
+  </li>
+  <li>vim在“输入状态”可以输入字符、回车换行、回格删除前一个字符(包括回车换行符)</li>
+  <li>
+    <p>ESC 键结束输入，回到“光标状态”</p>
+  </li>
+  <li>yy 拷贝光标所在当前行到缓冲区（相当于剪贴板，但与通常电脑的剪贴板不是一个，不能互相粘贴)</li>
+  <li>p 把缓冲区内容插入粘贴到当前光标行之后的一行</li>
+  <li>x 删除光标所在的一个字符</li>
+  <li>
+    <p>dd 删除光标所在的一行</p>
+  </li>
+  <li>:光标移动到屏幕最下面一行，并进入“命令状态”。</li>
+  <li>ESC键结束“命令状态”，返回“光标状态”，这跟从“输入状态”返回“光标状态”一样。</li>
+</ul>
+
+<p>下面讲述命令状态的几个操作：</p>
+<ul>
+  <li>w 将文件存盘</li>
+  <li>q 退出vim，回到命令行。如果文件被改变了，但没有存盘，会有警告信息，使用q!可以忽略警告信息直接退出。</li>
+  <li>x 存盘并且退出</li>
+  <li>0 光标跳到第一行</li>
+  <li>nn nn代表一个数字，表示跳到第nn行</li>
+  <li>$ 跳到文件最后一行，注意0和$跟“光标状态”移动光标到行首和行末的操作很相似，再注意“光标模式”下也有移动光标到第一行、最后一行的方法，可以对照记忆
+好了，掌握这些，你就可以编辑c语言的程序了。这部分学习的技巧是先记住必须、常用的，其它的可以打印出来当做速记卡放在显示器旁边，边用边记，一般强化记忆1、2天就能差不多了。<br />
+vim是从80年代的vi编辑器基础和发展过来的，历史已经比很多新入行的学习者年龄都大。经过这么多年的发展，已经有了很多扩展功能和定制功能，如果你用起来感觉还不错的话，建议在网上搜索一些更详细的教程，深入的了解一下。</li>
+</ul>
+
+<h4 id="使用vim开始我们的c语言之旅的第一个程序">使用vim开始我们的C语言之旅的第一个程序</h4>
+<p>习惯上人们都把第一个程序称为“Hello World”，原因就是，这第一个程序，一般只打印一行“Hello World”到屏幕上。</p>
+<ol>
+  <li>在命令行，首先建立一个工作目录，我们所有的程序、正式文件、临时文件、结果文件，都保存在这里目录中，这是保持电脑整洁的一个习惯。命令行建目录的命令是：<code class="language-plaintext highlighter-rouge">mkdir cfiles</code>,这样就在当前目录下，建立了一个cfiles目录。一般命令行刚打开的时候会是在用户的主目录，主目录在Mac/Linux系统中也缩写为<code class="language-plaintext highlighter-rouge">~</code>符号，那cfiles目录完整的写下来也就是<code class="language-plaintext highlighter-rouge">~/cfiles</code>，中间的除法符号<code class="language-plaintext highlighter-rouge">/</code>是多个目录名称之间的间隔符。</li>
+  <li>进入我们的工作目录，在命令行敲入：<code class="language-plaintext highlighter-rouge">cd cfiles</code>，这样以后的操作，默认就是在~/cfiles目录工作了。</li>
+  <li>快捷键COMMAND+C拷贝下面的程序到剪贴板。
+    <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;
+</span><span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+ <span class="n">printf</span><span class="p">(</span><span class="s">"Hello World!</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+ <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div>    </div>
+    <p>这篇不是C语言的编程文章，因此不解释程序本身的含义，有很多C语言的编程书可以用了。我们只继续说我们下面怎么做。</p>
+  </li>
+  <li>命令行敲入<code class="language-plaintext highlighter-rouge">vim helloworld.c</code>，这是使用vim编辑一个名为helloworld.c的文本文件，这个文件现在还不存在，所以我们是新建这样一个文件。</li>
+  <li>在vim中，敲i键进入插入状态，随后COMMAND+V把剪贴板中的代码粘贴出去。刚才讲vim的时候说了，yy也是拷贝的意思，但是vim的剪贴板，跟Mac操作系统的剪贴板不是一个，所以vim的yy跟vim的p是对应的。Mac的COMMAND+C跟COMMAND+V是对应的，互相之间不能拷贝粘贴。<br />
+<img src="http://115.182.41.123/files/201801/03/terminalp2.png" alt="" /></li>
+  <li>按ESC键从“输入状态”返回到“光标状态”，然后按<code class="language-plaintext highlighter-rouge">:</code>再切换到“命令状态”，随后按<code class="language-plaintext highlighter-rouge">x</code>保存文件，并退出vim。helloworld.c会保存在当前文件夹，也就是~/cfiles文件夹，这就是当前文件夹的作用。</li>
+  <li>在命令行输入<code class="language-plaintext highlighter-rouge">gcc -o helloworld helloworld.c</code>，这条命令就是编译helloworld.c程序，编译完成，输出为当前文件helloworld文件。正常情况下，编译会很快结束，并且没有错误信息。此外这里使用gcc进行了c语言程序的编译，但并不一定真的是gcc系统，在Mac电脑上默认是使用clang系统，只是为了兼容也伪装成了gcc的调用方式而已。这些知道就成，程序员没有必要过多了解，这些编译器互相都是兼容的。</li>
+  <li>命令行输入<code class="language-plaintext highlighter-rouge">./helloworld</code>回车执行，屏幕上会出现一行“Hello World!”，这表示我们编辑一个C程序，然后编译、并且运行验证成功了。
+<img src="http://115.182.41.123/files/201801/03/terminalp3.png" alt="" />
+以上就是在命令行编辑程序文件，编译并运行所需知道的所有知识。接下来就是你按照C语言课本的要求进行你的各项编程实验了。<br />
+PS:截止以上，利用命令行编辑、编译C语言的方法，在Linux电脑上，也几乎完全一样。可能就是拷贝、粘贴在Linux系统是Ctrl-C及Ctrl-V，如果是远程终端，则依赖终端所在客户端的操作系统操作方法。vim操作、gcc命令是完全相同的。</li>
+</ol>
+
+<h4 id="xcode">Xcode</h4>
+<p>跟运行“命令行”一样，Xcode也可以翻找图标运行，或者使用SpotLight搜索一下再执行。Xcode程序的图标就是题头图的样子，当然—-没那么大。<br />
+Xcode除了刚才说过的第一次运行会自动提示你安装命令行工具包，还需要设置一下苹果的开发者账号，其实就是AppleID。为苹果电脑开发并需要正式发布产品的人，都需要向苹果申请开发者账号，这个账号是收费的，IOS开发是99美金。不发布产品，仅仅是在自己电脑上学习、编程、测试，普通的AppleID应当会自动有一个user角色的PersonalTeam方式，不需要付费。想想Windows电脑上Visual Studio的高价格，这个还是很实惠的。Xcode设置开发者账号的菜单是：Xcode菜单-&gt;Preferences,出来的窗口从左数第二个表单Accounts，在这里设置具有开发者身份的AppleID。<br />
+在这个链接<a href="http://finance.591hx.com/article/2015-12-25/0000518556s.shtml">http://finance.591hx.com/article/2015-12-25/0000518556s.shtml</a>有个图文的说明讲解设置开发者账号，可以参考。下面继续我们的C语言之旅：</p>
+<ol>
+  <li>刚进入Xcode就有一个启动界面，从左侧第二行选择“Create a new Xcode project”,在下一个出现的对话框中，选择程序类型。Xcode可以开发iOS/watchOS/tvOS/macOS/Cross-platform五种应用，这里选择macOS,表示是运行在桌面电脑上面的应用程序。第二行选择“Command Line Tool”表示是命令行工具程序，接着选Next。
+<img src="http://115.182.41.123/files/201801/03/xcodep1.png" alt="" /></li>
+  <li>接着输入应用的名字，我们刚才在命令行状态起的名字是helloworld，这次可以叫firstc,随你喜好。第二行是你的开发组织，因为使用的AppleID没有开发者身份，所以就使用默认的Personal Team就可以了，如果使用了正式的开发者账号，要选择正确的组织信息。第三行是组织名称，第二行的组织信息实际是电脑签名用的证书名称，用于保证编译的程序正装原造，除了你没有被人篡改过。这一行则是用于软件给用户看的信息，就是一行可以辨识的字符，如果你有公司名可以输入进去，没有的话，随便看你高兴起一个吧。第四行是组织的标志名，用于确定全球本组织的唯一性，习惯上使用网址的逆向方式，没有网址的话，看你喜欢吧，起一个唯一性的标志就好了。最后一行是重点，既然学习的是C语言，就选C。
+<img src="http://115.182.41.123/files/201801/03/xcodep2.png" alt="" /></li>
+  <li>接下来为这个项目选择一个保存在磁盘上的位置，项目本身会自动建立一个文件夹，全部文件保存在项目自己的文件夹之内，这里选择的实际上是项目文件夹上一层文件夹的位置。<br />
+<img src="http://115.182.41.123/files/201801/03/xcodep3.png" alt="" /></li>
+  <li>到了这一步，实际上项目已经建立成功了。这个界面就是对项目整体进行修改、调整的界面，一般情况下选择默认值就好。<br />
+<img src="http://115.182.41.123/files/201801/03/xcodep4.png" alt="" /></li>
+  <li>我们可以在Finder中检视一下项目建立的情况，可以看到文件夹的层次结构，还有那个自动建立的程序主文件main.c。
+<img src="http://115.182.41.123/files/201801/03/xcodep5.png" alt="" /></li>
+  <li>main.c的内容，实际上已经是一个hello World，直接用鼠标点击左上角的三角键，Xcode会自动对项目进行编译、查错、并运行。屏幕中部右下角的位置，就是程序运行输出的结果。除了我们刚才知道的“Hello,World!”这一行，还有一行“Program ended with exit code 0”,直译的意思是程序已经执行结束，退出代码是0。0是一个特殊的退出代码，表示程序正常退出。通常我们可以使用退出代码表示某种错误，或者给本程序的调用者传达某种约定的信息。
+<img src="http://115.182.41.123/files/201801/03/xcodep6.png" alt="" />
+至此，使用命令行界面，和使用Xcode图形化界面，我们都知道了如何开始我们的C程序。下面的岁月里，捧着教科书，努力吧！</li>
+</ol>
+
+<p>参考资料：
+xcode开发参考：<a href="https://www.jianshu.com/p/feadeb1ae7ae">https://www.jianshu.com/p/feadeb1ae7ae</a></p>
+:ET

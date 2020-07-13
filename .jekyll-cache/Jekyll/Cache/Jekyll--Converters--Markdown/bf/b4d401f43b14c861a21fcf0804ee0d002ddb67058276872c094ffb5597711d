@@ -1,0 +1,27 @@
+I"9<p>通常GreenPlum都是安装在Centos上，结果安装完发现远程无法连接，在本地是可以正常访问的。<br />
+测试是否可以连接可以使用psql工具：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>psql <span class="nt">-h</span> 192.168.1.200 <span class="nt">-p</span> 5432 <span class="nt">-d</span> dw_oems <span class="nt">-U</span> gpadmin <span class="nt">-W</span>   
+	<span class="c">#默认密码一般也是gpadmin或者admin</span>
+</code></pre></div></div>
+<p>如果不能连接，可以先使用netstat测试一下：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#列出当前主机所有tcp监听端口</span>
+netstat <span class="nt">-ntl</span>
+<span class="c">#列出的主机中，如果是：</span>
+127.0.0.1:5432 	
+<span class="c">#则表示gp仅设置了本地访问，需要修改配置文件：postgresql.conf</span>
+<span class="c">#如果列出来是：</span>
+0.0.0.0:5432
+<span class="c">#这样的形式，表示gp数据库已经允许远程访问。</span>
+<span class="c">#需要考虑主机的配置问题，通常是防火墙的限制。</span>
+</code></pre></div></div>
+<p>比较简单的方式可以直接关闭centos的防火墙：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#关闭centos防火墙</span>
+systemctl stop firewalld.service
+<span class="c">#禁止centos防火墙</span>
+systemctl disable firewalld.service
+<span class="c">#查看防火墙状态</span>
+firewall-cmd <span class="nt">--state</span> 
+<span class="c">#（关闭后显示notrunning，开启后显示running）</span>
+</code></pre></div></div>
+<p>关闭防火墙后，远程访问gp数据库正常了。</p>
+:ET

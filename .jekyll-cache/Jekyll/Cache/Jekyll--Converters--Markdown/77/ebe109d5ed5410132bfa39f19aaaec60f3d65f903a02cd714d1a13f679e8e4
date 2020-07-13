@@ -1,0 +1,10 @@
+I"�<p><img src="http://www.linuxprobe.com/wp-content/uploads/2016/05/SElinux_logo.jpg" alt="" />
+作为业界多用户操作系统的代表，linux中把一个程序放到后台运行的办法估计连一个只学过3天linux的菜鸟都非常熟悉：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./myApp &amp;
+</code></pre></div></div>
+<p>程序已经在前台运行了也没关系，快捷键<code class="language-plaintext highlighter-rouge">CTRL-Z</code>,然后键入命令：<code class="language-plaintext highlighter-rouge">bg</code>,程序就放入后台执行了。<br />
+使用<code class="language-plaintext highlighter-rouge">jobs</code>可以列出所有正在后台运行的任务，必要的话，还可以使用<code class="language-plaintext highlighter-rouge">fg [pid]</code>把放入后台的任务调度到前台来继续执行。<br />
+这样正确吗？没错，至少unix类系统中的手册中都是这样写的。最早的系统也就是这样设计的。<br />
+不过自从30多年前开始确立这样的方式之后，操作系统又有了很多发展，其中变化最大的就是安全方面的发展，有很多linux/mac的版本在安全方面又有了新的要求。典型的比如新版的seLinux。<br />
+在这些系统中，有些设置就不允许某用户在后台运行程序，这样的就不多说了，请管理员用户修改设置。但更多的可能是这样几种情况：</p>
+:ET

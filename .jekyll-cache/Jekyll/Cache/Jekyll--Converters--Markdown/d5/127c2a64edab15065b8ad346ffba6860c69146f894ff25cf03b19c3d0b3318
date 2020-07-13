@@ -1,0 +1,78 @@
+I"<p><img src="http://www.yixieshi.com/uploads/allimg/140414/095559CA-0.jpg" alt="" /></p>
+
+<p>作为一个网站，加强搜索引擎的优化，俗称SEO优化总是很重要的事情。而重要手段之一就是建立自己网站的sitemap.xml。<br />
+原本jekyll有一个插件：jekyll-sitemap,但到了jekyll3.5版本以后，居然取消了，我还曾经奇怪为什么。直到后来发现，的确这个插件也没有什么太大的必要。<br />
+其实建立自己的sitemap.xml非常容易，不过就是在根目录增加一个sitemap.xml文件，其中使用liquid脚本语言把自己网站所有链接遍历一下成为xml文件即可，这里转载了别人的一个代码：</p>
+<div class="language-xml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>---
+layout: null
+sitemap:
+  exclude: 'yes'
+---
+
+<span class="cp">&lt;?xml version="1.0" encoding="UTF-8"?&gt;</span>
+<span class="nt">&lt;urlset</span> <span class="na">xmlns=</span><span class="s">"http://www.sitemaps.org/schemas/sitemap/0.9"</span><span class="nt">&gt;</span>
+  {% for post in site.posts %}
+    {% unless post.published == false %}
+    <span class="nt">&lt;url&gt;</span>
+      <span class="nt">&lt;loc&gt;</span>{{ site.url }}{{ post.url }}<span class="nt">&lt;/loc&gt;</span>
+      {% if post.sitemap.lastmod %}
+        <span class="nt">&lt;lastmod&gt;</span>{{ post.sitemap.lastmod | date: "%Y-%m-%d" }}<span class="nt">&lt;/lastmod&gt;</span>
+      {% elsif post.date %}
+        <span class="nt">&lt;lastmod&gt;</span>{{ post.date | date_to_xmlschema }}<span class="nt">&lt;/lastmod&gt;</span>
+      {% else %}
+        <span class="nt">&lt;lastmod&gt;</span>{{ site.time | date_to_xmlschema }}<span class="nt">&lt;/lastmod&gt;</span>
+      {% endif %}
+      {% if post.sitemap.changefreq %}
+        <span class="nt">&lt;changefreq&gt;</span>{{ post.sitemap.changefreq }}<span class="nt">&lt;/changefreq&gt;</span>
+      {% else %}
+        <span class="nt">&lt;changefreq&gt;</span>monthly<span class="nt">&lt;/changefreq&gt;</span>
+      {% endif %}
+      {% if post.sitemap.priority %}
+        <span class="nt">&lt;priority&gt;</span>{{ post.sitemap.priority }}<span class="nt">&lt;/priority&gt;</span>
+      {% else %}
+        <span class="nt">&lt;priority&gt;</span>0.5<span class="nt">&lt;/priority&gt;</span>
+      {% endif %}
+    <span class="nt">&lt;/url&gt;</span>
+    {% endunless %}
+  {% endfor %}
+  {% for page in site.pages %}
+    {% unless page.sitemap.exclude == "yes" %}
+    <span class="nt">&lt;url&gt;</span>
+      <span class="nt">&lt;loc&gt;</span>{{ site.url }}{{ page.url | remove: "index.html" }}<span class="nt">&lt;/loc&gt;</span>
+      {% if page.sitemap.lastmod %}
+        <span class="nt">&lt;lastmod&gt;</span>{{ page.sitemap.lastmod | date: "%Y-%m-%d" }}<span class="nt">&lt;/lastmod&gt;</span>
+      {% elsif page.date %}
+        <span class="nt">&lt;lastmod&gt;</span>{{ page.date | date_to_xmlschema }}<span class="nt">&lt;/lastmod&gt;</span>
+      {% else %}
+        <span class="nt">&lt;lastmod&gt;</span>{{ site.time | date_to_xmlschema }}<span class="nt">&lt;/lastmod&gt;</span>
+      {% endif %}
+      {% if page.sitemap.changefreq %}
+        <span class="nt">&lt;changefreq&gt;</span>{{ page.sitemap.changefreq }}<span class="nt">&lt;/changefreq&gt;</span>
+      {% else %}
+        <span class="nt">&lt;changefreq&gt;</span>monthly<span class="nt">&lt;/changefreq&gt;</span>
+      {% endif %}
+      {% if page.sitemap.priority %}
+        <span class="nt">&lt;priority&gt;</span>{{ page.sitemap.priority }}<span class="nt">&lt;/priority&gt;</span>
+      {% else %}
+        <span class="nt">&lt;priority&gt;</span>0.3<span class="nt">&lt;/priority&gt;</span>
+      {% endif %}
+    <span class="nt">&lt;/url&gt;</span>
+    {% endunless %}
+  {% endfor %}
+<span class="nt">&lt;/urlset&gt;</span>
+
+</code></pre></div></div>
+<p>同时为了预定义一些参数，在_config.yml中再增加下面这样一节：</p>
+<div class="language-yml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">sitemap</span><span class="pi">:</span>
+  <span class="na">lastmod</span><span class="pi">:</span> <span class="s">2017-12-31</span>
+  <span class="na">priority</span><span class="pi">:</span> <span class="m">0.7</span>
+  <span class="na">changefreq</span><span class="pi">:</span> <span class="s1">'</span><span class="s">weekly'</span>
+  <span class="na">exclude</span><span class="pi">:</span> <span class="s1">'</span><span class="s">yes'</span>
+</code></pre></div></div>
+<p>其实这些参数，写到上面脚本中也是一样的，这样还是更规范一些吧。<br />
+因为修改了_config.yml,所以本地的jekyll server要重启动一下，然后你就会看到在_site文件夹中生成的sitemap.xml。<br />
+参考链接：<br />
+<a href="http://www.uberobert.com/generate-a-jekyll-sitemap/">http://www.uberobert.com/generate-a-jekyll-sitemap/</a>
+<a href="https://stackoverflow.com/questions/13544241/generate-sitemap-in-jekyll-without-plugin">https://stackoverflow.com/questions/13544241/generate-sitemap-in-jekyll-without-plugin</a></p>
+
+:ET

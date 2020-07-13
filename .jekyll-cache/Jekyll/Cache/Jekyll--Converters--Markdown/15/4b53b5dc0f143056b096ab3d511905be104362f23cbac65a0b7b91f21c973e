@@ -1,0 +1,75 @@
+I"�<p>python2不是以unicode作为基本代码字符类型，碰到乱码的几率是远远高于python3，但即便如此，相信很多人，也不想随意的迁移到python3，这里就总结几个我平常碰到的问题及解法。</p>
+<ol>
+  <li>
+    <p>文件中无法使用中文注释<br />
+处理方法：<br />
+在代码中增加<code class="language-plaintext highlighter-rouge"># -*- coding=UTF-8 -*-</code>，一般加在文件头部第一行，如果第一行是脚本标志，则放在第二行（实际仍然是python正本的第一行）。<br />
+随后将文件另存为UTF-8格式。<br />
+此方法可以解决注释中有中文，及字符串立即数中包含中文的问题。</p>
+  </li>
+  <li>unicode中文变量打印出来是乱码<br />
+处理方法：<br />
+文件开始引入扩展库的部分加入以下3行代码。
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">sys</span>
+<span class="nb">reload</span><span class="p">(</span><span class="n">sys</span><span class="p">)</span>
+<span class="n">sys</span><span class="p">.</span><span class="n">setdefaultencoding</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </li>
+  <li>utf-8 及 gbk互相转换<br />
+直接看代码：
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#utf-8字符串转换成GBK（GB2312及其它编码也是这样用）
+</span><span class="k">print</span> <span class="nb">str</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'UTF-8'</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">'GBK'</span><span class="p">)</span>
+<span class="c1">#gbk转换成utf-8
+</span><span class="k">print</span> <span class="nb">str</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="s">'GBK'</span><span class="p">).</span><span class="n">encode</span><span class="p">(</span><span class="s">'UTF-8'</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>参数中的utf-8是用大写还是小写？<br />
+通常大小写都可以，这不是python决定的，是系统的语言代码设定决定的。</p>
+  </li>
+  <li>打开utf-8的文本文件
+经过1、2的设置，正常直接打开就可以，文件是什么编码，读出来就是什么编码，个别仍有不行的可以使用扩展库codecs：
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">codecs</span>
+<span class="p">...</span>
+<span class="k">with</span> <span class="n">codecs</span><span class="p">.</span><span class="nb">open</span><span class="p">(</span><span class="n">poetry_file</span><span class="p">,</span> <span class="s">"r"</span><span class="p">,</span><span class="s">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+</code></pre></div>    </div>
+  </li>
+  <li>print打印出来的结构中的汉字是乱码<br />
+print仅打印一个utf-8的变量是不会有问题的，比如
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span><span class="o">=</span><span class="s">"汉字"</span>
+<span class="k">print</span> <span class="n">a</span>
+<span class="c1">#会正常显示
+</span></code></pre></div>    </div>
+    <p>但是如果用了接续显示，比如：</p>
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span> <span class="n">a</span><span class="p">,</span>
+<span class="c1">#将会显示乱码
+</span></code></pre></div>    </div>
+    <p>如果是其它结构，诸如dict / list / class等，都会出现乱码。</p>
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="o">=</span> <span class="p">[</span><span class="s">"中文"</span><span class="err">，</span><span class="s">"测试"</span><span class="p">]</span>
+<span class="k">print</span> <span class="n">a</span>
+<span class="c1">#将会显示乱码
+</span></code></pre></div>    </div>
+    <p>这种情况使用基本库没有什么好办法，只能循环逐个打印内容，比如：</p>
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
+<span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">:</span>
+ <span class="k">print</span> <span class="n">item</span>
+</code></pre></div>    </div>
+    <p>或者整合输出，比如：<code class="language-plaintext highlighter-rouge">print ', '.join(a)</code><br />
+还可以使用第三方的包，比如：</p>
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">uniout</span>
+<span class="p">...</span>
+<span class="n">listnine</span> <span class="o">=</span> <span class="p">[</span><span class="s">'梨'</span><span class="p">,</span> <span class="s">'橘子'</span><span class="p">,</span> <span class="s">'苹果'</span><span class="p">,</span> <span class="s">'香蕉'</span><span class="p">]</span>
+<span class="k">print</span> <span class="s">'listnine list: %s'</span> <span class="o">%</span> <span class="n">listnine</span>
+</code></pre></div>    </div>
+  </li>
+  <li>变量本身显示正常，循环遍历出来的单个字符乱码<br />
+大多情况是因为字符串不是unicode编码。声明字符串的时候使用<code class="language-plaintext highlighter-rouge">a = u'汉字'</code>这样方式赋值的变量都是Unicode字符串，不会有问题。<br />
+如果是从外部传入的变量，源头情况又不知道，可以尝试转换成Unicode字符串：
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">str</span><span class="o">=</span><span class="nb">unicode</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="s">"utf-8"</span><span class="p">);</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<p>嗯，差不多就这些，想到再补充。</p>
+
+:ET

@@ -1,0 +1,15 @@
+I"�<p>Xcode编译swift项目报如题错误。</p>
+<ol>
+  <li>网上有介绍是使用photoshop等软件处理的图片附加了Xcode不识别的信息，可以在终端中查看，比如如下：
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-alF</span>@ <span class="k">*</span>
+<span class="nt">-rw-r--r--</span>@ 1 andrew  staff  179578 Jan 29 10:07 hsk_slpah.png
+ com.apple.FinderInfo	    32 
+ com.apple.lastuseddate#PS	    16 
+ com.apple.metadata:_kMDItemUserTags	    42 
+</code></pre></div>    </div>
+    <p>上面列出的com.apple.FinderInfo信息就是。可以使用：<code class="language-plaintext highlighter-rouge">xattr -c resources/hsk_slpah.png</code>命令来删除。</p>
+  </li>
+  <li>也碰到过一个情况，有的时候报这个错误，有的时候报签名错误，各种方法尝试没有解决。后来到可执行文件生成目录中去看，有很多个同名的项目，虽然项目被系统自动增加了随机的目录名前缀，但因为使用Xcode很久，所以积累的废文件很多，把没用的项目全部删除重启Xcode就没问题了。</li>
+</ol>
+
+:ET

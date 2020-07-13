@@ -1,0 +1,13 @@
+I"`<h4 id="剖析第一个例子">剖析第一个例子</h4>
+<p>学习《机器学习》，很多IT高手是直接去翻看TensorFlow文档，但碰壁的很多。究其原因，TensorFlow的文档跨度太大了，它首先假设你已经对“机器学习”和人工智能非常熟悉，所有的文档和样例，都是用于帮助你从以前的计算平台迁移至TensorFlow，而并不是一份入门教程。<br />
+所以本文尽力保持一个比较缓慢的节奏和阶梯，希望弥合这种距离。本文定位并非取代TensorFlow文档,而是希望通过对照本文和TensorFlow文档，帮助你更顺利的进入Google的机器学习世界。<br />
+基于这个思路，这一节开始对上一节的例子做一个更详细的讲解。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+</code></pre></div></div>
+<p>代码一开始，引入了两个python扩展库，第一个是我们的主角tensorflow,第二个是一个数学计算库，numpy。数学计算通常有有两个方向，一个是符号计算，或者叫化简公式；我们这里用到的是另外一个方向，就是数值计算，也就是不管公式多么复杂，最后的结果是不是无限不循环的小数，最终都计算出来具体的数值结果。所以习惯上也称numpy库叫做数值计算库。<br />
+有心人可能想到了，这个库跟前面提到的大计算器“Octave”功能是对应的。这里可以额外举一个使用python配合numpy解前面五元一次方程的例子：<br />
+```python
+#!/usr/bin/env python</p>
+<h1 id="---codingutf-8---">-<em>- coding=UTF-8 -</em>-</h1>
+:ET

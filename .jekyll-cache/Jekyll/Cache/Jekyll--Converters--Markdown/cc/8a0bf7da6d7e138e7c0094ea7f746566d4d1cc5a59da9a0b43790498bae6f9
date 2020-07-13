@@ -1,0 +1,394 @@
+I"v�<p><img src="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1545112916052&amp;di=d2428f9e946cda2d7df3f0ca9ff3def8&amp;imgtype=0&amp;src=http%3A%2F%2Finsights.thoughtworkers.org%2Fwp-content%2Fuploads%2F2015%2F07%2F718-%25E4%25BD%259F%25E8%25BE%25BE-%25E5%2585%25A8%25E6%25A0%2588%25E5%25BC%2580%25E5%258F%2591%25E8%25AF%25AD%25E8%25A8%2580Python-1024x724.png" alt="" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script></p>
+<h3 id="从零开始python3第十三讲">《从零开始PYTHON3》第十三讲</h3>
+
+<p>网络编程的火热和重要性这里就不多说了，我们直接来看看Python在互联网编程方面的表现。</p>
+
+<p>Python有很多网络编程的第三方扩展包，这里推荐一个我认为最易用的：Flask。安装方法跟其它的包一样：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#首先使用管理员模式执行cmd命令行，然后执行：
+</span><span class="n">pip</span> <span class="n">install</span> <span class="n">flask</span>  <span class="c1">#某些系统是pip3 install flask
+</span></code></pre></div></div>
+
+<hr />
+
+<h4 id="网络编程基本知识">网络编程基本知识</h4>
+
+<p>我们直接以一个示例开始，引入网络编程的概念：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#网络编程演示
+</span>
+<span class="c1">#引入网络库
+</span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+
+<span class="c1">#定义一个网络应用
+</span><span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s">"你好，世界！"</span>
+
+<span class="c1">#执行网络框架
+</span><span class="n">app</span><span class="p">.</span><span class="n">run</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>Flask是一个网络编程的框架。“程序框架”这个名词我们第一次见到。以前我们见过的程序，所有的控制权都在我们自己手里。程序启动后，从开始顺序执行，根据逻辑会有分支，中间会调用我们定义的函数，直到所有语句执行完成。<br />
+框架的意思是，由“框架”帮你完成所有繁琐、枯燥的基本工作，你只需要写跟你相关的一小部分内容。在这个过程中，程序的开始、初始化、定义等各个部分，都有一定的规范和要求，基本属于格式化的内容，大多数照抄过来就可以。而框架会接管程序运行的整个生命期，只在必要的某个时候，调用你自己写的部分程序代码，完成你要求的功能。<br />
+框架使用的一般模式都是在程序代码中引入库、初始化库，接着编写自己的程序代码嵌入到应当起作用的位置，最后把程序的控制权交给框架来掌控（运行库模块）。</p>
+
+<p>在上面的例子中，必须由我们自己编写的只有9-11三行代码，其它代码都是规范性的模板，也就是前面说的照抄的、框架的内容。所有的语句，能懂更好，不懂也无需深究，因为那是框架所维护的。上例中9-11三行代码的意思是：</p>
+
+<ul>
+  <li>
+    <p>第9行，@app.route函数定义了一个访问路径，“/”是网站主页的意思。也就是说，当访问当我们这个小网站主页的时候，就触发了第9行至第11行的程序。其它的访问，我们忽略不管。</p>
+  </li>
+  <li>
+    <p>第10行、第11行定义了一个函数，上面说了，第9行定义的访问路径，跟用户实际访问的路径吻合的情况下，这个函数才被激活执行。函数只是返回了一个字符串“你好，世界”。这行文字会显示在访问者的浏览器中。</p>
+  </li>
+</ul>
+
+<p><img src="/assets/cimages/201812/python313/myweb0.png" alt="myweb1" /></p>
+
+<p>作为编程的初学者课程，我需要多解释一些重要的概念。如果你已经了解了，可以忽略这部分:</p>
+
+<p>前面所说的“访问路径”，在互联网中称为URL，想访问互联网上任何一个网站或者任何一个资源，你都需要在浏览器中输入相应的URL,所以也叫URL地址。比如你想访问寓乐湾官网，一般是在浏览器中输入地址：<br />
+       <a href="http://www.stemedu.cn/">http://www.stemedu.cn/</a><br />
+也有特例，现在手机的app很多，打开app，直接就是网站相应的功能。这里面当然有手机端的程序，但需要与网络交互的部分，实际就是把URL直接写到了手机端的程序中，所以最终仍然是使用URL。只是手机app隐藏了URL不让你看到也不用你输入。<br />
+下面是一个更完整的URL的示例：
+<img src="/assets/cimages/201812/python313/url.png" alt="url" /></p>
+<ul>
+  <li>URL一开始的“http://”是指的这个网站需要使用http协议访问。协议其实就是一种网络通信标准，指的是网页浏览器使用什么样的方式同网络服务器通讯沟通，你可以当做这是另外一种简易语言，浏览器和服务器之间，双方通用的语言。这种“语言”绝大多数功能都是由程序自动处理的，所以一般不需要我们了解太多。</li>
+  <li>接着的www.stemedu.cn是域名，每个网站都有自己的域名，这跟门牌号码是一样的道理，好的域名曾经价值连城。</li>
+  <li>“:80”是网站服务器提供网页浏览服务的端口号，因为在http协议中，规定了默认的网页浏览服务的端口号就是80。所以平时我们访问各个网站，都是省略端口号的。如果采用了别的端口号码，则必须明确的写出来。比如我们开发程序通常都会使用其它的端口号，所以在调试程序的时候，就要明确的写出来端口号。</li>
+  <li>端口号的概念仅供了解。现代的每台电脑都很强大，可以同时做很多事情。对外提供服务的时候，每个服务都要占用一个或者多个端口来对外提供服务。如果把电脑比喻为银行，那每个端口就相当于银行的一个办事窗口。每个服务都不能发生冲突和误解，所以都要使用不同的端口号。Flask在开发的时候使用端口5000。正式的网页服务就是上面所说的80端口。</li>
+  <li>最后的斜线“/”及后面的部分，是在特定服务器上特定路径中的特定文件内容。可以有多级文件夹和最后的资源文件，之间使用“/”分割。如果你使用的是mac电脑或者linux电脑，你会发现网络URL的路径部分跟文件的路径几乎完全是对应的，也都使用同样的分隔斜线“/”，Windows则是使用相反的“\”。<br />
+每个网站肯定都有很多页面，比如很多个商品、很多门课程、很多篇新闻，这都需要用不同的URL路径来区分。<br />
+我们在上例第9行的程序中定义，如果有人访问“/”,也就是网站的根目录，或者也叫首页。会由我们的程序响应访问请求，并处理相应的内容。也就是由其后的函数来处理。<br />
+那么URL地址中的http协议和域名谁处理呢？http协议由Flask框架自动处理，而域名则是经由互联网公用的地址服务（DNS）翻译成一台电脑的IP地址，这一般是由你上网的运营商提供的，比如中国电信。</li>
+</ul>
+
+<p>我们学习编程，用的是自己的电脑，这个电脑当然没有申请域名。那么只能使用电脑的IP地址。<br />
+IP地址是每台上网的电脑都具备的一个识别标志，在一个局域网络中是唯一的。类似“192.168.1.100”这样的形式，算得上是真正的网络上的“门牌号码”。举例来说的话，IP地址就好比某人住在“长安街1号”，“长安街1号”就相当于一个IP地址。但如果你有域名，那可以直接说，“明太祖朱元璋”他老人家的故居，“朱元璋故居”就相当于使用域名了。最终这两者都是等价的，实际上计算机本身会更喜欢使用IP地址，因为计算机更适合处理数字。但为了让人类能更容易的使用，所以通常使用域名。<br />
+比如你的电脑IP地址是192.168.1.100，那当有别人在浏览器中访问http://192.168.1.100:5000/的时候，通过Flask的框架处理，程序的控制权将转到上面程序第10行、第11行定义的函数中。“:5000”是我们的网页提供服务的端口号，前面说过Python Flask会默认会使用端口5000号，因为不是默认端口，所以输入完整URL的时候要输入端口号。正式对外提供服务的时候都会使用http协议默认规定的端口80，就无需额外输入端口号了。</p>
+
+<p>那么不知道你自己的IP地址怎么办？每台电脑，在访问自己的时候可以使用127.0.0.1，这是操作系统规定的自己本机的IP地址。所以访问自己的程序可以用http://127.0.0.1:5000/这样的形式。</p>
+
+<p>IP地址、端口的概念，理解不了可以先记住http://127.0.0.1:5000/这个URL地址，访问这个地址就访问了我们编写的网站。先不需要深究，你去记别人门牌号码的时候也是一样的，记住就好，不用问为啥是xxx号，对不对？</p>
+
+<p>这是最简单的互联网程序，但万事开头难，你需要预先弄明白一些互联网的基础知识。真的编程，到了Python中，还是非常简单的。</p>
+
+<hr />
+
+<h5 id="模块化">模块化</h5>
+
+<p>再多补充一个Python的知识，上面程序中的第7行，是定义了一个Flask变量。其中使用了参数<code class="language-plaintext highlighter-rouge">__name__</code>，这是一个Python提供的系统变量，其内容就是当前Python程序“模块的名称”。模块名称是这样定义的：Python主程序在执行的过程中，<code class="language-plaintext highlighter-rouge">__name__</code>是<code class="language-plaintext highlighter-rouge">__main__</code>，如果是使用import引入的库，在库文件中的代码得到的<code class="language-plaintext highlighter-rouge">__name__</code>值，就是去除后缀之后的Python程序的名字。为了说明这一点，我们看一个例子，首先假设有一个程序code2.py,内容只有一行：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">"code2.py:"</span><span class="p">,</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="c1">#假设我们只运行code2.py，将显示：code2.py:__main__
+#这是因为此时code2.py被当做主程序运行
+</span></code></pre></div></div>
+
+<p>我们另外写一个程序，比如叫code3.py,内容为：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">code2</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"code3.py:"</span><span class="p">,</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="c1">#执行后将显示：
+# code2.py: code2
+# code3.py: __main__
+#这说明code3.py被当做主程序运行，code2是一个模块
+</span></code></pre></div></div>
+
+<p>这个功能对于编写逻辑复杂的Python程序非常有用。比如使用这个功能，我们优化上面的程序，使得程序既可以独立运行，也可以配合其它程序一起执行。<br />
+原因很简单，对于一个大的网站来说，肯定不可能一蹴而就，需要一点点的建立，那我们的程序肯定也需要有很多个，每个程序可能只处理某一个URL路径相关的工作。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#网络编程演示4
+#作者:andrew
+</span>
+<span class="c1">#引入网络库
+</span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+
+<span class="c1">#定义一个网络应用
+</span><span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s">"你好，世界，我现在已经模块化了！"</span>
+
+<span class="c1">#如果是主程序而不是模块，运行整个应用
+</span><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">app</span><span class="p">.</span><span class="n">run</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>这个程序只是增加了第15行，意思是，如果当前程序以主程序方式运行，就执行Flask框架。也就是自己就成为一个服务，并且只有一个主页面。<br />
+而如果没有以主程序的方式执行的时候，第15行条件为假，将不执行Flask框架。此时当然会有其它配合工作的主程序执行Flask框架，从而综合很多个Python程序一起工作，共同成为一个功能更多的网站。</p>
+
+<hr />
+
+<h4 id="网络程序基本结构">网络程序基本结构</h4>
+
+<p>一个网站程序的基本结构通常是这样：</p>
+
+<p><img src="/assets/cimages/201812/python313/webpic1.png" alt="webpic1" /></p>
+
+<p>我们的程序运行在中间标识为“后台”的部分，接受前端用户浏览器或者手机App的访问。我们的程序会做很多计算和逻辑处理的工作，如果碰到了需要大量数据支持的工作，通常需要访问更靠后部的数据库。<br />
+数据库不是我们课程的范围，我们这里略过不讲。在后面的程序中，我们会跟第十讲中的记事本程序一样，采用文本文件来模拟数据库的功能。<br />
+当然数据库仍然是非常重要的技术，建议有兴趣的同学另外选择相关课程学习。</p>
+
+<hr />
+
+<h4 id="从浏览器向服务器传递数据">从浏览器向服务器传递数据</h4>
+
+<p>前面的例子，我们已经可以响应一个页面的访问。这个过程是单向的，就是接受到请求之后，单方面把数据传回到网页。<br />
+在很多场景中，都需要由浏览器传递数据到网站，最常用的就是搜索，比如你在谷歌网站的搜索框中输入了要搜索的关键字，谷歌网站的程序，需要获取到你输入的关键字，完成搜索功能，然后才把结果反馈给你的浏览器。这个过程是双向的。我们下面演示如何获取用户输入的内容：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#网络编程演示5
+#作者:andrew
+</span>
+<span class="c1">#引入网络库
+</span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+
+<span class="c1">#定义一个网络应用
+</span><span class="n">app</span> <span class="o">=</span> <span class="n">Flask</span><span class="p">(</span><span class="n">__name__</span><span class="p">)</span>
+
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/&lt;name&gt;'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">(</span><span class="n">name</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">"你好，"</span><span class="o">+</span><span class="n">name</span><span class="o">+</span><span class="s">"！"</span>
+
+<span class="c1">#如果是主程序而不是模块，运行整个应用
+</span><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">app</span><span class="p">.</span><span class="n">run</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>仍然只看第10至第12行的内容，这是我们自己写的。其它部分仍然是拷贝过来就好。<br />
+第10行在路径的定义中，使用了尖括号定义了一个资源名称name，这表示，如果有类似这样的访问：http://127.0.0.1:5000/xxxxxx，那么在斜线之后的所有内容，会被当做数据，传递给Python中的name变量。<br />
+接下来11行，你会发现自定义的函数也多了一个参数，也就是刚才说的name变量，这个名字，跟上面对URL路径进行匹配的时候指定的名字，要相同。<br />
+12行返回的字符串值，也包含了name的值，这只是想让你看到，程序确实收到了从浏览器URL中传递给Python的参数。执行后，假设我们访问<code class="language-plaintext highlighter-rouge">http://127.0.0.1:5000/寓乐湾</code>得到的结果会是这样：<br />
+<img src="/assets/cimages/201812/python313/webpic2.png" alt="webpic2" /></p>
+
+<hr />
+
+<h4 id="从服务器向浏览器传递数据的多种方式">从服务器向浏览器传递数据的多种方式</h4>
+
+<p>上面的几个例子，我们都是直接返回了字符串到浏览器，简单的显示文字还是能做到的。但可能大多同学都知道，浏览器需要使用HTML语言编写网页，才能完成很多功能，图文并茂。这当然又需要大量的学习。</p>
+
+<p>不过不用担心，现在的互联网编程，分工已经非常的精细。这部分的工作，将会由前端HTML程序员或者手机App程序员完成，我们只需要Python写好服务器端的程序就好。而有兴趣从事前端工作和艺术设计工作的，可以另外参加相关的课程，来学习前端如何配合Python一起工作。</p>
+
+<p>如果需要传递很多数量、很多类型的数据，使用上面这种简单字符串的形式，显然不能满足应用。于是诞生了很多双方数据的封装格式的标准，比较常用的是JSON格式。<br />
+JSON格式起源于Javascript语言中对数据的包装方式，我们不用了解细节，只要知道如何使用就好。
+下面我们看一个例子，来演示上面说到的这几种形式：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#引入json转换库
+</span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">jsonify</span>  
+<span class="c1">#定义一个列表，模拟数据库
+</span><span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="s">"你好"</span><span class="p">,</span><span class="s">"世界"</span><span class="p">,</span><span class="s">"这是"</span><span class="p">,</span><span class="s">"Python"</span><span class="p">]</span>
+
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/list1'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">list1</span><span class="p">():</span>
+    <span class="nb">str</span> <span class="o">=</span> <span class="s">""</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="nb">str</span> <span class="o">+=</span> <span class="n">s</span> <span class="o">+</span> <span class="s">"</span><span class="se">\n</span><span class="s">"</span>  <span class="c1">#传统命令行格式
+</span>    <span class="k">return</span> <span class="nb">str</span>
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/list2'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">list2</span><span class="p">():</span>
+    <span class="nb">str</span> <span class="o">=</span> <span class="s">""</span>
+    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="nb">str</span> <span class="o">+=</span> <span class="n">s</span> <span class="o">+</span> <span class="s">"&lt;br&gt;"</span> <span class="c1">#HTML格式
+</span>    <span class="k">return</span> <span class="nb">str</span>
+<span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/list3'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">list3</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">data</span><span class="p">)</span> <span class="c1">#JSON格式
+</span>
+<span class="c1">#如果是主程序而不是模块，运行整个应用
+</span><span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">app</span><span class="p">.</span><span class="n">run</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>上面的程序中，除了Flask框架模板之外，我们定义了一个列表：data,其中包含4个字符串元素。<br />
+接着我们定义了3个URL访问，如果访问/list1，我们使用字符串+换行符的方式返回列表内容。转义符\n表示换行字符，我们在第三讲讲过。使用for循环遍历列表，我们在第六讲学过。/list2路径跟/list1很类似，但使用了html语言中的<code class="language-plaintext highlighter-rouge">&lt;br&gt;</code>标签，表示在浏览器中换行。<br />
+/list3看上去最简单，使用了我们第一次见的函数jsonify，这是Flask库中定义的一个函数，功能是把参数转换为json格式的字符串，最终我们返回了这个json字符串给访问者。</p>
+
+<p>我们分别访问三个URL，将得到三个不同结果，先列在下面：
+<img src="/assets/cimages/201812/python313/webstr1.png" alt="webstr1" /></p>
+
+<p><img src="/assets/cimages/201812/python313/webstr2.png" alt="webstr2" /></p>
+
+<p><img src="/assets/cimages/201812/python313/webstr3.png" alt="webstr3" />
+在/list1的访问结果中，“\n”换行符可以在我们通常的命令行程序中完成换行，在浏览器中，没有效果。<br />
+/list2的访问中，正常的换行，这是因为html的标签执行正常。<br />
+/list3的访问结果看上去一团混乱，无法辨识，这是因为使用了不同的字符编码，不过这种无法辨识，并不影响前端程序的处理。所以如果有前端网页程序正常处理的话，就可以正常显示。这部分有点抽象，后面我们还会看到更清晰的例子。</p>
+
+<p>这个程序中，我们演示了不同数据处理方式，在浏览器中不同的效果。我们最重要记住的就是一个函数jsonify。</p>
+
+<hr />
+
+<h4 id="挑战">挑战</h4>
+
+<p>上面所讲述的基本知识已经足够了，我们开始本讲的挑战：把第十章中的记事本程序，迁移到网络上，称为一个网页版的记事本。</p>
+
+<p>通常一个网络程序开发的流程是这样：</p>
+
+<p><img src="/assets/cimages/201812/python313/webprg1.png" alt="webprg1" />
+在这个流程中，需要后台程序开发的，主要是红字的部分。与后台开发直接相关联的是前端设计的网页和前端程序。没有前端程序的配合，我们只能使用json返回数据，但无法被用户识别使用。</p>
+
+<p>现在假设前端程序员已经完成了一个网页，包括网页的内容、格式和其中的程序，这个网页叫做index.html。我们还有一个责任是当用户访问的时候，我们首先把这个网页反馈给浏览器。</p>
+
+<p>此后的操作，用户实际都是跟网页打交道，比如阅读信息，比如输入内容，比如点击按钮。网页需要向后台查询的地方，会通过URL调用后端的程序，并接受后端返回的数据，并将数据显示给用户看。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#引入网络库
+</span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">Flask</span>
+<span class="c1">#引入json转换库
+</span><span class="kn">from</span> <span class="nn">flask</span> <span class="kn">import</span> <span class="n">jsonify</span>  
+<span class="c1">#引入记事本文件名定义
+</span><span class="kn">from</span> <span class="nn">common</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="p">......</span>
+
+<span class="c1">#首页，直接返回一个静态的网页文件
+</span><span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">index</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">app</span><span class="p">.</span><span class="n">send_static_file</span><span class="p">(</span><span class="s">'index.html'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>上面这段代码，我们省略了很多重复性的内容，其中第6行可能看起来眼熟，我们继续使用了第十章中定义的只有一行的一个小模块，其中包含了记事本文件的名称。<br />
+第11行定义了接受主页“/”的访问，当访问的时候，返回静态网页文件index.html给客户。使用的函数是app.send_static_file。这里的静态，指的是整个文件实际就是一个文本的html文件，中间不包含在服务器端运行的内容。<br />
+跟静态网页相对的有一个概念叫“动态网页”，动态网页不是指网页画面上有动画，而是指“网页动态生成”，也叫“服务器端渲染”。这是是早期网站开发中经常用到的技术，比如传统的PHP程序、JSP程序都属于这种。<br />
+网页会在服务器端首先运行，经过处理才返回给用户。现在已经越来越少这样使用了，因为会额外为服务器增加负载，也占用了更多的网络流量，所以我们只要知道有动态网页、服务器端渲染这回事就够。<br />
+新的编程方式正如我们前面所介绍的，采用前后端的程序分离，分别使用不同的技术完成。前后端之间使用JSON或同类技术进行极简的数据传递。因为这些新技术的出现和流行，所以虽然我们刚刚学习网络编程，但我们并不一定比一些工作很长时间的人理念上落后。<br />
+下面来看我们笔记本程序的例子:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#列出当前所有记录
+</span><span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/list'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">listdaily</span><span class="p">():</span>
+    <span class="c1">#所有读出的记录记录到列表变量中
+</span>    <span class="c1"># （文件是每行一条记录，
+</span>    <span class="c1">#  列表变量是每个元素一条记录）
+</span>    <span class="n">data</span><span class="o">=</span><span class="p">[]</span>
+    <span class="n">fd</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s">"r"</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fd</span><span class="p">:</span>
+        <span class="n">data</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+    <span class="n">fd</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="c1">#把列表生成JSON格式返回到网页
+</span>    <span class="k">return</span> <span class="n">jsonify</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>这段程序读取记事本文件，将记事本所有的内容，以json的方式返回给浏览器。URL是/list，函数内容没什么好讲的，都已经学过，并且也算练习过多次。只是在程序的最后，调用前面介绍过的jsonify函数，把数据json化，返回给浏览器前端程序。<br />
+这个URL在index.html网页一打开的时候调用，从而将当前的记事本内容显示到网页上。<br />
+继续看下一段程序：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#添加一条记录
+</span><span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/add/&lt;msg&gt;'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">adddaily</span><span class="p">(</span><span class="n">msg</span><span class="p">):</span>
+    <span class="c1">#打开文件，写出一条信息
+</span>    <span class="n">fd</span><span class="o">=</span><span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span><span class="s">"a"</span><span class="p">)</span>
+    <span class="n">fd</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+    <span class="n">fd</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">)</span>
+    <span class="n">fd</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="s">"OK"</span>
+</code></pre></div></div>
+
+<p>上面的程序定义了增加新记事条目的功能。向服务器程序传递信息的功能本讲开始讲过了，这里完全相同的处理方式。再后面文件操作的内容跟第十讲中的功能没有区别。
+<img src="/assets/cimages/201812/python313/myweb1.png" alt="myweb1" />
+上图是我们新的记事本在网页中运行的样子，完全完成后，增加、查看、删除三个功能都集成在一个页面。打开网页就有了以前存在的记事列表。在上面的输入框中，可以输入新的内容，输入完成点击增加，就会增加到记事本条目中。选择列表中全面的单选框，然后单击删除按钮，可以删掉这一条记事。<br />
+这个小程序移植到网络版的好处，是在手机的浏览器中也可以很好的运行，不用必须是一台电脑。</p>
+
+<hr />
+
+<h4 id="练习时间">练习时间</h4>
+
+<p>记事本程序一共三项功能，列出记事本内容、增加新的记事，还有删除记事内容。我们前面已经完成了程序的基本框架、列出内容和增加记事，删除记事的功能，我觉得可以作为练习自己来尝试。因为网页同后台程序之间的URL接口是提前定义好的，不能违背，所以我们把这个删除功能的定义部分给出写出来，你在这个基础上完成：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#删除一条记录
+</span><span class="o">@</span><span class="n">app</span><span class="p">.</span><span class="n">route</span><span class="p">(</span><span class="s">'/del/&lt;id&gt;'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">deldaily</span><span class="p">(</span><span class="nb">id</span><span class="p">):</span>
+
+
+
+
+
+    <span class="c1">#返回一个执行成功信息
+</span>    <span class="k">return</span> <span class="s">"OK"</span>
+</code></pre></div></div>
+
+<p>中间空白的部分，是你要接着写的部分。空行数量仅供示意，你不用受程序行数的限制。</p>
+
+<hr />
+
+<h4 id="本讲小结">本讲小结</h4>
+
+<ul>
+  <li>网络程序开发是互联网时代最重要的技能之一，使用Python开发网络程序非常简单</li>
+  <li>虽然网络程序开发并不难，但互联网发展很快，出现了很多的概念需要有了解，比如网址、HTML、JSON、浏览器、前端、后端</li>
+  <li>在新式的扩展库中，框架的概念很流行，指的是由“扩展库程序”接管程序的大部分功能，只在涉及具体工作的时候才调用由用户编写的具体功能，从而简化复杂的程序开发工作</li>
+  <li>Python的网络编程，就是用户编写对应到某具体网址的函数，当浏览器访问到指定网址是，函数被激活，完成某些工作，并返回结果到浏览器</li>
+</ul>
+
+<hr />
+
+<h4 id="练习答案">练习答案</h4>
+
+<p>请参考myweb.py程序源码。</p>
+
+<hr />
+<h4 id="附件">附件</h4>
+<p>程序中所使用的网页文件源码,文件名：static/index.html：</p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"zh-cn"</span><span class="nt">&gt;</span>
+<span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;</span>
+    <span class="nt">&lt;title&gt;</span>网页记事本<span class="nt">&lt;/title&gt;</span>
+<span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;body&gt;</span>
+新笔记：<span class="nt">&lt;input</span> <span class="na">id=</span><span class="s">'newtext'</span> <span class="na">type=</span><span class="s">"text"</span> <span class="na">width=</span><span class="s">100</span><span class="nt">&gt;&lt;/input&gt;</span>
+<span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">value=</span><span class="s">'添加'</span> <span class="na">onclick=</span><span class="s">"addButtonClick();return 0;"</span><span class="nt">&gt;&lt;/input&gt;</span>
+<span class="nt">&lt;p&gt;</span>笔记列表:<span class="nt">&lt;/p&gt;</span>
+<span class="nt">&lt;div</span> <span class="na">id=</span><span class="s">list</span><span class="nt">&gt;&lt;/div&gt;</span>
+<span class="nt">&lt;input</span> <span class="na">type=</span><span class="s">"button"</span> <span class="na">value=</span><span class="s">'删除'</span> <span class="na">onclick=</span><span class="s">"delButtonClick();return 0;"</span><span class="nt">&gt;&lt;/input&gt;</span>
+<span class="nt">&lt;script </span><span class="na">src=</span><span class="s">https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js</span><span class="nt">&gt;&lt;/script&gt;</span>
+<span class="nt">&lt;script&gt;</span>
+    <span class="nx">baseurl</span><span class="o">=</span><span class="dl">""</span><span class="p">;</span><span class="c1">//"http://127.0.0.1:5000";</span>
+    <span class="kd">function</span> <span class="nx">showList</span><span class="p">(</span><span class="nx">block</span><span class="p">,</span><span class="nx">result</span><span class="p">){</span>
+        <span class="nx">block</span><span class="p">.</span><span class="nx">empty</span><span class="p">();</span>
+        <span class="nx">block</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">"</span><span class="s2">&lt;table board=1 width=200&gt;</span><span class="dl">"</span><span class="p">)</span>
+        <span class="nx">$</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">result</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">i</span><span class="p">,</span> <span class="nx">field</span><span class="p">){</span>
+            <span class="nx">block</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">"</span><span class="s2">&lt;tr&gt;</span><span class="dl">"</span><span class="p">)</span>
+            <span class="nx">block</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">"</span><span class="s2">&lt;td width='10%'&gt;&lt;input name='index' type='radio' value='</span><span class="dl">"</span><span class="o">+</span><span class="nx">i</span><span class="o">+</span><span class="dl">"</span><span class="s2">'&gt;&lt;/input&gt;&lt;/td&gt;</span><span class="dl">"</span><span class="p">);</span>
+            <span class="nx">block</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">"</span><span class="s2">&lt;td width='*'&gt;</span><span class="dl">"</span><span class="o">+</span><span class="nx">field</span> <span class="o">+</span> <span class="dl">"</span><span class="s2">&lt;/td&gt;</span><span class="dl">"</span><span class="p">);</span>
+            <span class="nx">block</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">"</span><span class="s2">&lt;/tr&gt;</span><span class="dl">"</span><span class="p">)</span>
+        <span class="p">});</span>
+        <span class="nx">block</span><span class="p">.</span><span class="nx">append</span><span class="p">(</span><span class="dl">"</span><span class="s2">&lt;/table&gt;</span><span class="dl">"</span><span class="p">)</span>
+    <span class="p">};</span>
+    <span class="kd">function</span> <span class="nx">getData</span><span class="p">(</span><span class="nx">url</span><span class="p">){</span>
+        <span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="nx">url</span><span class="p">,</span><span class="kd">function</span><span class="p">(</span><span class="nx">result</span><span class="p">){</span>
+            <span class="nx">showList</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">#list</span><span class="dl">"</span><span class="p">),</span><span class="nx">result</span><span class="p">);</span>
+        <span class="p">});</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">delButtonClick</span><span class="p">(){</span>
+        <span class="c1">//alert($("input[name='index']:checked").val());</span>
+        <span class="k">if</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">input[name='index']:checked</span><span class="dl">"</span><span class="p">).</span><span class="nx">val</span><span class="p">()</span> <span class="o">==</span> <span class="kc">undefined</span><span class="p">)</span>
+            <span class="p">{</span>
+                <span class="nx">alert</span><span class="p">(</span><span class="dl">"</span><span class="s2">选一个要删除的笔记.</span><span class="dl">"</span><span class="p">);</span>
+                <span class="k">return</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="nx">baseurl</span><span class="o">+</span><span class="dl">"</span><span class="s2">/del/</span><span class="dl">"</span><span class="o">+</span><span class="nx">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">input[name='index']:checked</span><span class="dl">"</span><span class="p">).</span><span class="nx">val</span><span class="p">(),</span><span class="kc">null</span><span class="p">);</span>
+        <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span><span class="nx">getData</span><span class="p">(</span><span class="nx">baseurl</span><span class="o">+</span><span class="dl">"</span><span class="s2">/list</span><span class="dl">"</span><span class="p">);},</span><span class="mi">1000</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="kd">function</span> <span class="nx">addButtonClick</span><span class="p">(){</span>
+        <span class="nx">$</span><span class="p">.</span><span class="nx">getJSON</span><span class="p">(</span><span class="nx">baseurl</span><span class="o">+</span><span class="dl">"</span><span class="s2">/add/</span><span class="dl">"</span><span class="o">+</span><span class="nx">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">#newtext</span><span class="dl">"</span><span class="p">).</span><span class="nx">val</span><span class="p">(),</span><span class="kc">null</span><span class="p">);</span>
+        <span class="nx">setTimeout</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span><span class="nx">getData</span><span class="p">(</span><span class="nx">baseurl</span><span class="o">+</span><span class="dl">"</span><span class="s2">/list</span><span class="dl">"</span><span class="p">);},</span><span class="mi">1000</span><span class="p">);</span>
+        <span class="c1">//$("#newtext").attr("value","");</span>
+        <span class="nx">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">#newtext</span><span class="dl">"</span><span class="p">).</span><span class="nx">val</span><span class="p">(</span><span class="dl">""</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="nx">$</span><span class="p">(</span><span class="nb">document</span><span class="p">).</span><span class="nx">ready</span><span class="p">(</span><span class="kd">function</span><span class="p">(){</span>
+        <span class="nx">getData</span><span class="p">(</span><span class="nx">baseurl</span><span class="o">+</span><span class="dl">"</span><span class="s2">/list</span><span class="dl">"</span><span class="p">);</span>
+    <span class="p">});</span>
+<span class="nt">&lt;/script&gt;</span>
+<span class="nt">&lt;/body&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
+
+</code></pre></div></div>
+<p>注1：本课程并不是网页制作或者js语言课程，所以以上网页内容仅供实验使用，并非本课程重点。在实际工作中，网页的制作会由前端工程师完成。<br />
+注2：
+其它各讲中所使用到的源码，会在全部连载完成后集中整理并提供打包下载。</p>
+
+:ET

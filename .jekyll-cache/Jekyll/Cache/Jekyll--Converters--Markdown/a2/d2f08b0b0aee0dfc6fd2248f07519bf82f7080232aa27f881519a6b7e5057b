@@ -1,0 +1,47 @@
+I"F<p>搬家之后，上网有了一个安全认证，使用的是H3C的iNode。<br />
+软件是个好软件，不过功能上做的比较死板。比如说，已经不支持静态IP。<br />
+对于通常的办公室没有问题的，对于研发类的员工就费劲了，每次重启都要修改一堆的设置，来保证多台实验设备之间的互联。<br />
+这事儿也赖MicroSoft，系统设置中本来是支持多个IP地址设定的，但只要使用了DHCP就不再支持多IP的工作方式。<br />
+所以就跟通常一样，Linux/Mac很快的解决了问题，Win10还是在痛苦中挣扎。<br />
+在网上搜索后，有位国外的网友给出了<a href="https://superuser.com/questions/679134/add-a-static-ip-alias-to-a-dhcp-interface-on-windows-8/1250941">方案</a>，可惜的就是，在单网卡、英文版本windows中运行还不错。在多网卡或者安装有虚机之类的系统中，本身就存在多个虚拟网卡，再加上中文解析的规律性比较差，脚本就无法执行了。<br />
+但是这种思路还是非常有用的，思考半天，不加入第三方软件配合的话，PowerShell的功能还是比通常的bat脚本更强大，顺利的解决问题。</p>
+
+<p>下面就是我使用的脚本，可以根据自己的工作情况改成自己的：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c">#首先打开dhcp</span>
+<span class="nv">$adapter</span> <span class="o">=</span> gwmi win32_networkadapterconfiguration | ? <span class="o">{</span> <span class="nv">$_</span>.index <span class="nt">-eq</span> 1 <span class="o">}</span>
+<span class="nv">$adapter</span>.enabledhcp<span class="o">()</span>
+ <span class="c">#等待dhcp稍微稳定，至少清楚掉原有的IP</span>
+<span class="nb">sleep </span>5
+ <span class="c">#循环等待拿到新的地址</span>
+<span class="k">do</span> <span class="o">{</span>
+	<span class="c">#每次都要刷新重新拿地址</span>
+	<span class="nv">$adapter</span> <span class="o">=</span> gwmi win32_networkadapterconfiguration | ? <span class="o">{</span> <span class="nv">$_</span>.index <span class="nt">-eq</span> 1 <span class="o">}</span>
+	<span class="nb">echo</span> <span class="s2">"wait dhcp ready"</span>
+	<span class="nb">sleep </span>1
+ <span class="c">#等待拿到正确的IP地址才退出循环，不然一直等待，下面的10.98需要改成自己环境的规则</span>
+<span class="o">}</span> <span class="k">while</span>  <span class="o">(</span> <span class="nv">$adapter</span>.IPAddress.Substring<span class="o">(</span>0,5<span class="o">)</span> <span class="nt">-ne</span> <span class="s2">"10.98"</span> <span class="o">)</span> 
+ <span class="c">#显示一下拿到的IP地址和网关</span>
+<span class="nb">echo</span> <span class="s2">"IP:"</span>, <span class="nv">$adapter</span>.IPAddress 
+<span class="nb">echo</span> <span class="s2">"gateway:"</span>,<span class="nv">$adapter</span>.DefaultIPGateway
+
+ <span class="c">#使用获取到的地址和网关，当做静态IP设置到网卡，保证iNode监控下正常上网</span>
+ <span class="c">#这里使用netsh设置为了更好的兼容性，注意修改网卡名称为自己系统的	</span>
+netsh interface ipv4 <span class="nb">set </span>address <span class="nv">name</span><span class="o">=</span><span class="s2">"以太网"</span> <span class="nb">source</span><span class="o">=</span>static <span class="nv">$adapter</span>.IPAddress[0] 255.255.252.0 <span class="nv">$adapter</span>.DefaultIPGateway[0]
+netsh interface ipv4 <span class="nb">set </span>dns <span class="nv">name</span><span class="o">=</span><span class="s2">"以太网"</span> <span class="nb">source</span><span class="o">=</span>static <span class="nv">addr</span><span class="o">=</span>10.100.132.16 
+netsh interface ipv4 add dns <span class="nv">name</span><span class="o">=</span><span class="s2">"以太网"</span> <span class="nv">addr</span><span class="o">=</span>203.196.1.6 <span class="nv">index</span><span class="o">=</span>2
+ <span class="c">#设置一个静态IP地址，用于实验集群正常工作，这个地址不需要上外网，没有网关</span>
+netsh interface ip add address <span class="nv">name</span><span class="o">=</span><span class="s2">"以太网"</span> 192.168.10.100 255.255.255.0
+</code></pre></div></div>
+
+<p>每次电脑重启后，启动iNode，用管理员身份运行PowerShell,执行一下脚本，事情就搞定了。</p>
+
+<p>备注：<br />
+第一次运行PowerShell脚本的时候，可能会报错：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>无法加载文件 <span class="k">******</span>.ps1，因为在此系统中禁止执行脚本。有关详细信息，请参阅 <span class="s2">"get-help about_signing"</span>。 
+</code></pre></div></div>
+<p>这时候可以首先在管理员身份下执行：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>set-ExecutionPolicy RemoteSigned
+</code></pre></div></div>
+<p>随后出现的提示中，选择Yes或者All,即可。</p>
+
+:ET

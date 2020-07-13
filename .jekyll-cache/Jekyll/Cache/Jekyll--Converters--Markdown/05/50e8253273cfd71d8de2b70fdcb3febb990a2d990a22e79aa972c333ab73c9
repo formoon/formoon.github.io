@@ -1,0 +1,19 @@
+I",
+<p>照片处理的三大基本操作中，照片剪裁是这系列三篇博文中的最后一篇，但是图像处理中应当首先要做的操作。原因很简单，随着数码相机、摄像机分辨率的增加，现在一张照片几十M的容量已经很常见，先进行裁剪，剩下的部分就会小，后续的处理就能快一些。换一个说法，画面中有一些部分无论如何是你不想要的，那还对那些无用的部分做很多处理干啥？<br />
+关于照片处理三大基本操作的说法，很久之前我有一篇文章《简单2步，P出美图》，因为博客多次搬家，这篇文章已经遗失了。大意是在Photoshop中通过简单2步，一共3个方面的操作，把数码相机拍摄的照片处理成作品级的美图，而且每一步的处理有规范、有标准，基于理性的操作而不是随意的所谓“神来之笔”。这些理念在OpenCV这三篇文章中也有了很多的说明，相信你看到了。那篇文章只能等以后有心情的时候再重写一下吧。<br />
+照片裁剪在OpenCV中非常容易：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="n">Mat</span> <span class="n">dstPic</span><span class="p">,</span><span class="n">srcPic</span><span class="p">;</span>
+	<span class="p">...</span>
+	<span class="n">dstPic</span> <span class="o">=</span> <span class="n">srcPic</span><span class="p">(</span><span class="n">Rect</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">width</span><span class="p">,</span><span class="n">height</span><span class="p">));</span>
+	<span class="p">...</span>
+	<span class="c1">//参数x/y/width/height代表裁剪出来要保留的画面</span>
+</code></pre></div></div>
+<p>别说我托大，这么简单的问题需要单文来说明吗？<br />
+是的，有必要。原因是单独裁剪并不难，真正用起来就带来了以下问题：</p>
+<ol>
+  <li>一幅照片，从哪部分裁剪，首先需要把照片显示出来，并接受鼠标框画操作来标注裁剪的部分。用户体验才是这个问题的关键。</li>
+  <li>鼠标的框画，在事件处理比较简单的OpenCV中，很多部分，都是需要自行编码处理的。</li>
+  <li>数码相机的照片，分辨率往往高于屏幕的分辨率，因此照片的显示，要有多级的缩放功能。缩放要有单独的控制方法。</li>
+  <li>照片有了缩放，裁剪的部分不能受照片缩放的影响。</li>
+</ol>
+:ET

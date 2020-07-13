@@ -1,0 +1,367 @@
+I"ps<p><img src="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1545112916052&amp;di=d2428f9e946cda2d7df3f0ca9ff3def8&amp;imgtype=0&amp;src=http%3A%2F%2Finsights.thoughtworkers.org%2Fwp-content%2Fuploads%2F2015%2F07%2F718-%25E4%25BD%259F%25E8%25BE%25BE-%25E5%2585%25A8%25E6%25A0%2588%25E5%25BC%2580%25E5%258F%2591%25E8%25AF%25AD%25E8%25A8%2580Python-1024x724.png" alt="" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script></p>
+<h3 id="从零开始python3第七讲">《从零开始PYTHON3》第七讲</h3>
+
+<p>人生是由无数个选择组成，每个选择都有不同的限定条件。现在来说人生有点早是吧:)不过事实的确是这样的。</p>
+
+<p>程序也充满着选择，满足不同的条件，则运行不同的运算。这些对不同运算的选择，则被称为分支，或者叫“条件分支”。</p>
+
+<p>在Python中，最简单的条件分支是这个样子(伪代码)：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">条件</span><span class="err">：</span>
+    <span class="n">满足条件时执行的分支</span>
+<span class="n">条件不满足时</span><span class="err">，</span><span class="n">或者条件满足</span><span class="err">、</span><span class="n">执行完分支之后</span><span class="err">，</span><span class="n">会继续从这里开始执行</span>
+</code></pre></div></div>
+
+<p>用真实的代码来看个例子：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#当a的值大于3的时候，显示a的值
+</span><span class="k">if</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>以上是if分支最简单的形式，完整的if分支使用伪代码表示是这样：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">条件一</span><span class="p">:</span>
+    <span class="n">条件一满足时执行</span>
+<span class="k">elif</span> <span class="n">条件二</span><span class="p">:</span>
+    <span class="n">条件二满足</span><span class="err">（</span><span class="n">条件一不满足</span><span class="err">）</span><span class="n">时执行</span>
+<span class="k">elif</span> <span class="n">条件三</span><span class="p">:</span>
+    <span class="n">条件三满足</span><span class="err">（</span><span class="n">条件一</span><span class="err">、</span><span class="n">二不满足</span><span class="err">）</span><span class="n">时执行</span>
+<span class="p">...</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">所有分支条件均不满足时执行</span>
+</code></pre></div></div>
+
+<p>在其它的编程语言中，if分支通常最多只处理两种分支条件，更多的分支要使用if语句的嵌套，或者switch等命令。在python中这些不同的处理方式都被合并到了if分支语句。其中主要的体现就是elif子句，elif实际是“else if”的缩写，这非常像if的嵌套使用，但又更简单易用。<br />
+if语句完整的语法包含很多个部分，elif只是其中的一个部分，所以叫“子句”。每个elif子句对应一个分支条件和吻合条件后的分支。在一个if分支结构中，elif子句可以有很多个，这样就可以用于对应很多种不同的分支条件。但是最初的if和最后的else只能有一个。</p>
+
+<p>除了伪代码，我们还可以用流程图来描述if语句的执行走向，从而加深印象：</p>
+
+<p><img src="/assets/cimages/201812/python37/if-flowchart1.png" alt="if-flowchart1" />
+	相信你已经有了概念了。下面是一个真实代码的例子：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#条件分支示例
+#作者：Andrew
+</span>
+<span class="c1">#输入
+</span><span class="n">wallet</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s">"请输入钱包里的现金总数："</span><span class="p">))</span>
+
+<span class="k">if</span> <span class="n">wallet</span> <span class="o">&gt;</span> <span class="mf">1000.0</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"今晚去吃大餐."</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">wallet</span> <span class="o">&gt;</span> <span class="mf">500.0</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"简单吃一顿，然后去迪厅."</span><span class="p">)</span>
+<span class="k">elif</span> <span class="n">wallet</span> <span class="o">&gt;</span> <span class="mf">100.0</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"去吃个快餐，然后看场电影."</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"回家看看有没有剩饭，然后看电视吧."</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>上面程序中，首先请用户输入一个数字，代表钱包中的现金总数，然后使用float函数把输入变换为浮点数。使用float类型是因为，表达的是现金的总数，当然可能包含小数部分。如果不使用float函数，输入的数据默认是字符串类型，这个我们前面已经讲过了。</p>
+
+<p>随后根据现金的数额，显示不同的提示。提示信息仅供娱乐，这里是为了说明if语句的基本使用方式。你主要需要理解的部分就是，这些不同信息，是根据不同的分支条件决定的。</p>
+
+<p>在if语句中，真正控制程序走向的正是程序中所给出的条件，通常以条件表达式的方式存在。表达式的运算结果只有“真”、“假”两种形式。这是逻辑类型，或称bool（布尔）类型，属于数字类型的子类型，我们在第五章中讲过了。<br />
+我们当时还讲过，采用bool类型的原因之一是因为现代数学体系上完备的概念和体系。今天我们就在这个基础上再进一步讲述逻辑运算，或称bool（布尔）运算。</p>
+
+<hr />
+
+<h4 id="逻辑运算布尔运算">逻辑运算（布尔运算）</h4>
+
+<p>bool类型只有两个可能值，所以常见的bool运算方式也并不多，最常用的就是下面三种：</p>
+
+<ul>
+  <li>
+    <p>not 否定操作，比如下面两条语句，从逻辑上是相同的：</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="ow">not</span> <span class="n">性别</span><span class="o">==</span><span class="s">"女"</span><span class="p">:</span>
+  
+<span class="k">if</span> <span class="n">性别</span><span class="o">==</span><span class="s">"男"</span><span class="p">:</span>    
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>and 逻辑“与”操作：and操作符两边的条件，必须都为真，结果才是“真”，否则结果是“假”，例如：</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">性别</span><span class="o">==</span><span class="s">"男"</span> <span class="ow">and</span> <span class="mi">16</span><span class="o">&lt;</span><span class="n">年龄</span><span class="o">&lt;</span><span class="mi">25</span><span class="err">：</span>
+<span class="c1">#当性别为男，同时年龄在16到25岁之间(不包含16岁和25岁)时，执行
+</span></code></pre></div>    </div>
+  </li>
+  <li>
+    <p>or 逻辑“或”操作：or操作符两边的条件，只要有一个是“真”，则结果就是“真”，全部为“假”，结果才是假，例如：</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">年龄</span><span class="o">&lt;=</span><span class="mi">16</span> <span class="ow">or</span> <span class="n">年龄</span><span class="o">&gt;=</span><span class="mi">25</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"条件不符"</span><span class="p">)</span>
+<span class="c1">#当年龄小于等于16岁，或者大于等于25岁，则显示“条件不符“
+</span></code></pre></div>    </div>
+  </li>
+</ul>
+
+<p>条件判断本来挺好用，为什么学这么复杂的布尔运算呢？我们来看一个例子你就会理解了：</p>
+
+<p>假设某个男篮选秀，教练组提出了录取的三个基本条件：</p>
+
+<ul>
+  <li>男性</li>
+  <li>年龄大于16岁，小于25岁</li>
+  <li>身高超过2.1米</li>
+</ul>
+
+<p>如果只使用逻辑判断，不使用逻辑运算表达式，我们可能得到这样的程序代码(伪代码)：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">性别</span><span class="o">==</span><span class="s">"男"</span><span class="p">:</span>
+    <span class="k">if</span> <span class="mi">16</span><span class="o">&lt;</span><span class="n">年龄</span><span class="o">&lt;</span><span class="mi">25</span><span class="p">:</span>   <span class="c1">#注意这里使用了连续判断(if语句嵌套)
+</span>        <span class="k">if</span> <span class="n">身高</span><span class="o">&gt;</span><span class="mf">2.1</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">"符合条件！"</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">"不符合条件！"</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"不符合条件！"</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"不符合条件！"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>对比如果使用逻辑运算的代码：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="n">性别</span><span class="o">==</span><span class="s">"男"</span> <span class="ow">and</span> <span class="mi">16</span><span class="o">&lt;</span><span class="n">年龄</span><span class="o">&lt;</span><span class="mi">25</span> <span class="ow">and</span> <span class="n">身高</span><span class="o">&gt;</span><span class="mf">2.1</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"条件符合!"</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"条件不符合!"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>使用逻辑运算的代码干净、清晰，不易出错。不过在初学的时候，你会感觉有点“烧脑” :)</p>
+
+<hr />
+
+<h4 id="循环中的分支">循环中的分支</h4>
+
+<p>我们已经基本了解了分支语句的功能，上面举的例子，基本都是通用程序中的分支处理。在常用的循环中，分支的处理又略有不同。</p>
+
+<p>这些不同不是来自于分支语句本身，而往往是分支条件满足之后，所要达到的效果。通常在循环语句块中，我们常用到两种特殊的处理：</p>
+
+<ul>
+  <li>中断循环的继续，退出循环，从循环语句块之后的第一条语句继续执行程序的后续部分。这种情况下，使用break语句。</li>
+  <li>
+    <p>继续循环，但跳过本次循环的后续部分，从循环块开始的部分执行下一次循环。这种情况下，使用continue语句。</p>
+
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  来看一个例子：
+</code></pre></div>    </div>
+  </li>
+</ul>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#循环显示数字1-11，其中数字3、5跳过不显示
+</span>
+<span class="n">i</span><span class="o">=</span><span class="mi">0</span>
+<span class="c1">#启动一个无限循环
+</span><span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="c1">#因题意，跳过数字3、5
+</span>    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">3</span> <span class="ow">or</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+        <span class="k">continue</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+    <span class="c1">#因题意，超过数字11退出循环
+</span>    <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">11</span><span class="p">:</span>
+        <span class="k">break</span>
+</code></pre></div></div>
+
+<p>因为我们的好习惯，大多需要解释的内容，都已经在程序的给出注释了。当然仍有几点需要注意：</p>
+
+<ul>
+  <li>while True:语句，进入循环的条件和继续循环的条件是True,这是一个立即数，也是常数。这使得循环成为一个永远不停止的循环。</li>
+  <li>当i的值是3或者5的时候，执行continue命令,这将跳过后面的显示i值部分，从循环一开始重新执行。</li>
+  <li>当i&gt;=11的时候，break语句导致循环终止。</li>
+  <li>注意i += 1这是我们在前面演示的时候，都放到循环块最后部分的循环条件变量，当然这里i已经不是循环的条件变量了，但仍然对于退出循环起着很关键的作用。</li>
+</ul>
+
+<p>这里放到循环一开始，是为了防止continue语句跳过循环剩余部分的时候，把这一句也跳过去，从而导致i的值不再变化，最终导致循环无法停止的情况。</p>
+
+<p>根据上面这段示例代码，我们出几道思考题作为今天练习的一部分：</p>
+
+<ul>
+  <li>如果没有break语句，本程序会出现什么情况？</li>
+  <li>跟i == 3 or i == 5 对比
+ (i == 3) or (i == 5) 功能是否一样？哪个更好？</li>
+  <li>本程序中， i &gt;= 11 和
+ i == 11功能是否一样？
+ 哪个更好？</li>
+  <li>本例中，如果使用i==11,跟换用for循环模式，然后使用range(12)含义一样吗？</li>
+</ul>
+
+<hr />
+
+<h4 id="挑战">挑战</h4>
+
+<p>今天的挑战内容是编程来证明《哥德巴赫猜想》，这个话题比较大，所以理所当然我们只是来证明简化版的《哥德巴赫猜想》。</p>
+
+<blockquote>
+  <p>哥德巴赫是德国一位中学教师，也是一位著名的数学家，生于 1690 年，1725 年当选为俄国彼得堡科学院院士。1742年，哥德巴赫在教学中发现，每个不小于 6 的偶数都是两个素数（只能被 1 和它本身整除的数）之和。如 6＝3＋3，12＝5＋7 等。<br />
+哥德巴赫 1742 年给欧拉的信中哥德巴赫提出了以下猜想：任一大于 2 的偶数都可写成两个质数之和。但是哥德巴赫自己无法证明它，于是就写信请教赫赫有名的大数学家欧拉帮忙证明，但是一直到死，欧拉也无法证明。因现今数学界已经不使用“1 也是质数”这个约定，原初猜想的现代陈述为：任一大于 5 的偶数都可写成两个质数之和。</p>
+</blockquote>
+
+<p>编写程序，输入任意一个大于5的偶数，证明这个偶数符合哥德巴赫猜想，并显示是哪两个质数。</p>
+
+<p>我们前面就讲过，如果一个问题太复杂，我们难以实现。那就要对问题进行拆分，使得每个小的部分，都能够清晰、容易的完成，最后把所有小程序“组装”在一起。</p>
+
+<p>现在我们就把今天的挑战内容分拆一下，分解成几个容易完成的小问题。</p>
+
+<h5 id="奇数偶数判断">奇数、偶数判断</h5>
+
+<p>输入一个整数，判断这个数字是奇数还是偶数？我们直接来用代码讲解：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#输入一个正整数n,判断n是奇数还是偶数
+</span>
+<span class="c1">#定义一个的函数，
+#输入参数n
+#当n为偶数时返回True,否则返回False
+</span><span class="k">def</span> <span class="nf">isEven</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="n">n</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span>
+
+<span class="c1">#输入
+</span><span class="n">n</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s">"请输入一个正整数："</span><span class="p">))</span>
+<span class="c1">#判断
+</span><span class="k">if</span> <span class="n">isEven</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="s">"是偶数."</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="s">"是奇数."</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>我们在程序中定义了一个函数来判断参数是奇数还是偶数。判断的原理，是使用整数运算中的求余数办法，求参数除以2之后，是否有余数。如果有余数，则参数肯定是奇数；如果没有余数，刚好除尽了，则参数当然是偶数。</p>
+
+<p>判断的时候还使用了小技巧，就是<code class="language-plaintext highlighter-rouge">not (n % 2)</code>这一句。<br />
+有余数的话，整数值表示为非0，当然这里因为求除以2的余数，所以这个值要么是1，要么是0，不可能是其它的值。前面我们已经讲过了，1代表“真”，True。没有余数是0的话，0代表“假”，False。所以这个整数的结果，我们是可以直接当做bool值来使用的。<br />
+唯一要处理的，是我们的函数判断如果是偶数才返回True，所以在取余数运算的前面增加了not逻辑运算，也就是取反，来得到我们需要的bool值。也既：参数是偶数，返回真值True。</p>
+
+<p>输入整数之后，使用int()函数把输入的字符串内容转换为整数数字。因为我们定义的函数返回实际是bool值，所以使用if分支来打印判断的结果，而不是显示返回值本身，那样只能显示出来“True”或者“False”。</p>
+
+<h5 id="用户输入是否满足条件">用户输入是否满足条件？</h5>
+
+<p>因为我们的程序对用户的输入值有约束条件，1、偶数，2、大于5，所以我们要对用户输入的数字先进行判断是否条件吻合，如果不符合约束条件，要请用户重新输入。我们以前提过，为了简化问题，在我们涉及的编程概念中，暂不考虑用户输入根本不是数字这种错误。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#接受一个大于5的偶数输入
+#不符合条件则循环重新输入
+</span>
+<span class="c1">#判断是否为偶数
+</span><span class="k">def</span> <span class="nf">isEven</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span><span class="n">n</span> <span class="o">%</span> <span class="mi">2</span><span class="p">)</span>
+<span class="c1">#判断输入数字是否符合条件
+</span><span class="k">def</span> <span class="nf">isValid</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">n</span> <span class="o">&lt;=</span> <span class="mi">5</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">isEven</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">return</span> <span class="bp">True</span>
+<span class="c1">#循环输入，直到得到吻合条件的输入
+</span><span class="k">def</span> <span class="nf">inputNumber</span><span class="p">():</span>
+    <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="n">n</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s">"请输入一个大于5的偶数："</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">isValid</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="k">break</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">"输入不符合条件，请重新输入！"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">n</span>
+
+<span class="c1">#调用输入函数
+</span><span class="k">print</span><span class="p">(</span><span class="s">"输入为："</span><span class="p">,</span><span class="n">inputNumber</span><span class="p">())</span>
+</code></pre></div></div>
+
+<p>程序上来先是上一节定义的isEven函数，用来判断输入是否为偶数。</p>
+
+<p>接着是新定义的函数isValid(n)，用来判断参数是否大于5，并且是偶数。判断的方法使用or逻辑运算，用以在一个if分支判断中，同时判断两个约束条件。<br />
+逻辑运算中的or跟后面的not有点容易混淆。区分的方法也很容易，not运算符是单操作数的，只对其后面的表达式有效，or则是对两边的两个操作数有效。所以or后面一定要有一个操作数，这里显然只能是not的结果。而not操作符必须有其后面的唯一操作数。说了这么多，都是为了解释给“阅读”程序的人，所以其实编写程序的时候，写成：<code class="language-plaintext highlighter-rouge">if  (n&lt;=5) or (not isEven(n)):</code>这样更清楚，你说对吗？</p>
+
+<p>再下面的inputNumber()函数，重点是使用了while循环，并且用True作while的条件，形成一个永远的循环。在循环中，只要用户输入的数字不符合规定条件，就让用户重新输入。只有当用户输入了满足条件的数字的时候，才会退出循环，并由函数返回值返回用户符合条件的输入。</p>
+
+<h4 id="质数的判断">质数的判断</h4>
+
+<p>质数是数学上的定义，指的是只能被1和它本身整除的数字。因为要求整除，所以这个数字本身首先要是整数。</p>
+
+<p>判断质数很适合使用循环，假设我们需要对数字n判断是否为质数。循环从2开始，一直循环到这个n-1。用n除以这个循环变量后，如果没有余数，表示整除了。那当然这个数字就不是质数。如果所有的循环结束，也没有整除的现象，这个数字就是质数。来看程序代码：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#接受一个正整数输入，判断该数字是否为质数
+</span>
+<span class="k">def</span> <span class="nf">isPrime</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="c1">#从2开始循环到n-1
+</span>    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="n">n</span><span class="p">):</span>
+        <span class="c1">#如果有可以被整除的(无余数),
+</span>        <span class="c1">#则数字不是质数
+</span>        <span class="k">if</span> <span class="p">(</span><span class="n">n</span> <span class="o">%</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">False</span>
+    <span class="k">return</span> <span class="bp">True</span>
+
+<span class="c1">#输入
+</span><span class="n">n</span><span class="o">=</span><span class="nb">int</span><span class="p">(</span><span class="nb">input</span><span class="p">(</span><span class="s">"请输入一个正整数："</span><span class="p">))</span>
+<span class="c1">#判断是否为质数并显示
+</span><span class="k">if</span> <span class="n">isPrime</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="s">"是质数"</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="s">"不是质数"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>好了，至此我们所有用到的小功能都已经实现了，后续需要把所有代码拼装到一起，成为一个完整的程序。拼装工作我们当做今天的练习请你自己完成，一定要完成之后再看答案。</p>
+
+<p>拼装提示：在刚才的几个小程序中，因为每个小程序都是一个完整的程序，都有输入、显示等功能，核心的功能当然已经完成了函数化。所以拼装重要的工作是拼装这些函数。主要的程序流程，则需要根据前面《哥德巴赫猜想》的题面来自己编写。这个主流程的大致工作应当是：</p>
+
+<ul>
+  <li>输入数字，判断数字是否合规，否则重新输入</li>
+  <li>假设输入的数字是n，我们用i变量循环从3到n-1</li>
+  <li>如果存在i和n-i两个数字都是质数的情况，则猜想成立</li>
+  <li>猜想成立把i和n-i都显示出来就好了</li>
+</ul>
+
+<p>我相信你一定能完成的，加油吧。</p>
+
+<hr />
+
+<h4 id="练习时间">练习时间</h4>
+
+<ol>
+  <li>
+    <p>循环中的分支一节中的思考题。</p>
+  </li>
+  <li>
+    <p>循环显示数字1-11，其中数字3、5跳过不显示，要求使用for循环实现。（我们前面已经有了while循环的例子，可以参考完成）</p>
+  </li>
+  <li>
+    <p>完成上一节中的《哥德巴赫猜想》完整程序。这里有一个提示，在调试程序的时候，不要输入太大的数字，否则计算机可能需要运行上几天甚至更多，这让你完全无法验证程序和找出程序中的问题。</p>
+  </li>
+</ol>
+
+<hr />
+
+<h4 id="本讲小结">本讲小结</h4>
+
+<ul>
+  <li>本讲重点讲述了条件分支，但实际上逻辑运算及其各种应用是重点。因为分支的条件，是使用逻辑运算表达的。</li>
+  <li>有逻辑处理能力是计算机区别于其它计算设备（比如传统计算器）的重要特征。</li>
+  <li>多项条件通过逻辑运算组合在一起，可以让代码更简洁。并且能完成很多复杂的工作。这个工作的难度，在于你如果想让计算机执行的正确，你自己必须使用自己的大脑完全的模拟正确。</li>
+</ul>
+
+<hr />
+
+<h4 id="练习参考答案">练习参考答案</h4>
+
+<ul>
+  <li>
+    <p>程序请参考源码：code2a.py 及 goldbach.py。</p>
+  </li>
+  <li>
+    <p>如果没有break语句，本程序会出现什么情况？</p>
+
+    <p>没有break语句，本程序会陷入死循环，无法停止。</p>
+  </li>
+  <li>
+    <p>i == 3 or i == 5 对比(i == 3) or (i == 5) 功能是否一样？哪个更好？</p>
+
+    <p>功能都一样，但后者更好，因为更直观更容易理解。
+延伸一个解释。加上小括号之后，比不加，代码速度回略微受一点影响。但这个影响非常小，可以忽略不计，所以看上去更清晰就成了优选。</p>
+  </li>
+  <li>
+    <p>本程序中， i &gt;= 11 和i == 11功能是否一样？哪个更好？</p>
+
+    <p>功能是一样的，但i&gt;=11容错性更好。</p>
+  </li>
+  <li>
+    <p>本例中，如果换用i==11,跟for循环中使用range(12)含义一样吗？</p>
+
+    <p>功能可能一样，但含义完全不一样。i==11是本例中的结束条件，是相等的判断。而range(12)表示生成的列表&lt;12，使用了小于判断。</p>
+  </li>
+</ul>
+
+:ET

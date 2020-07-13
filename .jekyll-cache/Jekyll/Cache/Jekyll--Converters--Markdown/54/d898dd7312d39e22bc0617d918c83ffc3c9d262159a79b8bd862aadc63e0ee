@@ -1,0 +1,146 @@
+I"BY<p><img src="http://img.itools.hk/upload/77/27/8b543124-66a9-4372-ab5e-99fd841f7382.jpg" alt="" />
+本来Cuda用的挺好，为了Apple，放弃Cuda，改投OpenCl。好不容易OpenCl也算熟悉了，WWDC2018又宣布了Metal2，建议大家放弃OpenCl，使用Metal Performance Shaders。<br />
+Apple是一个富有“革命性”创新力的公司，很多创新，会彻底的放弃原有的积累。不断带来新能力的同时，也让人又爱又恨。</p>
+
+<p>下面是一个例子，用于演示如何使用Metal+Shader来加速mac的大规模数据计算。<br />
+主程序使用swift。随机生成一个大规模的整数数组，然后分配到GPU内核上并行对数组进行求和。<br />
+Metal部分的各项逻辑建议看官方文档<a href="https://developer.apple.com/metal/">https://developer.apple.com/metal/</a>，只重点说一下计算部分。计算是由Shader子程序（核函数）完成的，Shader编程所使用的语言衍生自c++14，所以跟cpu通讯所使用的数据结构基本都是使用c语言可以接受的类型。可以把Shader语言理解为c++的一个子集。官方的建议是可以有大量的计算，但尽力减少逻辑语句之类需要GPU核进行预判从而降低速度的内容。大多情况下单个内核的计算速度并不快，使用GPU加速计算的原因是GPU都具有很多个计算单元进行并行的计算。<br />
+通常在Shader函数的参数中，至少包含3个部分：输入、输出、进程的ID。前两个参数好理解，第三个参数就是因为该核函数可能随机的运行在某个GPU内核上进行计算工作，应当根据这个唯一的ID分配出来唯一的任务在程序中来计算，从而达到并发的效果。所以核函数都应当是支持并发、支持数据切割分块计算。<br />
+Metal对并发的支持首先是线程组数量threadgroupsPerGrid，这个基本上是跟GPU核心数相关的，另一个是批次数量threadsPerThreadgroup，这个要求是线程组数量的整倍数。<br />
+其它的内容请看代码中的注释。主程序命名为testCompute.swift</p>
+<div class="language-swift highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">import</span> <span class="kt">Metal</span>
+
+<span class="c1">//定义数据集长度，总共count个数据求和</span>
+<span class="c1">//swift数字立即数中可以添加下划线表现出来科学计数法的方式，很有特色</span>
+<span class="k">let</span> <span class="nv">count</span> <span class="o">=</span> <span class="mi">10_000_000</span>
+<span class="c1">//每elementsPerSum个数据分配到一个核汇总一次</span>
+<span class="k">let</span> <span class="nv">elementsPerSum</span> <span class="o">=</span> <span class="mi">10_000</span>
+
+<span class="c1">//每个数据的类型，必须使用C兼容的类型，</span>
+<span class="c1">//因为GPU运行的shader语言是从C++14衍生来的</span>
+<span class="kd">typealias</span> <span class="kt">DataType</span> <span class="o">=</span> <span class="kt">CInt</span>
+
+<span class="c1">//设备，就是GPU</span>
+<span class="k">let</span> <span class="nv">device</span> <span class="o">=</span> <span class="kt">MTLCreateSystemDefaultDevice</span><span class="p">()</span><span class="o">!</span>
+<span class="c1">//载入当前目录下的default.metallib(编译后的shader),使用其中的parsum核函数</span>
+<span class="k">let</span> <span class="nv">parsum</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="nf">makeDefaultLibrary</span><span class="p">()</span><span class="o">!.</span><span class="nf">makeFunction</span><span class="p">(</span><span class="nv">name</span><span class="p">:</span><span class="s">"parsum"</span><span class="p">)</span><span class="o">!</span>
+<span class="c1">//如果shader文件不是默认名称，可以使用下面的方法载入指定文件</span>
+<span class="c1">//let lib = try! dev.makeLibrary(filepath:"default.metallib")!.newFunctionWithName("parsum")!</span>
+<span class="c1">//建立GPU运算的流水线</span>
+<span class="k">let</span> <span class="nv">pipeline</span> <span class="o">=</span> <span class="k">try!</span> <span class="n">device</span><span class="o">.</span><span class="nf">makeComputePipelineState</span><span class="p">(</span><span class="nv">function</span><span class="p">:</span><span class="n">parsum</span><span class="p">)</span>
+<span class="c1">//生成随机数据集</span>
+<span class="k">var</span> <span class="nv">data</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="o">..&lt;</span><span class="n">count</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">{</span> <span class="n">_</span> <span class="k">in</span> <span class="kt">DataType</span><span class="p">(</span><span class="nf">arc4random_uniform</span><span class="p">(</span><span class="mi">100</span><span class="p">))</span> <span class="p">}</span>
+<span class="c1">//传递给核函数的数据总数，所以也用C兼容方式</span>
+<span class="k">var</span> <span class="nv">dataCount</span> <span class="o">=</span> <span class="kt">CUnsignedInt</span><span class="p">(</span><span class="n">count</span><span class="p">)</span>
+<span class="c1">//传递给核函数的每组汇总数量，同上</span>
+<span class="k">var</span> <span class="nv">elementsPerSumC</span> <span class="o">=</span> <span class="kt">CUnsignedInt</span><span class="p">(</span><span class="n">elementsPerSum</span><span class="p">)</span>
+<span class="c1">//返回的分批汇总的结果数</span>
+<span class="k">let</span> <span class="nv">resultsCount</span> <span class="o">=</span> <span class="p">(</span><span class="n">count</span> <span class="o">+</span> <span class="n">elementsPerSum</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">elementsPerSum</span>
+
+<span class="c1">//建立两个同GPU通信的缓冲区，一个用于输入给核函数，一个用用于核函数返回结果</span>
+<span class="k">let</span> <span class="nv">dataBuffer</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="nf">makeBuffer</span><span class="p">(</span><span class="nv">bytes</span><span class="p">:</span><span class="o">&amp;</span><span class="n">data</span><span class="p">,</span> <span class="nv">length</span><span class="p">:</span> <span class="kt">MemoryLayout</span><span class="o">&lt;</span><span class="kt">CInt</span><span class="o">&gt;.</span><span class="n">size</span> <span class="o">*</span> <span class="n">count</span><span class="p">,</span> <span class="nv">options</span><span class="p">:</span> <span class="p">[])</span> <span class="c1">// Our data in a buffer (copied)</span>
+<span class="k">let</span> <span class="nv">resultsBuffer</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="nf">makeBuffer</span><span class="p">(</span><span class="nv">length</span><span class="p">:</span><span class="kt">MemoryLayout</span><span class="o">&lt;</span><span class="kt">CInt</span><span class="o">&gt;.</span><span class="n">size</span> <span class="o">*</span> <span class="n">resultsCount</span><span class="p">,</span> <span class="nv">options</span><span class="p">:</span> <span class="p">[])</span> <span class="c1">// A buffer for individual results (zero initialized)</span>
+<span class="c1">//返回结果是c指针，要转换成swift可访问的数据类型</span>
+<span class="k">let</span> <span class="nv">results</span> <span class="o">=</span> <span class="kt">UnsafeBufferPointer</span><span class="o">&lt;</span><span class="kt">DataType</span><span class="o">&gt;</span><span class="p">(</span>
+    <span class="nv">start</span><span class="p">:</span> <span class="n">resultsBuffer</span><span class="o">!.</span><span class="nf">contents</span><span class="p">()</span><span class="o">.</span><span class="nf">assumingMemoryBound</span><span class="p">(</span><span class="nv">to</span><span class="p">:</span><span class="kt">CInt</span><span class="o">.</span><span class="k">self</span><span class="p">),</span> <span class="nv">count</span><span class="p">:</span> <span class="n">resultsCount</span><span class="p">)</span>
+<span class="c1">//建立GPU命令队列</span>
+<span class="k">let</span> <span class="nv">queue</span> <span class="o">=</span> <span class="n">device</span><span class="o">.</span><span class="nf">makeCommandQueue</span><span class="p">()</span>
+<span class="c1">//GPU命令缓冲区，一般有多个运算会都放置到缓冲区，一次性提交执行</span>
+<span class="k">let</span> <span class="nv">cmds</span> <span class="o">=</span> <span class="n">queue</span><span class="o">!.</span><span class="nf">makeCommandBuffer</span><span class="p">()</span>
+<span class="c1">//命令编码器是用于将一条GPU核函数调用的函数、参数等打包到一起</span>
+<span class="k">let</span> <span class="nv">encoder</span> <span class="o">=</span> <span class="n">cmds</span><span class="o">!.</span><span class="nf">makeComputeCommandEncoder</span><span class="p">()</span><span class="o">!</span>
+
+<span class="c1">//设置一条GPU核函数调用的函数及其相关参数，如前所述，必须使用C兼容的类型</span>
+<span class="n">encoder</span><span class="o">.</span><span class="nf">setComputePipelineState</span><span class="p">(</span><span class="n">pipeline</span><span class="p">)</span>
+<span class="n">encoder</span><span class="o">.</span><span class="nf">setBuffer</span><span class="p">(</span><span class="n">dataBuffer</span><span class="p">,</span> <span class="nv">offset</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">index</span><span class="p">:</span> <span class="mi">0</span><span class="p">)</span>
+<span class="n">encoder</span><span class="o">.</span><span class="nf">setBytes</span><span class="p">(</span><span class="o">&amp;</span><span class="n">dataCount</span><span class="p">,</span> <span class="nv">length</span><span class="p">:</span> <span class="kt">MemoryLayout</span><span class="o">&lt;</span><span class="kt">CUnsignedInt</span><span class="o">&gt;.</span><span class="n">size</span><span class="p">,</span> <span class="nv">index</span><span class="p">:</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">encoder</span><span class="o">.</span><span class="nf">setBuffer</span><span class="p">(</span><span class="n">resultsBuffer</span><span class="p">,</span> <span class="nv">offset</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">index</span><span class="p">:</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">encoder</span><span class="o">.</span><span class="nf">setBytes</span><span class="p">(</span><span class="o">&amp;</span><span class="n">elementsPerSumC</span><span class="p">,</span> <span class="nv">length</span><span class="p">:</span> <span class="kt">MemoryLayout</span><span class="o">&lt;</span><span class="kt">CUnsignedInt</span><span class="o">&gt;.</span><span class="n">size</span><span class="p">,</span> <span class="nv">index</span><span class="p">:</span> <span class="mi">3</span><span class="p">)</span>
+
+<span class="c1">//设定每组任务数量</span>
+<span class="k">let</span> <span class="nv">threadgroupsPerGrid</span> <span class="o">=</span> <span class="kt">MTLSize</span><span class="p">(</span><span class="nv">width</span><span class="p">:</span> <span class="p">(</span><span class="n">resultsCount</span> <span class="o">+</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">threadExecutionWidth</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">threadExecutionWidth</span><span class="p">,</span> <span class="nv">height</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nv">depth</span><span class="p">:</span> <span class="mi">1</span><span class="p">)</span>
+<span class="c1">//设定每批次任务数量，必须是上面组数量的整倍数</span>
+<span class="k">let</span> <span class="nv">threadsPerThreadgroup</span> <span class="o">=</span> <span class="kt">MTLSize</span><span class="p">(</span><span class="nv">width</span><span class="p">:</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">threadExecutionWidth</span><span class="p">,</span> <span class="nv">height</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="nv">depth</span><span class="p">:</span> <span class="mi">1</span><span class="p">)</span>
+<span class="c1">//分配任务线程</span>
+<span class="n">encoder</span><span class="o">.</span><span class="nf">dispatchThreadgroups</span><span class="p">(</span><span class="n">threadgroupsPerGrid</span><span class="p">,</span> <span class="nv">threadsPerThreadgroup</span><span class="p">:</span> <span class="n">threadsPerThreadgroup</span><span class="p">)</span>
+<span class="c1">//完成一个调用的所有设置</span>
+<span class="n">encoder</span><span class="o">.</span><span class="nf">endEncoding</span><span class="p">()</span>
+
+<span class="k">var</span> <span class="nv">start</span><span class="p">,</span> <span class="nv">end</span> <span class="p">:</span> <span class="kt">UInt64</span>
+<span class="k">var</span> <span class="nv">result</span> <span class="p">:</span> <span class="kt">DataType</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">start</span> <span class="o">=</span> <span class="nf">mach_absolute_time</span><span class="p">()</span>
+<span class="c1">//真正提交任务</span>
+<span class="n">cmds</span><span class="o">!.</span><span class="nf">commit</span><span class="p">()</span>
+<span class="c1">//等待完成GPU计算</span>
+<span class="n">cmds</span><span class="o">!.</span><span class="nf">waitUntilCompleted</span><span class="p">()</span>
+<span class="c1">//GPU计算式分批次汇总的，数量已经很少了，最后用CPU进行完整的汇总</span>
+<span class="k">for</span> <span class="n">elem</span> <span class="k">in</span> <span class="n">results</span> <span class="p">{</span>
+    <span class="n">result</span> <span class="o">+=</span> <span class="n">elem</span>
+<span class="p">}</span>
+<span class="n">end</span> <span class="o">=</span> <span class="nf">mach_absolute_time</span><span class="p">()</span>
+<span class="c1">//显示GPU计算结果及所用时间</span>
+<span class="nf">print</span><span class="p">(</span><span class="s">"Metal result: </span><span class="se">\(</span><span class="n">result</span><span class="se">)</span><span class="s">, time: </span><span class="se">\(</span><span class="kt">Double</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="kt">Double</span><span class="p">(</span><span class="kt">NSEC_PER_SEC</span><span class="p">)</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="c1">//下面是使用CPU完整的计算一次，并显示结果、耗费时间</span>
+<span class="n">start</span> <span class="o">=</span> <span class="nf">mach_absolute_time</span><span class="p">()</span>
+<span class="n">data</span><span class="o">.</span><span class="n">withUnsafeBufferPointer</span> <span class="p">{</span> <span class="n">buffer</span> <span class="k">in</span>
+    <span class="k">for</span> <span class="n">elem</span> <span class="k">in</span> <span class="n">buffer</span> <span class="p">{</span>
+        <span class="n">result</span> <span class="o">+=</span> <span class="n">elem</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="n">end</span> <span class="o">=</span> <span class="nf">mach_absolute_time</span><span class="p">()</span>
+<span class="nf">print</span><span class="p">(</span><span class="s">"CPU result: </span><span class="se">\(</span><span class="n">result</span><span class="se">)</span><span class="s">, time: </span><span class="se">\(</span><span class="kt">Double</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">/</span> <span class="kt">Double</span><span class="p">(</span><span class="kt">NSEC_PER_SEC</span><span class="p">)</span><span class="se">)</span><span class="s">"</span><span class="p">)</span>
+
+</code></pre></div></div>
+<p>shade程序命名为：shader.metal</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//各项数据类型必须跟Swift中定义的相同</span>
+<span class="cp">#include &lt;metal_stdlib&gt;
+</span><span class="k">typedef</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">uint</span><span class="p">;</span> 
+<span class="k">typedef</span> <span class="kt">int</span> <span class="n">DataType</span><span class="p">;</span>
+
+<span class="n">kernel</span> <span class="kt">void</span> <span class="nf">parsum</span><span class="p">(</span><span class="k">const</span> <span class="n">device</span> <span class="n">DataType</span><span class="o">*</span> <span class="n">data</span> <span class="p">[[</span> <span class="n">buffer</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span> <span class="p">]],</span>
+                   <span class="k">const</span> <span class="n">device</span> <span class="n">uint</span><span class="o">&amp;</span> <span class="n">dataLength</span> <span class="p">[[</span> <span class="n">buffer</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">]],</span>
+                   <span class="n">device</span> <span class="n">DataType</span><span class="o">*</span> <span class="n">sums</span> <span class="p">[[</span> <span class="n">buffer</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span> <span class="p">]],</span>
+                   <span class="k">const</span> <span class="n">device</span> <span class="n">uint</span><span class="o">&amp;</span> <span class="n">elementsPerSum</span> <span class="p">[[</span> <span class="n">buffer</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span> <span class="p">]],</span>
+
+                   <span class="k">const</span> <span class="n">uint</span> <span class="n">tgPos</span> <span class="p">[[</span> <span class="n">threadgroup_position_in_grid</span> <span class="p">]],</span>
+                   <span class="k">const</span> <span class="n">uint</span> <span class="n">tPerTg</span> <span class="p">[[</span> <span class="n">threads_per_threadgroup</span> <span class="p">]],</span>
+                   <span class="k">const</span> <span class="n">uint</span> <span class="n">tPos</span> <span class="p">[[</span> <span class="n">thread_position_in_threadgroup</span> <span class="p">]])</span> <span class="p">{</span>
+    <span class="c1">//根据组索引、批次索引、组中位置计算总的索引值，这个是唯一的</span>
+    <span class="n">uint</span> <span class="n">resultIndex</span> <span class="o">=</span> <span class="n">tgPos</span> <span class="o">*</span> <span class="n">tPerTg</span> <span class="o">+</span> <span class="n">tPos</span><span class="p">;</span>
+    <span class="c1">//计算本批次数据的开始结束位置</span>
+    <span class="n">uint</span> <span class="n">dataIndex</span> <span class="o">=</span> <span class="n">resultIndex</span> <span class="o">*</span> <span class="n">elementsPerSum</span><span class="p">;</span> <span class="c1">// Where the summation should begin</span>
+    <span class="n">uint</span> <span class="n">endIndex</span> <span class="o">=</span> <span class="n">dataIndex</span> <span class="o">+</span> <span class="n">elementsPerSum</span> <span class="o">&lt;</span> <span class="n">dataLength</span> <span class="o">?</span> <span class="n">dataIndex</span> <span class="o">+</span> <span class="n">elementsPerSum</span> <span class="o">:</span> <span class="n">dataLength</span><span class="p">;</span> <span class="c1">// The index where summation should end</span>
+    <span class="c1">//对本批次数据求和</span>
+    <span class="k">for</span> <span class="p">(;</span> <span class="n">dataIndex</span> <span class="o">&lt;</span> <span class="n">endIndex</span><span class="p">;</span> <span class="n">dataIndex</span><span class="o">++</span><span class="p">)</span>
+        <span class="n">sums</span><span class="p">[</span><span class="n">resultIndex</span><span class="p">]</span> <span class="o">+=</span> <span class="n">data</span><span class="p">[</span><span class="n">dataIndex</span><span class="p">];</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>给一个在命令行使用的编译脚本：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
+<span class="c"># 补充：如果遇到Invalid bitcode signature错误，可能需要加上-c参数</span>
+<span class="c">#xcrun metal -c -o shader.air shader.metal</span>
+xcrun metal <span class="nt">-o</span> shader.air shader.metal
+xcrun metal-ar rcs shader.metal-ar shader.air
+xcrun metallib <span class="nt">-o</span> default.metallib shader.metal-ar
+swiftc testCompute.swift⏎   
+</code></pre></div></div>
+<p>在我的笔记本上运行效果如下:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>metal&gt; ./testCompute 
+Metal result: 495056208, <span class="nb">time</span>: 0.017362745
+CPU result: 495056208, <span class="nb">time</span>: 1.210801891
+</code></pre></div></div>
+<p>作为一个比较片面的比较，GPU计算速度，比CPU快121倍。<br />
+测试环境：<br />
+MacBook Pro (13-inch, 2017, Four Thunderbolt 3 Ports)<br />
+CPU:3.1 GHz Intel Core i5<br />
+Graphics:Intel Iris Plus Graphics 650 1536 MB<br />
+Memory:8 GB 2133 MHz LPDDR3<br />
+Xcode:9.4.1</p>
+
+<p>参考资料：<br />
+<a href="https://stackoverflow.com/questions/38164634/compute-sum-of-array-values-in-parallel-with-metal-swift">https://stackoverflow.com/questions/38164634/compute-sum-of-array-values-in-parallel-with-metal-swift</a></p>
+
+:ET

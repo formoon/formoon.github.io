@@ -1,0 +1,171 @@
+I"�?<p><img src="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1513587702717&amp;di=bcbf3ccac47e31a8ec356751b4c44e8d&amp;imgtype=0&amp;src=http%3A%2F%2Ff.hiphotos.baidu.com%2Fzhidao%2Fpic%2Fitem%2Fb219ebc4b74543a9bfc173651b178a82b8011444.jpg" alt="" /></p>
+
+<p>如果不是Seven问起来，我以为C51这种东西已经属于历史遗迹了。不过简单搜索了一下，发现c51老而弥坚，仍然茁壮的生长着。原因据说，一方面是有很大的用户群和既有的软硬件资源，另外一方面，的确在很多的高校教学中仍然占有一席之地。其实个人感觉，高校课程的更新真的是需要再加快了。<br />
+不过不管如何，作为入门类的单片机，c51还好啦，这些学习的经历，并不会浪费，学生能够很快的转化到其它平台上去。<br />
+Seven碰到的情况是这样，c51开发工具目前基本以windows为主，在mac上无法工作，总不能为了学习c51就换一台电脑。我搜索了一下，发现了sdcc这个工具，于是来尝试一下，首先是安装sdcc：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>brew <span class="nb">install </span>sdcc
+</code></pre></div></div>
+<p>找一个呼吸灯程序源码，来测试一下编译是否正常：</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;8051.h&gt;
+</span>
+<span class="c1">//  延时函数</span>
+<span class="c1">//  参数  in 为延时的时间长度（单位时间很短，大约一条指令的时间）</span>
+<span class="kt">void</span> <span class="nf">delay</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">in</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="mi">10</span><span class="o">*</span><span class="n">in</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{;}</span>
+<span class="p">}</span>
+<span class="c1">//  由暗变亮的子函数</span>
+<span class="c1">//  参数 ledn 为点第几位的灯</span>
+<span class="kt">void</span> <span class="nf">off_on</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">ledn</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="mi">100</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">for</span><span class="p">(</span><span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">j</span><span class="o">&lt;</span><span class="mi">100</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">i</span><span class="o">&lt;=</span><span class="n">j</span><span class="p">)</span>
+            <span class="p">{</span>    <span class="c1">//    模拟pwm的低电平输出</span>
+				<span class="n">P0</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">else</span>
+            <span class="p">{</span>    <span class="c1">//    模拟PWM的高电平输出</span>
+				<span class="n">P0</span> <span class="o">=</span> <span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">ledn</span><span class="p">;</span>
+            <span class="p">}</span>
+			<span class="n">delay</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>      <span class="c1">//  这里的延时 根据灯的情况自己调整</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">//  由亮变暗的子函数</span>
+<span class="c1">//  参数 ledn 为点第几位的灯</span>
+<span class="kt">void</span> <span class="nf">on_off</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">ledn</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">100</span><span class="p">;</span><span class="n">i</span><span class="o">&gt;</span><span class="mi">1</span><span class="p">;</span><span class="n">i</span><span class="o">--</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">for</span><span class="p">(</span><span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">j</span><span class="o">&lt;</span><span class="mi">100</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">i</span><span class="o">&lt;=</span><span class="n">j</span><span class="p">)</span>
+            <span class="p">{</span>        <span class="c1">//    模拟pwm的低电平输出</span>
+				<span class="n">P0</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">else</span>
+            <span class="p">{</span>        <span class="c1">//    模拟PWM的高电平输出</span>
+				<span class="n">P0</span> <span class="o">=</span> <span class="mi">1</span><span class="o">&lt;&lt;</span><span class="n">ledn</span><span class="p">;</span>
+            <span class="p">}</span>
+			<span class="n">delay</span><span class="p">(</span><span class="mi">10</span><span class="p">);</span>                 <span class="c1">//  这里的延时 根据灯的情况自己调整</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">//  主程序开始</span>
+<span class="kt">void</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">ledn</span><span class="p">;</span>
+    <span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="k">for</span><span class="p">(</span><span class="n">ledn</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">ledn</span><span class="o">&lt;</span><span class="mi">8</span><span class="p">;</span><span class="n">ledn</span><span class="o">++</span><span class="p">)</span>
+        <span class="p">{</span>
+            <span class="n">off_on</span><span class="p">(</span><span class="n">ledn</span><span class="p">);</span>            
+            <span class="n">on_off</span><span class="p">(</span><span class="n">ledn</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>（补充知识：在mac电脑中一般都是在命令行工作，编辑文件可以使用vi编辑器，不熟悉vi编辑器的，也可以推荐使用TextMate.app，这个程序可以在启动台找到，也可以在命令行执行mate命令来启动编辑器。如果没有安装过的话，还可以使用<code class="language-plaintext highlighter-rouge">brew cask install textmate</code>来安装。）<br />
+上面的源代码我们保存到比如test.c文件，接下来编译一下：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#编译命令，后面的test.c就是我们的源码，可以替换成你需要的名字：</span>
+sdcc test.c
+<span class="c">#编译成功会生成多个文件：</span>
+test.asm test.ihx test.lk  test.lst test.map test.mem test.rel test.rst test.sym
+</code></pre></div></div>
+<p>这些文件中其实只有test.ihx文件是我们需要的输出文件。其它文件都是工作过程中的临时文件，一般没有用处，可以删除，但在大型系统中查错、分析可能会用得到。在windows工作惯了的同学们可能更习惯.hex输出文件，把.ihx转换为.hex的命令是：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>packihx test.ihx <span class="o">&gt;</span> test.hex
+</code></pre></div></div>
+<p>还有可能会需要.bin文件，转换方法是：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sdobjcopy <span class="nt">-I</span> ihex <span class="nt">-O</span> binary test.ihx test.bin
+<span class="c">#-I指定的是输入格式，-O指定的是输出格式</span>
+<span class="c">#最后两个参数分别是输入、输出的文件名</span>
+<span class="c">#sdobjcopy不带任何参数执行有更详细的帮助可以参考</span>
+</code></pre></div></div>
+<p>.hex/.bin文件，并非是必须的，特别是在mac上工作，只是交流的时候如果需要，可以用上面的方法转换出来。<br />
+一般在学习的情况下，知道上面这些就够用了。在正式的开发过程中，特别是项目比较大，有多个模块，你可能还需要知道下面这些用法。<br />
+把源代码编译成链接库文件.rel:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sdcc <span class="nt">-c</span> test.c
+</code></pre></div></div>
+<p>执行完成你会发现已经有了.rel链接库文件。.rel可以经由再次编译，输出成常规的.ihx文件，方法跟普通编译其实是一样的：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sdcc test.rel
+</code></pre></div></div>
+<p>这里大多初学者会有一个疑问，既然最终都是要.ihx文件，为啥还要编译成.rel文件呢？原因很多，常见的如下：</p>
+<ul>
+  <li>当一个工程很大的时候，会分成多个.c程序来写，这就需要分别编译。而如果很多个.c文件，这编译也是很慢的，所以通行的做法是哪个文件被修改了，就仅编译改变了的文件。这时候使用.rel文件就会快很多，因为从.c文件到.rel文件，编译做了大多工作，只是没有做最后的拼装。一个大工程编译仅修改过的文件到.rel，然后把所有的.rel拼装在一起成为.ihx文件，速度会很快。</li>
+  <li>还有的时候，比如你编写了一个模块，这个模块是通用的，可以供很多人使用，但你不希望别人看到源码或者避免别人修改搞乱了源码。你可以只给对方.rel文件和函数描述的.h文件，对方把你的模块放到自己的项目中而不去关心源代码是怎样的。</li>
+</ul>
+
+<p>继续我们的话题。单片机为了提高效率，还经常会用到汇编语言，汇编语言在sdcc软件包中是分cpu来实现的，一般默认提供这些cpu的汇编器：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sdas390    sdas6808   sdas8051   sdasgb     sdasrab    sdasstm8   sdastlcs90 sdasz80
+</code></pre></div></div>
+<p>这些汇编器统一的命名规则是sdasxxxx,xxxx是指cpu的型号，比如8051的cpu就使用sdas8051,z80的cpu就使用sdasz80。汇编器使用的方法是(以8051为例)：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sdas8051 <span class="nt">-ols</span> filename.asm
+</code></pre></div></div>
+<p>汇编结果输出.rel文件以及一些其它的过程文件。</p>
+
+<h4 id="重要使用sdcc编译单片机程序跟windows下面keil的c代码是有一些差别的列表如下">重要：使用sdcc编译单片机程序，跟windows下面keil的c代码是有一些差别的，列表如下：</h4>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>Mac sdcc</th>
+      <th>Windows Keil c</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>头文件</td>
+      <td>8051.h/8052.h</td>
+      <td>reg51.h/reg52.h</td>
+    </tr>
+    <tr>
+      <td>IO端口</td>
+      <td>P2_0</td>
+      <td>P2^0</td>
+    </tr>
+    <tr>
+      <td>IO口定义</td>
+      <td>#define LED P2_0</td>
+      <td>sbit LED = P2^0</td>
+    </tr>
+    <tr>
+      <td>中断函数</td>
+      <td>void INT0_ISR() __interrupt 0</td>
+      <td>void INT0_ISR() interrupt 0</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>可以看到，这个差别是非常小的。对于初学者来说，一般就是引用头文件的时候要注意别用错。其它的内容，碰到了就注意用对应的语法，碰不到就不用管。</p>
+
+<p>————————————————————————————————————————————</p>
+
+<p>有了编译的结果，还要烧录到51单片机上来测试结果，烧录这个词是行业内的“黑话”，表达同样意思的常用说法还有“刷机”、“烧机”、“烧写”、“下载到单片机”等，当然”下载到单片机”其实是最正式的说法。<br />
+烧录需要有一个烧录软件，mac上可以这样安装：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#首先到一个保存烧录程序的目录：</span>
+<span class="nb">cd</span> ~/bin/
+<span class="c">#下载程序</span>
+wget https://raw.githubusercontent.com/laborer/stcflash/master/stcflash.py
+<span class="c">#下载的程序实际是一个文本文件，设定这个文件的可以执行标志</span>
+<span class="nb">chmod</span> +x stcflash.py
+</code></pre></div></div>
+<p>51单片机都是通过串口跟电脑连接的，当前的电脑一般都没有串口，所以都是使用usb串口卡，mac电脑一定要安装对应的mac版本电脑驱动程序。这时候51单片机通过串口插到电脑上之后，在/dev/目录会看到这个串口设备，设备的名字根据串口卡厂商的不同而不同，比如叫：/dev/tty.usbserial 。
+刚才下载的这个烧写软件支持.ihx文件和.bin文件，也就是说我们刚才编译的.ihx文件直接就可以烧录到51单片机上，烧录的命令是：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>stcflash.py test.ihx
+</code></pre></div></div>
+<p>文章看起来似乎比较复杂，其实包含了才开始搭建环境以及你需要知道的所有入门型知识，只需要折腾这一次，以后的使用，应当能感觉到在mac更加的迅速、高效。</p>
+
+<p>参考资料链接：<br />
+sdcc官网：<a href="http://sdcc.sourceforge.net/">http://sdcc.sourceforge.net/</a>，建议以官方文档为主。<br />
+sdcc简单说明：<a href="http://blog.csdn.net/baskmmu/article/details/43683289">http://blog.csdn.net/baskmmu/article/details/43683289</a>，因版本问题，此文档中有一些错误，请甄别性的阅读。<br />
+使用SDCC在Linux/macOS上开发51单片机程序:<a href="https://lonord.name/article/580cb1f67240257ec13293fb">https://lonord.name/article/580cb1f67240257ec13293fb</a><br />
+烧录软件：<a href="https://github.com/laborer/stcflash">https://github.com/laborer/stcflash</a></p>
+
+:ET

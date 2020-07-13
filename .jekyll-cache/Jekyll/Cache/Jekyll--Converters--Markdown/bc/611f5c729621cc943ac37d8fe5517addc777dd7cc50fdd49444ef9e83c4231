@@ -1,0 +1,157 @@
+I"dg<p><img src="http://p9.pstatp.com/origin/16880003de1c4ef5ae0c" alt="" />（图文基本无关）<br />
+如果单纯说简单方便，其使用AppleScript更好，特别是现在有了JS的加入，比如：</p>
+<div class="language-applescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">(*</span><span class="w">
+
+</span><span class="nv">This</span><span class="w"> </span><span class="nv">Apple</span><span class="w"> </span><span class="nv">script</span><span class="w"> </span><span class="nv">will</span><span class="w"> </span><span class="nv">resize</span><span class="w"> </span><span class="nv">any</span><span class="w"> </span><span class="nv">program</span><span class="w"> </span><span class="na">window</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="nv">an</span><span class="w"> </span><span class="nv">exact</span><span class="w"> </span><span class="na">size</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nb">the</span><span class="w"> </span><span class="na">window</span><span class="w"> </span><span class="ow">is</span><span class="w"> </span><span class="k">then</span><span class="w"> </span><span class="nv">moved</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="nb">the</span><span class="w"> </span><span class="nb">center</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nv">your</span><span class="w"> </span><span class="nv">screen</span><span class="p">.</span><span class="w">
+</span><span class="nv">Specify</span><span class="w"> </span><span class="nb">the</span><span class="w"> </span><span class="nv">program</span><span class="w"> </span><span class="na">name</span><span class="p">,</span><span class="w"> </span><span class="nv">height</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="na">width</span><span class="w"> </span><span class="nb">below</span><span class="w"> </span><span class="ow">and</span><span class="w"> </span><span class="nb">run</span><span class="w"> </span><span class="nb">the</span><span class="w"> </span><span class="nv">script</span><span class="p">.</span><span class="w">
+
+</span><span class="nv">Written</span><span class="w"> </span><span class="k">by</span><span class="w"> </span><span class="nv">Amit</span><span class="w"> </span><span class="nv">Agarwal</span><span class="w"> </span><span class="nb">on</span><span class="w"> </span><span class="nv">December</span><span class="w"> </span><span class="mi">10</span><span class="p">,</span><span class="w"> </span><span class="mi">2013</span><span class="w">
+
+</span><span class="o">*</span><span class="p">)</span><span class="w">
+
+</span><span class="k">set</span><span class="w"> </span><span class="nv">theApp</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="s2">"Google Chrome"</span><span class="w">
+</span><span class="k">set</span><span class="w"> </span><span class="nv">appHeight</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="mi">1080</span><span class="w">
+</span><span class="k">set</span><span class="w"> </span><span class="nv">appWidth</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="mi">1920</span><span class="w">
+
+</span><span class="k">tell</span><span class="w"> </span><span class="nb">application</span><span class="w"> </span><span class="s2">"Finder"</span><span class="w">
+	</span><span class="k">set</span><span class="w"> </span><span class="nv">screenResolution</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="na">bounds</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="na">window</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nv">desktop</span><span class="w">
+</span><span class="k">end</span><span class="w"> </span><span class="k">tell</span><span class="w">
+
+</span><span class="k">set</span><span class="w"> </span><span class="nv">screenWidth</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="nb">item</span><span class="w"> </span><span class="mi">3</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nv">screenResolution</span><span class="w">
+</span><span class="k">set</span><span class="w"> </span><span class="nv">screenHeight</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="nb">item</span><span class="w"> </span><span class="mi">4</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nv">screenResolution</span><span class="w">
+
+</span><span class="k">tell</span><span class="w"> </span><span class="nb">application</span><span class="w"> </span><span class="nv">theApp</span><span class="w">
+	</span><span class="nb">activate</span><span class="w">
+	</span><span class="nv">reopen</span><span class="w">
+	</span><span class="k">set</span><span class="w"> </span><span class="nv">yAxis</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="p">(</span><span class="nv">screenHeight</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">appHeight</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nv">integer</span><span class="w">
+	</span><span class="k">set</span><span class="w"> </span><span class="nv">xAxis</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="p">(</span><span class="nv">screenWidth</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nv">appWidth</span><span class="p">)</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="mi">2</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nv">integer</span><span class="w">
+	</span><span class="k">set</span><span class="w"> </span><span class="nb">the</span><span class="w"> </span><span class="na">bounds</span><span class="w"> </span><span class="k">of</span><span class="w"> </span><span class="nb">the</span><span class="w"> </span><span class="nb">first</span><span class="w"> </span><span class="na">window</span><span class="w"> </span><span class="k">to</span><span class="w"> </span><span class="p">{</span><span class="nv">xAxis</span><span class="p">,</span><span class="w"> </span><span class="nv">yAxis</span><span class="p">,</span><span class="w"> </span><span class="nv">appWidth</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">xAxis</span><span class="p">,</span><span class="w"> </span><span class="nv">appHeight</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="nv">yAxis</span><span class="p">}</span><span class="w">
+</span><span class="k">end</span><span class="w"> </span><span class="k">tell</span><span class="w">
+</span></code></pre></div></div>
+<p>觉得增加脚本会让你的工程比较繁琐的话，还可以把脚本写入到object-c用对象调用的方法完成,比如：</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">NSApplescript</span> <span class="o">*</span> <span class="n">as</span> <span class="o">=</span> <span class="p">[[</span><span class="n">NSApplescript</span> <span class="n">alloc</span><span class="p">]</span> <span class="n">initWithSource</span><span class="o">:</span><span class="err">@</span><span class="s">"tell application </span><span class="se">\"</span><span class="s">TheApplication</span><span class="se">\"\n</span><span class="s">close every window</span><span class="se">\n</span><span class="s">end tell"</span><span class="p">];</span>
+<span class="n">NSDictionary</span> <span class="o">*</span> <span class="n">errInfo</span><span class="p">;</span>
+<span class="n">NSAppleEventDescriptor</span> <span class="o">*</span> <span class="n">res</span> <span class="o">=</span> <span class="p">[</span><span class="n">as</span> <span class="n">executeAndReturnError</span><span class="o">:&amp;</span><span class="n">err</span><span class="p">];</span>
+<span class="k">if</span><span class="p">(</span> <span class="o">!</span><span class="n">res</span> <span class="p">){</span>
+    <span class="c1">// An error occurred. Inspect errInfo and perform necessary actions</span>
+<span class="p">}</span>
+
+<span class="p">[</span><span class="n">as</span> <span class="n">release</span><span class="p">];</span>
+</code></pre></div></div>
+<p>但是如果真的开发一个产品，使用纯的c/object-c还是更规范、可控一些，因此上面这个两个脚本的方法不算在内。闲话不说，直接贴代码：</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;
+</span>
+<span class="cp">#import &lt;Foundation/Foundation.h&gt;
+#import &lt;CoreFoundation/CoreFoundation.h&gt;
+#import &lt;ApplicationServices/ApplicationServices.h&gt;
+#import &lt;CoreGraphics/CoreGraphics.h&gt;
+</span>
+<span class="k">typedef</span> <span class="kt">int</span> <span class="n">CGSConnection</span><span class="p">;</span>
+<span class="k">extern</span> <span class="n">CGSConnection</span> <span class="nf">_CGSDefaultConnection</span><span class="p">(</span><span class="kt">void</span><span class="p">);</span>
+<span class="k">extern</span> <span class="n">CGError</span> <span class="nf">CGSCopyWindowProperty</span><span class="p">(</span><span class="k">const</span> <span class="n">CGSConnection</span> <span class="n">cid</span><span class="p">,</span> <span class="n">NSInteger</span> <span class="n">wid</span><span class="p">,</span> <span class="n">CFStringRef</span> <span class="n">key</span><span class="p">,</span> <span class="n">CFStringRef</span> <span class="o">*</span><span class="n">output</span><span class="p">);</span>
+
+<span class="kt">void</span> <span class="nf">getTitleList1</span><span class="p">(){</span>
+	<span class="n">CFStringRef</span> <span class="n">titleValue</span><span class="p">;</span>
+	<span class="n">CGSConnection</span> <span class="n">connection</span> <span class="o">=</span> <span class="n">CGSDefaultConnectionForThread</span><span class="p">();</span>
+	<span class="n">NSInteger</span> <span class="n">windowCount</span><span class="p">,</span> <span class="o">*</span><span class="n">windows</span><span class="p">;</span>
+	<span class="kt">char</span> <span class="n">cTitle</span><span class="p">[</span><span class="mi">256</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+	
+	<span class="n">NSCountWindows</span><span class="p">(</span><span class="o">&amp;</span><span class="n">windowCount</span><span class="p">);</span>
+	<span class="n">windows</span> <span class="o">=</span> <span class="p">(</span><span class="n">NSInteger</span><span class="o">*</span><span class="p">)</span> <span class="n">malloc</span><span class="p">(</span><span class="n">windowCount</span> <span class="o">*</span> <span class="k">sizeof</span><span class="p">(</span><span class="n">NSInteger</span><span class="p">));</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">windows</span><span class="p">)</span> <span class="p">{</span>
+	    <span class="n">NSWindowList</span><span class="p">(</span><span class="n">windowCount</span><span class="p">,</span> <span class="n">windows</span><span class="p">);</span>
+	    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="n">windowCount</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+	    <span class="p">{</span>
+	        <span class="n">CGSCopyWindowProperty</span><span class="p">(</span><span class="n">connection</span><span class="p">,</span> <span class="n">windows</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">CFSTR</span><span class="p">(</span><span class="s">"kCGSWindowTitle"</span><span class="p">),</span> <span class="o">&amp;</span><span class="n">titleValue</span><span class="p">);</span>
+	        <span class="k">if</span><span class="p">(</span><span class="o">!</span><span class="n">titleValue</span><span class="p">)</span> <span class="c1">//Not every window has a title</span>
+	            <span class="k">continue</span><span class="p">;</span>
+
+			<span class="c1">//CFStringGetCString(titleValue,cTitle,127,kCFStringEncodingMacRoman);</span>
+			<span class="n">CFStringGetCString</span><span class="p">(</span><span class="n">titleValue</span><span class="p">,</span><span class="n">cTitle</span><span class="p">,</span><span class="mi">256</span><span class="p">,</span><span class="n">kCFStringEncodingUTF8</span><span class="p">);</span>
+			<span class="n">printf</span><span class="p">(</span><span class="s">"title: %s</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="n">cTitle</span><span class="p">);</span>
+	    <span class="p">}</span>
+	    <span class="n">free</span><span class="p">(</span><span class="n">windows</span><span class="p">);</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">getTitleList2</span><span class="p">(){</span>
+	<span class="err">@</span><span class="n">autoreleasepool</span> <span class="p">{</span>
+	<span class="c1">// Get all the windows</span>
+	<span class="n">CFArrayRef</span> <span class="n">windowListAll</span> <span class="o">=</span> <span class="n">CGWindowListCopyWindowInfo</span><span class="p">(</span><span class="n">kCGWindowListOptionOnScreenOnly</span><span class="p">,</span> <span class="n">kCGNullWindowID</span><span class="p">);</span>
+	<span class="n">NSArray</span><span class="o">*</span> <span class="n">arr</span> <span class="o">=</span> <span class="n">CFBridgingRelease</span><span class="p">(</span><span class="n">windowListAll</span><span class="p">);</span>
+	<span class="n">NSUInteger</span> <span class="n">count</span> <span class="o">=</span> <span class="p">[</span><span class="n">arr</span> <span class="n">count</span><span class="p">];</span> <span class="c1">//CFArrayGetCount(arr);</span>
+	<span class="c1">// Loop through the windows</span>
+	<span class="k">for</span> <span class="p">(</span><span class="n">NSMutableDictionary</span><span class="o">*</span> <span class="n">entry</span> <span class="n">in</span> <span class="n">arr</span><span class="p">){</span>
+		<span class="k">if</span> <span class="p">(</span><span class="n">entry</span> <span class="o">==</span> <span class="n">nil</span><span class="p">){</span>
+			<span class="k">break</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="n">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s">"enter:%@"</span><span class="p">,</span><span class="n">entry</span><span class="p">);</span>
+		<span class="n">NSString</span> <span class="o">*</span><span class="n">wndName</span><span class="o">=</span><span class="p">[</span><span class="n">entry</span> <span class="n">objectForKey</span><span class="o">:</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="n">kCGWindowName</span><span class="p">];</span>
+		<span class="n">NSInteger</span> <span class="n">wndNumber</span><span class="o">=</span><span class="p">[[</span><span class="n">entry</span> <span class="n">objectForKey</span><span class="o">:</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="n">kCGWindowNumber</span><span class="p">]</span> <span class="n">intValue</span><span class="p">];</span>
+		<span class="n">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s">"wndName:%@ number:%ld"</span><span class="p">,</span><span class="n">wndName</span><span class="p">,</span><span class="n">wndNumber</span><span class="p">);</span>
+		<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="p">[</span><span class="n">wndName</span> <span class="n">isEqualToString</span><span class="o">:</span> <span class="err">@</span><span class="s">"~/test.txt"</span><span class="p">]){</span>
+			<span class="c1">//不是自己想要的窗口继续下一个循环</span>
+			<span class="k">continue</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="c1">//下面这个方法是手册中最先查到的，但仅对属于自己app的窗口有效，其它app的窗口无效，所以不能采用</span>
+		<span class="c1">//NSWindow * wind=[NSApp windowWithWindowNumber: wndNumber];</span>
+		<span class="c1">//NSLog(@"wnd:%@",wind);</span>
+		<span class="n">CGRect</span> <span class="n">bounds</span><span class="p">;</span>
+	    <span class="n">CGRectMakeWithDictionaryRepresentation</span><span class="p">((</span><span class="n">CFDictionaryRef</span><span class="p">)[</span><span class="n">entry</span> <span class="n">objectForKey</span><span class="o">:</span><span class="err">@</span><span class="s">"kCGWindowBounds"</span><span class="p">],</span> <span class="o">&amp;</span><span class="n">bounds</span><span class="p">);</span>
+	    <span class="n">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s">"bounds: %@"</span><span class="p">,</span><span class="n">NSStringFromRect</span><span class="p">(</span><span class="n">bounds</span><span class="p">));</span>   
+		<span class="c1">//根据pid获取窗口所属的app</span>
+        <span class="n">pid_t</span> <span class="n">pid</span> <span class="o">=</span> <span class="p">[[</span><span class="n">entry</span> <span class="n">objectForKey</span><span class="o">:</span><span class="p">(</span><span class="n">id</span><span class="p">)</span><span class="n">kCGWindowOwnerPID</span><span class="p">]</span> <span class="n">intValue</span><span class="p">];</span>
+        <span class="n">AXUIElementRef</span> <span class="n">appRef</span> <span class="o">=</span> <span class="n">AXUIElementCreateApplication</span><span class="p">(</span><span class="n">pid</span><span class="p">);</span>
+        <span class="n">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s">"Ref = %@"</span><span class="p">,</span><span class="n">appRef</span><span class="p">);</span>
+		<span class="c1">//获取app所有的窗口</span>
+        <span class="n">CFArrayRef</span> <span class="n">windowList</span><span class="p">;</span>
+        <span class="n">AXUIElementCopyAttributeValue</span><span class="p">(</span><span class="n">appRef</span><span class="p">,</span> <span class="n">kAXWindowsAttribute</span><span class="p">,</span> <span class="p">(</span><span class="n">CFTypeRef</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">windowList</span><span class="p">);</span>
+        <span class="c1">//NSLog(@"WindowList = %@", windowList);</span>
+		<span class="n">CFRelease</span><span class="p">(</span><span class="n">appRef</span><span class="p">);</span>
+		<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">windowList</span><span class="p">){</span>
+			<span class="c1">//NSLog(@"windowList is nil");</span>
+			<span class="k">continue</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">CFArrayGetCount</span><span class="p">(</span><span class="n">windowList</span><span class="p">);</span><span class="n">i</span><span class="o">++</span><span class="p">){</span>
+			<span class="c1">//遍历app所有窗口，查找跟全局遍历所获得窗口的实体</span>
+			<span class="n">AXUIElementRef</span> <span class="n">windowRef</span> <span class="o">=</span> <span class="p">(</span><span class="n">AXUIElementRef</span><span class="p">)</span> <span class="n">CFArrayGetValueAtIndex</span><span class="p">(</span> <span class="n">windowList</span><span class="p">,</span> <span class="n">i</span><span class="p">);</span>
+			<span class="n">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s">"windowRef:%@"</span><span class="p">,</span><span class="n">windowRef</span><span class="p">);</span>
+			<span class="n">CGWindowID</span> <span class="n">application_window_id</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+			<span class="n">_AXUIElementGetWindow</span><span class="p">(</span><span class="n">windowRef</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">application_window_id</span><span class="p">);</span>
+			<span class="k">if</span> <span class="p">(</span><span class="n">application_window_id</span> <span class="o">==</span> <span class="n">wndNumber</span><span class="p">){</span>
+				<span class="c1">//找到</span>
+				<span class="n">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s">"Found a wnd that number is:%u"</span><span class="p">,</span><span class="n">application_window_id</span><span class="p">);</span>
+				<span class="c1">//根据需要来操作窗口的位置，仅用作示例，这里可以修改成其它操作</span>
+	            <span class="n">CFTypeRef</span> <span class="n">position</span><span class="p">;</span>
+	            <span class="n">CGPoint</span> <span class="n">newPoint</span><span class="p">;</span>
+	            <span class="n">newPoint</span><span class="p">.</span><span class="n">x</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+	            <span class="n">newPoint</span><span class="p">.</span><span class="n">y</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+	            <span class="n">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s">"Create new position"</span><span class="p">);</span>
+	            <span class="n">position</span> <span class="o">=</span> <span class="p">(</span><span class="n">CFTypeRef</span><span class="p">)(</span><span class="n">AXValueCreate</span><span class="p">(</span><span class="n">kAXValueCGPointType</span><span class="p">,</span> <span class="p">(</span><span class="k">const</span> <span class="kt">void</span> <span class="o">*</span><span class="p">)</span><span class="o">&amp;</span><span class="n">newPoint</span><span class="p">));</span>
+				<span class="c1">//setting new position</span>
+				<span class="n">AXUIElementSetAttributeValue</span><span class="p">(</span><span class="n">windowRef</span><span class="p">,</span> <span class="n">kAXPositionAttribute</span><span class="p">,</span> <span class="n">position</span><span class="p">);</span>
+			<span class="p">}</span>
+			<span class="n">CFRelease</span><span class="p">(</span><span class="n">windowRef</span><span class="p">);</span>
+		<span class="p">}</span>
+	 <span class="n">NSLog</span><span class="p">(</span><span class="err">@</span><span class="s">"end a loop ----------------------------"</span><span class="p">);</span>
+	<span class="p">}</span> <span class="c1">//for windowListAll</span>
+	<span class="p">}</span> <span class="c1">//autorelease</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">){</span>
+	<span class="n">getTitleList1</span><span class="p">();</span>	<span class="c1">//第一种方法，重点在遍历</span>
+	<span class="n">getTitleList2</span><span class="p">();</span>	<span class="c1">//第二种方法，重点在获取窗口后可以进一步控制</span>
+
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>	
+<span class="p">}</span>
+</code></pre></div></div>
+<p>重点的内容直接看注释，其中的第二种方法可控性要好很多，不过程序也复杂一些。大概流程是先遍历所有屏幕的窗口-&gt;然后根据窗口获取该窗口所属的应用-&gt;再次获取应用所属的所有窗口-&gt;在这些窗口中找到自己想要的-&gt;控制，第二步的确做的会有大量重复遍历，不过从提供的api上看，目前只有这个办法才能够控制窗口。代码中有大量的日志信息，正式使用的话调试完成可以删掉。<br />
+这段代码使用object-c和c混编，后缀为.m,因为只是测试代码，没有建立xcode项目，是在命令行编译的，编译方法可能有的人不太熟悉，也贴出来：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>clang <span class="nt">-fobjc-arc</span>  <span class="nt">-o</span> wndjob wndjob.m <span class="nt">-framework</span> CoreGraphics <span class="nt">-framework</span> AppKit
+</code></pre></div></div>
+
+<p>参考链接：<br />
+<a href="https://www.labnol.org/software/resize-mac-windows-to-specific-size/28345/">https://www.labnol.org/software/resize-mac-windows-to-specific-size/28345/</a><br />
+<a href="https://stackoverflow.com/questions/8898430/close-all-windows-of-another-app-using-accessibility-api">https://stackoverflow.com/questions/8898430/close-all-windows-of-another-app-using-accessibility-api</a><br />
+<a href="https://stackoverflow.com/questions/21069066/move-other-windows-on-mac-os-x-using-accessibility-api">https://stackoverflow.com/questions/21069066/move-other-windows-on-mac-os-x-using-accessibility-api</a></p>
+:ET

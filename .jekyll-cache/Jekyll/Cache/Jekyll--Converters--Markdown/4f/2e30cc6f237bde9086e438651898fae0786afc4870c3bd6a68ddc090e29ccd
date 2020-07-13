@@ -1,0 +1,246 @@
+I"ي<h4 id="手写数字识别问题">手写数字识别问题</h4>
+<p>图像识别是深度学习众多主流应用之一，手写数字识别则是图像识别范畴简化版的入门学习经典案例。在TensorFlow的官方文档中，把手写数字识别“MNIST”案例称为机器学习项目的“Hello World”。从这个案例开始，我们的连载才开始有了一些“人工智能”的感觉。 <br />
+问题的描述是这样：<br />
+有一批手写数字的图片，对应数字0-9。通过机器学习的算法，将这些图片对应到文本字符0-9。用通俗的话来说，就是计算机认出了图片上面手写的数字。<br />
+从问题描述可见这个机器学习项目的“Hello World”对于入门者来讲，既很实用，也存在一些门槛。下面以我们的节奏，尽可能把这个问题分解，中间插入一些机器学习的基本概念，让大家可以轻松入门。</p>
+
+<h4 id="线性回归和逻辑回归">线性回归和逻辑回归</h4>
+<p>也有人从线性回归和非线性回归的角度来讲，因为逻辑回归就是非线性回归的一种。<br />
+不要被这些专有名词吓倒，其实重要的是你理解这个概念，以便以后碰到复杂问题的时候帮助你选择更适合的算法。<br />
+线性回归是指数据集和结果都满足线性函数，也就是方程组是一次方的，不包含高次元。前面例子中的房价，虽然我们例子中的参数很少，但即便参数大量增加，也基本符合线性回归机器学习的范畴。与此类似的还有基本股价预测、限定环境的金融分析等等。<br />
+逻辑回归主要使用数学sigmoid函数进行逻辑分类，在通常机器学习的概念中，这也是重要讲解的部分，TensorFlow中已经预先封装了对应的softmax函数，所以这里我们也忽略掉具体的算法实现，只要记住逻辑回归主要对应分类的学习方式就可以了。比如本次MNIST的例子，就是把图片分类到0-9这十个类别之一。与此类似的应用领域还有：垃圾邮件分类、产品质量自动检测等。<br />
+（最下面参考链接中有相关公式的详细介绍，有兴趣的建议跳转去阅读。）</p>
+
+<h4 id="监督学习和无监督学习">监督学习和无监督学习</h4>
+<p>监督学习是指对于每一个样本，如果有给定的正确结果作为学习依据，就属于监督学习。例如MNIST手写数字识别的每一副样本图片，我们都有已知的标签指明这是哪个数字，这是监督学习。<br />
+无监督学习则相反，对于样本我们没有指定的结果。例如我们去看画展，有几幅画看上去“很喜欢”，另外几幅看起来则“不喜欢”。如果是由机器学习做这个判断，则是典型的根据一些特征进行了分类，但这个分类并不是有准确答案指导的，只是把“某一类”的画作放在一起，这就属于无监督学习。<br />
+了解这个概念的目的同样是帮你分解问题及选取合适的算法。</p>
+
+<h4 id="人工智能的基本工作模式">人工智能的基本工作模式</h4>
+<p>结合上面两个概念，我们已经可以得出比较常见的人工智能的工作模式，这也是我们第一篇文章中概念的延伸。</p>
+<ol>
+  <li>学习阶段：<code class="language-plaintext highlighter-rouge">采集数据集</code>-&gt;<code class="language-plaintext highlighter-rouge">可能的认为标注（监督学习）</code>-&gt;<code class="language-plaintext highlighter-rouge">机器学习系统</code>-&gt;<code class="language-plaintext highlighter-rouge">完成补全的机器学习系统（方程求解）</code></li>
+  <li>生产阶段：<code class="language-plaintext highlighter-rouge">生产数据集导入</code>-&gt;<code class="language-plaintext highlighter-rouge">完成的机器学习系统</code>-&gt;<code class="language-plaintext highlighter-rouge">分类后的结果（假设逻辑回归）</code></li>
+</ol>
+
+<p>看起来结果很简单，只是一个分类。但这个分类在我们做数学模型设计的时候，可能包含了所有需要的可能。比如本例中的字符0-9。<br />
+拿人工智能典型应用再举几个例子：</p>
+<ul>
+  <li>自动驾驶：是输入各种摄像头、传感器检测到的路面和周边环境数据集，进行机器学习分类，最后得到加油门、减油门、左转、右转、刹车、倒车灯动作。</li>
+  <li>语音识别：MIC采集到的声音样本，输出分类为所有可能的字符或者字母，中间根据语气可能插入几个有限的标点符号。</li>
+  <li>广告推荐：根据采集到的个人偏好数据，推荐已经分类的有限内容。</li>
+</ul>
+
+<p>当然人工智能的发展远不仅仅这些，机器学习的算法也在不断的完善和发展过程中。<br />
+总体上，只要能找到解决问题对应的算法，然后收集大量的数据集，并经过可能必要的标注，就可能把一个传统用程序无法解决的问题，转化为算法实现+数据处理的工程化问题，从而有了实现的可能。<br />
+反过来如果有人问：“机器学习能让电脑打扫花园吗？”，这一句话可能就带出来很复杂的情况，诸如“图像识别”、“自动驾驶”还有一系列机械工程的问题，对于这样复杂的问题，很可能是当前一个行业和领域单独所无法解决的。所以有的时候说起来简单，仔细思考后会发现，反而不一定容易实现。</p>
+
+<h4 id="数据规范化">数据规范化</h4>
+<p>数据规范化（Normalization）也称为数据归一化（Regularization），都是翻译的词汇，明白意思就好。前面第一个例子的时候已经讲过一些，这里需要再重点讲一下。<br />
+使用TensorFlow等机器学习框架之后，原先最复杂的部分，比如算法实现，都已经由框架帮你解决掉了，完全不懂算法也可以靠抄样例的方式完成工作。事实上现在新的算法不断出现，你已经不太可能搞明白所有算法了，参考成熟算法完成工作已经成为常态。<br />
+但是原来算法实现的工作量虽然降低了，但数据从采集、规范化、输入给程序，到完成机器学习运算，再转换为合理的输出。这些工作难度不仅没有降低，而且随着机器学习应用场景的广泛化变得更为复杂。<br />
+可以说很多项目的阻碍，都在于无法找到合理的数据规范化方法，从而无法将机器学习应用到场景中。<br />
+以MNIST为例，首先要做这几样事情，这也是通常图像识别都要经过的步骤：</p>
+<ul>
+  <li>准备手写数字的样本图片</li>
+  <li>所有的样本中，手写数字的部分，在整个图片中所占的面积，基本相同</li>
+  <li>手写的数字在图片中，应当都是正向的，不能有横、有竖甚至还有倾斜的（数字自身手写中应有的倾斜不算）</li>
+  <li>所有样本图片，最终要使用完全相同的分辨率，本例中统一使用28x28的点阵</li>
+  <li>所有样本图片，要使用相同的图形格式，比如手写样本用单色就好</li>
+  <li>这一条就是我们前面说过的，通常单色图片每字节数据是0-255的整数，要统一按比例转换成0-1的浮点数</li>
+</ul>
+
+<p>对于不同的系统，规范化可能做不同的工作，但大致原则是类似的。比如对于语音识别类的系统中：</p>
+<ul>
+  <li>语音的采样频率必须是相同的</li>
+  <li>PCM声音采样整数数据，最后也要转换成0-1的浮点数</li>
+  <li>…</li>
+</ul>
+
+<p>关于取值0-1范围的浮点数的事情，也有一些例外的情况。比如自然语言处理(NLP)系统中的“单词向量化”问题，因为单词或者词语，长度是不同的，规范化起见，我们只能把单词转换成数字，比如1代表the/2代表is，这种情况下，这个数字是不能再规范化到0-1的浮点数的。原因主要是这个整数经过运算后，结果必须仍然是精确的整数，否则即便差一点，单词就完全是另外一个了。所以具体情况还是要具体分析。“单词向量化”的问题属于比较专业化的问题，我也不是专家，以后如果有机会我们再分享。</p>
+
+<h4 id="数据预处理">数据预处理</h4>
+<p>由数据规范化带来的数据预处理问题往往很复杂，几乎每一个机器学习系统中都可能有不同的实现。而机器学习本身的内核翻来覆去不过就那几个算法，类似前两年一个神经网络就包打了天下。所以机器学习编程语言的能力，就有了很高的要求。<br />
+而python刚好是这样可塑性极好的一种语言，并且有丰富的第三方扩展库来实现各种各样的功能。比如图像处理的skimage / cv2(opencv) / pillow / matplotlib，声音处理的librosa / eyed3 / pydub / pyaudio等。有句行间逗比的话说“没有什么是一个python库解决不了的，如果有，那就是两个”。<br />
+所以至少当前，机器学习的重点转移到了数字化、大数据和算法，适应性如此之强的python就成了首先工具。<br />
+也因为数据预处理往往需要大量长期实际工作经验的积淀，所以实际上机器学习行业虽然是新兴学科，但仍然很需要大量经验丰富的程序员加入其中。很多刚毕业的学生，因为了解到人工智能的火爆，在学校冲刺学习了机器学习的知识，但碰到具体问题时候往往无法下手，所差的大多不是机器学习本身，而是在数据预处理方面经验不足。</p>
+
+<h4 id="样本集分组">样本集分组</h4>
+<p>科学是可以重复的，科学的研究需要科学的手段，很类似现代西医对药物临床试验的要求，对于“魔法师”一般神奇的人工智能，验证其有效性是很关键的环节。<br />
+对于收集到用于机器学习的样本，通常是要划分成三组：训练集、验证集和测试集。分别用于对算法模型进行训练、微调算法参数用验证集样本选择最优的算法以及对一个训练完成的模型使用测试集样本计算这个模型的正确率。<br />
+完全独立的划分成三组数据的原因比较复杂，这个原因很类似药物的临时实验的需求，在这里也略去只说结果，通常会把数据集划分成60%：20%：20%的比例，当然具体情况也要具体看。<br />
+本例中因为不涉及算法调优及算法优选的工作，所以一般只需要划分成训练集和测试集两部分就可以。</p>
+<h4 id="mnist的数据">MNIST的数据</h4>
+<p>非常幸运，毕竟TensorFlow官方文档只是为了介绍机器学习框架的工作，所以提供的数据样本是已经完成预处理和规范化的。为了便于大家以后解决类似的问题，在进入源代码之前，我们先把样本数据展开做一个介绍，以便将来解决类似问题时候大家有一个参照。<br />
+<img src="http://www.tensorfly.cn/tfdoc/images/MNIST-Matrix.png" alt="" />
+如图所示，这就是一副样本图片数字化之后的样子：</p>
+<ul>
+  <li>在灰度图中，每个字节代表图中一个点，取值范围原本为0-255整数，这里已经转换成了0-1的浮点小数。</li>
+  <li>图片的分辨率是28x28点阵灰度图，数字化之后是一个28x28的浮点数矩阵。在实际机器学习的计算中，这个图片会进一步展开为28x28=784的一维矩阵（向量）。</li>
+  <li>灰度图已经预先通过修图、亮度对比度操作等，去掉了无意义的噪点干扰，比如看起来图片中除了手写之外的部分基本是0。（看到这里，老读者可能想起来本博中另外用OpenCV处理图片的文章，现在你应当知道那些文章真正的目的是什么了吧。）</li>
+</ul>
+
+<p>这样的图片样本，本例数据集中一共是60000幅，保存在<code class="language-plaintext highlighter-rouge">mnist.train.images</code>之中，排列起来如下所示：<br />
+<img src="http://www.tensorfly.cn/tfdoc/images/mnist-train-xs.png" alt="" /></p>
+
+<p>作为监督学习，每幅图片我们都有一个人为标注，指明这幅图片是哪个数字。我们刚才讲过了，这实际是一种分类算法，计算的结果并不是直接得到0-9数字，而是得到一个分类信息,本例就是分成10类。在这种表述方式中，数字n将表示成一个只有在第n维度（从0开始）数字为1的10维向量。比如，标签3将表示成([0,0,0,1,0,0,0,0,0,0,0])。因此， mnist.train.labels 是一个 [60000, 10] 的数字矩阵：<br />
+<img src="http://www.tensorfly.cn/tfdoc/images/mnist-train-ys.png" alt="" /></p>
+
+<h4 id="分类算法">分类算法</h4>
+<p>分类在通常的机器学习中需要附加和多次使用sigmoid公式(公式只能完成0、1两种分类，多次使用达成分多类)，TensorFlow则内置了softmax函数（可以完成多项分类）。<br />
+因为有这些内置的函数帮助，我们已经不需要在具体算法上下太大的功夫，不过我们这里仍然做一个简单的解释，更详细的说明其实这一部分的官方文档算说的比较明白，可以去参考。<br />
+回忆一下第一篇中的内容，机器学习最重要的假设就是，我们认为一切问题都是可以用数学模型所描述的。引申到MNIST案例中，因为我们要分类10组，就可以列出一个包含10项的方程式。我们简化一下，用一个只有3维的小方程来说明，方程式看起来类似是这样子的：<br />
+<img src="http://www.tensorfly.cn/tfdoc/images/softmax-regression-scalarequation.png" alt="" /><br />
+这个方程式经过简化、推导、矩阵化之后，就成为了程序中所使用的语句：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">W</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span>
+</code></pre></div></div>
+<p>注意其中的x、W是矩阵，b则是向量。所以这一条语句，展开后实际上代表了10行、每行784个变量的方程式，如果没有IT技术支持，这样的方程式应当会哭死吧？<br />
+这也是较为通用的一个分类算法，很多机器学习的系统中，这简单的一行都是核心。<br />
+从直观上看，分类算法的功能就是把非常多维的数据，本例中是784个，处理成少量的输出，本例中是10个。事实上达成了降维的效果，所以也称为降维算法。<br />
+这很类似于人类利用自身的经验、感知和判断，通过获取多种数据后，抽丝剥茧的思考，最终在有限的可能手段中做出选择的过程。所以降维基本上是人工智能最常用的方法，同时也是机器学习算法“像”人的原因。</p>
+
+<h4 id="看一眼我们的数据">看一眼我们的数据</h4>
+<p>TensorFlow官方文档帮我们简化了数据的规范化过程，这省了一大把力气。另外一方面，本来很接地气的图像识别，变得看不见摸不着，就算看到了MNIST的源码和运行结果，很多人仍然感觉不在掌握。归根结底，就是那些数据，不是我们熟悉了的格式。所以额外的，我们加一个小程序，用于把MNIST的样本数据，还原成肉眼可见的图片文件，并且在下面进入MNIST源代码讲解之前，先热身一下。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python
+# -*- coding=UTF-8 -*-
+#引入mnist数据预读准备库
+</span><span class="kn">import</span> <span class="nn">input_data</span>
+<span class="c1">#tensorflow库
+</span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+<span class="c1">#引入绘图库
+</span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1">#这里使用mnist数据预读准备库检查给定路径是已经有样本数据，
+#没有的话去网上下载，并保存在指定目录
+#已经下载了数据的话，将数据读入内存，保存到mnist对象中
+</span><span class="n">mnist</span> <span class="o">=</span> <span class="n">input_data</span><span class="p">.</span><span class="n">read_data_sets</span><span class="p">(</span><span class="s">"MNIST_data/"</span><span class="p">,</span> <span class="n">one_hot</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="c1">#sess = tf.Session()
+#使用交互模式初始化tf库
+</span><span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">InteractiveSession</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">toImage</span><span class="p">(</span><span class="n">image</span><span class="p">,</span><span class="n">filename</span><span class="p">):</span>
+	<span class="c1">#刚才我们讲过了，样本数据是784长的向量数据，这里重定义成28x28的图片，每个点1个数据
+</span>    <span class="n">x_image</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="p">[</span><span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+
+	<span class="c1">#将规范化后0-1的浮点数，重新变成0-255的数据集
+</span>    <span class="n">x_image</span> <span class="o">=</span> <span class="mi">256</span> <span class="o">*</span> <span class="n">x_image</span>
+	<span class="c1">#取整
+</span>    <span class="n">x_image</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">floor</span><span class="p">(</span><span class="n">x_image</span><span class="p">)</span>
+	<span class="c1">#从浮点数转换成无符号8位二进制数，也就是1个字节
+</span>    <span class="n">y_image</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">image</span><span class="p">.</span><span class="n">convert_image_dtype</span><span class="p">(</span><span class="n">x_image</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">uint8</span><span class="p">)</span>
+	<span class="c1">#转成jpeg图像格式
+</span>    <span class="n">im</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">image</span><span class="p">.</span><span class="n">encode_jpeg</span><span class="p">(</span><span class="n">y_image</span><span class="p">)</span>
+
+	<span class="c1">#打开图像文件并写出
+</span>    <span class="n">f</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s">"wb+"</span><span class="p">)</span>
+	<span class="c1">#注意这里就是tf运行的部分，交互模式下，可以使用.eval的方式运行而不是通常的sess.run
+</span>    <span class="c1">#f.write(im.eval(session = sess))
+</span>    <span class="n">f</span><span class="p">.</span><span class="n">write</span><span class="p">(</span><span class="n">im</span><span class="p">.</span><span class="nb">eval</span><span class="p">())</span>
+    <span class="n">f</span><span class="p">.</span><span class="n">close</span><span class="p">()</span>
+
+<span class="c1">#将样本数据测试集的前三个样本保存为图片    
+</span><span class="n">babe</span> <span class="o">=</span> <span class="n">mnist</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">next_batch</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">toImage</span><span class="p">(</span><span class="n">babe</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s">"./digital1.jpeg"</span><span class="p">)</span>
+<span class="n">babe</span> <span class="o">=</span> <span class="n">mnist</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">next_batch</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">toImage</span><span class="p">(</span><span class="n">babe</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s">"./digital2.jpeg"</span><span class="p">)</span>
+<span class="n">babe</span> <span class="o">=</span> <span class="n">mnist</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">next_batch</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">toImage</span><span class="p">(</span><span class="n">babe</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="s">"./digital3.jpeg"</span><span class="p">)</span>
+</code></pre></div></div>
+<p>这里我们展示了python跟外界数据集互动的方式，希望可以加深你对机器学习的理解。这个例子中，新用户在读取数据集那一行属于碰到问题最多，主要原因是我们在国内一个网络高度不稳定的环境下。我的办法是采用其它方式获得了数据文件，保存在指定目录，省去启动后再次下载数据。我这里四个数据文件的列表如下：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">-rw-r--r--</span>  1 andrew  staff   1.6M Jan  6  2017 t10k-images-idx3-ubyte.gz
+<span class="nt">-rw-r--r--</span>  1 andrew  staff   4.4K Jan  6  2017 t10k-labels-idx1-ubyte.gz
+<span class="nt">-rw-r--r--</span>  1 andrew  staff   9.5M Jan  6  2017 train-images-idx3-ubyte.gz
+<span class="nt">-rw-r--r--</span>  1 andrew  staff    28K Jan  6  2017 train-labels-idx1-ubyte.gz
+</code></pre></div></div>
+<p>下载数据的方法可以参考input_data.py脚本，也可以用上面给出的文件名在网上搜索，有国内的下载点。<br />
+程序中使用了互动模式初始化TensorFlow,也就是这一行：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">InteractiveSession</span><span class="p">()</span>
+</code></pre></div></div>
+<p>官方文档中只是解释这种互动式的初始化一般用在交互方式，同前一个例子用的tf.Session()相比，Session()初始化必须在数学模型全部构建完成之后，交互模式可以一边构建模型，一边做一些运算比如插入一些图。<br />
+实际上官方开发人员在咨询问答中又给了更精确的一个解释，它们唯一的区别在于：tf.InteractiveSession()把它自身作为默认的session，tensor.eval()和operation.run()运行的时候，在后面不需要给出session的参数，直接使用默认session运行。而如果使用Session()初始化的话，上述两类函数的执行，必须在后面显示的给出使用哪一个session执行该操作。上面源码中Session初始化及最后写出图像数据的两行，你可以用注释掉的内容自行测试一下就明白了。</p>
+
+<p>程序生成的三幅图片文件跟本篇第一幅图片示例中左侧的原图样式完全一致，这里就不再贴图了。这个例子的根本目的还是让你对tensorflow加深了解，并且更多的理解数据文件内容的来龙去脉。</p>
+
+<h4 id="初级mnist源码">初级mnist源码</h4>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python
+# -*- coding=UTF-8 -*-
+</span>
+<span class="kn">import</span> <span class="nn">input_data</span>
+<span class="n">mnist</span> <span class="o">=</span> <span class="n">input_data</span><span class="p">.</span><span class="n">read_data_sets</span><span class="p">(</span><span class="s">"MNIST_data/"</span><span class="p">,</span> <span class="n">one_hot</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+
+<span class="c1">#定义占位符，也就是tensorFlow的运行时参数，
+#x占位符定义为28*28=784的数据集，None表示有多个这样的数据
+</span><span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="s">"float"</span><span class="p">,</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="mi">784</span><span class="p">])</span>
+<span class="c1">#前面介绍过了本例采用的方程算法：W*x+b，
+#这里定义的就是方程中每一项的权重W（weight）
+#上面的公式看起来简单，因为已经矩阵化，实际上
+#W包含10个方程式、每个方程式784个权重值
+</span><span class="n">W</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">784</span><span class="p">,</span><span class="mi">10</span><span class="p">]))</span>
+<span class="c1">#变量b，b比较简单一些，代表10个方程式中，
+#每个方程最后的常数，b是bias的缩写
+#b是参与运算和返回结果用的，不需要输入数据，因此是变量不是占位符
+</span><span class="n">b</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">zeros</span><span class="p">([</span><span class="mi">10</span><span class="p">]))</span>
+<span class="c1">#定义核心数学模型
+</span><span class="n">y</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">W</span><span class="p">)</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span>
+<span class="c1">#y_是监督学习中，对应x数据的标注分类标签
+#每个标签是10个元素的向量，含义见正文部分
+</span><span class="n">y_</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="s">"float"</span><span class="p">,</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span><span class="mi">10</span><span class="p">])</span>
+
+<span class="c1">#交叉熵代价函数，参考下面正文的解释
+</span><span class="n">cross_entropy</span> <span class="o">=</span> <span class="o">-</span><span class="n">tf</span><span class="p">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">y_</span><span class="o">*</span><span class="n">tf</span><span class="p">.</span><span class="n">log</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+
+<span class="c1">#梯度下降法解方程，学习步长是0.01，交叉熵最小时候得到W和b的解
+</span><span class="n">train_step</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">GradientDescentOptimizer</span><span class="p">(</span><span class="mf">0.01</span><span class="p">).</span><span class="n">minimize</span><span class="p">(</span><span class="n">cross_entropy</span><span class="p">)</span>
+
+<span class="n">init</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">global_variables_initializer</span><span class="p">()</span>
+<span class="n">sess</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">Session</span><span class="p">()</span>
+<span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
+
+<span class="c1">#循环进行1000个批次的训练
+</span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+  <span class="c1">#随机抽取一个批次的训练数据，抽取算法参考input_data.py
+</span>  <span class="n">batch_xs</span><span class="p">,</span> <span class="n">batch_ys</span> <span class="o">=</span> <span class="n">mnist</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">next_batch</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+  <span class="c1">#开始训练
+</span>  <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">train_step</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">batch_xs</span><span class="p">,</span> <span class="n">y_</span><span class="p">:</span> <span class="n">batch_ys</span><span class="p">})</span>
+  	
+<span class="c1">#重点来了，在上一个例子中没有这部分
+#训练结束后（1000个批次后），
+#通过验证集数据验证我们模型的正确率
+#argmax是内置函数，用于将10个元素的分类表，取出最大的那一维的索引，
+#等于将分类变回了0-9数字
+#参考正文的解释，在样本或者计算结果的分类表中，
+#某索引的值如果是1，表示分类到了这一类，算法决定了其余的必然都是0
+</span><span class="n">correct_prediction</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">y</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="n">tf</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">y_</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+<span class="c1">#上面的结果是比较值，所以是true/false这样的一维数组，
+#下面这个公式将bool转换成0、1数字，求平均值得出最后的正确率
+</span><span class="n">accuracy</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">cast</span><span class="p">(</span><span class="n">correct_prediction</span><span class="p">,</span> <span class="s">"float"</span><span class="p">))</span>
+
+<span class="c1">#显示验证组标签信息
+</span><span class="k">print</span> <span class="n">mnist</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">labels</span>
+<span class="c1">#执行验证组正确率运算
+#在这个tensorflow任务执行前，一定要理解一个概念，
+#就是这个任务，在同一个session中执行，跟上面学习过程的任务是接着的，
+#所以实际上计算的核心是相同的一个公式
+</span><span class="k">print</span> <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">accuracy</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">x</span><span class="p">:</span> <span class="n">mnist</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">images</span><span class="p">,</span> <span class="n">y_</span><span class="p">:</span> <span class="n">mnist</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">labels</span><span class="p">})</span>
+</code></pre></div></div>
+<p>这个模型最后的识别正确率在91%左右，虽然并不高，但是几行代码就能得到这样的结果，还是很不错的了，在很多机器学习应用中，这样的正确率已经达到应用水平。<br />
+上面的代码通过前面的铺垫和源码中的注解，应当很容易理解，额外说一下交叉熵的概念。<br />
+代价（cost）函数，也被称作损失(lost)函数，看名字应当能理解是一回事吧？我们前面一个例子的代价函数使用了标签样本值与计算值相减的平方差，值越小表示越接近方程的正确解。这个模式简单易懂。不过这种算法有很多缺陷，在这个例子中引入了“交叉熵”的代价函数算法。<br />
+交叉熵是个复杂的概念，想详细了解的可以看参考引文中的softmax链接，其中有比较详细的解释。<br />
+简单介绍，就是交叉熵越小（跟平方差算法一样哈），变量的取值就越确定，越确定就表示我们得到了确定的结果。比如晓明考试10次才能及格1次，小王考试10次只会有1次不及格，小李50%的可能及格。那晓明和小王的交叉商就低，确定性强，小李则最不确定，你完全没法判断他下一次考试是好是差。<br />
+在本例中的交叉熵不仅仅是计算单一的一组数据，而是本批次100幅图片的交叉熵的总和。这样预测表现就比单一数据点计算能更好地描述我们的求解是否趋近了收敛。</p>
+
+<p>(待续…)</p>
+
+<h4 id="引文及参考">引文及参考</h4>
+<p><a href="http://www.tensorfly.cn">TensorFlow中文社区</a><br />
+<a href="http://www.tensorfly.cn/tfdoc/tutorials/mnist_download.html">手写字体样本数据下载</a><br />
+<a href="http://blog.csdn.net/neleuska/article/details/73193096">机器学习中训练集、验证集和测试集的作用</a><br />
+<a href="http://blog.csdn.net/viewcode/article/details/8794401">对线性回归、逻辑回归、各种回归的概念学习</a><br />
+<a href="https://www.jianshu.com/p/7bae1ead174e">我的机器学习笔记(一) - 监督学习vs 无监督学习</a><br />
+<a href="http://blog.csdn.net/neleuska/article/details/73193096">机器学习中训练集、验证集和测试集的作用</a><br />
+<a href="https://baike.baidu.com/item/Sigmoid函数/7981407?fr=aladdin">sigmoid函数</a><br />
+<a href="https://www.jianshu.com/p/8eb17fa41164">Softmax分类函数</a></p>
+:ET

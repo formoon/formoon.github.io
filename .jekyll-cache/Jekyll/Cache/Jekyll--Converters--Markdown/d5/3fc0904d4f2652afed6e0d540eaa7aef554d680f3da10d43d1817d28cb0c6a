@@ -1,0 +1,426 @@
+I"U�<p><img src="http://115.182.41.123/files/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
+<h4 id="三种开发模式">三种开发模式</h4>
+<p>使用TensorFlow 2.0完成机器学习一般有三种方式：</p>
+<ul>
+  <li>使用底层逻辑<br />
+这种方式使用Python函数自定义学习模型，把数学公式转化为可执行的程序逻辑。接着在训练循环中，通过tf.GradientTape()迭代，使用tape.gradient()梯度下降，使用optimizer.apply_gradients()更新模型权重，逐次逼近，完成模型训练。</li>
+  <li>使用Keras高层接口<br />
+TensorFlow 1.x的开发中，Keras就作为第三方库存在。2.0中，更是已经成为标准配置。我们前面大多的例子都是基于Keras或者自定义Keras模型配合底层训练循环完成。从网上的一些开源项目来看，这已经是应用最广泛的方式。</li>
+  <li>今天要介绍的评估器tf.estimator<br />
+评估器是TensorFlow官方推荐的内置高级API，层次上看跟Keras实际处于同样位置，只是似乎大家都视而不见了，以至于现在从用户的实际情况看用的人要远远少于Keras。</li>
+</ul>
+
+<p><img src="http://115.182.41.123/files/201904/tensorFlow2/est-struct-1.png" alt="" />
+通常认为评估器因为内置的紧密结合，运行速度要高于Keras。Keras一直是一个通用的高层框架，除了支持TensorFlow作为后端，还同时支持Theano和CNTK。高度的抽象肯定会影响Keras的速度，不过本人并未实际对比测试。我觉的，对于大量数据导致的长时间训练来说，这点效率上的差异不应当成为大问题，否则Python这种解释型的语言就不会成为优选的机器学习基础平台了。<br />
+在TensorFlow 1.x中可以使用tf.estimator.model_to_estimator方法将Keras模型转换为TensorFlow评估器。TensorFlow 2.0中，统一到了tf.keras.estimator.model_to_estimator方法。所以如果偏爱评估器的话，使用Keras也不会成为障碍。</p>
+
+<h4 id="评估器基本工作流程">评估器基本工作流程</h4>
+<p>其实从编程逻辑来看，这些高层API所提供的工作方式是很相似的。使用评估器开发机器学习大致分为如下步骤：</p>
+<ul>
+  <li>载入数据</li>
+  <li>数据清洗和数据预处理</li>
+  <li>编写数据流水线输入函数</li>
+  <li>定义评估器模型</li>
+  <li>训练</li>
+  <li>评估</li>
+</ul>
+
+<p>在这个流程里面，只有“编写数据流水线输入函数”这一步是跟Keras模型是不同的。在Keras模型中，我们直接准备数据集，把数据集送入到模型即可。而在评估器中，数据的输入，需要指定一个函数供评估器调用。</p>
+
+<h4 id="使用评估器的实例">使用评估器的实例</h4>
+<p>这一个来自官方文档的实例比较残酷，使用泰坦尼克号的乘客名单，评估在沉船事件发生后，客户能生存下来的可能性。<br />
+数据格式是csv，建议先下载，保存到工作目录：<br />
+训练集数据：<a href="https://storage.googleapis.com/tf-datasets/titanic/train.csv">https://storage.googleapis.com/tf-datasets/titanic/train.csv</a><br />
+评估集数据：<a href="https://storage.googleapis.com/tf-datasets/titanic/eval.csv">https://storage.googleapis.com/tf-datasets/titanic/eval.csv</a><br />
+文件下载后不要修改名称。</p>
+
+<p>数据包含如下属性维度：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>属性名称</th>
+      <th>属性描述</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>sex</td>
+      <td>乘客性别</td>
+    </tr>
+    <tr>
+      <td>age</td>
+      <td>乘客年龄</td>
+    </tr>
+    <tr>
+      <td>n_siblings_spouses</td>
+      <td>随行兄弟或者配偶数量</td>
+    </tr>
+    <tr>
+      <td>parch</td>
+      <td>随行父母或者子女数量</td>
+    </tr>
+    <tr>
+      <td>fare</td>
+      <td>船费金额</td>
+    </tr>
+    <tr>
+      <td>class</td>
+      <td>船舱等级</td>
+    </tr>
+    <tr>
+      <td>deck</td>
+      <td>甲板编号</td>
+    </tr>
+    <tr>
+      <td>embark_town</td>
+      <td>登船地点</td>
+    </tr>
+    <tr>
+      <td>alone</td>
+      <td>是否为独自旅行</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>从这些属性中能看出，数据的收集者是非常用心的。<br />
+比如随行兄弟或者配偶、随行父母或者子女这种特征，在大多人的传统观念中，肯定会用类似“随行家属数量”这样的维度合并在一起。<br />
+但在这个案例中，两个不同的维度，对于最终存活影响肯定是不同的。</p>
+
+<h4 id="基本数据分析">基本数据分析</h4>
+<p>这部分的工作其实跟评估器的使用没有什么关系，但这正是大数据时代的魅力所在，所以我们还是延续官方文档的思路来看一看。</p>
+
+<p>先在命令行执行Python，启动交互环境。然后把下面这部分代码拷贝到Python执行。这些代码完成引用扩展库、载入数据等基本工作。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 引入扩展库
+</span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+
+<span class="c1"># 载入数据
+</span><span class="n">dftrain</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'train.csv'</span><span class="p">)</span>
+<span class="n">dfeval</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'eval.csv'</span><span class="p">)</span>
+<span class="c1"># 分离标注字段
+</span><span class="n">y_train</span> <span class="o">=</span> <span class="n">dftrain</span><span class="p">.</span><span class="n">pop</span><span class="p">(</span><span class="s">'survived'</span><span class="p">)</span>
+<span class="n">y_eval</span> <span class="o">=</span> <span class="n">dfeval</span><span class="p">.</span><span class="n">pop</span><span class="p">(</span><span class="s">'survived'</span><span class="p">)</span>
+
+<span class="n">dftrain</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+
+</code></pre></div></div>
+<p>这时候命令行看起来大致是这个样子：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>python3
+Python 3.7.3 <span class="o">(</span>default, Mar 27 2019, 09:23:39<span class="o">)</span> 
+<span class="o">[</span>Clang 10.0.0 <span class="o">(</span>clang-1000.11.45.5<span class="o">)]</span> on darwin
+Type <span class="s2">"help"</span>, <span class="s2">"copyright"</span>, <span class="s2">"credits"</span> or <span class="s2">"license"</span> <span class="k">for </span>more information.
+<span class="o">&gt;&gt;&gt;</span> <span class="c"># 引入扩展库</span>
+... from __future__ import absolute_import, division, print_function, unicode_literals
+<span class="o">&gt;&gt;&gt;</span> 
+<span class="o">&gt;&gt;&gt;</span> import numpy as np
+<span class="o">&gt;&gt;&gt;</span> import pandas as pd
+<span class="o">&gt;&gt;&gt;</span> import matplotlib.pyplot as plt
+<span class="o">&gt;&gt;&gt;</span> import tensorflow as tf
+<span class="o">&gt;&gt;&gt;</span> 
+<span class="o">&gt;&gt;&gt;</span> <span class="c"># 载入数据</span>
+... dftrain <span class="o">=</span> pd.read_csv<span class="o">(</span><span class="s1">'train.csv'</span><span class="o">)</span>
+<span class="o">&gt;&gt;&gt;</span> dfeval <span class="o">=</span> pd.read_csv<span class="o">(</span><span class="s1">'eval.csv'</span><span class="o">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="c"># 分离标注字段</span>
+... y_train <span class="o">=</span> dftrain.pop<span class="o">(</span><span class="s1">'survived'</span><span class="o">)</span>
+<span class="o">&gt;&gt;&gt;</span> y_eval <span class="o">=</span> dfeval.pop<span class="o">(</span><span class="s1">'survived'</span><span class="o">)</span>
+<span class="o">&gt;&gt;&gt;</span> 
+<span class="o">&gt;&gt;&gt;</span> dftrain.head<span class="o">()</span>
+      sex   age  n_siblings_spouses  parch     fare  class     deck  embark_town alone
+0    male  22.0                   1      0   7.2500  Third  unknown  Southampton     n
+1  female  38.0                   1      0  71.2833  First        C    Cherbourg     n
+2  female  26.0                   0      0   7.9250  Third  unknown  Southampton     y
+3  female  35.0                   1      0  53.1000  First        C  Southampton     n
+4    male  28.0                   0      0   8.4583  Third  unknown   Queenstown     y
+<span class="o">&gt;&gt;&gt;</span> 
+</code></pre></div></div>
+<p>最后是列出的训练集头5条记录。<br />
+我们先看看乘客的年龄分布(后续的代码都是直接拷贝到Python命令行执行)：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dftrain</span><span class="p">.</span><span class="n">age</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="http://115.182.41.123/files/201904/tensorFlow2/est-age-0.png" alt="" />
+直方图中显示，乘客年龄主要分布在20岁至30岁之间。<br />
+再来看看性别分布：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dftrain</span><span class="p">.</span><span class="n">sex</span><span class="p">.</span><span class="n">value_counts</span><span class="p">().</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s">'barh'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="http://115.182.41.123/files/201904/tensorFlow2/est-sex-0.png" alt="" />
+男性乘客的数量，几乎是女性乘客的两倍。<br />
+接着是船舱等级的分布，这个参数能间接体现乘客的经济实力：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dftrain</span><span class="p">[</span><span class="s">'class'</span><span class="p">].</span><span class="n">value_counts</span><span class="p">().</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s">'barh'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="http://115.182.41.123/files/201904/tensorFlow2/est-class-0.png" alt="" />
+图中显示，大多数乘客还是在三等舱。<br />
+继续看乘客上船的地点：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dftrain</span><span class="p">[</span><span class="s">'embark_town'</span><span class="p">].</span><span class="n">value_counts</span><span class="p">().</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s">'barh'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="http://115.182.41.123/files/201904/tensorFlow2/est-town-0.png" alt="" />
+大多数乘客来自南安普顿。<br />
+继续，把性别跟最后生存标注关联起来：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">pd</span><span class="p">.</span><span class="n">concat</span><span class="p">([</span><span class="n">dftrain</span><span class="p">,</span> <span class="n">y_train</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">).</span><span class="n">groupby</span><span class="p">(</span><span class="s">'sex'</span><span class="p">).</span><span class="n">survived</span><span class="p">.</span><span class="n">mean</span><span class="p">().</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s">'barh'</span><span class="p">).</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">'% survive'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="http://115.182.41.123/files/201904/tensorFlow2/est-sex-1.png" alt="" />
+女性的存活率几乎超过男性的5倍。<br />
+再来一个更复杂的统计，我们首先把年龄分段，然后看看不同年龄段的乘客最终存活率：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">calc_age_section</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">lim</span><span class="p">):</span>
+    <span class="k">return</span><span class="s">'[%.f,%.f)'</span> <span class="o">%</span> <span class="p">(</span><span class="n">lim</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">//</span><span class="n">lim</span><span class="p">),</span> <span class="n">lim</span><span class="o">*</span><span class="p">(</span><span class="n">n</span><span class="o">//</span><span class="n">lim</span><span class="p">)</span><span class="o">+</span><span class="n">lim</span><span class="p">)</span>  <span class="c1"># map function
+</span>
+<span class="n">addone</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">Series</span><span class="p">([</span><span class="n">calc_age_section</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">dftrain</span><span class="p">.</span><span class="n">age</span><span class="p">])</span>
+<span class="n">dftrain</span><span class="p">[</span><span class="s">'ages'</span><span class="p">]</span> <span class="o">=</span> <span class="n">addone</span>
+<span class="n">pd</span><span class="p">.</span><span class="n">concat</span><span class="p">([</span><span class="n">dftrain</span><span class="p">,</span> <span class="n">y_train</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">).</span><span class="n">groupby</span><span class="p">(</span><span class="s">'ages'</span><span class="p">).</span><span class="n">survived</span><span class="p">.</span><span class="n">mean</span><span class="p">().</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s">'barh'</span><span class="p">).</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">'% survive'</span><span class="p">);</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+</code></pre></div></div>
+<p><img src="http://115.182.41.123/files/201904/tensorFlow2/est-survive-ages-0.png" alt="" />
+10岁以下儿童和80岁以上的老人得到了最多的生存机会。<br />
+在那个寒冷、慌乱的沉船夜晚，弱者反而更多的活了下来。</p>
+
+<h4 id="数据的预处理">数据的预处理</h4>
+<p>数据预处理这个话题我们讲了很多次，这是通常机器学习研发工作中，工程师需要做的最多工作。<br />
+泰坦尼克号乘客名单的数据虽然不复杂，也属于典型的结构化数据。<br />
+其中主要包含两类，一种是分类型的数据，比如船舱等级，比如上船城市名称。另一类则是简单的数值，比如年龄和购票价格。<br />
+对于数值型的数据可以直接规范化后进入模型，对于分类型的数据，则还需要做编码，我们这里还是使用最常见的one-hot。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 定义所需的数据列，分为分类型属性和数值型属性分别定义
+</span><span class="n">CATEGORICAL_COLUMNS</span> <span class="o">=</span> <span class="p">[</span><span class="s">'sex'</span><span class="p">,</span> <span class="s">'n_siblings_spouses'</span><span class="p">,</span> <span class="s">'parch'</span><span class="p">,</span> <span class="s">'class'</span><span class="p">,</span> <span class="s">'deck'</span><span class="p">,</span> 
+                       <span class="s">'embark_town'</span><span class="p">,</span> <span class="s">'alone'</span><span class="p">]</span>
+<span class="n">NUMERIC_COLUMNS</span> <span class="o">=</span> <span class="p">[</span><span class="s">'age'</span><span class="p">,</span> <span class="s">'fare'</span><span class="p">]</span>
+
+<span class="c1"># 辅助函数，把给定数据列做one-hot编码
+</span><span class="k">def</span> <span class="nf">one_hot_cat_column</span><span class="p">(</span><span class="n">feature_name</span><span class="p">,</span> <span class="n">vocab</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">feature_column</span><span class="p">.</span><span class="n">indicator_column</span><span class="p">(</span>
+        <span class="n">tf</span><span class="p">.</span><span class="n">feature_column</span><span class="p">.</span><span class="n">categorical_column_with_vocabulary_list</span><span class="p">(</span><span class="n">feature_name</span><span class="p">,</span>
+                                                                  <span class="n">vocab</span><span class="p">))</span>
+
+<span class="c1"># 最终使用的数据列，先置空
+</span><span class="n">feature_columns</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">feature_name</span> <span class="ow">in</span> <span class="n">CATEGORICAL_COLUMNS</span><span class="p">:</span>
+    <span class="c1"># 分类的属性都要做one-hot编码，然后加入数据列
+</span>    <span class="n">vocabulary</span> <span class="o">=</span> <span class="n">dftrain</span><span class="p">[</span><span class="n">feature_name</span><span class="p">].</span><span class="n">unique</span><span class="p">()</span>
+    <span class="n">feature_columns</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">one_hot_cat_column</span><span class="p">(</span><span class="n">feature_name</span><span class="p">,</span> <span class="n">vocabulary</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">feature_name</span> <span class="ow">in</span> <span class="n">NUMERIC_COLUMNS</span><span class="p">:</span>
+    <span class="c1"># 数值类的属性直接入列
+</span>    <span class="n">feature_columns</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">feature_column</span><span class="p">.</span><span class="n">numeric_column</span><span class="p">(</span><span class="n">feature_name</span><span class="p">,</span>
+                                                            <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">))</span>
+</code></pre></div></div>
+
+<h4 id="数据输入函数">数据输入函数</h4>
+<p>评估器的训练、评估都需要使用数据输入函数作为参数。输入函数本身不接受任何参数，返回一个tf.data.Dataset对象给模型用于供给数据。<br />
+因为除了数据集不同，训练和评估模型所使用的数据格式通常都是一样的。所以经常会在程序代码上，共用一个函数，然后用参数来区分用于评估还是用于训练。<br />
+然而输入函数相当于回调函数，由评估器控制着调用，这过程中并没有参数传递。所以比较聪明的做法可以使用嵌套函数的方法来定义，比如：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 这是一个很少量数据的样本，直接把整个数据集当做一批
+</span><span class="n">NUM_EXAMPLES</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span>
+<span class="c1"># 输入函数的构造函数
+</span><span class="k">def</span> <span class="nf">make_input_fn</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">n_epochs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">input_fn</span><span class="p">():</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">Dataset</span><span class="p">.</span><span class="n">from_tensor_slices</span><span class="p">((</span><span class="nb">dict</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">y</span><span class="p">))</span>
+        <span class="c1"># 乱序
+</span>        <span class="k">if</span> <span class="n">shuffle</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">NUM_EXAMPLES</span><span class="p">)</span>
+        <span class="c1"># 训练时让数据重复尽量多的次数
+</span>        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">n_epochs</span><span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">.</span><span class="n">batch</span><span class="p">(</span><span class="n">NUM_EXAMPLES</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dataset</span>
+    <span class="k">return</span> <span class="n">input_fn</span>
+
+<span class="c1"># 训练、评估所使用的数据输入函数，区别只是数据是否乱序以及迭代多少次
+</span><span class="n">train_input_fn</span> <span class="o">=</span> <span class="n">make_input_fn</span><span class="p">(</span><span class="n">dftrain</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">eval_input_fn</span> <span class="o">=</span> <span class="n">make_input_fn</span><span class="p">(</span><span class="n">dfeval</span><span class="p">,</span> <span class="n">y_eval</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">n_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+</code></pre></div></div>
+
+<h4 id="模型和源码">模型和源码</h4>
+<p>本例中我们直接使用预定义的评估器模型(pre-made estimator)。所以代码非常简单，定义、训练、评估都是只需要一行代码：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 使用线性分类器作为模型
+</span><span class="n">linear_est</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">estimator</span><span class="p">.</span><span class="n">LinearClassifier</span><span class="p">(</span><span class="n">feature_columns</span><span class="p">)</span>
+
+<span class="c1"># 训练
+</span><span class="n">linear_est</span><span class="p">.</span><span class="n">train</span><span class="p">(</span><span class="n">train_input_fn</span><span class="p">,</span> <span class="n">max_steps</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="c1"># 评估
+</span><span class="n">result</span> <span class="o">=</span> <span class="n">linear_est</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">eval_input_fn</span><span class="p">)</span>
+</code></pre></div></div>
+<p>我们来看看完整代码：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
+</span>
+<span class="c1"># 引入扩展库
+</span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+
+<span class="c1"># 载入数据
+</span><span class="n">dftrain</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'train.csv'</span><span class="p">)</span>
+<span class="n">dfeval</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'eval.csv'</span><span class="p">)</span>
+<span class="c1"># 分离标注字段
+</span><span class="n">y_train</span> <span class="o">=</span> <span class="n">dftrain</span><span class="p">.</span><span class="n">pop</span><span class="p">(</span><span class="s">'survived'</span><span class="p">)</span>
+<span class="n">y_eval</span> <span class="o">=</span> <span class="n">dfeval</span><span class="p">.</span><span class="n">pop</span><span class="p">(</span><span class="s">'survived'</span><span class="p">)</span>
+
+<span class="c1">################################################################
+# 定义所需的数据列，分为分类型属性和数值型属性分别定义
+</span><span class="n">CATEGORICAL_COLUMNS</span> <span class="o">=</span> <span class="p">[</span><span class="s">'sex'</span><span class="p">,</span> <span class="s">'n_siblings_spouses'</span><span class="p">,</span> <span class="s">'parch'</span><span class="p">,</span> <span class="s">'class'</span><span class="p">,</span> <span class="s">'deck'</span><span class="p">,</span> 
+                       <span class="s">'embark_town'</span><span class="p">,</span> <span class="s">'alone'</span><span class="p">]</span>
+<span class="n">NUMERIC_COLUMNS</span> <span class="o">=</span> <span class="p">[</span><span class="s">'age'</span><span class="p">,</span> <span class="s">'fare'</span><span class="p">]</span>
+
+<span class="c1"># 辅助函数，把给定数据列做one-hot编码
+</span><span class="k">def</span> <span class="nf">one_hot_cat_column</span><span class="p">(</span><span class="n">feature_name</span><span class="p">,</span> <span class="n">vocab</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">feature_column</span><span class="p">.</span><span class="n">indicator_column</span><span class="p">(</span>
+        <span class="n">tf</span><span class="p">.</span><span class="n">feature_column</span><span class="p">.</span><span class="n">categorical_column_with_vocabulary_list</span><span class="p">(</span><span class="n">feature_name</span><span class="p">,</span>
+                                                                  <span class="n">vocab</span><span class="p">))</span>
+
+<span class="c1"># 最终使用的数据列，先置空
+</span><span class="n">feature_columns</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">feature_name</span> <span class="ow">in</span> <span class="n">CATEGORICAL_COLUMNS</span><span class="p">:</span>
+    <span class="c1"># 分类的属性都要做one-hot编码，然后加入数据列
+</span>    <span class="n">vocabulary</span> <span class="o">=</span> <span class="n">dftrain</span><span class="p">[</span><span class="n">feature_name</span><span class="p">].</span><span class="n">unique</span><span class="p">()</span>
+    <span class="n">feature_columns</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">one_hot_cat_column</span><span class="p">(</span><span class="n">feature_name</span><span class="p">,</span> <span class="n">vocabulary</span><span class="p">))</span>
+
+<span class="k">for</span> <span class="n">feature_name</span> <span class="ow">in</span> <span class="n">NUMERIC_COLUMNS</span><span class="p">:</span>
+    <span class="c1"># 数值类的属性直接入列
+</span>    <span class="n">feature_columns</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">feature_column</span><span class="p">.</span><span class="n">numeric_column</span><span class="p">(</span><span class="n">feature_name</span><span class="p">,</span>
+                                                            <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">))</span>
+
+<span class="c1">################################################################
+# 这是一个很少量数据的样本，直接把整个数据集当做一批
+</span><span class="n">NUM_EXAMPLES</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">y_train</span><span class="p">)</span>
+<span class="c1"># 输入函数的构造函数
+</span><span class="k">def</span> <span class="nf">make_input_fn</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">n_epochs</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">input_fn</span><span class="p">():</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">Dataset</span><span class="p">.</span><span class="n">from_tensor_slices</span><span class="p">((</span><span class="nb">dict</span><span class="p">(</span><span class="n">X</span><span class="p">),</span> <span class="n">y</span><span class="p">))</span>
+        <span class="c1"># 乱序
+</span>        <span class="k">if</span> <span class="n">shuffle</span><span class="p">:</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">NUM_EXAMPLES</span><span class="p">)</span>
+        <span class="c1"># 训练时让数据重复尽量多的次数
+</span>        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">n_epochs</span><span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">.</span><span class="n">batch</span><span class="p">(</span><span class="n">NUM_EXAMPLES</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dataset</span>
+    <span class="k">return</span> <span class="n">input_fn</span>
+
+<span class="c1"># 训练、评估所使用的数据输入函数，区别只是数据是否乱序以及迭代多少次
+</span><span class="n">train_input_fn</span> <span class="o">=</span> <span class="n">make_input_fn</span><span class="p">(</span><span class="n">dftrain</span><span class="p">,</span> <span class="n">y_train</span><span class="p">)</span>
+<span class="n">eval_input_fn</span> <span class="o">=</span> <span class="n">make_input_fn</span><span class="p">(</span><span class="n">dfeval</span><span class="p">,</span> <span class="n">y_eval</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">n_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># 使用线性分类器作为模型
+</span><span class="n">linear_est</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">estimator</span><span class="p">.</span><span class="n">LinearClassifier</span><span class="p">(</span><span class="n">feature_columns</span><span class="p">)</span>
+
+<span class="c1"># 训练
+</span><span class="n">linear_est</span><span class="p">.</span><span class="n">train</span><span class="p">(</span><span class="n">train_input_fn</span><span class="p">,</span> <span class="n">max_steps</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="c1"># 评估
+</span><span class="n">result</span> <span class="o">=</span> <span class="n">linear_est</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">eval_input_fn</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"----------------------------------"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">pd</span><span class="p">.</span><span class="n">Series</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+</code></pre></div></div>
+<p>程序执行的最后显示了评估的结果，在我的电脑上显示的结果是这样的：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">----------------------------------</span>
+accuracy                  0.765152
+accuracy_baseline         0.625000
+auc                       0.832844
+auc_precision_recall      0.789631
+average_loss              0.478908
+label/mean                0.375000
+loss                      0.478908
+precision                 0.703297
+prediction/mean           0.350790
+recall                    0.646465
+global_step             100.000000
+</code></pre></div></div>
+<p>正确率不算太高。<br />
+评估器的模型使用起来很简单，我们尝试换用另外一种模型，比如提升树分类器。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 以下代码放在程序最后，因为这个数据集非常小，速度很快，所以做两次学习也并不感觉慢
+</span><span class="n">n_batches</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">est</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">estimator</span><span class="p">.</span><span class="n">BoostedTreesClassifier</span><span class="p">(</span><span class="n">feature_columns</span><span class="p">,</span>
+                                          <span class="n">n_batches_per_layer</span><span class="o">=</span><span class="n">n_batches</span><span class="p">)</span>
+
+<span class="c1"># 训练
+</span><span class="n">est</span><span class="p">.</span><span class="n">train</span><span class="p">(</span><span class="n">train_input_fn</span><span class="p">,</span> <span class="n">max_steps</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+
+<span class="c1"># 评估
+</span><span class="n">result</span> <span class="o">=</span> <span class="n">est</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">eval_input_fn</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"----------------------------------"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">pd</span><span class="p">.</span><span class="n">Series</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+
+</code></pre></div></div>
+<p>这次得到的结果是这样的：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">----------------------------------</span>
+<span class="n">accuracy</span>                  <span class="mf">0.825758</span>
+<span class="n">accuracy_baseline</span>         <span class="mf">0.625000</span>
+<span class="n">auc</span>                       <span class="mf">0.872360</span>
+<span class="n">auc_precision_recall</span>      <span class="mf">0.857325</span>
+<span class="n">average_loss</span>              <span class="mf">0.411853</span>
+<span class="n">label</span><span class="o">/</span><span class="n">mean</span>                <span class="mf">0.375000</span>
+<span class="n">loss</span>                      <span class="mf">0.411853</span>
+<span class="n">precision</span>                 <span class="mf">0.784946</span>
+<span class="n">prediction</span><span class="o">/</span><span class="n">mean</span>           <span class="mf">0.382282</span>
+<span class="n">recall</span>                    <span class="mf">0.737374</span>
+<span class="n">global_step</span>             <span class="mf">100.000000</span>
+</code></pre></div></div>
+<p>虽然准确率仍然并不高，但比起来线性分类器，提高还是算的上明显。</p>
+
+<h4 id="性能评价">性能评价</h4>
+<p>评价机器学习模型的性能，除了看刚才的统计信息，绘图是非常好的一种方式，可以更直观，某些问题也能体现的一目了然。<br />
+我们在上面程序的最后再增加几行代码，绘制预测概率的统计信息：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 绘制预测概率直方图
+</span><span class="n">pred_dicts1</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">linear_est</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">eval_input_fn</span><span class="p">))</span>
+<span class="n">pred_dicts2</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">bt_est</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">eval_input_fn</span><span class="p">))</span>
+<span class="n">probs1</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">Series</span><span class="p">([</span><span class="n">pred</span><span class="p">[</span><span class="s">'probabilities'</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">pred</span> <span class="ow">in</span> <span class="n">pred_dicts1</span><span class="p">])</span>
+<span class="n">probs2</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">Series</span><span class="p">([</span><span class="n">pred</span><span class="p">[</span><span class="s">'probabilities'</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">pred</span> <span class="ow">in</span> <span class="n">pred_dicts2</span><span class="p">])</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">probs1</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s">'hist'</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">'linear-est predicted probabilities'</span><span class="p">);</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">probs2</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s">'hist'</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">'bt-est predicted probabilities'</span><span class="p">);</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="http://115.182.41.123/files/201904/tensorFlow2/est-predicted-probabilities-0.png" alt="" />
+大量集中在图形左侧的数据簇，显示了乘客九死一生的悲惨命运。<br />
+因为我们的预测结果只有两种可能：0表示未能生存；1表示生存下来。所以预测的结果，应当明显的尽量靠近0和1两端。中间悬而未决的部分应当尽可能少。从图形的情况看，如果不考虑分类准确率问题，提升树分类器效果要更好一些。<br />
+当然作为成熟的预定义模型，模型都是很优秀的，只是提升树可能更适合本应用的场景。</p>
+
+<p>尽管这个例子很简单，但现在的分类算法实际越来越复杂。预测结果在不同类别数据上表现并不不均衡，使得使用正确率这样的传统标准不能恰当的反应分类器的性能，本例中也已经出现了这种倾向。或者说，分类器，对于不同类别的样本，性能表现是不一致的。<br />
+这种情况，使用ROC(Receiver Operating Characteristic)观察者操作曲线能够表现的更清楚。<br />
+对于一个分类器的分类结果，一般有以下四种情况：</p>
+<ol>
+  <li>真阳性（TP）：判断为1，实际上也为1。</li>
+  <li>伪阳性（FP）：判断为1，实际上为0。</li>
+  <li>真阴性（TN）：判断为0，实际上也为0。</li>
+  <li>伪阴性（FN）：判断为0，实际上为1。</li>
+</ol>
+
+<p>ROC图中，左上角是真阳性的极点，曲线越接近左上角，意味着分类器性能越好。所以左上角是分类器追求的方向。<br />
+下面代码，请接续在上面代码之后，用来绘制ROC曲线：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 绘制ROC(Receiver Operating Characteristic)曲线
+</span><span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">roc_curve</span>
+
+<span class="k">def</span> <span class="nf">plot_roc</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">roc_curve</span><span class="p">(</span><span class="n">y_eval</span><span class="p">,</span> <span class="n">probs</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">fpr</span><span class="p">,</span> <span class="n">tpr</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="n">title</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'false positive rate'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'true positive rate'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">xlim</span><span class="p">(</span><span class="mi">0</span><span class="p">,)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">14</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">plot_roc</span><span class="p">(</span><span class="n">probs1</span><span class="p">,</span> <span class="s">"linear-est ROC"</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">plot_roc</span><span class="p">(</span><span class="n">probs2</span><span class="p">,</span> <span class="s">"bt-est ROC"</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="http://115.182.41.123/files/201904/tensorFlow2/est-predicted-ROC-1.png" alt="" />
+从ROC曲线看，在本例中使用提升树模型的优势更为明显。</p>
+
+<p>（待续…）</p>
+
+:ET

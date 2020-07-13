@@ -1,0 +1,5 @@
+I"u<h4 id="语音识别">语音识别</h4>
+<p>TensorFlow 1.x中提供了一个语音识别的例子<a href="https://github.com/tensorflow/tensorflow/tree/master/tensorflow/examples/speech_commands">speech_commands</a>，用于识别常用的命令词汇，实现对设备的语音控制。speech_commands是一个很成熟的语音识别原型，有很高的正确率，除了提供python的完整源码，还提供了c/c++的示例程序，方便你移植到嵌入设备及移动设备中去。<br />
+官方提供了关于这个示例的<a href="https://www.tensorflow.org/tutorials/audio_recognition">语音识别教程</a>。不过实际就是一个使用说明，没有对代码和原理做过多解释。<br />
+这个程序相对前面的例子复杂了很多，整体结构、代码、算法都可以当做范本，我觉得我已经没有资格象前面的讲解一样随意在代码中注释和指手画脚。因此建议大家把这个例子当做参考资料，有兴趣也有能力的，自己去阅读一下代码来研究。你碰到最多的困难不会来自机器学习算法，而是程序结构、音频处理等方面。</p>
+:ET

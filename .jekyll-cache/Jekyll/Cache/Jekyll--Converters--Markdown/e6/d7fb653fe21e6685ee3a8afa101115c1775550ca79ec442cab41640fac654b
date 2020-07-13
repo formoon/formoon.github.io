@@ -1,0 +1,138 @@
+I"o@<p><img src="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1572063023449&amp;di=09176f269d178aa171bcb02202245ddc&amp;imgtype=0&amp;src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fq_70%2Cc_zoom%2Cw_640%2Fimages%2F20180725%2F052e834ddacf4228bd9b6fd5427b3bfe.jpg" alt="" /></p>
+<h4 id="题外话">题外话</h4>
+<p>  最近简直要忙死，所以停更了很久，你们会不会以为我人间蒸发了？<br />
+  正文之前，请允许我先跑个题，就是关于忙的问题。<br />
+  做了Freelance，每天过的比上班还累，这完全不是我想要的生活啊？所以痛定思痛，需要检讨一下自己：</p>
+<ol>
+  <li>首先仍然是目标，工作需要确定目标，生活也是一样的。如果你的目标是做一番事业，那不得不说，忙才是正常的状态。如果觉得累了，希望生活和工作能有一个平衡，那就要下决心改变自己的状态。</li>
+  <li>关于工作，如果目标是挣大钱，而且从时间上更紧迫。那接单的时候，就考虑优先完成利润高的。排序上利润低的需求，还是要勇敢的说“不”。</li>
+  <li>如果你的目标是维护朋友、客户的关系，希望将来能有更好的回报。那现在很多不挣钱的项目，做了也就做了，也没有什么好抱怨的。更需要的，是调整自己的心态，接受现状。</li>
+</ol>
+
+<hr />
+<h4 id="前端">前端</h4>
+<p>​  工作终于告一段落，今天念叨念叨最近一个项目的小体会。<br />
+​  前端的工具链无比繁荣丰富，也带来了大量的选型、学习的问题，这个在网上吐槽已久，我就不画蛇添足了。<br />
+​  我本身过手的项目比较多，所以挺早就做了一些比较，单纯从个人爱好入手（不代表性能、功能、框架结构的优势）做了如下的划分：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>业务类型</th>
+      <th>选型</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>功能性项目，更多偏向HTML层的处理</td>
+      <td>JQuery.js</td>
+    </tr>
+    <tr>
+      <td>小型商业逻辑项目</td>
+      <td>vue.js</td>
+    </tr>
+    <tr>
+      <td>大型或者将来可能快速成长的商务逻辑</td>
+      <td>AngularJS</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>  最近的项目使用了AngularJS7，中间有了不少新的体会，分享出来希望能对大家有用。</p>
+<h4 id="angularjs版本">AngularJS版本</h4>
+<p>  通常AngularJS项目的构建、编译、管理等都是由@angular/cli模块完成的。这个模块简便的安装方法是依赖npm, 而@angular/cli本身也依赖网络，因此当AngularJS有了新版本，所有使用客户端ng建立项目，也就自动使用了AngularJS的新版本。更不要说npm的升级中，也会直接升级了@angular/cli本身。<br />
+  好在从AngularJS2之后，框架和语法糖方面的变化并没有多大，如果类似AngularJS1到2那种剧烈的变化，相信很多人会直接哭死吧:)<br />
+  即便如此，在一个复杂的项目中，不可避免仍然还会有不少版本升级带来的兼容性问题。这时候如果是以前建立的项目，使用保留的package.json直接安装依赖包，自动在老版本下工作就好，不一定必须升级到AngularJS新版本，通常这样能省事不少。<br />
+  有的时候会碰到一些意外，就是某些依赖包，可能在npm的库中已经停止维护了，这时候依赖包的安装将无法成功。这在大公司中通常不是问题，大公司大多都使用自己的包镜像服务器，因此这种情况出现的少。但在中、小型公司，这是个很烦心的问题。我建议对于一些复杂的项目，尽可能的保留下来原有的node_modules 文件夹，毕竟跟硬盘容量比起来，这一点空间不算啥了，能让你将来项目的维护轻松许多。<br />
+  此外还可以考虑搜索多家的包服务器镜像，比如我经常同时安装cnpm、npm两套工具，前者使用阿里云的镜像，后者则是官方的服务器，发现某些包失维的时候，换一个源试试，很可能会有惊喜。<br />
+  有的时候还会碰到一些很特别的情况，必须使用老的AngularJS版本进行开发。这时候可以首先卸载当前的新版本@angular/cli, 然后使用npm 安装制定的老版本，比如1.4版本的客户端对应AngularJS4：</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nb">install</span> @angular/cli@1.4
+</code></pre></div></div>
+<p>  这样之后使用ng新建的项目，将是AngularJS4的版本。当然这在工作中，也会碰到上面说的依赖包失维的问题，建议常用的功能包，平常自己就留意保留一些吧。</p>
+<h4 id="在angularjs7中使用jqueryjsbootstrap等第三方功能库">在AngularJS7中使用JQuery.js/Bootstrap等第三方功能库</h4>
+<p>  这几个包是在使用传统html页面的时候常用的，JQuery.js在很多的框架中已经不建议使用了，而是使用框架的组件或组件通讯类功能来完成相似的功能。Bootstrap则有很多社区提供的AngularJS化的组件库可以直接使用。<br />
+  对于前者，虽然的确感觉上在AngularJS中使用JQuery没有哲学上那么完美，但你不得不说在很多情况下的确用起来更方便，能大量的简化代码。对于后者，我个人的感觉把BootStrap库AngularJS组件化会带来额外的学习成本，感觉并不划算。所以介绍一下此类扩展库的使用方法：<br />
+  首先使用npm安装需要使用的第三方扩展包：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nb">install </span>jquery bootstrap@3 bootstrap-switch createjs-module <span class="nt">--save</span>
+</code></pre></div></div>
+<p>  随后打开angular.json文件，在projects一节，找到你的项目名称，随后在其options中，scripts参数后面的数组中添加所有需要引用的js库：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s2">"scripts"</span>: <span class="o">[</span>
+    <span class="s2">"node_modules/jquery/dist/jquery.min.js"</span>,
+    <span class="s2">"node_modules/bootstrap/dist/js/bootstrap.js"</span>,
+    <span class="s2">"node_modules/bootstrap-switch/dist/js/bootstrap-switch.js"</span><span class="o">]</span>
+
+</code></pre></div></div>
+<p>  需要注意，如果是AngularJS4, 文件名应当是.angular.json，scripts数组中添加的路径，应当是../node_modules/xxxx这样的路径，因为AngularJS7和4的默认路径是不同的。<br />
+  第三步是为bootstrap这样的UI库添加额外的css，这个比较容易。直接在默认的主css文件：src/styles.css增加额外的引用就可以了,比如：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>@import <span class="s2">"~bootstrap/dist/css/bootstrap.css"</span><span class="p">;</span>
+@import <span class="s2">"~bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.css"</span><span class="p">;</span>
+</code></pre></div></div>
+<p>  做完第三步，css可以立即生效，js文件则仍然需要在AngularJS主程序中引用，比如：</p>
+
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">...</span>
+<span class="k">import</span> <span class="o">*</span> <span class="k">as</span> <span class="nx">_</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">lodash</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="o">*</span> <span class="k">as</span> <span class="nx">$</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">jquery</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="dl">'</span><span class="s1">bootstrap-switch</span><span class="dl">'</span><span class="p">;</span>
+<span class="k">import</span> <span class="o">*</span> <span class="k">as</span> <span class="nx">createjs</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">createjs-module</span><span class="dl">'</span><span class="p">;</span>
+<span class="p">...</span>
+    <span class="nx">$</span><span class="p">(</span><span class="dl">'</span><span class="s1">.url1</span><span class="dl">'</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="dl">'</span><span class="s1">href</span><span class="dl">'</span><span class="p">,</span> <span class="dl">'</span><span class="s1">/home</span><span class="dl">'</span><span class="p">);</span>
+
+</code></pre></div></div>
+<p>  注意这里面的引用并没有指定js的路径，路径实际是由angular.json文件中我们刚才修改的scripts一节决定的。此外就是通常我们使用import都是标准的typescript的形式，比如：</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Component</span><span class="p">,</span> <span class="nx">OnInit</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@angular/core</span><span class="dl">'</span><span class="p">;</span>
+</code></pre></div></div>
+<p>  而我们对于JQuery.js库的引用，则使用了引用非结构化js的方法，重点是引用“*”也就是所有内容，然后用“as $”命名成平常我们喜欢的样子。对于bootstrap-switch库因为是直接在bootstrap原型上添加功能，所以干脆连“ * as ”也省略了。</p>
+<h4 id="使用自己积累的js库">使用自己积累的js库</h4>
+<p>  在日常的工作中，大多程序员肯定都保存了不少的函数库、功能库。这些库可以直接在typescript中引用，不需要改名字，引用的时候也不需要添加后缀。引用时候的路径，使用当前typescript文件的相对路径就可以。比如：</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">import</span> <span class="p">{</span> <span class="nx">Lists</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">../jslib/lists</span><span class="dl">'</span><span class="p">;</span>
+</code></pre></div></div>
+<p>  在使用的时候，跟原来在js中引用也完全一致。通常说，比上面介绍的引用JQuery.js之类的引用会更容易。其实这大多是因为npm所管理的node_modules路径规则太复杂所致，相比较npm模块管理带来的好处，你还是忍受的好:)</p>
+<h4 id="编译中报错的问题">编译中报错的问题</h4>
+<p>  通常AngularJS的编译都能给出来比较清晰的错误提示，按图索骥，能够比较容易的解决问题。<br />
+  但也有很多时候，AngularJS并不能给出清晰的提示，比如UglifyJS处理中所出现的Unexpected token: punc (() - ES6 parsing errors。<br />
+  这时候可以在编译的时候增加参数：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ng build <span class="nt">-prod</span> <span class="nt">--source-map</span>
+</code></pre></div></div>
+<p>  此时编译过程中，虽然信息仍然不够完整，但能够比较清楚的界定到时哪一个文件的哪一行出现了问题。相信再找错误，就容易多了。当然既然开发模式编译时通过的，这时候的报错往往也是兼容性问题或者更严格的语法限制。</p>
+<h4 id="编译结果在老版本ios设备无法使用的问题">编译结果，在老版本ios设备无法使用的问题</h4>
+<p>  为了支持更多的设备，兼容早期的ios浏览器是很有必要的。但原本运行良好的项目，移植到AngularJS后就无法 在早期ios浏览器中使用了。现象是屏幕全白，没有任何内容和功能。<br />
+​  使用ios的联机功能，可以检查在浏览器中的报错信息。ios联机调试不是今天的重点，这里就跳过了。通常能得到错误信息为：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>SyntaxError: Use of const <span class="k">in </span>strict mode.
+</code></pre></div></div>
+<p>  其实主要还是老版本浏览器不能很好支持新的js语法的问题。在AngularJS中呈现出来，是因为AngularJS默认使用typescript编译。而通常的开发工具链是使用babel编译，而后者的编译结果，从向前兼容上，显然做的更好一些。<br />
+  解决办法有很多，网上有很多使用babel替代typescript的方法，但总体都比较麻烦,如果不是特别必要，就别折腾了。<br />
+  或者你还可以把js改写到ts文件，估计你更不愿意了，如果积累的库比较多，真的会累死人:)<br />
+  我的建议是，所有你自己添加的js包，集中存放在同一个目录下，比如我例子中的jslib。然后在另外的工作目录中，安装babel的工作环境：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm <span class="nb">install</span> <span class="nt">-g</span> babel-cli
+npm init
+npm <span class="nb">install</span> <span class="nt">--save-dev</span> babel-preset-es2015
+</code></pre></div></div>
+<p>  在工作目录中，新建一个.babelrc的文件，内容为：</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+  <span class="dl">"</span><span class="s2">presets</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span>
+    <span class="dl">"</span><span class="s2">es2015</span><span class="dl">"</span>
+  <span class="p">],</span>
+  <span class="dl">"</span><span class="s2">plugins</span><span class="dl">"</span><span class="p">:</span> <span class="p">[]</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>  随后就可以将原有的js文件都编译一遍了（ts文件typescript处理的挺好，完全不需要使用babel），编译方法示例：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>babel ../some_dir/jslib <span class="nt">-d</span> ../some_angular_dir/jslib
+</code></pre></div></div>
+<p>  这会编译jslib中的所有文件，文件夹结构也会保留，所以编译完成，直接用生成的jslib替换原来的文件夹。然后再使用AngularJS编译就完全正常了。</p>
+<h4 id="其它稀奇古怪的错误">其它稀奇古怪的错误</h4>
+<p>  某项目开发模式工作正常，编译过程正常，编译后执行有报错。即便增加了source map，因为报错往往位于第三方库或者@angular模块，调用栈复杂难辨，也难以排除错误问题。这种情况通常只能在源代码中增加log输出来排查错误。也有较多时候不是程序本身的问题，而是依赖包的问题。可以尝试完整删除node_modules文件夹，然后重新npm install安装。甚至必要情况下，删除本地缓存之后再重新安装：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>npm cache clean <span class="nt">--force</span>
+npm <span class="nb">install</span>
+</code></pre></div></div>
+<p>  因为前面说过的原因，大多是新建项目才敢这么做，否则如果有依赖包版本比较低找不到那就是个麻烦了。</p>
+
+<hr />
+
+<h4 id="最后">最后</h4>
+<p>  最后决定选择一个更开心的生活，所以给自己放个假。头一次，看着星光下闪烁的大海，听着潮水细微而深邃的波动，感觉微微腥咸的海风轻柔的拂面。然后手指在键盘上跳动，心情也变得轻快了。所谓幸福，不过如此。</p>
+
+<h4 id="更正">更正</h4>
+<p>  有网友指正AngularJS特指1.x系列版本，之后的版本都已经更名为Angular，在此感谢。不过因为习惯问题，本篇及以往很多文章中都是混用的，就不一一修改了，大家能看懂意思就好，谢谢理解。</p>
+
+:ET

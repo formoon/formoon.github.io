@@ -1,0 +1,5 @@
+I"�<p><img src="https://upload.wikimedia.org/wikipedia/commons/d/d4/X-Window-System.png" alt="" />
+XWindows太老了，历史比Windows和Linux的开发时间都长，以至于很多人每天实际在用，但已经不知道它的存在。<br />
+XWindows目前是Linux/类Unix系统上的标准显示配置，QT/GTK等架构也是基于XWindows的。所以通常也有很多人只关注占领桌面市场的Windows，对于败退在边缘的XWindows完全嗤之以鼻。<br />
+其实只从GUI层面上来对比Windows和XWindows是不公平的。XWindows设计之初就是一个显示服务器的概念，在显示器服务器和应用之间，有一套<a href="http://blog.csdn.net/hxh129/article/details/7839963">协议</a>来沟通彼此，是C/S的架构，这个协议可以序列化，从而显示的设备、跟应用运行的环境，可以不在同一台电脑之上。想想你熟悉的那些无线投影啥的，是啥时候才出现的吧。</p>
+:ET

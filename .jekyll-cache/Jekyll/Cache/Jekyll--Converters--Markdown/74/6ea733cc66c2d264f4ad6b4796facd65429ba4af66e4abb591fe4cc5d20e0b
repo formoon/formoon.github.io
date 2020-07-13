@@ -1,0 +1,271 @@
+I"��<p><img src="http://115.182.41.123/files/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
+<h4 id="fashion-mnist--一个图片识别的延伸案例">Fashion Mnist — 一个图片识别的延伸案例</h4>
+<p>在TensorFlow官方新的教程中，第一个例子使用了由MNIST延伸而来的新程序。<br />
+这个程序使用一组时尚单品的图片对模型进行训练，比如T恤(T-shirt)、长裤(Trouser)，训练完成后，对于给定图片，可以识别出单品的名称。<br />
+<img src="http://115.182.41.123/files/201904/tensorFlow2/fashion-mnist-sprite.png" alt="" />
+程序同样将所有图片规范为28x28点阵，使用灰度图，每个字节取值范围0-255。时尚单品的类型，同样也是分为10类，跟手写数字识别的分类维度相同。因此实际上，这个例子看起来美观也有趣很多，但是在技术层面上，跟传统的MNIST没有区别。<br />
+不同的地方也有，首先是识别之后需要显示的是单品名称，而不是0-9的数字，所以程序中需要定义一个标签数组，并在显示时做一个转换：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="p">......</span>
+<span class="c1"># 标签列表
+</span><span class="n">class_names</span> <span class="o">=</span> <span class="p">[</span><span class="s">'T-shirt/top'</span><span class="p">,</span> <span class="s">'Trouser'</span><span class="p">,</span> <span class="s">'Pullover'</span><span class="p">,</span> <span class="s">'Dress'</span><span class="p">,</span> <span class="s">'Coat'</span><span class="p">,</span> 
+               <span class="s">'Sandal'</span><span class="p">,</span> <span class="s">'Shirt'</span><span class="p">,</span> <span class="s">'Sneaker'</span><span class="p">,</span> <span class="s">'Bag'</span><span class="p">,</span> <span class="s">'Ankle boot'</span><span class="p">]</span>
+	<span class="p">......</span>
+<span class="c1"># 显示标签名称
+</span><span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">class_names</span><span class="p">[</span><span class="n">train_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+	<span class="p">......</span>
+</code></pre></div></div>
+<p><img src="http://115.182.41.123/files/201904/tensorFlow2/fashion_mnist_train_samples.png" alt="" />
+其次，从样本图片中你应当能看出来，图片的复杂度，比手写数字还是高多了。从而造成的混淆和误判，显然也高的多。这种情况下，只使用tf.argmax()获取确定的一个标签就有点不足了。所以在这个例子中，增加了使用直方图，显示所有10个预测分类中，每个分类的相似度功能。同时，预测正确的，用蓝色字体表示。预测结果同样本标注不同的，使用红色字体表示。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="p">......</span>
+<span class="k">def</span> <span class="nf">plot_value_array</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">predictions_array</span><span class="p">,</span> <span class="n">true_label</span><span class="p">):</span>
+    <span class="n">predictions_array</span><span class="p">,</span> <span class="n">true_label</span> <span class="o">=</span> <span class="n">predictions_array</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">true_label</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">grid</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">xticks</span><span class="p">([])</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">yticks</span><span class="p">([])</span>
+    <span class="n">thisplot</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">predictions_array</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">"#777777"</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">predicted_label</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">predictions_array</span><span class="p">)</span>
+
+    <span class="n">thisplot</span><span class="p">[</span><span class="n">predicted_label</span><span class="p">].</span><span class="n">set_color</span><span class="p">(</span><span class="s">'red'</span><span class="p">)</span>
+    <span class="n">thisplot</span><span class="p">[</span><span class="n">true_label</span><span class="p">].</span><span class="n">set_color</span><span class="p">(</span><span class="s">'blue'</span><span class="p">)</span>
+	<span class="p">......</span>
+<span class="n">plot_value_array</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">)</span>
+	<span class="p">......</span>	
+</code></pre></div></div>
+<p>完整的代码如下：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
+</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+
+<span class="c1"># TensorFlow and tf.keras
+</span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+<span class="kn">from</span> <span class="nn">tensorflow</span> <span class="kn">import</span> <span class="n">keras</span>
+
+<span class="c1"># Helper libraries
+</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="c1"># 显示样本集中，指定图片、预测信息、标注信息
+</span><span class="k">def</span> <span class="nf">plot_image</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">predictions_array</span><span class="p">,</span> <span class="n">true_label</span><span class="p">,</span> <span class="n">img</span><span class="p">):</span>
+    <span class="n">predictions_array</span><span class="p">,</span> <span class="n">true_label</span><span class="p">,</span> <span class="n">img</span> <span class="o">=</span> <span class="n">predictions_array</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">true_label</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">img</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">grid</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">xticks</span><span class="p">([])</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">yticks</span><span class="p">([])</span>
+
+    <span class="n">plt</span><span class="p">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="p">.</span><span class="n">cm</span><span class="p">.</span><span class="n">binary</span><span class="p">)</span>
+
+    <span class="n">predicted_label</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">predictions_array</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">predicted_label</span> <span class="o">==</span> <span class="n">true_label</span><span class="p">:</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="s">'blue'</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="s">'red'</span>
+  
+    <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">"{} {:2.0f}% ({})"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">class_names</span><span class="p">[</span><span class="n">predicted_label</span><span class="p">],</span>
+                                         <span class="mi">100</span><span class="o">*</span><span class="n">np</span><span class="p">.</span><span class="nb">max</span><span class="p">(</span><span class="n">predictions_array</span><span class="p">),</span>
+                                         <span class="n">class_names</span><span class="p">[</span><span class="n">true_label</span><span class="p">]),</span>
+                                         <span class="n">color</span><span class="o">=</span><span class="n">color</span><span class="p">)</span>
+
+
+<span class="c1"># 使用柱状图显示预测结果数组，每一个柱状图，代表图片属于该类的可能性
+</span><span class="k">def</span> <span class="nf">plot_value_array</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">predictions_array</span><span class="p">,</span> <span class="n">true_label</span><span class="p">):</span>
+    <span class="n">predictions_array</span><span class="p">,</span> <span class="n">true_label</span> <span class="o">=</span> <span class="n">predictions_array</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">true_label</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">grid</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">xticks</span><span class="p">([])</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">yticks</span><span class="p">([])</span>
+    <span class="n">thisplot</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">bar</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">),</span> <span class="n">predictions_array</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">"#777777"</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+    <span class="n">predicted_label</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">predictions_array</span><span class="p">)</span>
+
+    <span class="n">thisplot</span><span class="p">[</span><span class="n">predicted_label</span><span class="p">].</span><span class="n">set_color</span><span class="p">(</span><span class="s">'red'</span><span class="p">)</span>
+    <span class="n">thisplot</span><span class="p">[</span><span class="n">true_label</span><span class="p">].</span><span class="n">set_color</span><span class="p">(</span><span class="s">'blue'</span><span class="p">)</span>
+
+<span class="c1"># 加载Fashion Mnist数据集，第一次执行的时候会自动从网上下载，这个速度会比较慢
+</span><span class="n">fashion_mnist</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">datasets</span><span class="p">.</span><span class="n">fashion_mnist</span>
+<span class="p">(</span><span class="n">train_images</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">),</span> <span class="p">(</span><span class="n">test_images</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">)</span> <span class="o">=</span> <span class="n">fashion_mnist</span><span class="p">.</span><span class="n">load_data</span><span class="p">()</span>
+
+<span class="c1"># 如同数字识别的0-9十类，这里也将时尚潮品分了以下十类
+# 所以本质上，这跟手写数字的识别是完全一致的
+</span><span class="n">class_names</span> <span class="o">=</span> <span class="p">[</span><span class="s">'T-shirt/top'</span><span class="p">,</span> <span class="s">'Trouser'</span><span class="p">,</span> <span class="s">'Pullover'</span><span class="p">,</span> <span class="s">'Dress'</span><span class="p">,</span> <span class="s">'Coat'</span><span class="p">,</span> 
+               <span class="s">'Sandal'</span><span class="p">,</span> <span class="s">'Shirt'</span><span class="p">,</span> <span class="s">'Sneaker'</span><span class="p">,</span> <span class="s">'Bag'</span><span class="p">,</span> <span class="s">'Ankle boot'</span><span class="p">]</span>
+
+<span class="c1"># 数据规范化，将图片数据转化为0-1之间的浮点数字
+</span><span class="n">train_images</span> <span class="o">=</span> <span class="n">train_images</span> <span class="o">/</span> <span class="mf">255.0</span>
+<span class="n">test_images</span> <span class="o">=</span> <span class="n">test_images</span> <span class="o">/</span> <span class="mf">255.0</span>
+
+<span class="c1"># 为了有一个直观印象，我们把训练集前24个样本图片显示在屏幕上，同时显示图片的标注信息
+# 你可能注意到了，我们在显示图片的时候，并没有跟前面显示手写字体图片一样，把图片的规范化数据还原为0-255，
+# 这是因为实际上mathplotlib库可以直接接受浮点型的图像数据，
+# 我们前面首先还原规范化数据，是为了让你清楚理解原始数据的格式。
+</span><span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">24</span><span class="p">):</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">grid</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">xticks</span><span class="p">([])</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">yticks</span><span class="p">([])</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">train_images</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">cmap</span><span class="o">=</span><span class="n">plt</span><span class="p">.</span><span class="n">cm</span><span class="p">.</span><span class="n">binary</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="n">class_names</span><span class="p">[</span><span class="n">train_labels</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># 定义神经网络模型，用了一个比较简单的模型
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">Sequential</span><span class="p">([</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Flatten</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">28</span><span class="p">,</span> <span class="mi">28</span><span class="p">)),</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">),</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'softmax'</span><span class="p">)</span>
+<span class="p">])</span>
+
+<span class="c1"># 采用指定的优化器和损失函数编译模型
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'adam'</span><span class="p">,</span> 
+              <span class="n">loss</span><span class="o">=</span><span class="s">'sparse_categorical_crossentropy'</span><span class="p">,</span>
+              <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+
+<span class="c1"># 训练模型
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_images</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+
+<span class="c1"># 使用测试集数据评估训练后的模型，并显示评估结果
+</span><span class="n">test_loss</span><span class="p">,</span> <span class="n">test_acc</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">test_images</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">Test accuracy:'</span><span class="p">,</span> <span class="n">test_acc</span><span class="p">)</span>
+
+<span class="c1">#########
+# 预测所有测试集数据，用于图形显示结果
+</span><span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_images</span><span class="p">)</span>
+
+<span class="c1"># 以5行x3列显示测试集前15个样本的图片和预测结果
+# 正确的预测结果蓝色显示，错误的预测信息会红色显示
+# 每一张图片的右侧，会显示图片预测的结果数组，这个数组中，数值最大的，代表最可能的分类
+# 或者说，每一个数组元素，都代表图片属于对应分类的可能性
+</span><span class="n">num_rows</span> <span class="o">=</span> <span class="mi">5</span>
+<span class="n">num_cols</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="n">num_images</span> <span class="o">=</span> <span class="n">num_rows</span><span class="o">*</span><span class="n">num_cols</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="mi">2</span><span class="o">*</span><span class="n">num_cols</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">num_rows</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_images</span><span class="p">):</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">num_rows</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">num_cols</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plot_image</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">,</span> <span class="n">test_images</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">num_rows</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">num_cols</span><span class="p">,</span> <span class="mi">2</span><span class="o">*</span><span class="n">i</span><span class="o">+</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">plot_value_array</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1">#############
+# 演示预测单独一幅图片
+# 从测试集获取一幅图
+</span><span class="n">img</span> <span class="o">=</span> <span class="n">test_images</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="c1"># 我们的模型是批处理进行预测的，要求的是一个图片的数组，所以这里扩展一维
+# 成为(1, 28, 28)这样的形式
+</span><span class="n">img</span> <span class="o">=</span> <span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+<span class="c1"># 使用模型进行预测
+</span><span class="n">predictions_single</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+<span class="c1"># 显示预测结果数组
+</span><span class="k">print</span><span class="p">(</span><span class="s">"test_images[0] prediction array:"</span><span class="p">,</span> <span class="n">predictions_single</span><span class="p">)</span>
+<span class="c1"># 显示转换为可识别类型的预测结果
+</span><span class="k">print</span><span class="p">(</span><span class="s">"test_images[0] prediction text:"</span><span class="p">,</span> <span class="n">class_names</span><span class="p">[</span><span class="n">tf</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">predictions_single</span><span class="p">[</span><span class="mi">0</span><span class="p">])])</span>
+<span class="c1"># 显示原标注
+</span><span class="k">print</span><span class="p">(</span><span class="s">"test_labels[0]:"</span><span class="p">,</span> <span class="n">class_names</span><span class="p">[</span><span class="n">test_labels</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span>
+<span class="c1"># 原图的显示请参考上面大图的左上角第一幅，此处略
+</span></code></pre></div></div>
+<p>程序最后还演示了使用1幅图片数据调用模型进行预测的方式。特别不要忘记把这一幅图片扩展一维再进入模型，因为我们的模型是使用批处理方式进行预测的，原本接受的是一个图片的数组。<br />
+程序在第一次执行的时候，会自动由网上下载数据集，下载的网址在下面的显示信息中能看到。下载完成后，数据会存放在~/.keras/datasets/fashion-mnist/文件夹。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./fashion_mnist.py 
+Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/train-labels-idx1-ubyte.gz
+32768/29515 <span class="o">[=================================]</span> - 0s 15us/step
+Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/train-images-idx3-ubyte.gz
+26427392/26421880 <span class="o">[==============================]</span> - 65s 2us/step
+Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/t10k-labels-idx1-ubyte.gz
+8192/5148 <span class="o">[===============================================]</span> - 0s 8us/step
+Downloading data from https://storage.googleapis.com/tensorflow/tf-keras-datasets/t10k-images-idx3-ubyte.gz
+4423680/4422102 <span class="o">[==============================]</span> - 10s 2us/step
+</code></pre></div></div>
+<p>以后再运行程序的时候，程序就直接使用本地数据运行。执行过程所显示的信息类似下面：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./fashion_mnist.py
+Epoch 1/15
+60000/60000 <span class="o">[==============================]</span> - 4s 68us/sample - loss: 0.4999 - accuracy: 0.8247
+Epoch 2/15
+60000/60000 <span class="o">[==============================]</span> - 4s 63us/sample - loss: 0.3753 - accuracy: 0.8652
+Epoch 3/15
+60000/60000 <span class="o">[==============================]</span> - 4s 63us/sample - loss: 0.3361 - accuracy: 0.8783
+Epoch 4/15
+60000/60000 <span class="o">[==============================]</span> - 4s 64us/sample - loss: 0.3120 - accuracy: 0.8848
+Epoch 5/15
+60000/60000 <span class="o">[==============================]</span> - 4s 63us/sample - loss: 0.2950 - accuracy: 0.8916
+Epoch 6/15
+60000/60000 <span class="o">[==============================]</span> - 4s 63us/sample - loss: 0.2825 - accuracy: 0.8950
+Epoch 7/15
+60000/60000 <span class="o">[==============================]</span> - 4s 64us/sample - loss: 0.2681 - accuracy: 0.9004
+Epoch 8/15
+60000/60000 <span class="o">[==============================]</span> - 4s 63us/sample - loss: 0.2564 - accuracy: 0.9052
+Epoch 9/15
+60000/60000 <span class="o">[==============================]</span> - 4s 63us/sample - loss: 0.2463 - accuracy: 0.9088
+Epoch 10/15
+60000/60000 <span class="o">[==============================]</span> - 4s 64us/sample - loss: 0.2385 - accuracy: 0.9118
+Epoch 11/15
+60000/60000 <span class="o">[==============================]</span> - 5s 79us/sample - loss: 0.2299 - accuracy: 0.9145
+Epoch 12/15
+60000/60000 <span class="o">[==============================]</span> - 4s 72us/sample - loss: 0.2224 - accuracy: 0.9165
+Epoch 13/15
+60000/60000 <span class="o">[==============================]</span> - 4s 65us/sample - loss: 0.2152 - accuracy: 0.9192
+Epoch 14/15
+60000/60000 <span class="o">[==============================]</span> - 4s 64us/sample - loss: 0.2093 - accuracy: 0.9214
+Epoch 15/15
+60000/60000 <span class="o">[==============================]</span> - 4s 64us/sample - loss: 0.2031 - accuracy: 0.9227
+10000/10000 <span class="o">[==============================]</span> - 0s 38us/sample - loss: 0.3361 - accuracy: 0.8889
+
+Test accuracy: 0.8889
+test_images[0] prediction array: <span class="o">[[</span>2.8952907e-09 4.0831842e-06 9.7278274e-08 1.6851689e-09 5.8218838e-08
+  3.0680697e-03 1.2691763e-07 1.8435927e-02 3.7783199e-08 9.7849166e-01]]
+test_images[0] prediction text: Ankle boot
+test_labels[0]: Ankle boot
+</code></pre></div></div>
+<p>程序执行中，测试集前15幅图片的验证结果显示如下：<br />
+<img src="http://115.182.41.123/files/201904/tensorFlow2/fashion_mnist_predict.png" alt="" />
+左下角的图片出现了明显的识别错误。不过话说回来，以我这种时尚盲人来说，也完全区分不出来这种样子的凉鞋跟运动鞋有啥区别（手动捂脸），当然图片的分辨率也是问题之一啦。</p>
+
+<h4 id="保存和恢复训练数据">保存和恢复训练数据</h4>
+<p>TensorFlow 2.0提供了两种数据保存和恢复的方式。第一种方式是我们在TensorFlow 1.x中经常用的保存模型权重参数的方式。<br />
+因为在TensorFlow 2.0中，我们使用了model.fit方法来代替之前使用的训练循环，所以保存训练权重数据是使用回调函数的方式完成的。下面举一个例子：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="p">...</span><span class="n">在model</span><span class="p">.</span><span class="n">compile之后增加下面代码</span><span class="p">...</span>
+<span class="n">checkpoint_path</span> <span class="o">=</span> <span class="s">"training_data/cp.ckpt"</span>
+<span class="n">checkpoint_dir</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">checkpoint_path</span><span class="p">)</span>
+
+<span class="c1"># 设置自己的回调函数
+</span><span class="n">cp_callback</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">callbacks</span><span class="p">.</span><span class="n">ModelCheckpoint</span><span class="p">(</span><span class="n">checkpoint_dir</span><span class="p">,</span> 
+                                                 <span class="n">save_weights_only</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                                                 <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1"># 修改fit方法增加回调参数
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_images</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span>
+          <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span><span class="n">cp_callback</span><span class="p">])</span>  
+	<span class="p">......</span>
+</code></pre></div></div>
+<p>这样在每一个训练周期，都会将训练数据写入到文件，屏幕显示会类似这样：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Epoch 1/15
+60000/60000 <span class="o">[==============================]</span> - 4s 68us/sample - loss: 0.4999 - accuracy: 0.8247
+Epoch 00001: saving model to training_data/cp.ckpt
+Epoch 2/15
+60000/60000 <span class="o">[==============================]</span> - 4s 63us/sample - loss: 0.3753 - accuracy: 0.8652
+Epoch 00002: saving model to training_data/cp.ckpt
+Epoch 3/15
+60000/60000 <span class="o">[==============================]</span> - 4s 63us/sample - loss: 0.3361 - accuracy: 0.8783
+Epoch 00003: saving model to training_data/cp.ckpt
+Epoch 4/15
+	......
+</code></pre></div></div>
+<p>对于稍大的数据集和稍微复杂的模型，训练的时间会非常之长。通常我们都会把这种工作部署到有强大算力的服务器上执行。训练完成，将训练数据保存下来。预测的时候，则并不需要很大的运算量，就可以在普通的设备上执行了。<br />
+还原保存的数据，其实就是把fit方法这一句，替换为加载保存的数据就可以：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="p">...</span><span class="n">替代model</span><span class="p">.</span><span class="n">fit那一行代码</span><span class="p">...</span>
+<span class="n">model</span><span class="p">.</span><span class="n">load_weights</span><span class="p">(</span><span class="n">checkpoint_dir</span><span class="p">)</span>
+	<span class="p">...</span><span class="n">然后就可以当做训练完成的模型一样进行预测操作了</span><span class="p">...</span>
+</code></pre></div></div>
+<p>这种方法是比较多用的，因为很多情况下，我们训练所使用的模型，跟预测所使用的模型，会有细微的调整。这时候只载入模型的权重值，并不影响模型的微调。<br />
+此外，上面的代码仅为示例。在实际应用中，这种不改变文件名、只保存一组文件的形式，实际并不需要回调函数，在训练完成后一次写入到文件是更好的选择。使用回调函数通常都是为了保存每一步的训练结果。</p>
+
+<h4 id="保存完整模型">保存完整模型</h4>
+<p>如果模型是比较成熟稳定的，我们很可能喜欢完整的保存整个模型，这样不仅操作容易，而且也省去了重新建模的工作。Keras内置的vgg-19/resnet50等模型，实际就使用了这种方式，我们会在下一篇详细介绍。<br />
+保存完整的模型非常简单，只要在model.fit执行完成后，一行代码就可以保存完整、包含权重参数的模型：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># 将完整模型保存为HDF5文件</span>
+model.save<span class="o">(</span><span class="s1">'fashion_mnist.h5'</span><span class="o">)</span>
+</code></pre></div></div>
+<p>还原完整模型的话，则可以从使用keras.Sequential开始定义模型、模型编译都不需要，直接使用：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>new_model <span class="o">=</span> keras.models.load_model<span class="o">(</span><span class="s1">'fashion_mnist.h5'</span><span class="o">)</span>
+</code></pre></div></div>
+<p>接着就可以使用new_model这个模型进行预测了。</p>
+
+<p>（待续…）</p>
+
+:ET

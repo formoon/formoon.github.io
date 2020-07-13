@@ -1,0 +1,29 @@
+I"5<p><img src="http://115.182.41.123/files/201804/19/secure.jpeg" alt="" />
+用了这么久mac，发现居然还存在这么大一个bug。就是如果你曾经编辑mac电脑默认用户资料，比如试图改用户名、试图改HOME路径之类的，有很高比率可能导致该用户丧失管理员权限。<br />
+随后悲剧就开始了，所有需要管理员权限认证的地方，比如安装了一个新软件，在弹出的认证窗口中，无论如何输入用户名和密码，都无法授权通过。此时在系统设置-&gt;用户及用户组中，会发现该用户选项卡中“允许用户管理这台电脑”前面的勾选已经不见了。当然这时候因为无法授权修改用户权限，因此也无法重新勾选上这个选项。</p>
+
+<p>解决方法一：<br />
+这个是通常的做法，目前网上搜索基本都是这个。</p>
+<ol>
+  <li>开机的时候按住 command+s 进入单用户模式。</li>
+  <li>出现命令行终端的时候按照以下顺序输入命令：
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/sbin/mount <span class="nt">-uaw</span> <span class="c">#加载系统盘</span>
+<span class="nb">rm </span>var/db/.applesetupdone <span class="c">#删除系统安装完成标志，从而触发开机的重新系统设置</span>
+reboot	<span class="c">#重启电脑</span>
+</code></pre></div>    </div>
+  </li>
+  <li>重启完成后，电脑会跟新安装系统一样要求你进行一些系统设置，并允许你创建系统管理员账号。这时创建一个新的用户，按照提示操作。</li>
+  <li>新用户创建后，打开系统偏好设置-用户与群组点击原来的普通用户，右侧有个“允许用户管理这台电脑”，打勾然后重启。<br />
+电脑重启后可以以管理员的身份登录到你原来的系统，如果没有其它的用途再把刚新创建的管理员账户删除就可以了（也可以考虑留这个用户作为应急备用）。</li>
+</ol>
+
+<p>解决方法二：
+经过研究，发现还有另外一种方法快速的解决问题：<br />
+通常用户虽然没有了管理员权限，但是在终端状态，sudo命令，输入你的密码，还可以执行root权限。<br />
+因此可以在命令行重新将本用户加入到管理员组：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>dscl <span class="nb">.</span> <span class="nt">-merge</span> /Groups/admin GroupMembership &lt;用户名&gt;
+</code></pre></div></div>
+<p>这个命令执行后，权限立即就生效了。<br />
+这时候可以再到系统设置-&gt;用户及用户组中打开左下角的保护锁，此时认证窗口已经可以正常工作了。接着再勾选上“允许用户管理这台电脑”，重启电脑即可。</p>
+
+:ET

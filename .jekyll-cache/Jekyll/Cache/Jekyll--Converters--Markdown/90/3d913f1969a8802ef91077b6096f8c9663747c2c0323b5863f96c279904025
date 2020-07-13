@@ -1,0 +1,8 @@
+I"�<p><img src="http://img.mp.sohu.com/q_mini,c_zoom,w_640/upload/20170730/f355b2b2ee184957b4bf782bc056ea21.jpg" alt="" />
+首先声明哈，VPN是一种很规范的应用方式，在很多企业应用中都必不可少，我这里可不是教你翻墙的意思。<br />
+某日到一个客户公司去办事，客户的公司上网控制非常严格，上外网都需要拨号到给定的VPN才允许。但在我的苹果本上设置正常、拨号正常、各项网络测试也正常，仍然上不了外网。<br />
+打开终端，命令行使用netstat -r查看，得到类似如下信息：<br />
+```bash
+macbookpro13 ~&gt; netstat -r
+Routing tables</p>
+:ET

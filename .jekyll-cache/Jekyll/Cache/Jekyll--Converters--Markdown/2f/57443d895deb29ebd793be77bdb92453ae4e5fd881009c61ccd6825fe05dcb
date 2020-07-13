@@ -1,0 +1,121 @@
+I"q'<p>虽然是mac老司机，但每次装机总会碰到一些小问题需要临时上网搜索一下解决方案，所以留下些文字备忘一下：</p>
+<ol>
+  <li>研发用的新机最好选择语言用英文版，中文版通常的使用没问题，但很多的地方的翻译都不准确，而且有一些测试不充分的BUG。比如我曾经碰到过配置IP地址，多个IP地址之间应当是用英文分号分割，结果也变成了中文分号，新版本虽然修改了这个BUG，但类似小问题经常还是会有。</li>
+  <li>Xcode优先安装，后面其它许多的开源软件都依赖Xcode的命令行。</li>
+  <li>正常情况下，Sierra和High Sierra已经不建议在Recovery状态关闭系统保护功能，原来依赖关闭系统文件权限，注入一些功能的软件，大多升级版本也已经不再需要写入系统文件区。所以我也建议不要再关闭系统文件保护功能，这样系统的安全性会好很多，即便出现可能的病毒，也不会导致系统基础崩溃。 
+如果一定要关闭，重启时按⌘R键进入恢复模式，启动后打开终端程序，在其中使用如下命令关闭系统文件保护：
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>csrutil disable
+</code></pre></div>    </div>
+  </li>
+  <li>因为3的原因，系统内置的python/ruby等，不要再跟以前一样升级，如果需要，另外安装一个新版本即可。</li>
+  <li>安装Homebrew,其它开源软件包，尽量统一使用Homebrew管理：
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>/usr/bin/ruby <span class="nt">-e</span> <span class="s2">"</span><span class="si">$(</span>curl <span class="nt">-fsSL</span> https://raw.githubusercontent.com/Homebrew/install/master/install<span class="si">)</span><span class="s2">"</span>
+</code></pre></div>    </div>
+  </li>
+  <li>通常即便不需要升级python,也还是要重新安装一个，因为python的一些扩展包你也可能碰到需要升级，这也是需要自己安装一份有读写权限的python。别心疼那几十M的空间。
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>brew <span class="nb">install </span>python
+</code></pre></div>    </div>
+    <p>另外注意，新版的brew,安装的python默认是python2.7，程序执行的时候命名为python2。总结一下就是：</p>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python		<span class="c">#系统内置的python2.7</span>
+pip			<span class="c">#系统没有自带，如果你自己安装了pip那对应的是系统的python</span>
+python2		<span class="c">#用brew自己安装的python2.7</span>
+pip2		<span class="c">#安装python的时候回自动安装pip</span>
+python3		<span class="c">#如果你另外安装了python3</span>
+pip3		<span class="c">#对应python3</span>
+</code></pre></div>    </div>
+  </li>
+  <li>所以如果你想继续安装tensorflow，应当是使用你另外安装的pip2或者pip3来安装，系统内置的python因为扩展包版本不兼容又无法改写，实际无法安装tensorflow。
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip2 <span class="nb">install </span>tensorflow
+</code></pre></div>    </div>
+    <p>使用上面命令行安装的tensorflow，只有python2环境中才能引用，python3如果要使用，需要用pip3自行安装。</p>
+  </li>
+  <li>python有些包的提示不是很完整，比如错误信息是scipy.misc包中找不到imread，实际上是因为包pillow包没有安装，应当使用<code class="language-plaintext highlighter-rouge">pip2 install pillow</code>安装。</li>
+  <li>ruby / gem比python幸运，因为gem可以指定安装包安装的路径，这样即便系统的版本不满意，也不一定非要重新整个安装了。比如：
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>gem <span class="nb">install </span>jekyll bundler <span class="nt">-n</span> /usr/local/bin
+<span class="c">#后面的-n参数就是指定安装路径</span>
+</code></pre></div>    </div>
+    <p>相对的更换源到国内网站你肯定忘不掉，因为下载包下不动你就想起来了：</p>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#前面要先删除原来的源，这里省略</span>
+gem sources <span class="nt">--add</span> https://gems.ruby-china.org/
+</code></pre></div>    </div>
+  </li>
+  <li>调试程序经常会碰到没有签名的应用需要运行，所以人为打开权限控制对于研发人员也是不得已了，虽然这样有了病毒传播的风险，但毕竟工作重要：
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>spctl <span class="nt">--master-disable</span>
+</code></pre></div>    </div>
+  </li>
+  <li>研发的一些特殊情况可能需要修改EFI分区，加载方式如下：
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#首先检查EFI分区设备名</span>
+diskutil list
+<span class="c">#比如结果是：</span>
+/dev/disk0
+ <span class="c">#: TYPE                     NAME          SIZE       IDENTIFIER</span>
+ 0: GUID_partition_scheme                  <span class="k">*</span>251.0 GB  disk0
+ 1: EFI                                    209.7 MB   disk0s1
+ 2: Apple_HFS                Macintosh HD  250.1 GB   disk0s2
+ 3: Apple_Boot               Recovery HD   650.0 MB   disk0s3
+<span class="c">#建立一个加载点</span>
+<span class="nb">mkdir</span> /Volumes/efi
+<span class="c">#挂载，注意设备名跟上面对应</span>
+<span class="nb">sudo </span>mount <span class="nt">-t</span> msdos /dev/disk0s1 /Volumes/efi
+<span class="c">#后面就可以做自己的事情了</span>
+</code></pre></div>    </div>
+  </li>
+  <li>有一些小工具想加到Finder工具栏中，是按住⌘键不松手，然后用鼠标拖动到Finder工具栏。</li>
+  <li>Messager短信应用删除信息太麻烦，option+⌘+backspace可以无提示框直接删。</li>
+  <li>开机启动脚本，有以下几个路径可以放置开机启动脚本的引导配置文件，
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#以.plist配置文件的方式</span>
+/Library/LaunchAgents/
+/Library/LaunchDaemons/
+/System/Library/LaunchAgents/
+/System/Library/LaunchDaemons/
+<span class="c">#以文件夹的方式，文件夹内放置配置文件.plist及相关脚本</span>
+/Library/StartupItems/
+/System/Library/StartupItems/
+</code></pre></div>    </div>
+    <p>LaunchDaemons是在系统引导时执行(boot)，LaunchAgents是在用户登录的时候执行（login)。<br />
+/System/Library下的是macOS系统进程使用。/Library是所有用户使用。<br />
+对应的，~/Library中的，上面没有列，一般用的少，是对应某一个用户的。<br />
+通常用户自己设置的，需要开机就执行的一些进程一般是放在/Library/LaunchDaemons/之下，有2点需要注意：</p>
+    <ul>
+      <li>拥有者权限必须是root:wheel</li>
+      <li>权限644</li>
+    </ul>
+  </li>
+  <li>新机有时候Spotlight搜索不到刚刚安装的应用，一般可能是刚刚同时安装了大量新的应用及拷贝进入了大量新的数据，系统仍然在进行索引。等待一段时间之后如果还搜不到，那可能是有问题了。几个可能的解决方法，必有一款适于你：
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#方法1,删除索引并重做：</span>
+<span class="nb">sudo </span>mdutil <span class="nt">-E</span> /Applications
+<span class="c">#----------------------------------</span>
+<span class="c">#方法2，重新建某目录索引：</span>
+mdimport /Applications/
+<span class="c">#----------------------------------</span>
+<span class="c">#方法3,重新载入系统matedata数据：</span>
+<span class="c">#关闭spotlight</span>
+<span class="nb">sudo </span>mdutil <span class="nt">-a</span> <span class="nt">-i</span> off
+<span class="c">#上传数据</span>
+<span class="nb">sudo </span>launchctl unload <span class="nt">-w</span> /System/Library/LaunchDaemons/com.apple.metadata.mds.plist
+<span class="c">#载入数据</span>
+<span class="nb">sudo </span>launchctl load <span class="nt">-w</span> /System/Library/LaunchDaemons/com.apple.metadata.mds.plist
+<span class="c">#打开spotlight</span>
+<span class="nb">sudo </span>mdutil <span class="nt">-a</span> <span class="nt">-i</span> on
+</code></pre></div>    </div>
+  </li>
+  <li>默认截图路径修改<br />
+Mac屏幕截图默认是存在桌面，如果不喜欢可以改一下，方法如下：
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#参数请修改为自己的目录，这个是保存在我的下载目录</span>
+defaults write com.apple.screencapture location /Users/andrew/Downloads/
+<span class="c">#如果想关闭截图的阴影还可以加上这一行</span>
+defaults write com.apple.screencapture disable-shadow <span class="nt">-bool</span> TRUE
+<span class="c">#重启界面服务</span>
+killall SystemUIServer
+</code></pre></div>    </div>
+  </li>
+  <li>让Finder显示隐藏文件
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>defaults write com.apple.finder AppleShowAllFiles <span class="nt">-bool</span> <span class="nb">true</span> 
+</code></pre></div>    </div>
+  </li>
+  <li>命令行swift无法执行，报错缺少一堆库：<br />
+```bash
+warning: Swift error in module repl_swift.
+Debug info from this module will be unavailable in the debugger.</li>
+</ol>
+:ET

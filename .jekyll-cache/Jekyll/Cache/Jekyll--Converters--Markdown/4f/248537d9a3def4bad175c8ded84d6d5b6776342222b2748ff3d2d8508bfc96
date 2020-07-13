@@ -1,0 +1,169 @@
+I"	o<p>照片处理的三大基本操作中，照片剪裁是这系列三篇博文中的最后一篇，但是图像处理中应当首先要做的操作。原因很简单，随着数码相机、摄像机分辨率的增加，现在一张照片几十M的容量已经很常见，先进行裁剪，剩下的部分就会小，后续的处理就能快一些。换一个说法，画面中有一些部分无论如何是你不想要的，那还对那些无用的部分做很多处理干啥？<br />
+关于照片处理三大基本操作的说法，很久之前我有一篇文章《简单2步，P出美图》，因为博客多次搬家，这篇文章已经遗失了。大意是在Photoshop中通过简单2步，一共3个方面的操作，把数码相机拍摄的照片处理成作品级的美图，而且每一步的处理有规范、有标准，基于理性的操作而不是随意的所谓“神来之笔”。这些理念在OpenCV这三篇文章中也有了很多的说明，相信你看到了。那篇文章只能等以后有心情的时候再重写一下吧。<br />
+照片裁剪在OpenCV中非常容易：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="n">Mat</span> <span class="n">dstPic</span><span class="p">,</span><span class="n">srcPic</span><span class="p">;</span>
+	<span class="p">...</span>
+	<span class="n">dstPic</span> <span class="o">=</span> <span class="n">srcPic</span><span class="p">(</span><span class="n">Rect</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">width</span><span class="p">,</span><span class="n">height</span><span class="p">));</span>
+	<span class="p">...</span>
+	<span class="c1">//参数x/y/width/height代表裁剪出来要保留的画面</span>
+</code></pre></div></div>
+<p>别说我托大，这么简单的问题需要单文来说明吗？<br />
+是的，有必要。原因是单独裁剪并不难，真正用起来就带来了以下问题：</p>
+<ol>
+  <li>一幅照片，从哪部分裁剪，首先需要把照片显示出来，并接受鼠标框画操作来标注裁剪的部分。用户体验才是这个问题的关键。</li>
+  <li>鼠标的框画，在事件处理比较简单的OpenCV中，很多部分，都是需要自行编码处理的。</li>
+  <li>数码相机的照片，分辨率往往高于屏幕的分辨率，因此照片的显示，要有多级的缩放功能。缩放要有单独的控制方法。</li>
+  <li>照片有了缩放，裁剪的部分不能受照片缩放的影响。</li>
+</ol>
+
+<p>所以本文的副标题，叫《从概念到成品》，意思就是说，裁剪很简单，真正能让用户用起来，要解决的事情其实一点也不少。<br />
+请看源码：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;iostream&gt;
+#include "opencv2/core.hpp"
+#include "opencv2/imgproc.hpp"
+#include "opencv2/highgui.hpp"
+</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">cv</span><span class="p">;</span>
+
+<span class="n">Mat</span> <span class="n">org</span><span class="p">,</span><span class="n">dst</span><span class="p">,</span><span class="n">img</span><span class="p">,</span><span class="n">tmp</span><span class="p">;</span>
+<span class="kt">double</span> <span class="n">dScale</span><span class="p">;</span>
+<span class="k">const</span> <span class="kt">int</span> <span class="n">startWidth</span><span class="o">=</span><span class="mi">1280</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">showPicInScale</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">wndName</span><span class="p">,</span><span class="n">Mat</span> <span class="o">&amp;</span><span class="n">pic</span><span class="p">,</span><span class="kt">double</span> <span class="n">scale</span><span class="p">){</span>
+	<span class="n">Size</span> <span class="n">outSize</span><span class="p">;</span>
+	<span class="n">Mat</span> <span class="n">displayPic</span><span class="p">;</span>
+
+	<span class="n">outSize</span><span class="p">.</span><span class="n">width</span><span class="o">=</span><span class="n">pic</span><span class="p">.</span><span class="n">cols</span> <span class="o">*</span> <span class="n">scale</span><span class="p">;</span>
+	<span class="n">outSize</span><span class="p">.</span><span class="n">height</span><span class="o">=</span><span class="n">pic</span><span class="p">.</span><span class="n">rows</span> <span class="o">*</span> <span class="n">scale</span><span class="p">;</span>
+	<span class="n">resize</span><span class="p">(</span><span class="n">pic</span><span class="p">,</span><span class="n">displayPic</span><span class="p">,</span><span class="n">outSize</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="n">INTER_AREA</span><span class="p">);</span>
+	<span class="n">imshow</span><span class="p">(</span><span class="n">wndName</span><span class="p">,</span><span class="n">displayPic</span><span class="p">);</span>
+	<span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">void</span> <span class="nf">on_mouse</span><span class="p">(</span><span class="kt">int</span> <span class="n">event</span><span class="p">,</span><span class="kt">int</span> <span class="n">x1</span><span class="p">,</span><span class="kt">int</span> <span class="n">y1</span><span class="p">,</span><span class="kt">int</span> <span class="n">flags</span><span class="p">,</span><span class="kt">void</span> <span class="o">*</span><span class="n">ustc</span><span class="p">)</span><span class="c1">//event鼠标事件代号，x,y鼠标坐标，flags拖拽和键盘操作的代号</span>
+<span class="p">{</span>
+	<span class="k">static</span> <span class="n">Point</span> <span class="n">pre_pt</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span><span class="c1">//初始坐标</span>
+	<span class="k">static</span> <span class="n">Point</span> <span class="n">cur_pt</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">);</span><span class="c1">//实时坐标</span>
+	<span class="kt">char</span> <span class="n">temp</span><span class="p">[</span><span class="mi">16</span><span class="p">];</span>
+	<span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="n">x1</span> <span class="o">/</span> <span class="n">dScale</span><span class="p">;</span>
+	<span class="kt">int</span> <span class="n">y</span> <span class="o">=</span> <span class="n">y1</span> <span class="o">/</span> <span class="n">dScale</span><span class="p">;</span>
+	<span class="kt">double</span> <span class="n">fontSize</span><span class="o">=</span><span class="mf">0.5</span> <span class="o">/</span> <span class="n">dScale</span><span class="p">;</span>
+	<span class="kt">int</span> <span class="n">lineSize</span><span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="n">dScale</span><span class="p">;</span>
+	<span class="c1">//printf("fontsize:%d linesize:%d\n",fontSize,lineSize);</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">event</span> <span class="o">==</span> <span class="n">CV_EVENT_LBUTTONDOWN</span><span class="p">)</span><span class="c1">//左键按下，读取初始坐标，并在图像上该点处划圆</span>
+	<span class="p">{</span>
+		<span class="n">org</span><span class="p">.</span><span class="n">copyTo</span><span class="p">(</span><span class="n">img</span><span class="p">);</span><span class="c1">//将原始图片复制到img中</span>
+		<span class="n">sprintf</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span><span class="s">"(%d,%d)"</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">);</span>
+		<span class="n">pre_pt</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">);</span>
+		<span class="n">putText</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">temp</span><span class="p">,</span><span class="n">pre_pt</span><span class="p">,</span><span class="n">FONT_HERSHEY_SIMPLEX</span><span class="p">,</span><span class="n">fontSize</span><span class="p">,</span><span class="n">Scalar</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">),</span><span class="n">lineSize</span><span class="p">,</span><span class="mi">8</span><span class="p">);</span><span class="c1">//在窗口上显示坐标</span>
+		<span class="n">circle</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">pre_pt</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="n">dScale</span><span class="p">,</span><span class="n">Scalar</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span><span class="n">CV_FILLED</span><span class="p">,</span><span class="n">CV_AA</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span><span class="c1">//划圆</span>
+		<span class="n">showPicInScale</span><span class="p">(</span><span class="s">"org"</span><span class="p">,</span><span class="n">img</span><span class="p">,</span><span class="n">dScale</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">event</span> <span class="o">==</span> <span class="n">CV_EVENT_MOUSEMOVE</span> <span class="o">&amp;&amp;</span> <span class="o">!</span><span class="p">(</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">CV_EVENT_FLAG_LBUTTON</span><span class="p">))</span><span class="c1">//左键没有按下的情况下鼠标移动的处理函数</span>
+	<span class="p">{</span>
+		<span class="n">img</span><span class="p">.</span><span class="n">copyTo</span><span class="p">(</span><span class="n">tmp</span><span class="p">);</span><span class="c1">//将img复制到临时图像tmp上，用于显示实时坐标</span>
+		<span class="n">sprintf</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span><span class="s">"(%d,%d)"</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">);</span>
+		<span class="n">cur_pt</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">);</span>
+		<span class="n">putText</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span><span class="n">temp</span><span class="p">,</span><span class="n">cur_pt</span><span class="p">,</span><span class="n">FONT_HERSHEY_SIMPLEX</span><span class="p">,</span><span class="n">fontSize</span><span class="p">,</span><span class="n">Scalar</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">),</span><span class="n">lineSize</span><span class="p">,</span><span class="mi">8</span><span class="p">);</span><span class="c1">//只是实时显示鼠标移动的坐标</span>
+		<span class="n">showPicInScale</span><span class="p">(</span><span class="s">"org"</span><span class="p">,</span><span class="n">tmp</span><span class="p">,</span><span class="n">dScale</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">event</span> <span class="o">==</span> <span class="n">CV_EVENT_MOUSEMOVE</span> <span class="o">&amp;&amp;</span> <span class="p">(</span><span class="n">flags</span> <span class="o">&amp;</span> <span class="n">CV_EVENT_FLAG_LBUTTON</span><span class="p">))</span><span class="c1">//左键按下时，鼠标移动，则在图像上划矩形</span>
+	<span class="p">{</span>
+		<span class="n">img</span><span class="p">.</span><span class="n">copyTo</span><span class="p">(</span><span class="n">tmp</span><span class="p">);</span>
+		<span class="n">sprintf</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span><span class="s">"(%d,%d)"</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">);</span>
+		<span class="n">cur_pt</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">);</span>
+		<span class="n">putText</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span><span class="n">temp</span><span class="p">,</span><span class="n">cur_pt</span><span class="p">,</span><span class="n">FONT_HERSHEY_SIMPLEX</span><span class="p">,</span><span class="n">fontSize</span><span class="p">,</span><span class="n">Scalar</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">),</span><span class="n">lineSize</span><span class="p">,</span><span class="mi">8</span><span class="p">);</span>
+		<span class="n">rectangle</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span><span class="n">pre_pt</span><span class="p">,</span><span class="n">cur_pt</span><span class="p">,</span><span class="n">Scalar</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span><span class="n">lineSize</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span><span class="c1">//在临时图像上实时显示鼠标拖动时形成的矩形</span>
+		<span class="n">showPicInScale</span><span class="p">(</span><span class="s">"org"</span><span class="p">,</span><span class="n">tmp</span><span class="p">,</span><span class="n">dScale</span><span class="p">);</span>
+	<span class="p">}</span>
+	<span class="k">else</span> <span class="k">if</span> <span class="p">(</span><span class="n">event</span> <span class="o">==</span> <span class="n">CV_EVENT_LBUTTONUP</span><span class="p">)</span><span class="c1">//左键松开，将在图像上划矩形</span>
+	<span class="p">{</span>
+		<span class="n">org</span><span class="p">.</span><span class="n">copyTo</span><span class="p">(</span><span class="n">img</span><span class="p">);</span>
+		<span class="n">sprintf</span><span class="p">(</span><span class="n">temp</span><span class="p">,</span><span class="s">"(%d,%d)"</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">);</span>
+		<span class="n">cur_pt</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">);</span>
+		<span class="n">putText</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">temp</span><span class="p">,</span><span class="n">cur_pt</span><span class="p">,</span><span class="n">FONT_HERSHEY_SIMPLEX</span><span class="p">,</span><span class="n">fontSize</span><span class="p">,</span><span class="n">Scalar</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">),</span><span class="n">lineSize</span><span class="p">,</span><span class="mi">8</span><span class="p">);</span>
+		<span class="n">circle</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">pre_pt</span><span class="p">,</span><span class="mi">2</span><span class="o">/</span><span class="n">dScale</span><span class="p">,</span><span class="n">Scalar</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span><span class="n">CV_FILLED</span><span class="p">,</span><span class="n">CV_AA</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
+		<span class="n">rectangle</span><span class="p">(</span><span class="n">img</span><span class="p">,</span><span class="n">pre_pt</span><span class="p">,</span><span class="n">cur_pt</span><span class="p">,</span><span class="n">Scalar</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span><span class="n">lineSize</span><span class="p">,</span><span class="mi">8</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span><span class="c1">//根据初始点和结束点，将矩形画到img上</span>
+		<span class="n">showPicInScale</span><span class="p">(</span><span class="s">"org"</span><span class="p">,</span><span class="n">img</span><span class="p">,</span><span class="n">dScale</span><span class="p">);</span>
+		<span class="n">img</span><span class="p">.</span><span class="n">copyTo</span><span class="p">(</span><span class="n">tmp</span><span class="p">);</span>
+		<span class="c1">//截取矩形包围的图像，并保存到dst中</span>
+		<span class="kt">int</span> <span class="n">width</span> <span class="o">=</span> <span class="n">abs</span><span class="p">(</span><span class="n">pre_pt</span><span class="p">.</span><span class="n">x</span> <span class="o">-</span> <span class="n">cur_pt</span><span class="p">.</span><span class="n">x</span><span class="p">);</span>
+		<span class="kt">int</span> <span class="n">height</span> <span class="o">=</span> <span class="n">abs</span><span class="p">(</span><span class="n">pre_pt</span><span class="p">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">cur_pt</span><span class="p">.</span><span class="n">y</span><span class="p">);</span>
+		<span class="k">if</span> <span class="p">(</span><span class="n">width</span> <span class="o">==</span> <span class="mi">0</span> <span class="o">||</span> <span class="n">height</span> <span class="o">==</span> <span class="mi">0</span><span class="p">){</span>
+			<span class="k">return</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="n">dst</span> <span class="o">=</span> <span class="n">org</span><span class="p">(</span><span class="n">Rect</span><span class="p">(</span><span class="n">min</span><span class="p">(</span><span class="n">cur_pt</span><span class="p">.</span><span class="n">x</span><span class="p">,</span><span class="n">pre_pt</span><span class="p">.</span><span class="n">x</span><span class="p">),</span><span class="n">min</span><span class="p">(</span><span class="n">cur_pt</span><span class="p">.</span><span class="n">y</span><span class="p">,</span><span class="n">pre_pt</span><span class="p">.</span><span class="n">y</span><span class="p">),</span><span class="n">width</span><span class="p">,</span><span class="n">height</span><span class="p">));</span>
+		<span class="n">imshow</span><span class="p">(</span><span class="s">"cuted pic"</span><span class="p">,</span><span class="n">dst</span><span class="p">);</span>
+	<span class="p">}</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">setWindowTop</span><span class="p">(){</span>
+	<span class="n">namedWindow</span><span class="p">(</span><span class="s">"GetFocus"</span><span class="p">,</span> <span class="n">CV_WINDOW_NORMAL</span><span class="p">);</span>
+	<span class="n">Mat</span> <span class="n">img</span> <span class="o">=</span> <span class="n">cv</span><span class="o">::</span><span class="n">Mat</span><span class="o">::</span><span class="n">zeros</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">,</span> <span class="n">CV_8UC3</span><span class="p">);</span>
+	<span class="n">imshow</span><span class="p">(</span><span class="s">"GetFocus"</span><span class="p">,</span> <span class="n">img</span><span class="p">);</span>
+	<span class="n">setWindowProperty</span><span class="p">(</span><span class="s">"GetFocus"</span><span class="p">,</span> <span class="n">CV_WND_PROP_FULLSCREEN</span><span class="p">,</span> <span class="n">CV_WINDOW_FULLSCREEN</span><span class="p">);</span>
+	<span class="n">waitKey</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+	<span class="n">setWindowProperty</span><span class="p">(</span><span class="s">"GetFocus"</span><span class="p">,</span> <span class="n">CV_WND_PROP_FULLSCREEN</span><span class="p">,</span> <span class="n">CV_WINDOW_NORMAL</span><span class="p">);</span>
+	<span class="n">destroyWindow</span><span class="p">(</span><span class="s">"GetFocus"</span><span class="p">);</span>
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span><span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">){</span>
+	<span class="kt">int</span> <span class="n">nQuit</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>
+	
+	<span class="k">if</span> <span class="p">(</span><span class="n">argc</span> <span class="o">!=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+		<span class="n">printf</span><span class="p">(</span><span class="s">"%s imgfile"</span><span class="p">,</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]);</span>
+	<span class="p">}</span>
+	<span class="n">org</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>
+	<span class="n">org</span><span class="p">.</span><span class="n">copyTo</span><span class="p">(</span><span class="n">img</span><span class="p">);</span>
+	<span class="n">dScale</span> <span class="o">=</span> <span class="p">(</span><span class="kt">double</span><span class="p">)</span><span class="n">startWidth</span><span class="o">/</span><span class="n">org</span><span class="p">.</span><span class="n">cols</span><span class="p">;</span>
+
+	<span class="n">setWindowTop</span><span class="p">();</span>
+	<span class="c1">//namedWindow("org",CV_WINDOW_NORMAL);//定义一个img窗口</span>
+	<span class="n">namedWindow</span><span class="p">(</span><span class="s">"org"</span><span class="p">);</span><span class="c1">//定义一个img窗口</span>
+	<span class="n">setMouseCallback</span><span class="p">(</span><span class="s">"org"</span><span class="p">,</span><span class="n">on_mouse</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span><span class="c1">//调用回调函数</span>
+	<span class="n">showPicInScale</span><span class="p">(</span><span class="s">"org"</span><span class="p">,</span><span class="n">img</span><span class="p">,</span><span class="n">dScale</span><span class="p">);</span>
+
+	<span class="kt">double</span> <span class="n">dZoomFactor</span><span class="o">=</span><span class="mf">0.05</span><span class="p">;</span>
+	<span class="k">do</span> <span class="p">{</span>
+		<span class="kt">int</span> <span class="n">key</span><span class="o">=</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+		<span class="k">switch</span><span class="p">(</span><span class="n">key</span><span class="p">){</span>
+			<span class="k">case</span> <span class="mi">27</span><span class="p">:</span>
+				<span class="n">nQuit</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+				<span class="k">break</span><span class="p">;</span>
+			<span class="k">case</span> <span class="sc">'q'</span><span class="p">:</span>
+				<span class="n">dScale</span> <span class="o">+=</span> <span class="mi">2</span><span class="o">*</span><span class="n">dZoomFactor</span><span class="p">;</span>
+			<span class="k">case</span> <span class="sc">'a'</span><span class="p">:</span>
+				<span class="n">dScale</span> <span class="o">-=</span> <span class="n">dZoomFactor</span><span class="p">;</span>
+				<span class="k">if</span> <span class="p">(</span><span class="n">dScale</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">)</span>
+					<span class="n">dScale</span> <span class="o">=</span> <span class="n">dZoomFactor</span><span class="p">;</span>
+				<span class="n">showPicInScale</span><span class="p">(</span><span class="s">"org"</span><span class="p">,</span><span class="n">img</span><span class="p">,</span><span class="n">dScale</span><span class="p">);</span>
+				<span class="k">break</span><span class="p">;</span>
+			<span class="nl">default:</span> <span class="k">continue</span><span class="p">;</span>
+		<span class="p">}</span>
+	<span class="p">}</span> <span class="k">while</span> <span class="p">(</span><span class="n">nQuit</span><span class="p">);</span>
+	
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>源码中已经有了很多的注释，这里再大框架的解释一下：</p>
+<ul>
+  <li>showPicInScale是将照片以给定的缩放率在屏幕上显示</li>
+  <li>on_mouse是所有在原图片窗口的鼠标动作事件回调到这个函数来处理，主要处理以下几项：
+    <ul>
+      <li>如果没有鼠标键按下，则仅在鼠标位置显示当前鼠标位置坐标，注意这个坐标换算成了以全幅图片为标准的坐标，尽管在屏幕显示的时候照片可能缩小了</li>
+      <li>如果鼠标左键按下，在该坐标点标记框画起始点</li>
+      <li>如果鼠标左键按下移动，则实时用绿线在屏幕上画框</li>
+      <li>如果鼠标左键抬起来，则获取框画结束点，配合起始点，就得到了要裁剪的矩形，从而完成裁剪</li>
+    </ul>
+  </li>
+  <li>setWindowTop，可能是OpenCV跟Mac电脑的兼容问题，每次出来的窗口都在后面，这个函数的功能是使得之后出现的窗口，都出现在屏幕最前面</li>
+  <li>main主函数中，do - while循环中主要处理了原始照片缩放级别的加大和缩小</li>
+</ul>
+
+<p>使用示例：<br />
+<img src="http://115.182.41.123/files/201801/04/opencvp2.jpg" alt="" />
+至此关于使用OpenCV进行自动化照片处理的三篇系列就全部完成了，希望对你有用。</p>
+
+<p>参考链接：<a href="http://blog.csdn.net/skeeee/article/details/16844937">http://blog.csdn.net/skeeee/article/details/16844937</a></p>
+:ET

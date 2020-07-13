@@ -2,13 +2,13 @@
 layout:         page
 title:          让我来为“区块链”添把火
 subtitle:      	再谈区块链：正在改变世界的区块链技术
-card-image:		https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1529056339174&di=269f27bbde8448306b9fa765798205f0&imgtype=0&src=http%3A%2F%2Fimg.jrzj.com%2Fuploadfile%2F2017%2F0510%2F20170510050308265.png
+card-image:		http://115.182.41.123/files/201806/blockchain.jpg
 date:           2018-06-15
 tags:           life
 post-card-type: image
 ---
 <link rel="stylesheet" type="text/css" href="{{ "/assets/css/sectors.css" | prepend: site.baseurl }}">
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1529056339174&di=269f27bbde8448306b9fa765798205f0&imgtype=0&src=http%3A%2F%2Fimg.jrzj.com%2Fuploadfile%2F2017%2F0510%2F20170510050308265.png)
+![](http://115.182.41.123/files/201806/blockchain.jpg)
 <section style="text-align: center; height: 50px;"><section style="width:48px;height:48px;color:#fff;font-size:16px;line-height:48px;display:inline-block;text-align:center;background-image:url(http://image2.135editor.com/mmbiz_gif/yqVAqoZvDibElUrxgDE4QeKBff3ehKBcxKdGhmMbTCFtF1y4BYviab1IbDHuSvqYyrFUFdicSOrOMABzH2nfYVm0A/0?wx_fmt=gif);background-repeat:no-repeat;background-size:100%;background-position:0;margin:0 auto;background-color:rgb(255,255,255);"><p style="margin:10px;padding:0px;font-size:16px;text-align:center;font-weight:bold;color:#ffffff"><span>1</span></p></section><section style="height:2px;background-color:rgb(34,33,33);margin-top:-26px;"></section></section>
 这次我不是来灭火的，我觉得现在为炙手可热的区块链添一把柴正是时候。  
 在大多数人的概念中，区块链就是比特币。了解多一点的，可能还会说起来现在充斥于各交易所形形色色的虚拟货币。然后接下来一句可能就是：暴跌啊，惨不忍睹...   

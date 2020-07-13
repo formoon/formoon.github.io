@@ -1,0 +1,34 @@
+I"�<p>不同于Docker和虚拟机，诞生于Windows尚且一家独大的年代,wine是一个在Linux/Mac上面运行Windows应用的选择。<br />
+当然从诞生开始，对wine的诟病就不曾中断，主要来自于较低的运行效率和不良的兼容性。<br />
+事实上,wine是一个天才的项目和被严重低估的产品。</p>
+
+<p>在官网的说明中，wine是“Wine Is Not an Emulator” 的递归缩写。其实这已经把wine的出身说的很清楚了，不过仍然有很多人质疑认为”非模拟器“的解释不过是一种娱乐性的说法。<br />
+如果真要从技术的对比上，wine要更类似于cygwin这样的产品，后者是在windows的环境中，编写一个可以运行Linux的底层，从而在windows的环境中实现了一个在应用层运行的linux环境。<br />
+wine则是反过来，在POSIX兼容系统中，编写了一个windows的底层环境，从而在POSIX上运行windows的应用。<br />
+但是因为Windows的复杂度，这个工作艰巨而繁重，很多的应用特别是对显卡等底层要求比较高的应用无法运行。即便能跑起来的一些，也因为兼容层的速度问题，执行效率打了折扣或者软件微小的升级就导致不再兼容。wine的每一个版本更新，几乎都是为了解决一些软件的兼容性问题。<br />
+所以很多下载网站的介绍中，都特别指出“使用wine需要具备较高的技术水平”。</p>
+
+<p>CrossOver是wine的一个商业版本，对Mac等系统有更好的支持效果，易用性也高了许多。在CrossOver中，每一个Windows的执行环境被称为Bottle，通常是首先安装类似<a href="https://www.microsoft.com/en-us/download/details.aspx?id=9183">Visual C++ 6 run time library</a>这样的执行环境，然后就可以运行其上的Windows应用。对中文的支持仍然不太理想，但后台服务类（类似linux的命令行类）程序几乎兼容的都还不错。</p>
+
+<p>在这种情况下，你会感觉到wine和CrossOver的优点，不需要庞大的虚拟机环境和内存等资源限制，几乎如同Mac/Linux本身的应用一样，很小的代价就完成了Windows应用的执行。启动和关闭的速度更是将虚机远远抛在了脑后。<br />
+比如在Mac电脑上，可以看一看CrossOver执行之后的进程情况：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ps</span> <span class="nt">-fe</span> 
+...
+  501 60565     1   0  4:40PM ??         0:10.36 /Applications/CrossOver.app/Contents/MacOS/CrossOver
+  501 60568 60565   0  4:40PM ??         0:00.04 /Applications/CrossOver.app/Contents/SharedSupport/X11/bin/xpbproxy
+  501 60569 60565   0  4:40PM ??         0:00.09 /Applications/CrossOver.app/Contents/SharedSupport/X11/bin/quartz-wm
+  501 60570 60564   0  4:40PM ??         0:00.23 winewrapper.exe <span class="nt">--run</span> <span class="nt">--</span> /Applications/CrossOver.app/Contents/SharedSupport/CrossOver/lib/wine/sendwndcmd.exe.so <span class="nt">-n</span> <span class="nt">-e</span> explorer<span class="p">;</span>winewrapper 
+  501 60571 60564   0  4:40PM ??         0:00.40 winewrapper.exe <span class="nt">--enable-alt-loader</span> macdrv <span class="nt">--wait-children</span> <span class="nt">--start</span> <span class="nt">--</span> C:/users/crossover/Start Menu/u.lnk 
+  501 60573     1   0  4:40PM ??         0:13.42 /Applications/CrossOver.app/Contents/SharedSupport/CrossOver/lib/../bin/wineserver
+  501 60577     1   0  4:40PM ??         0:00.13 C:<span class="se">\w</span>indows<span class="se">\s</span>ystem32<span class="se">\s</span>ervices.exe 
+  501 60579     1   0  4:40PM ??         0:00.09 C:<span class="se">\w</span>indows<span class="se">\s</span>ystem32<span class="se">\w</span>inedevice.exe 
+  501 60581     1   0  4:40PM ??         0:00.08 C:<span class="se">\w</span>indows<span class="se">\s</span>ystem32<span class="se">\p</span>lugplay.exe 
+  501 60583     1   0  4:40PM ??         0:16.85 C:<span class="se">\w</span>indows<span class="se">\s</span>ystem32<span class="se">\w</span>inedevice.exe 
+  501 60585     1   0  4:40PM ??         0:00.31 Z:<span class="se">\A</span>pplications<span class="se">\C</span>rossOver.app<span class="se">\C</span>ontents<span class="se">\S</span>haredSupport<span class="se">\C</span>rossOver<span class="se">\l</span>ib<span class="se">\w</span>ine<span class="se">\s</span>endwndcmd.exe.so <span class="nt">-n</span> <span class="nt">-e</span> explorer<span class="p">;</span>winewrapper 
+  501 60587     1   0  4:40PM ??         0:00.71 C:<span class="se">\w</span>indows<span class="se">\s</span>ystem32<span class="se">\e</span>xplorer.exe /desktop 
+  501 60591     1   0  4:40PM ??         0:05.49 C:<span class="se">\P</span>rogram Files<span class="se">\x</span>xx<span class="se">\x</span>xx<span class="se">\x</span>xx.exe <span class="nt">-ProgPath</span><span class="o">=</span>C:<span class="se">\P</span>rogram Files<span class="se">\x</span>xx<span class="se">\ </span><span class="nt">-TmpPath</span><span class="o">=</span>C:<span class="se">\P</span>rogram Files<span class="se">\f</span>reedom<span class="se">\x</span>xx<span class="se">\ </span><span class="nt">-ConnMode</span><span class="o">=</span>0 <span class="nt">-version</span><span class="o">=</span>1704100 
+...
+</code></pre></div></div>
+<p>从这些信息中，可以清楚的看到，wine运行与macOS应用同一层次的用户空间中，Windows应用就好像macOS应用一样在单独的进程中执行，看起来很让人安心。</p>
+
+:ET

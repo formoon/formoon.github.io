@@ -1,0 +1,406 @@
+I"՞<p><img src="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1545112916052&amp;di=d2428f9e946cda2d7df3f0ca9ff3def8&amp;imgtype=0&amp;src=http%3A%2F%2Finsights.thoughtworkers.org%2Fwp-content%2Fuploads%2F2015%2F07%2F718-%25E4%25BD%259F%25E8%25BE%25BE-%25E5%2585%25A8%25E6%25A0%2588%25E5%25BC%2580%25E5%258F%2591%25E8%25AF%25AD%25E8%25A8%2580Python-1024x724.png" alt="" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.2/MathJax.js?config=TeX-MML-AM_CHTML"></script></p>
+<h3 id="从零开始python3第四讲">《从零开始PYTHON3》第四讲</h3>
+
+<p>先看看上一讲的练习答案。<br />
+程序完成的是功能，功能来自于“程序需求”（“需求”这个词忘记了什么意思的去复习一下第二讲）。<br />
+练习的程序需求当然就是练习题本身。所以编程类的练习题通常并没有所谓标准答案，只要能完成功能，都应当是正确的。下面是一个参考：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">speedXY</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+    <span class="n">y</span><span class="o">=</span><span class="p">((</span><span class="mi">12</span><span class="o">*</span><span class="mf">4.5</span><span class="o">-</span><span class="n">t</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">4.5</span><span class="o">*</span><span class="mi">5</span><span class="o">/</span><span class="mi">3</span><span class="o">-</span><span class="mf">2.5</span><span class="p">))</span>
+    <span class="n">x</span><span class="o">=</span><span class="p">((</span><span class="n">t</span><span class="o">-</span><span class="mi">5</span><span class="o">*</span><span class="n">y</span><span class="p">)</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span>
+
+<span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">speedXY</span><span class="p">(</span><span class="mi">36</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+<span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">speedXY</span><span class="p">(</span><span class="mi">48</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+</code></pre></div></div>
+<p>程序的执行结果是：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mf">6.0</span> <span class="mf">3.6</span>
+<span class="mf">14.0</span> <span class="mf">1.2</span>
+</code></pre></div></div>
+
+<p>讲到这里先要问一个问题，有人记得练习题的内容和上面执行的结果代表什么含义吗?</p>
+
+<p>我曾经在一个项目组问过类似的问题，代码完成后时隔仅仅1周，能正确回答的，不超过30%。</p>
+
+<p>我这里不是想说什么“人的记忆总是靠不住”之类的哲学问题。我想说的是，我们的程序，需要写的足够友好。至少过了很久我们拿起来，都能很容易的明白这是一个什么程序，用途是什么。</p>
+
+<hr />
+
+<h4 id="让程序更友好">让程序更友好</h4>
+
+<p>让程序更友好这个概念包含至少两层意思：</p>
+
+<ul>
+  <li>对自己更友好</li>
+  <li>对用户更友好</li>
+</ul>
+
+<p>我们先看如何对自己更友好。对自己更友好首先就是帮助编程人员自己和合作者理解程序的含义、功能，便于将来的代码重新使用，和便于错误的排查。</p>
+
+<p>比如程序一开始，首先应当对这个程序的背景、需求、开发时间、程序作者等内容作出注释。甚至如果程序用于团队之外，可能还要附加作者的联系方式。让别人有问题的时候，方便得到你的帮助。我们继续用上一讲的练习来做一个例子：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">"""
+程序名：函数式编程解应用题练习
+作者：Andrew
+时间：2018年6月1日
+
+原题：
+甲、乙两人相距36千米，相向而行.
+如果甲比乙先走2小时，那么他们在乙出发2.5小时后相遇;
+如果乙比甲先走2小时，那么他们在甲出发3小时后相遇;
+甲、乙两人每小时各走多少千米？（假设甲乙的速度均匀稳定）
+解题思路：
+假设甲的速度为x千米/小时
+假设乙的速度为y千米/小时
+列方程组：
+(2.5+2)x+2.5y=36
+3x+(3+2)y=36 
+根据方程2推导得出：
+x=(36-5y)/3
+代入方程1得出：
+y=(12*4.5-36)/(4.5*5/3-2.5)
+"""</span>
+</code></pre></div></div>
+
+<p>上面我们只列出了程序一开始的部分。连续的三个双引号<code class="language-plaintext highlighter-rouge">"""</code>就是Python中的“多行注释”命令，连续的三个单引号<code class="language-plaintext highlighter-rouge">'''</code>也是一样的，都可以使用。在两个“三引号”之间的文本，就是注释内容，上面的例子使用了三个双引号的方式。<br />
+注释内容对于Python系统来讲不起任何作用，会在处理的时候忽略掉。用途只是让读程序的人，用人类理解起来更友好的语言描述程序的功能，帮助程序员记忆或者理解程序。</p>
+
+<p>通过增加这样的注释，在我们自己重新读程序，或者别人借用我们的程序时，对程序会有更清晰的了解。<br />
+我们继续：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#定义用于计算甲乙两人速度的函数
+#输入值：数值参数t，代表甲乙之间的距离
+#返回值：甲、乙两人的速度
+</span><span class="k">def</span> <span class="nf">getSpeed</span><span class="p">(</span><span class="n">t</span><span class="p">):</span>
+    <span class="c1">#计算乙的速度
+</span>    <span class="n">y</span><span class="o">=</span><span class="p">((</span><span class="mi">12</span><span class="o">*</span><span class="mf">4.5</span><span class="o">-</span><span class="n">t</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">4.5</span><span class="o">*</span><span class="mi">5</span><span class="o">/</span><span class="mi">3</span><span class="o">-</span><span class="mf">2.5</span><span class="p">))</span>
+    <span class="c1">#计算甲的速度
+</span>    <span class="n">x</span><span class="o">=</span><span class="p">((</span><span class="n">t</span><span class="o">-</span><span class="mi">5</span><span class="o">*</span><span class="n">y</span><span class="p">)</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
+    <span class="c1">#返回计算结果：甲、乙的速度
+</span>    <span class="k">return</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span>
+</code></pre></div></div>
+
+<p>“#”读作“井号”，在Python中用于单行的注释，<code class="language-plaintext highlighter-rouge">"""</code>和<code class="language-plaintext highlighter-rouge">'''</code>是多行有效的，“#”只在本行有效，适合程序中小范围的注释。</p>
+
+<p>除了注释，函数名称、变量名称的用心选取也能够帮助对程序的理解。比如上面getSpeed，或者ji_suan_su_du这样的名字，就比speedXY这样的名字容易理解。当然在具体编程的时候会有权衡取舍的问题。单纯为了便于理解，把很多频繁使用的变量名取的很长反而会影响编程过程，就不如单独对某变量做一个清晰的注释，然后变量名用短一些的。<br />
+我们继续看完这个程序：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#计算原题：当甲乙双方相距36千米时双方的速度
+</span><span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">getSpeed</span><span class="p">(</span><span class="mi">36</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+
+<span class="c1">#计算延伸题：当甲乙双方相距48千米时双方的速度
+</span><span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">getSpeed</span><span class="p">(</span><span class="mi">48</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+</code></pre></div></div>
+<p>这部分是调用定义好的函数，来计算相距不同距离的时候，甲、乙的速度。有了注释的帮助，程序读起来显然容易多了。把注释用到程序的教学中，也是格外见效。<br />
+程序的开发通常会有很多文档性的要求，在不同的规则中，有些文档需要，在另外一些规则中，某些文档可能不需要。但源码都是必不可少的部分，所以把必要的文档保留在源码中是最重要的好习惯之一。</p>
+
+<p>注释的内容可多可少，目的就是让人看懂。但是“看懂”是个很主观的事情，什么样叫做“看懂”呢？一般的原则是，在编写注释的时候，把自己对当前程序的知识清空，假设自己对这个程序一无所知，然后来读自己写的注释，看是否能理解注释和所注释的程序。或者也可以用“换位思考法”，把自己设想成其他人，来阅读自己的程序，看能否在注释的帮助下完全理解。<br />
+业界有一句经典：“好的程序会说话”，指的就是程序有良好的注释及良好的结构，从而有良好的可读性。</p>
+
+<p>现在我们已经完整的注释了昨天的练习程序。为了解释起来方便，我们把程序拆分成了三部分，并没有删减。如果断断续续看起来觉得不顺畅，也可以读一下资料包中的code1.py源码。</p>
+
+<hr />
+
+<p>接着就是如何做到对用户友好，我们现在的程序对用户可不友好。看看这个输出，你觉得除了编程序的人，还有别人能看懂吗？</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mf">6.0</span> <span class="mf">3.6</span>
+<span class="mf">14.0</span> <span class="mf">1.2</span>
+</code></pre></div></div>
+<p>为了让用户能看得懂，我们应当提供更多的辅助性说明信息，来描述程序的功能和计算结果，比如我们对比下面一个执行结果：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">原题</span><span class="err">：</span>
+<span class="n">甲</span><span class="err">、</span><span class="n">乙两人相距36千米</span><span class="err">，</span><span class="n">相向而行</span><span class="p">.</span>
+<span class="n">如果甲比乙先走2小时</span><span class="err">，</span><span class="n">那么他们在乙出发2</span><span class="p">.</span><span class="mi">5</span><span class="n">小时后相遇</span><span class="p">;</span>
+<span class="n">如果乙比甲先走2小时</span><span class="err">，</span><span class="n">那么他们在甲出发3小时后相遇</span><span class="p">;</span>
+<span class="n">甲</span><span class="err">、</span><span class="n">乙两人每小时各走多少千米</span><span class="err">？（</span><span class="n">假设甲乙的速度均匀稳定</span><span class="err">）</span>
+
+<span class="n">当甲乙双方相距36千米时</span><span class="err">：</span>
+<span class="n">甲方速度为</span><span class="err">：</span> <span class="mf">6.0</span> <span class="n">千米</span><span class="err">，</span><span class="n">乙方速度为</span><span class="err">：</span> <span class="mf">3.6</span> <span class="n">千米</span>
+<span class="n">当甲乙双方相距48千米时</span><span class="err">：</span>
+<span class="n">甲方速度为</span><span class="err">：</span> <span class="mf">14.0</span> <span class="n">千米</span><span class="err">，</span><span class="n">乙方速度为</span><span class="err">：</span> <span class="mf">1.2</span> <span class="n">千米</span>
+</code></pre></div></div>
+<p>哪一个对用户更友好完全是不言而喻的。接下来我们看看如何做到这一点：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">"""
+程序名：函数式编程解应用题练习
+作者：Andrew
+时间：2018年6月1日
+"""</span>
+<span class="n">question</span><span class="o">=</span><span class="s">"""
+原题：
+甲、乙两人相距36千米，相向而行.
+如果甲比乙先走2小时，那么他们在乙出发2.5小时后相遇;
+如果乙比甲先走2小时，那么他们在甲出发3小时后相遇;
+甲、乙两人每小时各走多少千米？（假设甲乙的速度均匀稳定）
+"""</span>
+<span class="s">"""
+解题思路：
+假设甲的速度为x千米/小时
+假设乙的速度为y千米/小时
+列方程组：
+(2.5+2)x+2.5y=36
+3x+(3+2)y=36 
+根据方程2推导得出：
+x=(36-5y)/3
+代入方程1得出：
+y=(12*4.5-36)/(4.5*5/3-2.5)
+"""</span>
+
+<span class="p">......</span>
+<span class="p">......</span><span class="n">这里我们忽略掉函数定义的部分</span><span class="err">，</span><span class="n">因为没有变化</span>
+<span class="p">......</span>
+
+<span class="c1">#显示原题
+</span><span class="k">print</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+<span class="c1">#计算原题：当甲乙双方相距36千米时双方的速度
+</span><span class="k">print</span><span class="p">(</span><span class="s">"当甲乙双方相距36千米时："</span><span class="p">)</span>
+<span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">getSpeed</span><span class="p">(</span><span class="mi">36</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"甲方速度为："</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="s">"千米，乙方速度为："</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s">"千米"</span><span class="p">)</span>
+
+<span class="c1">#计算延伸题：当甲乙双方相距48千米时双方的速度
+</span><span class="k">print</span><span class="p">(</span><span class="s">"当甲乙双方相距48千米时："</span><span class="p">)</span>
+<span class="n">x</span><span class="p">,</span><span class="n">y</span> <span class="o">=</span> <span class="n">getSpeed</span><span class="p">(</span><span class="mi">48</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"甲方速度为："</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="s">"千米，乙方速度为："</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s">"千米"</span><span class="p">)</span>
+</code></pre></div></div>
+<p>程序在一开始的部分还是注释，使用三引号的注释方法。跟上一个程序的区别是，在原题描述的部分，我们把注释断开了。之前的部分，两组三引号圈住，完成了第一个注释。接着是：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">question</span><span class="o">=</span><span class="s">"""
+原题：
+甲、乙两人相距36千米，相向而行.
+如果甲比乙先走2小时，那么他们在乙出发2.5小时后相遇;
+如果乙比甲先走2小时，那么他们在甲出发3小时后相遇;
+甲、乙两人每小时各走多少千米？（假设甲乙的速度均匀稳定）
+"""</span>
+</code></pre></div></div>
+<p>同样是两组三引号圈住一段多行文字，但使用“=”赋值符号，赋值给了变量question。这段文字叫做“字符串”，变量question就是“字符串变量”。名字的来源是这样：如果每个字符都是一个元素的话，这么多字符连接在一起，就好像是珍珠项链一样串接着，所以叫“字符串”。</p>
+
+<p>同数字一样，字符串是Python的基本数据类型的一种，Python一共有6种基本的数据类型，我们的课程后续会逐步讲解，但并不会全部重点介绍。</p>
+
+<blockquote>
+  <p>注意这里“数据类型”的概念非常重要，无论是数字还是字符串，不同的类型，可以进行的操作是不一样的。比如数字可以加、减、乘、除计算。字符串就不可以，当然后面我们会讲字符串也有自己的运算，而这些运算，数字又不可以。</p>
+</blockquote>
+
+<p>跟能够输出数字变量的值一样，print函数也可以输出字符串变量中的值。所以程序在显示的时候，先显示了question变量的值，也就是输出了原题部分的文字内容：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="n">question</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>所产生的输出结果是：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">原题</span><span class="err">：</span>
+<span class="n">甲</span><span class="err">、</span><span class="n">乙两人相距36千米</span><span class="err">，</span><span class="n">相向而行</span><span class="p">.</span>
+<span class="n">如果甲比乙先走2小时</span><span class="err">，</span><span class="n">那么他们在乙出发2</span><span class="p">.</span><span class="mi">5</span><span class="n">小时后相遇</span><span class="p">;</span>
+<span class="n">如果乙比甲先走2小时</span><span class="err">，</span><span class="n">那么他们在甲出发3小时后相遇</span><span class="p">;</span>
+<span class="n">甲</span><span class="err">、</span><span class="n">乙两人每小时各走多少千米</span><span class="err">？（</span><span class="n">假设甲乙的速度均匀稳定</span><span class="err">）</span>
+
+</code></pre></div></div>
+
+<p>请注意输出的最后，也就是第6行，有一个空行。在第二讲我们已经说过了“回车符”或者“换行符”，这个符号是看不到的，只是把输出点，或者说光标点，换到下一行一开始的位置。<br />
+每个print函数在输出的时候，最后都会加一个换行符，从而使得下一次的输出，是从下一行一开始进行的。想想我们上一个例子最后输出的样子：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mf">6.0</span> <span class="mf">3.6</span>
+<span class="mf">14.0</span> <span class="mf">1.2</span>
+</code></pre></div></div>
+
+<p>这两组数字，分成两行输出，就是因为第一个print函数执行的最后，附加了一个“换行符”。</p>
+
+<p>回到刚才字符串的例子。使用三引号圈住多行字符串的时候，实际每一行的最后，都有一个不可见的“回车换行符”，这才有了行的概念。在圈住原题说明的最后一行，三引号是从下一行的开始圈住的，这里面就包含了一个不可见的换行符，这也是题目文字部分最后一行的结尾。在输出题目文字的时候，print附加了一个换行符，没有任何内容的一个新行，再换行，这就是第6行整行空行的由来。</p>
+
+<p>随后的每一组输出，我们都使用字符串进行输出的提示：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">"当甲乙双方相距36千米时："</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>这里使用一组两个单双引号圈起来的部分，也是一个字符串，比刚才的题目文字要短很多，另外重点是在一行之内。一组三引号，无论是三个双引号、还是三个单引号，都表示圈起来多行的字符串。当然在一行内使用也没问题，只是显得麻烦。<br />
+而一组单个的引号，无论是双引号还是单引号，都表示不跨行的字符串。所有这些用各种引号引起来的字符串，同数字的立即数一样，也是立即数，只是类型是“字符串类型”。</p>
+
+<p>print函数的功能是输出参数的值。当然字符串的值也可以输出。</p>
+
+<p>前面同时输出两个数字的时候，我们使用了<code class="language-plaintext highlighter-rouge">print(x,y)</code>这样的形式。这是因为print可以接受多个参数，参数中间使用逗号隔开。实际上所有的函数，使用多个参数的时候，都是这种格式，这是语法的要求。</p>
+
+<p>print输出多个参数的时候，每输出完一个参数，会附加一个空格，这个空格就是刚才例子中<code class="language-plaintext highlighter-rouge">6.0 3.6</code>两个数字之间的空格。print函数并不限定所有的参数是什么类型，只要是Python合法的数据，就可以被print输出，并在参数中间使用空格隔开。因为这种特征，我们为每个输出，都使用字符串进行了输出的提示，就是下面这句：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="s">"甲方速度为："</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="s">"千米，乙方速度为："</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s">"千米"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>输出的效果是：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">甲方速度为</span><span class="err">：</span> <span class="mf">6.0</span> <span class="n">千米</span><span class="err">，</span><span class="n">乙方速度为</span><span class="err">：</span> <span class="mf">3.6</span> <span class="n">千米</span>
+ <span class="p">...</span>
+<span class="n">甲方速度为</span><span class="err">：</span> <span class="mf">14.0</span> <span class="n">千米</span><span class="err">，</span><span class="n">乙方速度为</span><span class="err">：</span> <span class="mf">1.2</span> <span class="n">千米</span>
+</code></pre></div></div>
+
+<p>看起来是不是清楚多了呢？</p>
+
+<hr />
+
+<h4 id="字符串的总结">字符串的总结</h4>
+
+<p>由多个字符组成的文本就是字符串，并且使用“界定符”圈起来。不超过一行的字符串，界定符可以使用双引号“””或者单引号“’‘”。多行字符串则必须使用三个单引号<code class="language-plaintext highlighter-rouge">'''</code>或者三个双引号<code class="language-plaintext highlighter-rouge">"""</code>。界定符必须成对儿使用，两个界定符之间的部分，才会被认为是字符串。更精确的讲是“字符串立即数”，回忆一下，立即数是跟变量对应的讲法，立即数是常量。</p>
+
+<p>但是井号“#”并不是界定符，也不用成对使用。井号只有当做注释符一种用法，不能用来表示字符串。</p>
+
+<p>一个字符串不赋值给任何变量，可以当做注释来使用，就好像我们前面见过的那样，虽然我们使用多行字符串举例，但单行字符串也是一样的。<br />
+把字符串不赋值给任何变量，相当于忽略掉了字符串这个值。这跟有些函数我们不使用返回值，等于忽略掉返回值是完全一样的方法。所以你可以推理一下，实际上数字的立即数，也可以不赋值给任何变量，这时候这个数字同样也会被忽略。只是这种用法完全没有意义，所以正常编程中几乎见不到。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">43</span><span class="c1">#数字立即数，不赋值给任何变量，这一行会被忽略
+</span><span class="mi">34</span><span class="o">+</span><span class="mi">7</span><span class="c1">#数字表达式，计算结果不赋值给任何变量，也会被忽略
+</span><span class="k">print</span><span class="p">(</span><span class="s">"test"</span><span class="p">)</span><span class="c1">#一个输出，来验证程序正常的执行
+</span></code></pre></div></div>
+
+<p>以上面几行程序为例，程序可以正常执行，没有任何报错信息，执行结果只是输出一行“test”字符串。</p>
+
+<p>我们来看几个字符串的例子：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">'好好学习，天天向上'</span><span class="c1">#字符串，没有赋值给变量，会被忽略，可以用于注释
+</span>
+<span class="s">"好好学习，天天向上"</span><span class="c1">#字符串，同上
+</span>
+<span class="s">'''好好学习，天天向上'''</span><span class="c1">#字符串
+</span>
+<span class="s">'''好好学习，
+天天向上'''</span><span class="c1">#多行字符串，包括两行内容
+</span>
+<span class="s">"""好好学习，天天向上"""</span><span class="c1">#字符串
+</span>
+<span class="s">'好好学习，天天向上"#前后界定符不匹配，会报错
+
+a="好好学习，天天向上"#字符串赋值给变量
+</span></code></pre></div></div>
+
+<p>这几个概念不困难，相信你能看明白。而且，你看在注释的帮助下，我们对每一行的代码理解更清晰了，并且及时的就能看到包含在注释中的讲解。</p>
+
+<p>学习过C语言的同学可能会问，为什么Python中会有4种字符串界定符。原因很简单，用起来更方便，也防止混淆。比如在下面几个例子：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">"Today is Tina's Birthday"</span><span class="c1">#防止字符串中的单引号造成混淆
+</span>
+<span class="s">'Tom said: "Come back Jerry!"'</span><span class="c1">#防止字符串中的对话引用混淆
+</span>
+<span class="s">"""
+Tom said:" I'm afraid not!"
+"""</span><span class="c1">#单、双引号都有混淆的可能，所以使用三引号
+</span>
+<span class="s">'''Tom said:" I'm afraid not!"'''</span><span class="c1">#跟上面一行意思一样
+</span>
+</code></pre></div></div>
+
+<p>类似C语言这种没有那么多种界定符的语言，Python中同样可以使用“转义符”来处理字符串内容可能造成混淆的情况，比如：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">'Tom said:" I</span><span class="se">\'</span><span class="s">m afraid not!"'</span>
+</code></pre></div></div>
+
+<p>为了防止字符串内部的单引号造成混淆，在单引号前面使用了转义符“\”，所有字符串中，当转义符出现的时候，其后面一个字符都将视情况不同，而做其它的处理，防止其本身的含义会造成混淆。在这一例中，“'”被强制当做字符串的内容来处理，而不是界定符，这样就不会同界定符单引号所混淆。字符串中的双引号，本身就不会同外面的单引号界定符混淆，所以不用特殊处理。</p>
+
+<p>转义符的概念还有很多，我们可能会经常用到的还有换行符：“\n”，制表符：“\t”，反斜线字符本身“\\”。换行符我们前面见过多次了，在字符串中使用换行符，除了使用多行字符串，还可以在需要的位置使用这里讲的换行转义符。另外字符串中比如会有可能用到反斜线自己，这时候就要键入两次反斜线，意思是“转义反斜线自己”。来看一个简单的例子：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="s">"abc</span><span class="se">\n</span><span class="s"> def</span><span class="se">\t</span><span class="s">321"</span><span class="p">)</span><span class="c1">#看到&gt;&gt;&gt;，你应当想到这使用了交互模式
+</span><span class="n">abc</span>
+ <span class="n">def321</span>
+</code></pre></div></div>
+
+<p>上例的输出中，“abc”不会有疑问，换了一行继续输出，这就是换行转义符的功效。“def”之前有一个空格，这是字符串中\n之后那个空格。def跟321中有一个制表符。事实上如果你尝试多输出几行不同的内容，并且使用制表符，你会发现制表符可以把内容排列的非常整齐。另外再说一点你就更清楚了，在前面讲缩格的时候，我提到可以在需要缩格的地方使用一个“TAB键”，事实上键盘上TAB键输入的，就是制表符。只是跟换行符一样，虽然能看到效果，但是制表符也一样不可见，所以在需要使用制表符的地方，通常都是使用\t转义符。</p>
+
+<p>前面两讲我们熟悉了数字的运算，下面我们看看字符串的常用运算。首先是字符串相加。我们使用Python的交互模式来展示一下：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="mi">123</span><span class="o">+</span><span class="mi">456</span><span class="c1">#数字类型的+运算
+</span><span class="mi">579</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="s">"好好学习，"</span><span class="o">+</span><span class="s">"天天向上"</span><span class="c1">#字符串类型的+运算
+</span><span class="s">'好好学习，天天向上'</span>
+
+<span class="c1">#字符串之后是另外一个字符串，空格有没有都可以，这是另外形式的+运算
+</span><span class="o">&gt;&gt;&gt;</span> <span class="s">"好好学习,"</span> <span class="s">'天天向上'</span> 
+<span class="s">'好好学习,天天向上'</span>
+
+<span class="c1">#字符串的+操作经常用于组合各种复杂的格式，后面我们会经常用到
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span> <span class="o">=</span> <span class="s">"今天天气:"</span> <span class="s">'晴,'</span> <span class="s">'东南风2-3级,'</span> <span class="s">"雾霾指数:"</span> <span class="s">'0'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">今天天气</span><span class="p">:</span><span class="n">晴</span><span class="p">,</span><span class="n">东南风2</span><span class="o">-</span><span class="mi">3</span><span class="n">级</span><span class="p">,</span><span class="n">雾霾指数</span><span class="p">:</span><span class="mi">0</span>
+<span class="c1">#注意使用print输出，输出的只是内容本身，并不像交互模式那样两边还有引号
+</span></code></pre></div></div>
+
+<p>Python字符串的乘法操作非常有创意：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="s">"好好学习,"</span><span class="o">*</span><span class="mi">3</span>
+<span class="s">'好好学习,好好学习,好好学习,'</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="s">"好好学习,"</span><span class="o">*</span><span class="mi">3</span><span class="o">+</span><span class="s">"天天向上"</span>
+<span class="s">'好好学习,好好学习,好好学习,天天向上'</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="mi">1234567</span><span class="o">*</span><span class="mi">3</span>
+<span class="mi">3703701</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="s">"1234567"</span><span class="o">*</span><span class="mi">3</span>
+<span class="s">'123456712345671234567'</span>
+</code></pre></div></div>
+
+<p>现在我们已经学习了Python的两种数据类型。经常有很多操作，是需要两种类型互相转换的，我们同样用交互模式来展示：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">int</span><span class="p">(</span><span class="s">"1234567"</span><span class="p">)</span><span class="o">*</span><span class="mi">3</span><span class="c1">#int()我们前面学过了，把小数变成整数用过
+</span><span class="mi">3703701</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">float</span><span class="p">(</span><span class="s">"3.14"</span><span class="p">)</span><span class="o">*</span><span class="mi">3</span><span class="c1">#字符串转换成小数(浮点数)
+</span><span class="mf">9.42</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">str</span><span class="p">(</span><span class="mi">1234</span><span class="p">)</span><span class="o">*</span><span class="mi">3</span><span class="c1">#把数字转换成字符串
+</span><span class="s">'123412341234'</span>
+
+<span class="c1">#下面这个例子我们在前面看过：
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">x</span><span class="o">=</span><span class="mf">6.0</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">y</span><span class="o">=</span><span class="mf">3.6</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="s">"甲方速度为："</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="s">"千米，乙方速度为："</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="s">"千米"</span><span class="p">)</span>
+<span class="n">甲方速度为</span><span class="err">：</span> <span class="mf">6.0</span> <span class="n">千米</span><span class="err">，</span><span class="n">乙方速度为</span><span class="err">：</span> <span class="mf">3.6</span> <span class="n">千米</span>
+
+<span class="c1">#下面是把x/y先转换为字符串，然后整体使用字符串+操作，最后是1个字符串
+</span><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="s">"甲方速度为："</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">+</span><span class="s">"千米，乙方速度为："</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">y</span><span class="p">)</span><span class="o">+</span><span class="s">"千米"</span><span class="p">)</span>
+<span class="c1">#输出的时候，没有必要的空格不见了
+</span><span class="n">甲方速度为</span><span class="err">：</span><span class="mf">6.0</span><span class="n">千米</span><span class="err">，</span><span class="n">乙方速度为</span><span class="err">：</span><span class="mf">3.6</span><span class="n">千米</span>
+</code></pre></div></div>
+
+<p>上例中，最后的部分，我们展示了把数字变量，先转换为字符串，然后使用字符串的+操作把多个字符串组合为一个更复杂的字符串，然后使用print函数一次性输出。这是最常见的字符串应用场景。</p>
+
+<p>我们在电脑上操作，编写程序，使用编辑软件，敲击键盘，实际全部都是字符串的操作。只是输入到电脑中之后，在各种电脑程序的支持下，把输入的内容分别当做不同的类型来对待，最常见的就是字符串转换成数字。</p>
+
+<p>在Python程序中，即时获取用户的输入使用input()函数，函数返回值永远是字符串类型。如果你需要获取数字，则需要使用前面讲过的字符串转数值操作，int()或者float()。有一点需要特别注意，如果用户输入错误，应当输入数字而输入了字符或者无意义的符号，那在转换的时候Python会失败报错。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="nb">input</span><span class="p">()</span><span class="c1">#使用input()要求用户输入
+</span><span class="n">abc</span><span class="c1">#这里实际是Python在等待用户输入，用户输入了abc
+</span><span class="s">'abc'</span><span class="c1">#input()返回值将是字符串类型的'abc'
+</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">a</span><span class="o">=</span><span class="nb">input</span><span class="p">(</span><span class="s">'请输入你的年龄:'</span><span class="p">)</span>
+<span class="n">请输入你的年龄</span><span class="p">:</span><span class="mi">18</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+<span class="mf">18.0</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">a</span><span class="o">=</span><span class="nb">input</span><span class="p">(</span><span class="s">'请输入你的年龄:'</span><span class="p">)</span>
+<span class="n">请输入你的年龄</span><span class="p">:</span><span class="mi">3</span><span class="n">a</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">a</span><span class="p">))</span>
+<span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+  <span class="n">File</span> <span class="s">"&lt;stdin&gt;"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">1</span><span class="p">,</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="nb">ValueError</span><span class="p">:</span> <span class="n">could</span> <span class="ow">not</span> <span class="n">convert</span> <span class="n">string</span> <span class="n">to</span> <span class="nb">float</span><span class="p">:</span> <span class="s">'3a'</span>
+</code></pre></div></div>
+
+<hr />
+
+<h4 id="练习时间">练习时间</h4>
+
+<p>检验学习效果最好的方法就是做练习，想快速成长也是做练习。今天的练习内容是这样：</p>
+<blockquote>
+  <p>请让用户输入两个数字，并求和，输出求和结果。请尽力保持程序的友好。</p>
+</blockquote>
+
+<hr />
+
+<h4 id="本讲小结">本讲小结</h4>
+
+<p>保持程序的易读性是程序员永远追求的目标，因为不管你的脑子有多好，总有一天你会忘记。而效率的提高，依赖你经验的增长和程序代码的积累。程序代码的积累要求你的程序具有良好的可读性和可维护性。</p>
+
+<p>本讲讲解了为程序增加注释的方法，和字符串的基本用法。保持程序的易用性需要大量用到字符串，向用户给出细致、准确的提示。字符串操作是几乎所有电脑程序最主要的工作之一。</p>
+
+<hr />
+
+<h4 id="练习参考答案">练习参考答案</h4>
+
+<p>请参考源码ex.py</p>
+
+<hr />
+
+<p>附注：前面提到了用户输入不合理导致的异常报错，想避免这个问题可以使用Python中的异常处理功能。异常处理不属于本课程的讲授范围，有兴趣的可以查询try/except异常处理操作自己了解。</p>
+
+:ET

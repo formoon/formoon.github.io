@@ -1,0 +1,149 @@
+I"�K<p>好像是macOS10.10之后，以及iOS8之后，新出现的WKWebview组件就迅速的替代了Webview及UIWebView。后者的确存在一些无法解决的bug,诸如架构导致的速度缓慢和内存泄漏。<br />
+但无法避免的问题总是有的，比如有些客户端软件，仍然要求兼容老版本的系统，这时候，很不想使用，但也不得不仍然把Webview塞到自己的代码中。<br />
+互联网是个喜新厌旧的圈子，网上搜索，几乎只有两类。一是WKWebview的文档，二是iOS类的文档。想要的macOS下面Webview的资料缈如黄鹤。<br />
+经过部分只言片语的资料指导和大量的实验，终于完成了工作。所以决定来烧烧冷灶，写出来记录一下。</p>
+
+<h4 id="1添加webview">1.添加Webview</h4>
+<p>最简单添加webview的方法就是直接在Interface Builder中把Webview拖入到窗口并且用鼠标拖动到指定位置和指定大小，随后在程序中加上对应的变量：</p>
+<div class="language-swift highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kd">@IBOutlet</span> <span class="k">weak</span> <span class="k">var</span> <span class="nv">webView</span><span class="p">:</span> <span class="kt">WebView</span><span class="o">!</span>
+</code></pre></div></div>
+<p>如果必须动态程序实现，可以使用<code class="language-plaintext highlighter-rouge">window.contentView?.addSubview(webView)</code>把webview控件插入到界面中。</p>
+
+<h4 id="2载入网页">2.载入网页</h4>
+<ol>
+  <li>可以直接导向到某个网页，也可以先在本地启动一个静态页面文件，后续一些工作可以在本地静态网页中用js处理。这种方法是比较多用的,因为程序启动速度会感觉快的很多。
+    <div class="language-swift highlighter-rouge"><div class="highlight"><pre class="highlight"><code>     <span class="k">let</span> <span class="nv">path</span> <span class="o">=</span> <span class="kt">Bundle</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="nf">path</span><span class="p">(</span><span class="nv">forResource</span><span class="p">:</span> <span class="s">"somepage"</span><span class="p">,</span> <span class="nv">ofType</span><span class="p">:</span> <span class="s">"html"</span><span class="p">)</span>
+     <span class="k">let</span> <span class="nv">url</span> <span class="o">=</span> <span class="kt">NSURL</span><span class="o">.</span><span class="nf">fileURL</span><span class="p">(</span><span class="nv">withPath</span><span class="p">:</span> <span class="n">path</span><span class="o">!</span><span class="p">)</span>
+     <span class="k">let</span> <span class="nv">request</span> <span class="o">=</span> <span class="kt">URLRequest</span><span class="p">(</span><span class="nv">url</span><span class="p">:</span> <span class="n">url</span><span class="p">);</span>
+     <span class="k">self</span><span class="o">.</span><span class="n">webView</span><span class="o">.</span><span class="n">mainFrame</span><span class="o">.</span><span class="nf">load</span><span class="p">(</span><span class="n">request</span><span class="p">);</span>
+</code></pre></div>    </div>
+  </li>
+  <li>把somepage.html添加到项目，并在项目设置中Build Phases-&gt;Copy Bundle Resources中添加上文件somepage.html，这样最后生成app文件的时候，somepage.html文件才会被打包到其中。</li>
+  <li>如果建立的项目使用沙箱(sandbox)模式，现在的应用，如果想上App Store，一般是强制要求使用沙箱的，需要在系统设置的Capabilities中允许incoming network/output networking。否则本地网页没问题，之后的任何网站都无法访问。</li>
+  <li>新版本的macOS及iOS都强制必须使用https网页访问，如果需要支持老的http网页，还需要在Info.plist中增加一行：App Transport Security Settings，类型为字典项，其中增加一项：Allow Arbitrary Loads，值为YES。
+完成以上4项，网页已经可以访问了。</li>
+</ol>
+
+<h4 id="3从swift调用js">3.从swift调用js</h4>
+<p>假定在网页中有如下内容：</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
+<span class="kd">function</span> <span class="nx">callFromSwift</span><span class="p">(</span><span class="nx">msg</span><span class="p">){</span>
+    <span class="nb">document</span><span class="p">.</span><span class="nx">getElementById</span><span class="p">(</span><span class="dl">'</span><span class="s1">msgbox</span><span class="dl">'</span><span class="p">).</span><span class="nx">innerHTML</span><span class="o">=</span><span class="nx">msg</span><span class="p">;</span>
+    <span class="k">return</span><span class="p">(</span><span class="dl">"</span><span class="s2">msg return from js</span><span class="dl">"</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="o">&lt;</span><span class="sr">/script</span><span class="err">&gt;
+</span><span class="o">&lt;</span><span class="nx">div</span> <span class="nx">id</span><span class="o">=</span><span class="dl">'</span><span class="s1">msgbox</span><span class="dl">'</span><span class="o">&gt;&lt;</span><span class="sr">/div</span><span class="err">&gt;
+</span></code></pre></div></div>
+<p>其中定义了一个函数callFromSwift,当被调用的时候，在下面预定义的div中显示传入的字符串，并且返回一个字符串“msg return from js”。<br />
+在swift中调用网页中的callFromSwift函数并获取其返回值可以这样做：</p>
+<div class="language-swift highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="k">let</span> <span class="nv">s</span><span class="o">=</span><span class="n">webView</span><span class="o">.</span><span class="n">windowScriptObject</span><span class="o">.</span><span class="nf">evaluateWebScript</span><span class="p">(</span><span class="s">"callFromSwift('Hello, JavaScript')"</span><span class="p">)</span>
+        <span class="kt">NSLog</span><span class="p">(</span><span class="n">s</span> <span class="k">as!</span> <span class="kt">String</span><span class="p">)</span>	<span class="c1">//s是js函数的返回结果，可以是多种类型，本例要求是string</span>
+</code></pre></div></div>
+<h4 id="4从js调用swift">4.从js调用swift</h4>
+<p>前面的3部分都比较容易，跟WKWebview也大同小异。从JS到swift的调用要复杂的多了。<br />
+首先在初始化的时候，要加上一句：</p>
+<div class="language-swift highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="n">webView</span><span class="o">!.</span><span class="n">frameLoadDelegate</span><span class="o">=</span><span class="k">self</span><span class="p">;</span>
+</code></pre></div></div>
+<p>对应的，要在类声明的位置加上一个继承：<code class="language-plaintext highlighter-rouge">WebFrameLoadDelegate</code>，随后加入代码：</p>
+<div class="language-swift highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="c1">//为js对象声明一个接口</span>
+    <span class="kd">func</span> <span class="nf">webView</span><span class="p">(</span><span class="n">_</span> <span class="nv">webView</span><span class="p">:</span> <span class="kt">WebView</span><span class="o">!</span><span class="p">,</span> <span class="n">didClearWindowObject</span> <span class="nv">windowObject</span><span class="p">:</span> <span class="kt">WebScriptObject</span><span class="o">!</span><span class="p">,</span> <span class="k">for</span> <span class="nv">frame</span><span class="p">:</span> <span class="kt">WebFrame</span><span class="o">!</span><span class="p">)</span> <span class="p">{</span>
+        <span class="k">self</span><span class="o">.</span><span class="n">webView</span><span class="o">.</span><span class="n">windowScriptObject</span><span class="o">.</span><span class="nf">setValue</span><span class="p">(</span><span class="k">self</span><span class="p">,</span> <span class="nv">forKey</span><span class="p">:</span> <span class="s">"swiftHost"</span><span class="p">)</span>
+    <span class="p">}</span>
+	<span class="c1">//这个是基本框架，声明了本类中有两个函数会开放给js对象，并供其调用</span>
+	<span class="c1">//这里示例了两个，一个是callFromJS1,另一个是quit</span>
+	<span class="c1">//注意swift中的函数名跟js中的函数名可以不一样，</span>
+	<span class="c1">//#selector中指明的是swift中声明的函数名，因为selector是object-c中的机制，</span>
+	<span class="c1">//所以后面在声明真正函数的时候，前面必须加@objc的标志</span>
+	<span class="c1">//在后面return "xxx"的部分，返回的字符串js中会使用的名字，</span>
+	<span class="c1">//本例中，swift中函数名跟js中函数名使用了相同的名字，我认为这是好习惯</span>
+    <span class="k">override</span> <span class="kd">class</span> <span class="kd">func</span> <span class="nf">webScriptName</span><span class="p">(</span><span class="k">for</span> <span class="nv">aSelector</span><span class="p">:</span> <span class="kt">Selector</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">String</span><span class="p">?</span>
+    <span class="p">{</span>
+        <span class="c1">//NSLog("%@",aSelector.description)</span>
+        <span class="k">if</span> <span class="n">aSelector</span> <span class="o">==</span> <span class="kd">#selector(</span><span class="nf">callFromJS1</span><span class="kd">)</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="s">"callFromJS1"</span>
+        <span class="p">}</span>
+        <span class="k">else</span>
+        <span class="k">if</span> <span class="n">aSelector</span> <span class="o">==</span> <span class="kd">#selector(</span><span class="nf">quit</span><span class="kd">)</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="s">"quit"</span>
+        <span class="p">}</span>
+        <span class="k">else</span>
+        <span class="p">{</span>
+            <span class="k">return</span> <span class="kc">nil</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+	<span class="c1">//这个函数顾名思义，应当是不允许在js中调用的，对所有的来值都返回false表示全部允许调用</span>
+    <span class="k">override</span> <span class="kd">class</span> <span class="kd">func</span> <span class="nf">isSelectorExcluded</span><span class="p">(</span><span class="n">fromWebScript</span> <span class="nv">aSelector</span><span class="p">:</span> <span class="kt">Selector</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span>
+    <span class="p">{</span>
+        <span class="c1">//NSLog("%@",aSelector.description)</span>
+        <span class="k">return</span> <span class="kc">false</span>
+    <span class="p">}</span>
+	<span class="c1">//具体的函数</span>
+    <span class="kd">@objc</span>
+    <span class="kd">func</span> <span class="nf">callFromJS1</span><span class="p">(</span><span class="nv">message</span><span class="p">:</span><span class="kt">String</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="kt">NSLog</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="kd">@objc</span>
+    <span class="kd">func</span> <span class="nf">quit</span><span class="p">()</span>
+    <span class="p">{</span>
+        <span class="kt">NSLog</span><span class="p">(</span><span class="s">"call for quit"</span><span class="p">)</span>
+        <span class="kt">NSApp</span><span class="o">.</span><span class="nf">terminate</span><span class="p">(</span><span class="k">self</span><span class="p">);</span>
+    <span class="p">}</span>
+
+</code></pre></div></div>
+<p>前三个函数是基本的框架，其中第二个麻烦一些，随后实际上工作的函数没有什么特别。<br />
+接着来看看js的部分：</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="o">&lt;</span><span class="nx">a</span> <span class="nx">href</span><span class="o">=</span><span class="dl">'</span><span class="s1">javascript:testCallSwift();</span><span class="dl">'</span><span class="o">&gt;</span><span class="nx">testCallSwift</span><span class="o">&lt;</span><span class="sr">/a&gt;&lt;p</span><span class="err">&gt;
+</span>    <span class="o">&lt;</span><span class="nx">a</span> <span class="nx">href</span><span class="o">=</span><span class="dl">'</span><span class="s1">javascript:needQuit();</span><span class="dl">'</span><span class="o">&gt;</span><span class="nx">Quit</span><span class="o">&lt;</span><span class="sr">/a&gt;&lt;p</span><span class="err">&gt;
+</span>	<span class="o">&lt;</span><span class="nx">script</span><span class="o">&gt;</span>
+		<span class="kd">function</span> <span class="nx">testCallSwift</span><span class="p">(){</span>
+			<span class="c1">//注意调用方式，window是js的对象</span>
+			<span class="c1">//swiftHost是swift的接口</span>
+			<span class="c1">//其后则是声明的swift函数</span>
+		    <span class="nb">window</span><span class="p">.</span><span class="nx">swiftHost</span><span class="p">.</span><span class="nx">callFromJS1</span><span class="p">(</span><span class="dl">"</span><span class="s2">hello swift</span><span class="dl">"</span><span class="p">);</span>
+		<span class="p">}</span>
+		<span class="kd">function</span> <span class="nx">needQuit</span><span class="p">(){</span>
+		    <span class="nb">window</span><span class="p">.</span><span class="nx">swiftHost</span><span class="p">.</span><span class="nx">quit</span><span class="p">();</span>
+		<span class="p">}</span>
+	<span class="o">&lt;</span><span class="sr">/script</span><span class="err">&gt;
+</span>
+</code></pre></div></div>
+<h4 id="5截获webview每一次访问">5.截获webview每一次访问</h4>
+<p>跟上面类似，要再增加一个代理：</p>
+<div class="language-swift highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//初始化的时候增加：</span>
+        <span class="n">webView</span><span class="o">!.</span><span class="n">policyDelegate</span><span class="o">=</span><span class="k">self</span><span class="p">;</span>
+</code></pre></div></div>
+<p>并且声明类的时候多一个继承:<code class="language-plaintext highlighter-rouge">WebPolicyDelegate</code>。随后代码中可以实现一个接口：</p>
+<div class="language-swift highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="kd">func</span> <span class="nf">webView</span><span class="p">(</span><span class="n">_</span> <span class="nv">webView</span><span class="p">:</span> <span class="kt">WebView</span><span class="o">!</span><span class="p">,</span>
+                 <span class="n">decidePolicyForNavigationAction</span> <span class="nv">actionInformation</span><span class="p">:</span> <span class="p">[</span><span class="kt">AnyHashable</span> <span class="p">:</span> <span class="kt">Any</span><span class="p">]</span><span class="o">!</span><span class="p">,</span>
+                 <span class="nv">request</span><span class="p">:</span> <span class="kt">URLRequest</span><span class="o">!</span><span class="p">,</span>
+                 <span class="nv">frame</span><span class="p">:</span> <span class="kt">WebFrame</span><span class="o">!</span><span class="p">,</span>
+                 <span class="n">decisionListener</span> <span class="nv">listener</span><span class="p">:</span> <span class="kt">WebPolicyDecisionListener</span><span class="o">!</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kt">NSLog</span><span class="p">(</span><span class="s">"nav to %@"</span><span class="p">,</span><span class="n">request</span><span class="o">.</span><span class="n">url</span><span class="o">!.</span><span class="n">absoluteString</span><span class="p">)</span>  <span class="c1">//这里是将要转向的网址</span>
+        <span class="n">listener</span><span class="o">.</span><span class="nf">use</span><span class="p">()</span>	<span class="c1">//允许访问这个网址</span>
+        <span class="c1">//listener.ignore()   //不允许访问这个网址则调用这个</span>
+    <span class="p">}</span>
+</code></pre></div></div>
+<p>也有些程序中为了简化从js调用swift的工作量，会用链接的方式，在链接地址中传入一些指令，就可以用这个函数截获网址并且处理，被处理的网址通常使用listener.ignore()来禁止本次浏览器转向，免得影响当前页面。</p>
+<h4 id="6响应js中的警告窗">6.响应js中的警告窗</h4>
+<p>通常的webview都是不允许js中的alert警告窗的，一方面是为了应用程序整体的效果；另一方面，webview作为一个空间，自己没有UI的控制权，所以类似的工作，是要有应用程序自己实现警告框窗口的。实现警告窗依然要给类增加一个集成<code class="language-plaintext highlighter-rouge">WebUIDelegate</code>,并在初始化中增加：</p>
+<div class="language-swift highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="n">webView</span><span class="o">!.</span><span class="n">uiDelegate</span><span class="o">=</span><span class="k">self</span><span class="p">;</span>
+
+<span class="c1">//随后可以实现一个接口：</span>
+    <span class="kd">func</span> <span class="nf">webView</span><span class="p">(</span><span class="n">_</span> <span class="nv">sender</span><span class="p">:</span> <span class="kt">WebView</span><span class="o">!</span><span class="p">,</span>
+                 <span class="n">runJavaScriptAlertPanelWithMessage</span> <span class="nv">message</span><span class="p">:</span> <span class="kt">String</span><span class="o">!</span><span class="p">,</span>
+                 <span class="n">initiatedBy</span> <span class="nv">frame</span><span class="p">:</span> <span class="kt">WebFrame</span><span class="o">!</span><span class="p">){</span>
+        <span class="kt">NSLog</span><span class="p">(</span><span class="s">"msg of alert: %@"</span><span class="p">,</span><span class="n">message</span><span class="p">)</span>
+    <span class="p">}</span>
+</code></pre></div></div>
+<p>如果不满足于只是得到警告消息，要自己在这个函数中使用cocoa的警告窗来显示相关的信息。</p>
+
+<h4 id="7其它">7.其它</h4>
+<p>还可以实现从js中访问swift中的变量功能。使用<code class="language-plaintext highlighter-rouge">isKeyExcludedFromWebScript</code>和<code class="language-plaintext highlighter-rouge">webScriptNameForKey</code>函数，我用得少，如果需要，参考上面定义函数的方法，查一查官方文档自己来试试吧。</p>
+
+<h4 id="参考资料">参考资料：</h4>
+<p><a href="http://blog.sibo.me/2016/07/11/swift-and-javascript-integration.html">Swift &amp; JavaScript integration</a></p>
+
+:ET

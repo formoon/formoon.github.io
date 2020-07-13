@@ -1,0 +1,19 @@
+I"�<p>副标题是不是好气人啊:)<br />
+其实没有歧视linux的意思，在Mac上的确5分钟可以搭建一个quic服务器。在Linux环境配置略微麻烦，10分钟也够了，五十步跟百步的区别。<br />
+QUIC协议不多解释了，网上搜有很多资料，被认为是下一代的主流互联网访问协议。你需要记住的只有一个字：“快”。<br />
+使用Chromium的quic插件编译一个服务器端很啰嗦，因为它自己以及很多的依赖包都是被墙掉的，下载会让你愁白几根头发。<br />
+另外一个golang的实现caddy则在github上，还是比较亲民的。<br />
+我的Mac上常备golang，所以golang的安装就省了，直接开始安装caddy:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>go get github.com/mholt/caddy/caddy
+<span class="nb">cd</span> <span class="nv">$GOPATH</span>/src/github.com/mholt/caddy/caddy
+<span class="c">#直接按照官方文档运行go run build.go有问题，因为其中引用了github/caddyserver包不存在，使用：</span>
+go build
+<span class="c">#可以直接编译出caddy主文件。</span>
+<span class="c">#移到可执行目录</span>
+<span class="nb">sudo mv </span>caddy /usr/local/bin
+<span class="c">#到自己的网站目录</span>
+<span class="nb">cd</span> ~/wwwroot
+caddy
+</code></pre></div></div>
+<p>至此caddy运行起来了，网络就算慢点，5分钟也够了。</p>
+:ET

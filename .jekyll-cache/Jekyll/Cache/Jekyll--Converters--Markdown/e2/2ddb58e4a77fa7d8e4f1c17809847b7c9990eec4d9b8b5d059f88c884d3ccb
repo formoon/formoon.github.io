@@ -1,0 +1,25 @@
+I"�<p>某台机重装两次ubuntu16.04 LTS版本都有开机报错，但一闪而过难以看清，后来尝试<code class="language-plaintext highlighter-rouge">apt update</code>,在下载完更新索引之后报错,从而确定了报错信息：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Problem executing scripts APT::Update::Post-Invoke-Success <span class="s1">'if /usr/bin/test -w /var/cache/app-info -a -e /usr/bin/appstreamcli; then appstreamcli refresh &gt; /dev/null; fi'</span>
+</code></pre></div></div>
+<p>尝试强制重新安装appstreamcli之后故障消失，但不知道造成的原因是什么：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#先停止当前的运行</span>
+<span class="nb">sudo </span>pkill <span class="nt">-KILL</span> appstreamcli
+<span class="c">#下载主程序和库的软件包</span>
+wget <span class="nt">-P</span> /tmp https://launchpad.net/ubuntu/+archive/primary/+files/appstream_0.9.4-1ubuntu1_amd64.deb https://launchpad.net/ubuntu/+archive/primary/+files/libappstream3_0.9.4-1ubuntu1_amd64.deb
+
+<span class="c">#安装</span>
+<span class="nb">sudo </span>dpkg <span class="nt">-i</span> /tmp/appstream_0.9.4-1ubuntu1_amd64.deb /tmp/libappstream3_0.9.4-1ubuntu1_amd64.deb
+</code></pre></div></div>
+
+<p>之后再运行一次apt的升级操作，因为appstream肯定有了新的升级包。之后就可以正常使用了。</p>
+
+<h2 id="参考httpsaskubuntucomquestions774986appstreamcli-hanging-with-100-cpu-usage-during-update">参考：<a href="https://askubuntu.com/questions/774986/appstreamcli-hanging-with-100-cpu-usage-during-update">https://askubuntu.com/questions/774986/appstreamcli-hanging-with-100-cpu-usage-during-update</a></h2>
+<p>补充：</p>
+<ol>
+  <li>用同一个U盘装过很多台Linux,都没有出现过类似现象。</li>
+  <li>本台电脑日常偶尔还会出现其它的异常情况。</li>
+  <li>经过一段时间之后，这台电脑频繁崩溃，经过仔细检测，都是硬盘文件损坏。</li>
+  <li>最终判断硬盘有较为隐性的故障，更换硬盘后各种异常都消失了。</li>
+</ol>
+
+:ET

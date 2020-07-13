@@ -1,0 +1,74 @@
+I"�(<p><img src="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1513158912465&amp;di=b075ed914ce5796fb5cf2584d9fe3a61&amp;imgtype=jpg&amp;src=http%3A%2F%2Fimg2.imgtn.bdimg.com%2Fit%2Fu%3D381617887%2C3941446456%26fm%3D214%26gp%3D0.jpg" alt="" /></p>
+
+<p>某个角度上说，kindle很类似android,同样的Linux内核，同样的Java用户层。不过kindle更注重简单、节能、稳定。Amazon一向认为，功能过多会分散人们阅读时候的注意力。<br />
+Kindle底层的Linux比Android保持了更多的linux兼容性，可以使用GTK或者QT编写程序。QT适合编写大的、独占界面性的应用，比如多看就曾经发布过一个Kindle之上的版本，现在还有很多人用，可惜因为公司战略调整的原因，这个产品被废弃了。GTK及最基本的Linux应用更适合开发一些补丁性的小程序，来补充Kindle的基本功能。在Ubuntu上搭建kindle的gtk开发环境非常简单,只需要一条命令：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt-get <span class="nb">install </span>pkg-config gcc-arm-linux-gnueabi libgtk2.0-dev
+</code></pre></div></div>
+<p>接着我们来写一个hello world来验证功能：(文件名:testGtk.c)</p>
+
+<figure class="highlight"><pre><code class="language-c" data-lang="c"><span class="cp">#include &lt;gtk/gtk.h&gt;
+</span>
+<span class="k">static</span> <span class="kt">void</span> <span class="nf">hello</span><span class="p">(</span> <span class="n">GtkWidget</span> <span class="o">*</span><span class="n">widget</span><span class="p">,</span><span class="n">gpointer</span> <span class="n">data</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="n">gtk_main_quit</span> <span class="p">();</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="n">gboolean</span> <span class="nf">delete_event</span><span class="p">(</span> <span class="n">GtkWidget</span> <span class="o">*</span><span class="n">widget</span><span class="p">,</span> <span class="n">GdkEvent</span>  <span class="o">*</span><span class="n">event</span><span class="p">,</span> <span class="n">gpointer</span>   <span class="n">data</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="n">g_print</span> <span class="p">(</span><span class="s">"delete event occurred</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span> <span class="c1">// we do want to quit</span>
+<span class="p">}</span>
+
+<span class="k">static</span> <span class="kt">void</span> <span class="nf">destroy</span><span class="p">(</span> <span class="n">GtkWidget</span> <span class="o">*</span><span class="n">widget</span><span class="p">,</span> <span class="n">gpointer</span>   <span class="n">data</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="n">gtk_main_quit</span> <span class="p">();</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span> <span class="kt">int</span>   <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[]</span> <span class="p">)</span> <span class="p">{</span>
+
+    <span class="n">GtkWidget</span> <span class="o">*</span><span class="n">window</span><span class="p">;</span>
+    <span class="n">GtkWidget</span> <span class="o">*</span><span class="n">button</span><span class="p">;</span>
+
+    <span class="n">gtk_init</span> <span class="p">(</span><span class="o">&amp;</span><span class="n">argc</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">argv</span><span class="p">);</span>
+
+    <span class="n">window</span> <span class="o">=</span> <span class="n">gtk_window_new</span> <span class="p">(</span><span class="n">GTK_WINDOW_TOPLEVEL</span><span class="p">);</span>
+    <span class="n">g_signal_connect</span> <span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="s">"delete-event"</span><span class="p">,</span> <span class="n">G_CALLBACK</span> <span class="p">(</span><span class="n">delete_event</span><span class="p">),</span> <span class="nb">NULL</span><span class="p">);</span>
+    <span class="n">g_signal_connect</span> <span class="p">(</span><span class="n">window</span><span class="p">,</span> <span class="s">"destroy"</span><span class="p">,</span> <span class="n">G_CALLBACK</span> <span class="p">(</span><span class="n">destroy</span><span class="p">),</span> <span class="nb">NULL</span><span class="p">);</span>
+    <span class="n">gtk_container_set_border_width</span> <span class="p">(</span><span class="n">GTK_CONTAINER</span> <span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="mi">10</span><span class="p">);</span>
+    <span class="n">button</span> <span class="o">=</span> <span class="n">gtk_button_new_with_label</span> <span class="p">(</span><span class="s">"Hello World"</span><span class="p">);</span>
+    <span class="n">g_signal_connect</span> <span class="p">(</span><span class="n">button</span><span class="p">,</span> <span class="s">"clicked"</span><span class="p">,</span> <span class="n">G_CALLBACK</span> <span class="p">(</span><span class="n">hello</span><span class="p">),</span> <span class="nb">NULL</span><span class="p">);</span>
+    <span class="n">gtk_container_add</span> <span class="p">(</span><span class="n">GTK_CONTAINER</span> <span class="p">(</span><span class="n">window</span><span class="p">),</span> <span class="n">button</span><span class="p">);</span>
+    <span class="n">gtk_window_set_title</span> <span class="p">(</span> <span class="n">GTK_WINDOW</span><span class="p">(</span><span class="n">window</span><span class="p">)</span> <span class="p">,</span> <span class="s">"L:A_N:application_ID:test"</span><span class="p">);</span>
+    <span class="n">gtk_widget_show_all</span> <span class="p">(</span><span class="n">window</span><span class="p">);</span>
+
+    <span class="n">gtk_main</span> <span class="p">();</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>接着先在桌面Linux电脑上编译来试一下：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>gcc <span class="nt">-o</span> testGtk testGtk.c <span class="sb">`</span>pkg-config gtk+-2.0 <span class="nt">--cflags</span> <span class="nt">--libs</span><span class="sb">`</span>
+</code></pre></div></div>
+<p>在电脑上执行./testGtk，可以看到结果正确。<br />
+交叉编译kindle的版本则相对比较复杂，我们还是直接写一个Makefile吧，避免手工输入太长容易出错，同时Makefile中也增加了macos的编译部分。gtk虽然看上去很陈旧、落伍，但是跨平台用起来，其实比很多主流应用还要顺畅。</p>
+
+<figure class="highlight"><pre><code class="language-makefile" data-lang="makefile"><span class="nv">GCC</span><span class="o">=</span>gcc
+<span class="nv">ARMGCC</span><span class="o">=</span>arm-linux-gnueabi-gcc
+<span class="nv">ARMLIBS</span><span class="o">=</span><span class="sb">`</span>pkg-config gtk+-2.0 <span class="nt">--cflags</span><span class="sb">`</span> <span class="nt">-L</span>/usr/arm-linux-gnueabi/lib/ <span class="nt">-L</span>/home/andrew/dev/kindleLib/ <span class="nt">-lgtk-x11-2</span>.0 <span class="nt">-lgdk-x11-2</span>.0 <span class="nt">-lXrender</span> <span class="nt">-lXinerama</span> <span class="nt">-lXext</span> <span class="nt">-lgdk_pixbuf-2</span>.0 <span class="nt">-lpangocairo-1</span>.0 <span class="nt">-lXdamage</span> <span class="nt">-lXfixes</span> <span class="nt">-latk-1</span>.0 <span class="nt">-lcairo</span> <span class="nt">-lpixman-1</span> <span class="nt">-lpng12</span> <span class="nt">-lxcb-shm</span> <span class="nt">-lxcb-render</span> <span class="nt">-lX11</span> <span class="nt">-lxcb</span> <span class="nt">-lXau</span> <span class="nt">-lXdmcp</span> <span class="nt">-lgio-2</span>.0 <span class="nt">-lpangoft2-1</span>.0 <span class="nt">-lpango-1</span>.0 <span class="nt">-lfontconfig</span> <span class="nt">-lfreetype</span> <span class="nt">-lz</span> <span class="nt">-lexpat</span> <span class="nt">-lgobject-2</span>.0 <span class="nt">-lffi</span> <span class="nt">-lgmodule-2</span>.0 <span class="nt">-lgthread-2</span>.0 <span class="nt">-lglib-2</span>.0
+
+<span class="nv">keys</span> <span class="o">=</span> testKindleGtk
+
+<span class="nl">all</span><span class="o">:</span><span class="nf">$(keys) $(objs)</span>
+
+
+<span class="nl">testKindleGtk</span><span class="o">:</span><span class="nf">testGtk.c</span>
+	<span class="nv">$(ARMGCC)</span> <span class="nt">-o</span> testKindleGtk testGtk.c <span class="nv">$(ARMLIBS)</span>
+	
+<span class="nl">x86</span><span class="o">:</span>
+	gcc <span class="nt">-o</span> testGtk testGtk.c <span class="sb">`</span>pkg-config gtk+-2.0 <span class="nt">--cflags</span> <span class="nt">--libs</span><span class="sb">`</span> 
+<span class="nl">osx</span><span class="o">:</span>
+	<span class="nb">export </span><span class="nv">PKG_CONFIG_PATH</span><span class="o">=</span>/usr/X11/lib/pkgconfig <span class="o">&amp;&amp;</span> gcc <span class="nt">-o</span> testGtk testGtk.c <span class="sb">`</span>pkg-config gtk+-2.0 <span class="nt">--cflags</span> <span class="nt">--libs</span><span class="sb">`</span> 
+<span class="nl">clean</span><span class="o">:</span>
+	<span class="nb">rm</span> <span class="nv">$(keys)</span> testGtk</code></pre></figure>
+
+<p>项目的源码已经上传到<a href="https://github.com/formoon/kindleGtkDemo">github</a>,有兴趣的可以下载试试。<br />
+咳。。。不好意思，原谅我把最重要的放到最后说，在kindle上测试这个程序，需要越狱kindle,在KPW2之间的版本，在网上搜索，有软件的方法越狱。之后的版本就复杂了，可能还需要拆机引串口线的方式。<br />
+不过总感觉kindle的越狱还是很有意义的，主要是原生系统对于纯文本的排版水平实在太差，我就是越狱后装了再也见不到更新的多看系统。</p>
+
+:ET
