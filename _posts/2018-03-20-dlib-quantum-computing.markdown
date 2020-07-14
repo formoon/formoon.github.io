@@ -2,12 +2,12 @@
 layout:         page
 title:          量子计算及量子计算的模拟
 subtitle:       白话量子计算
-card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1521542737388&di=ad51209bad2d2becb367d0e283956a9c&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimage%2Fc0%253Dshijue1%252C0%252C0%252C294%252C40%2Fsign%3D54b10aa88d44ebf8797c6c7cb190bd5f%2F1b4c510fd9f9d72a5f8823b6de2a2834359bbba8.jpg
+card-image:     http://115.182.41.123/files/201803/iclines.jpg
 date:           2018-03-20
 tags:           algorithm
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1521542737388&di=ad51209bad2d2becb367d0e283956a9c&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimage%2Fc0%253Dshijue1%252C0%252C0%252C294%252C40%2Fsign%3D54b10aa88d44ebf8797c6c7cb190bd5f%2F1b4c510fd9f9d72a5f8823b6de2a2834359bbba8.jpg)
+![](http://115.182.41.123/files/201803/iclines.jpg)
 IT是一个繁荣的行业，寄托着无数人的梦想，充斥着无数的造梦神话。  
 IT是一个悲催的行业，层出不穷的新概念让人应接不暇，几乎只要有一天不学习，都可能让你寝食不安。  
 

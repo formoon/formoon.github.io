@@ -2,12 +2,12 @@
 layout:         page
 title:          将dylib库嵌入macOS应用的方法
 subtitle:       otool和install_name_tool
-card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1519748676513&di=7fddd93ad6716d53054bdd046b84c1a5&imgtype=0&src=http%3A%2F%2Fimg.pconline.com.cn%2Fimages%2Fupload%2Fupc%2Ftx%2Fphotoblog%2F1110%2F02%2Fc2%2F9141961_9141961_1317519881983_mthumb.jpg
+card-image:     http://115.182.41.123/files/201802/sun1.jpg
 date:           2018-02-27
 tags:           mac
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1519748676513&di=7fddd93ad6716d53054bdd046b84c1a5&imgtype=0&src=http%3A%2F%2Fimg.pconline.com.cn%2Fimages%2Fupload%2Fupc%2Ftx%2Fphotoblog%2F1110%2F02%2Fc2%2F9141961_9141961_1317519881983_mthumb.jpg)  
+![]http://115.182.41.123/files/201802/sun1.jpg)  
 写作是一种习惯，稍微松懈，也许失去的就很多。过了一个年，居然很多天都没有更新，幸福的代价吧:)  
 
 标题的问题其实以前碰到过，不过当时在iOS，所以随手处理了没有重视。  

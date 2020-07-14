@@ -2,7 +2,7 @@
 layout:         page
 title:          Python2中文处理纪要
 subtitle:       遇见乱码不用慌，我来跟你说端详
-card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1516201454384&di=92f6037ebfaa3933009dedab7a748141&imgtype=0&src=http%3A%2F%2Fwww.phpxs.com%2Fuploads%2F201705%2F17%2F14950150811.JPG
+card-image:     http://115.182.41.123/files/201801/python.jpg
 date:           2018-01-17
 tags:           ml
 post-card-type: image

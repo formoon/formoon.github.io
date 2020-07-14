@@ -1,0 +1,421 @@
+I"�<p><img src="http://115.182.41.123/files/201803/iclines.jpg" alt="" />
+IT是一个繁荣的行业，寄托着无数人的梦想，充斥着无数的造梦神话。<br />
+IT是一个悲催的行业，层出不穷的新概念让人应接不暇，几乎只要有一天不学习，都可能让你寝食不安。</p>
+
+<p>量子计算机是一个炒的比较热的概念，目前还处于上升期，感觉上已经到了爆发的边缘，似乎随时可以呼之欲出。<br />
+通常对于量子计算机的理解就是，因为量子计算机的存储特征，可以处理很大的数据，而不是像传统计算机那样只是处理1、0二进制数，因此计算效率更高。从而有可能颠覆现有的计算机架构，甚至现有的所有的加密算法，因为新的、高速的量子计算机的出现，都将因为可能会被快速的解密而失去效用。<br />
+这个概念对，但也不全对，并且可能丢失了很多重要的内容。所以这里试图更通俗的解释一番。</p>
+
+<h4 id="传统计算机">传统计算机</h4>
+<p>说量子计算之前，我们首先要看一下传统的计算机是如何工作的：
+体系结构、硬盘、内存、CPU啥的就不用说了，对于计算本身来说，这些体现不出来什么不同。<br />
+我们要从CPU来解析，当前不管多么复杂的计算机，计算的根本来自于两个部件：<br />
+<strong>寄存器</strong> ：用于存储计算用的数据，及计算的结果，比如当前的64位CPU,其实就代表寄存器是由64位二进制数组成的。<br />
+<strong>逻辑门</strong> ：用于通过各种复杂拼接、组合，从而完成所需的计算。常见的逻辑有：与、或、非。
+下面对应传统的计算机，我们说说量子计算机的的原理。</p>
+
+<h4 id="测量">测量</h4>
+<p>对于传统计算机来讲，测量就是读取，读取又是所有运算的基础，功能没啥好多说的，就是知道寄存器中保存的数值是什么。<br />
+量子计算机就复杂了，你应当听说过薛定谔的猫，猫放在箱子里面，箱子里面的放射性元素是否衰变决定着猫的死活，但是在你打开箱子之前，你无法确定，而在打开箱子的瞬间，你实际也改变了箱子的状态，也就是影响了猫的生死，这是量子物理重要的一个特征。
+这个特征产生了以下几个重要的概念，或者说重要的特征，这些特征决定了量子计算机的几个重要功能。</p>
+
+<h4 id="叠加态">叠加态</h4>
+<p>传统的计算机，无论是寄存器还是存储器，很重要的一个指标就是确定性或者说稳定性。在寄存器方面，其中的每一位(bit),可以确定是1或者是0，64位计算机，寄存器保存的数值最大是2的64次方（2^64）。<br />
+量子计算机采用叠加态在寄存器中保存数据，因此同一个寄存器，可能保存了多个数据，这导致量子寄存器可以保存的数值，在同样位数下，比传统计算机保存的数据更多。<br />
+当前的量子计算机，每一位(bit),通过叠加态可以保存2对可以互相转换的状态，可以分别表示两位二进制数字。因为两位二进制数共有4个状态，因此量子计算机寄存器指定位长下，可以最大表达4的N次方(4^N)的数字。<br />
+而同时因为叠加态及可互相转换的特征，实际上每个指定位长的寄存器，都可能存储2^N个数据，而不是1个，这就是量子计算机的超强存储能力（本项能力只是基于理论设想，在当前的各种量子机实现中，还没有看到资料介绍实际的实现）。</p>
+
+<h4 id="概率">概率</h4>
+<p>因为叠加态和测量也会对其中数值造成的影响，实际其中的值是由概率决定的。这在量子计算机的制造和算法的研究中，都必须考虑到的问题。</p>
+
+<h4 id="量子密码">量子密码</h4>
+<p>因为不可测的特征带来的无法窃听和不可克隆特征，强大的量子计算能力虽然对传统的密码学是一个灾难，但同时也会出现新的、更强大的加密算法。从公开资料上看，我们国家所实现的星-地量子通讯的主要基础就是来自于此。</p>
+
+<h4 id="向量计算和并行计算">向量计算和并行计算</h4>
+<p>因为上面说的叠加态的两对状态，每一个计算实际都转换为了向量运算。现在计算机中最耗能的几项运算：挖矿、图形图像、深度学习等，都是转换成向量和矩阵进行运算的。在传统的计算中，因为二进制的特征，一般复杂度都是O(2^N),而在量子计算机中，因为这种特征，每次是两个数据参与运算，所以复杂度是O(N)。所以运算量不再呈现指数飙升，而是线性增加。<br />
+此外，因为叠加态的存在，我们在量子运算中，不必像传统计算一样同时只处理一个数值，而是同时处理叠加的多个数值，实现了真正的并行计算。而传统计算中的并行，不过是把大的并行转换成多个小的时间片再串行而已。这更进一步的提高了运算能力。当然这也需要更复杂的并行算法来支持。</p>
+
+<h4 id="单量子比特门">单量子比特门</h4>
+<p>如同传统计算机一样，量子计算机也是通过逻辑门的运算来完成实际运算的。<br />
+同时因为上面说过的那些特征，单量子比特门也有一个很重要的特征：<strong>可逆性</strong>，我们知道，传统计算机的逻辑门是不可逆的，而单量子比特门的各种运算都可逆；另外一个重要特征就是上面说过的：<strong>可并行</strong>。<br />
+这些常用的门中，包括以下几个：<br />
+<strong>Hadamard</strong>：旋转门<br />
+<strong>CNOT</strong>:受控非门，如果第一位置1，倒置第二位，否则保持不变。<br />
+<strong>Toffoli</strong>：控-控-非门，也叫CCNOT，如果前两位置1，它将倒置第三位，否则所有位保持不变<br />
+<strong>noop</strong>：单位门，等于不做任何操作。<br />
+<strong>X门</strong>：求非变换，NOT门<br />
+<strong>Z门</strong>：相位移动操作<br />
+<strong>Y门</strong>：相当于上面两个门的组合，Y=ZX</p>
+
+<h4 id="量子计算的模拟">量子计算的模拟</h4>
+<p>目前的情况，除非是在相关单位工作，否则一般的开发人员尚无法亲身体验量子计算机。更谈不上学习量子计算机的开发了。<br />
+但是通过上面的介绍你可以发现，除非只做一个拿来主义的使用者，否则这些颠覆性的特征将带来算法上的重大改变，不及早的研究、积累，这真的可能成为程序员的一个“灰犀牛”。<br />
+除了在实际的量子计算机上实验，目前也有很多软件提供了量子计算的模拟能力，从而可以尝试自己的算法和实验，达到学习的目的。<br />
+微软甚至创立了一种新的语言叫“Q#”来应对将来的量子计算，相信应当也不错，不过最近对于非开源的项目还是有些障碍，所以我们来尝试另外一个工具库DLIB。</p>
+
+<h4 id="环境搭建">环境搭建</h4>
+<p>首先要假设你已经有了基本的开发环境，比如g++/clang。Ubuntu要保证APT包管理的正常使用，macOS则预先安装好Homebrew包管理。</p>
+
+<p>在Ubuntu16上：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apt <span class="nb">install </span>libdlib-dev
+</code></pre></div></div>
+
+<p>在macOS：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>brew <span class="nb">install </span>dlib
+</code></pre></div></div>
+
+<h4 id="demo源码">DEMO源码</h4>
+<p>本源码来自DLIB的Examples代码quantum_computing_ex.cpp，未做任何修改。<br />
+代码中使用上面介绍过的这几个逻辑门，实现了两个最常用的基本算法：Grover Search和Shor ECC校验。这两个算法也是相当有名，网上一搜资料大把，我这半瓶水就不画蛇添足了。</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// The contents of this file are in the public domain. See LICENSE_FOR_EXAMPLE_PROGRAMS.txt</span>
+<span class="cm">/*
+    This is an example illustrating the use of the quantum computing
+    simulation classes from the dlib C++ Library.
+
+    This example assumes you are familiar with quantum computing and 
+    Grover's search algorithm and Shor's 9 bit error correcting code
+    in particular.   The example shows how to simulate both of these
+    algorithms.
+
+
+    The code to simulate Grover's algorithm is primarily here to show
+    you how to make custom quantum gate objects.  The Shor ECC example
+    is simpler and uses just the default gates that come with the 
+    library.
+
+*/</span>
+
+
+<span class="cp">#include &lt;iostream&gt;
+#include &lt;complex&gt;
+#include &lt;ctime&gt;
+#include &lt;dlib/quantum_computing.h&gt;
+#include &lt;dlib/string.h&gt;
+</span>
+
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">dlib</span><span class="p">;</span>
+
+<span class="c1">// ----------------------------------------------------------------------------------------</span>
+<span class="c1">// ----------------------------------------------------------------------------------------</span>
+<span class="c1">// ----------------------------------------------------------------------------------------</span>
+
+<span class="c1">// This declares a random number generator that we will be using below  </span>
+<span class="n">dlib</span><span class="o">::</span><span class="n">rand</span> <span class="n">rnd</span><span class="p">;</span>
+
+<span class="c1">// ----------------------------------------------------------------------------------------</span>
+
+<span class="kt">void</span> <span class="nf">shor_encode</span> <span class="p">(</span>
+    <span class="n">quantum_register</span><span class="o">&amp;</span> <span class="n">reg</span>
+<span class="p">)</span>
+<span class="cm">/*!
+    requires
+        - reg.num_bits() == 1
+    ensures
+        - #reg.num_bits() == 9
+        - #reg == the Shor error coding of the input register
+!*/</span>
+<span class="p">{</span>
+    <span class="n">DLIB_CASSERT</span><span class="p">(</span><span class="n">reg</span><span class="p">.</span><span class="n">num_bits</span><span class="p">()</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span><span class="s">""</span><span class="p">);</span>
+
+    <span class="n">quantum_register</span> <span class="n">zeros</span><span class="p">;</span>
+    <span class="n">zeros</span><span class="p">.</span><span class="n">set_num_bits</span><span class="p">(</span><span class="mi">8</span><span class="p">);</span>
+    <span class="n">reg</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">zeros</span><span class="p">);</span>
+
+    <span class="k">using</span> <span class="k">namespace</span> <span class="n">dlib</span><span class="o">::</span><span class="n">quantum_gates</span><span class="p">;</span>
+    <span class="k">const</span> <span class="n">gate</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span> <span class="n">h</span> <span class="o">=</span> <span class="n">hadamard</span><span class="p">();</span>
+    <span class="k">const</span> <span class="n">gate</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span> <span class="n">i</span> <span class="o">=</span> <span class="n">noop</span><span class="p">();</span>
+
+    <span class="c1">// Note that the expression (h,i) represents the tensor product of the 1 qubit </span>
+    <span class="c1">// h gate with the 1 qubit i gate and larger versions of this expression </span>
+    <span class="c1">// represent even bigger tensor products.  So as you see below, we make gates </span>
+    <span class="c1">// big enough to apply to our quantum register by listing out all the gates we </span>
+    <span class="c1">// want to go into the tensor product and then we just apply the resulting gate </span>
+    <span class="c1">// to the quantum register.</span>
+
+    <span class="c1">// Now apply the gates that constitute Shor's encoding to the input register.  </span>
+    <span class="p">(</span><span class="n">cnot</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">(),</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">).</span><span class="n">apply_gate_to</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+    <span class="p">(</span><span class="n">cnot</span><span class="o">&lt;</span><span class="mi">6</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">(),</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">).</span><span class="n">apply_gate_to</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+    <span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">h</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">h</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">).</span><span class="n">apply_gate_to</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+    <span class="p">(</span><span class="n">cnot</span><span class="o">&lt;</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">(),</span><span class="n">i</span><span class="p">,</span><span class="n">cnot</span><span class="o">&lt;</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">(),</span><span class="n">i</span><span class="p">,</span><span class="n">cnot</span><span class="o">&lt;</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">(),</span><span class="n">i</span><span class="p">).</span><span class="n">apply_gate_to</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+    <span class="p">(</span><span class="n">cnot</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">(),</span><span class="n">cnot</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">(),</span><span class="n">cnot</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">()).</span><span class="n">apply_gate_to</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+<span class="err">}</span>
+
+<span class="c1">// ----------------------------------------------------------------------------------------</span>
+
+<span class="kt">void</span> <span class="nf">shor_decode</span> <span class="p">(</span>
+    <span class="n">quantum_register</span><span class="o">&amp;</span> <span class="n">reg</span>
+<span class="p">)</span>
+<span class="cm">/*!
+    requires
+        - reg.num_bits() == 9
+    ensures
+        - #reg.num_bits() == 1
+        - #reg == the decoded qubit that was in the given input register 
+!*/</span>
+<span class="p">{</span>
+    <span class="n">DLIB_CASSERT</span><span class="p">(</span><span class="n">reg</span><span class="p">.</span><span class="n">num_bits</span><span class="p">()</span> <span class="o">==</span> <span class="mi">9</span><span class="p">,</span><span class="s">""</span><span class="p">);</span>
+
+    <span class="k">using</span> <span class="k">namespace</span> <span class="n">dlib</span><span class="o">::</span><span class="n">quantum_gates</span><span class="p">;</span>
+    <span class="k">const</span> <span class="n">gate</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span> <span class="n">h</span> <span class="o">=</span> <span class="n">hadamard</span><span class="p">();</span>
+    <span class="k">const</span> <span class="n">gate</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span> <span class="n">i</span> <span class="o">=</span> <span class="n">noop</span><span class="p">();</span>
+
+    <span class="c1">// Now apply the gates that constitute Shor's decoding to the input register</span>
+
+    <span class="p">(</span><span class="n">cnot</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">(),</span><span class="n">cnot</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">(),</span><span class="n">cnot</span><span class="o">&lt;</span><span class="mi">2</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">()).</span><span class="n">apply_gate_to</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+    <span class="p">(</span><span class="n">cnot</span><span class="o">&lt;</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">(),</span><span class="n">i</span><span class="p">,</span><span class="n">cnot</span><span class="o">&lt;</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">(),</span><span class="n">i</span><span class="p">,</span><span class="n">cnot</span><span class="o">&lt;</span><span class="mi">1</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">(),</span><span class="n">i</span><span class="p">).</span><span class="n">apply_gate_to</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+
+    <span class="p">(</span><span class="n">toffoli</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="o">&gt;</span><span class="p">(),</span><span class="n">toffoli</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="o">&gt;</span><span class="p">(),</span><span class="n">toffoli</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="o">&gt;</span><span class="p">()).</span><span class="n">apply_gate_to</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+
+    <span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">h</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">h</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">).</span><span class="n">apply_gate_to</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+
+    <span class="p">(</span><span class="n">cnot</span><span class="o">&lt;</span><span class="mi">6</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">(),</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">).</span><span class="n">apply_gate_to</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+    <span class="p">(</span><span class="n">cnot</span><span class="o">&lt;</span><span class="mi">3</span><span class="p">,</span><span class="mi">0</span><span class="o">&gt;</span><span class="p">(),</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">).</span><span class="n">apply_gate_to</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+    <span class="p">(</span><span class="n">toffoli</span><span class="o">&lt;</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">6</span><span class="o">&gt;</span><span class="p">(),</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">).</span><span class="n">apply_gate_to</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+
+    <span class="c1">// Now that we have decoded the value we don't need the extra 8 bits any more so </span>
+    <span class="c1">// remove them from the register.</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">8</span><span class="p">;</span> <span class="o">++</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">reg</span><span class="p">.</span><span class="n">measure_and_remove_bit</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="n">rnd</span><span class="p">);</span>
+<span class="err">}</span>
+
+<span class="c1">// ----------------------------------------------------------------------------------------</span>
+<span class="c1">// ----------------------------------------------------------------------------------------</span>
+<span class="c1">// ----------------------------------------------------------------------------------------</span>
+
+<span class="c1">// This is the function we will use in Grover's search algorithm.  In this</span>
+<span class="c1">// case the value we are searching for is 257.</span>
+<span class="kt">bool</span> <span class="nf">is_key</span> <span class="p">(</span><span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">n</span><span class="p">)</span>
+<span class="p">{</span>
+    <span class="k">return</span> <span class="n">n</span> <span class="o">==</span> <span class="mi">257</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="c1">// ----------------------------------------------------------------------------------------</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="kt">int</span> <span class="n">bits</span><span class="p">&gt;</span>
+<span class="k">class</span> <span class="nc">uf_gate</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="n">dlib</span> <span class="p">{</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="kt">int</span> <span class="n">bits</span><span class="p">&gt;</span>
+<span class="k">struct</span> <span class="nc">gate_traits</span><span class="o">&lt;</span><span class="n">uf_gate</span><span class="o">&lt;</span><span class="n">bits</span><span class="o">&gt;</span> <span class="o">&gt;</span>
+<span class="p">{</span>
+    <span class="k">static</span> <span class="k">const</span> <span class="kt">long</span> <span class="n">num_bits</span> <span class="o">=</span> <span class="n">bits</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">const</span> <span class="kt">long</span> <span class="n">dims</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">::</span><span class="n">qc_helpers</span><span class="o">::</span><span class="n">exp_2_n</span><span class="o">&lt;</span><span class="n">num_bits</span><span class="o">&gt;::</span><span class="n">value</span><span class="p">;</span>
+<span class="p">};}</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="kt">int</span> <span class="n">bits</span><span class="p">&gt;</span>
+<span class="k">class</span> <span class="nc">uf_gate</span> <span class="o">:</span> <span class="k">public</span> <span class="n">gate_exp</span><span class="o">&lt;</span><span class="n">uf_gate</span><span class="o">&lt;</span><span class="n">bits</span><span class="o">&gt;</span> <span class="o">&gt;</span>
+<span class="p">{</span>
+    <span class="cm">/*!
+        This gate represents the black box function in Grover's search algorithm.
+        That is, it is the gate defined as follows:
+            Uf|x&gt;|y&gt; = |x&gt;|y XOR is_key(x)&gt;
+
+        See the documentation for the gate_exp object for the details regarding
+        the compute_state_element() and operator() functions defined below.
+    !*/</span>
+<span class="nl">public:</span>
+    <span class="n">uf_gate</span><span class="p">()</span> <span class="o">:</span> <span class="n">gate_exp</span><span class="o">&lt;</span><span class="n">uf_gate</span><span class="o">&gt;</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">)</span> <span class="p">{}</span>
+
+    <span class="k">static</span> <span class="k">const</span> <span class="kt">long</span> <span class="n">num_bits</span> <span class="o">=</span> <span class="n">gate_traits</span><span class="o">&lt;</span><span class="n">uf_gate</span><span class="o">&gt;::</span><span class="n">num_bits</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">const</span> <span class="kt">long</span> <span class="n">dims</span> <span class="o">=</span> <span class="n">gate_traits</span><span class="o">&lt;</span><span class="n">uf_gate</span><span class="o">&gt;::</span><span class="n">dims</span><span class="p">;</span>
+
+    <span class="k">const</span> <span class="n">qc_scalar_type</span> <span class="k">operator</span><span class="p">()</span> <span class="p">(</span><span class="kt">long</span> <span class="n">r</span><span class="p">,</span> <span class="kt">long</span> <span class="n">c</span><span class="p">)</span> <span class="k">const</span> 
+    <span class="p">{</span> 
+        <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">output</span> <span class="o">=</span> <span class="n">c</span><span class="p">;</span>
+        <span class="c1">// if the input control bit is set</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">is_key</span><span class="p">(</span><span class="n">output</span><span class="o">&gt;&gt;</span><span class="mi">1</span><span class="p">))</span>
+        <span class="p">{</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="o">^</span><span class="mh">0x1</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">if</span> <span class="p">((</span><span class="kt">unsigned</span> <span class="kt">long</span><span class="p">)</span><span class="n">r</span> <span class="o">==</span> <span class="n">output</span><span class="p">)</span>
+            <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+        <span class="k">else</span>
+            <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">exp</span><span class="p">&gt;</span>
+    <span class="n">qc_scalar_type</span> <span class="n">compute_state_element</span> <span class="p">(</span>
+        <span class="k">const</span> <span class="n">matrix_exp</span><span class="o">&lt;</span><span class="n">exp</span><span class="o">&gt;&amp;</span> <span class="n">reg</span><span class="p">,</span>
+        <span class="kt">long</span> <span class="n">row_idx</span>
+    <span class="p">)</span> <span class="k">const</span>
+    <span class="p">{</span>
+        <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">output</span> <span class="o">=</span> <span class="n">row_idx</span><span class="p">;</span>
+        <span class="c1">// if the input control bit is set</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">is_key</span><span class="p">(</span><span class="n">output</span><span class="o">&gt;&gt;</span><span class="mi">1</span><span class="p">))</span>
+        <span class="p">{</span>
+            <span class="n">output</span> <span class="o">=</span> <span class="n">output</span><span class="o">^</span><span class="mh">0x1</span><span class="p">;</span>
+        <span class="p">}</span>
+
+        <span class="k">return</span> <span class="n">reg</span><span class="p">(</span><span class="n">output</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="c1">// ----------------------------------------------------------------------------------------</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="kt">int</span> <span class="n">bits</span><span class="p">&gt;</span>
+<span class="k">class</span> <span class="nc">w_gate</span><span class="p">;</span>
+
+<span class="k">namespace</span> <span class="n">dlib</span> <span class="p">{</span>
+<span class="k">template</span> <span class="o">&lt;</span><span class="kt">int</span> <span class="n">bits</span><span class="p">&gt;</span>
+<span class="k">struct</span> <span class="nc">gate_traits</span><span class="o">&lt;</span><span class="n">w_gate</span><span class="o">&lt;</span><span class="n">bits</span><span class="o">&gt;</span> <span class="o">&gt;</span>
+<span class="p">{</span>
+    <span class="k">static</span> <span class="k">const</span> <span class="kt">long</span> <span class="n">num_bits</span> <span class="o">=</span> <span class="n">bits</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">const</span> <span class="kt">long</span> <span class="n">dims</span> <span class="o">=</span> <span class="n">dlib</span><span class="o">::</span><span class="n">qc_helpers</span><span class="o">::</span><span class="n">exp_2_n</span><span class="o">&lt;</span><span class="n">num_bits</span><span class="o">&gt;::</span><span class="n">value</span><span class="p">;</span>
+<span class="p">};</span> <span class="p">}</span>
+
+<span class="k">template</span> <span class="o">&lt;</span><span class="kt">int</span> <span class="n">bits</span><span class="p">&gt;</span>
+<span class="k">class</span> <span class="nc">w_gate</span> <span class="o">:</span> <span class="k">public</span> <span class="n">gate_exp</span><span class="o">&lt;</span><span class="n">w_gate</span><span class="o">&lt;</span><span class="n">bits</span><span class="o">&gt;</span> <span class="o">&gt;</span>
+<span class="p">{</span>
+    <span class="cm">/*!
+        This is the W gate from the Grover algorithm
+    !*/</span>
+<span class="nl">public:</span>
+
+    <span class="n">w_gate</span><span class="p">()</span> <span class="o">:</span> <span class="n">gate_exp</span><span class="o">&lt;</span><span class="n">w_gate</span><span class="o">&gt;</span><span class="p">(</span><span class="o">*</span><span class="k">this</span><span class="p">)</span> <span class="p">{}</span>
+
+    <span class="k">static</span> <span class="k">const</span> <span class="kt">long</span> <span class="n">num_bits</span> <span class="o">=</span> <span class="n">gate_traits</span><span class="o">&lt;</span><span class="n">w_gate</span><span class="o">&gt;::</span><span class="n">num_bits</span><span class="p">;</span>
+    <span class="k">static</span> <span class="k">const</span> <span class="kt">long</span> <span class="n">dims</span> <span class="o">=</span> <span class="n">gate_traits</span><span class="o">&lt;</span><span class="n">w_gate</span><span class="o">&gt;::</span><span class="n">dims</span><span class="p">;</span>
+
+    <span class="k">const</span> <span class="n">qc_scalar_type</span> <span class="k">operator</span><span class="p">()</span> <span class="p">(</span><span class="kt">long</span> <span class="n">r</span><span class="p">,</span> <span class="kt">long</span> <span class="n">c</span><span class="p">)</span> <span class="k">const</span> 
+    <span class="p">{</span> 
+        <span class="n">qc_scalar_type</span> <span class="n">res</span> <span class="o">=</span> <span class="mf">2.0</span><span class="o">/</span><span class="n">dims</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">r</span> <span class="o">!=</span> <span class="n">c</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">res</span><span class="p">;</span>
+        <span class="k">else</span>
+            <span class="k">return</span> <span class="n">res</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="k">template</span> <span class="o">&lt;</span><span class="k">typename</span> <span class="nc">exp</span><span class="p">&gt;</span>
+    <span class="n">qc_scalar_type</span> <span class="n">compute_state_element</span> <span class="p">(</span>
+        <span class="k">const</span> <span class="n">matrix_exp</span><span class="o">&lt;</span><span class="n">exp</span><span class="o">&gt;&amp;</span> <span class="n">reg</span><span class="p">,</span>
+        <span class="kt">long</span> <span class="n">row_idx</span>
+    <span class="p">)</span> <span class="k">const</span>
+    <span class="p">{</span>
+        <span class="n">qc_scalar_type</span> <span class="n">temp</span> <span class="o">=</span> <span class="n">sum</span><span class="p">(</span><span class="n">reg</span><span class="p">)</span><span class="o">*</span><span class="mf">2.0</span><span class="o">/</span><span class="n">dims</span><span class="p">;</span>
+        <span class="c1">// compute this value: temp = temp - reg(row_idx)*2.0/dims + reg(row_idx)*(2.0/dims - 1.0)</span>
+        <span class="n">temp</span> <span class="o">=</span> <span class="n">temp</span> <span class="o">-</span> <span class="n">reg</span><span class="p">(</span><span class="n">row_idx</span><span class="p">);</span>
+
+        <span class="k">return</span> <span class="n">temp</span><span class="p">;</span>
+    <span class="p">}</span>
+<span class="p">};</span>
+
+<span class="c1">// ----------------------------------------------------------------------------------------</span>
+<span class="c1">// ----------------------------------------------------------------------------------------</span>
+<span class="c1">// ----------------------------------------------------------------------------------------</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">()</span>
+<span class="p">{</span>
+    <span class="c1">// seed the random number generator</span>
+    <span class="n">rnd</span><span class="p">.</span><span class="n">set_seed</span><span class="p">(</span><span class="n">cast_to_string</span><span class="p">(</span><span class="n">time</span><span class="p">(</span><span class="mi">0</span><span class="p">)));</span>
+
+    <span class="c1">// Pick out some of the gates we will be using below</span>
+    <span class="k">using</span> <span class="k">namespace</span> <span class="n">dlib</span><span class="o">::</span><span class="n">quantum_gates</span><span class="p">;</span>
+    <span class="k">const</span> <span class="n">gate</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span> <span class="n">h</span> <span class="o">=</span> <span class="n">quantum_gates</span><span class="o">::</span><span class="n">hadamard</span><span class="p">();</span>
+    <span class="k">const</span> <span class="n">gate</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span> <span class="n">z</span> <span class="o">=</span> <span class="n">quantum_gates</span><span class="o">::</span><span class="n">z</span><span class="p">();</span>
+    <span class="k">const</span> <span class="n">gate</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span> <span class="n">x</span> <span class="o">=</span> <span class="n">quantum_gates</span><span class="o">::</span><span class="n">x</span><span class="p">();</span>
+    <span class="k">const</span> <span class="n">gate</span><span class="o">&lt;</span><span class="mi">1</span><span class="o">&gt;</span> <span class="n">i</span> <span class="o">=</span> <span class="n">quantum_gates</span><span class="o">::</span><span class="n">noop</span><span class="p">();</span>
+
+    <span class="n">quantum_register</span> <span class="n">reg</span><span class="p">;</span>
+
+    <span class="c1">// We will be doing the 12 qubit version of Grover's search algorithm.</span>
+    <span class="k">const</span> <span class="kt">int</span> <span class="n">bits</span><span class="o">=</span><span class="mi">12</span><span class="p">;</span>
+    <span class="n">reg</span><span class="p">.</span><span class="n">set_num_bits</span><span class="p">(</span><span class="n">bits</span><span class="p">);</span>
+
+
+    <span class="c1">// set the quantum register to its initial state</span>
+    <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">x</span><span class="p">).</span><span class="n">apply_gate_to</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+
+    <span class="c1">// Print out the starting bits</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"starting bits: "</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">reg</span><span class="p">.</span><span class="n">num_bits</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="o">--</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">reg</span><span class="p">.</span><span class="n">probability_of_bit</span><span class="p">(</span><span class="n">i</span><span class="p">);</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+
+    <span class="c1">// Now apply the Hadamard gate to all the input bits</span>
+    <span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="n">h</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span><span class="n">h</span><span class="p">,</span><span class="n">h</span><span class="p">,</span><span class="n">h</span><span class="p">,</span><span class="n">h</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span><span class="n">h</span><span class="p">,</span><span class="n">h</span><span class="p">,</span><span class="n">h</span><span class="p">,</span><span class="n">h</span><span class="p">).</span><span class="n">apply_gate_to</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+
+    <span class="c1">// Print out the status</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"after Hadamard gate: "</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">reg</span><span class="p">.</span><span class="n">num_bits</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">;</span> <span class="o">--</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">reg</span><span class="p">.</span><span class="n">probability_of_bit</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">" "</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+    <span class="c1">// Here we do the grover iteration</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">j</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">j</span> <span class="o">&lt;</span> <span class="mi">35</span><span class="p">;</span> <span class="o">++</span><span class="n">j</span><span class="p">)</span>
+    <span class="p">{</span>
+        <span class="p">(</span><span class="n">uf_gate</span><span class="o">&lt;</span><span class="n">bits</span><span class="o">&gt;</span><span class="p">()).</span><span class="n">apply_gate_to</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+        <span class="p">(</span><span class="n">w_gate</span><span class="o">&lt;</span><span class="n">bits</span><span class="o">-</span><span class="mi">1</span><span class="o">&gt;</span><span class="p">(),</span><span class="n">i</span><span class="p">).</span><span class="n">apply_gate_to</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+
+
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">j</span> <span class="o">&lt;&lt;</span> <span class="s">" probability: bit 1 = "</span> <span class="o">&lt;&lt;</span> <span class="n">reg</span><span class="p">.</span><span class="n">probability_of_bit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="s">", bit 9 = "</span> <span class="o">&lt;&lt;</span> <span class="n">reg</span><span class="p">.</span><span class="n">probability_of_bit</span><span class="p">(</span><span class="mi">9</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="p">}</span>
+
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+    <span class="c1">// Print out the final probability of measuring a 1 for each of the bits</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">reg</span><span class="p">.</span><span class="n">num_bits</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">;</span> <span class="o">--</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"probability for bit "</span> <span class="o">&lt;&lt;</span> <span class="n">i</span> <span class="o">&lt;&lt;</span> <span class="s">" = "</span> <span class="o">&lt;&lt;</span> <span class="n">reg</span><span class="p">.</span><span class="n">probability_of_bit</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"The value we want grover's search to find is 257 which means we should measure a bit pattern of 00100000001"</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"Measured bits: "</span><span class="p">;</span>
+    <span class="c1">// finally, measure all the bits and print out what they are.</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kt">int</span> <span class="n">i</span> <span class="o">=</span> <span class="n">reg</span><span class="p">.</span><span class="n">num_bits</span><span class="p">()</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span> <span class="n">i</span> <span class="o">&gt;=</span> <span class="mi">1</span><span class="p">;</span> <span class="o">--</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">reg</span><span class="p">.</span><span class="n">measure_bit</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">rnd</span><span class="p">);</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+    
+
+
+
+    <span class="c1">// Now let's test out the Shor 9 bit encoding</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"</span><span class="se">\n\n\n\n</span><span class="s">Now let's try playing around with Shor's 9bit error correcting code"</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+    <span class="c1">// Reset the quantum register to contain a single bit</span>
+    <span class="n">reg</span><span class="p">.</span><span class="n">set_num_bits</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+    <span class="c1">// Set the state of this single qubit to some random mixture of the two computational bases</span>
+    <span class="n">reg</span><span class="p">.</span><span class="n">state_vector</span><span class="p">()(</span><span class="mi">0</span><span class="p">)</span> <span class="o">=</span> <span class="n">qc_scalar_type</span><span class="p">(</span><span class="n">rnd</span><span class="p">.</span><span class="n">get_random_double</span><span class="p">(),</span><span class="n">rnd</span><span class="p">.</span><span class="n">get_random_double</span><span class="p">());</span>
+    <span class="n">reg</span><span class="p">.</span><span class="n">state_vector</span><span class="p">()(</span><span class="mi">1</span><span class="p">)</span> <span class="o">=</span> <span class="n">qc_scalar_type</span><span class="p">(</span><span class="n">rnd</span><span class="p">.</span><span class="n">get_random_double</span><span class="p">(),</span><span class="n">rnd</span><span class="p">.</span><span class="n">get_random_double</span><span class="p">());</span>
+    <span class="c1">// Make sure the state of the quantum register is a unit vector</span>
+    <span class="n">reg</span><span class="p">.</span><span class="n">state_vector</span><span class="p">()</span> <span class="o">/=</span> <span class="n">sqrt</span><span class="p">(</span><span class="n">sum</span><span class="p">(</span><span class="n">norm</span><span class="p">(</span><span class="n">reg</span><span class="p">.</span><span class="n">state_vector</span><span class="p">())));</span>
+
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"state: "</span> <span class="o">&lt;&lt;</span> <span class="n">trans</span><span class="p">(</span><span class="n">reg</span><span class="p">.</span><span class="n">state_vector</span><span class="p">());</span>
+
+    <span class="n">shor_encode</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"x bit corruption on bit 8"</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">).</span><span class="n">apply_gate_to</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span> <span class="c1">// mess up the high order bit </span>
+    <span class="n">shor_decode</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span> <span class="c1">// try to decode the register</span>
+
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"state: "</span> <span class="o">&lt;&lt;</span> <span class="n">trans</span><span class="p">(</span><span class="n">reg</span><span class="p">.</span><span class="n">state_vector</span><span class="p">());</span>
+
+    <span class="n">shor_encode</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"x bit corruption on bit 1"</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">x</span><span class="p">,</span><span class="n">i</span><span class="p">).</span><span class="n">apply_gate_to</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+    <span class="n">shor_decode</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"state: "</span> <span class="o">&lt;&lt;</span> <span class="n">trans</span><span class="p">(</span><span class="n">reg</span><span class="p">.</span><span class="n">state_vector</span><span class="p">());</span>
+
+    <span class="n">shor_encode</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"z bit corruption on bit 8"</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="p">(</span><span class="n">z</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">,</span><span class="n">i</span><span class="p">).</span><span class="n">apply_gate_to</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+    <span class="n">shor_decode</span><span class="p">(</span><span class="n">reg</span><span class="p">);</span>
+
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"state: "</span> <span class="o">&lt;&lt;</span> <span class="n">trans</span><span class="p">(</span><span class="n">reg</span><span class="p">.</span><span class="n">state_vector</span><span class="p">());</span>
+
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"</span><span class="se">\n</span><span class="s">The state of the input qubit survived all the corruptions in tact so the code works."</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+
+<span class="p">}</span>
+</code></pre></div></div>
+<p>编译的方法如下：<br />
+Ubuntu:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>g++ <span class="nt">-std</span><span class="o">=</span>c++11 <span class="nt">-O3</span> <span class="nt">-o</span> quantum_computing_ex quantum_computing_ex.cpp <span class="nt">-l</span> dlib <span class="nt">-l</span> cblas
+</code></pre></div></div>
+
+<p>macOS:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>g++ <span class="nt">-std</span><span class="o">=</span>c++11 <span class="nt">-O3</span> <span class="nt">-o</span> quantum_computing_ex quantum_computing_ex.cpp <span class="o">(</span>pkg-config <span class="nt">--cflags</span> <span class="nt">--libs</span> dlib-1<span class="o">)</span> <span class="nt">-l</span> cblas
+</code></pre></div></div>
+
+:ET
