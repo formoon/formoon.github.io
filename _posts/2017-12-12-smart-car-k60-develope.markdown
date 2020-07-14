@@ -2,12 +2,12 @@
 layout:         page
 title:          K60平台智能车开发工作随手记
 subtitle:       IAR开发
-card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513083187762&di=91f1f47b50bbd41bf6875e9453fa5c14&imgtype=0&src=http%3A%2F%2Fxfjy.chd.edu.cn%2F_mediafile%2Fzerui24%2F2017%2F04%2F12%2F2jawp8ae2v.jpg
+card-image:     http://115.182.41.123/files/201712/k60car.jpg
 date:           2017-12-11
 tags:           embed toSeven
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513083187762&di=91f1f47b50bbd41bf6875e9453fa5c14&imgtype=0&src=http%3A%2F%2Fxfjy.chd.edu.cn%2F_mediafile%2Fzerui24%2F2017%2F04%2F12%2F2jawp8ae2v.jpg)
+![](http://115.182.41.123/files/201712/k60car.jpg)
 (图片仅为示例，并不一定固定为这种造型)
 
 第十二届全国大学生智能汽车竞赛有一个分项是光电四轮车的竞速（任务A），Seven她们组采购到的配件使用了freescale Crotex-M4内核的CPU,TSL1401 CCD摄像头进行道路识别，从网上搜索了一下，应当是K60平台的的一个变种方案。  

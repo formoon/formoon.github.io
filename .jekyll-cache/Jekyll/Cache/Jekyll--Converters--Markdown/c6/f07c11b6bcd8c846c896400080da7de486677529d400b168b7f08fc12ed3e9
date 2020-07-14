@@ -1,0 +1,46 @@
+I"�<p><img src="http://115.182.41.123/files/201801/miniprog.jpg" alt="" />
+首先要说，按照中华人民共和国著作权法，逆向工程看别人源码是不合法的，所以请仅限于个人学习。<br />
+另外一个角度来说，HTML/JS本身的开源特质，也是在鼓励大家互相交流、沟通和共同的进步。从这个角度上说，非技术限制所导致的人为对源码进行封装、隐藏网页源码，似乎也不那么令人信服。</p>
+
+<p>如题，这件事情要分为两步：<br />
+1.拿到小程序软件包。有两种方法可以建议，一是使用抓包工具获取网络数据记录，所有的软件包应当是https://cdn-xxxx.xxx.xxx/nnnnn.wxapkg这样的URL形式从网上下载。后面的nnnn指的是数字，随后可以在桌面浏览器把这个文件下载下来。二是从手机的缓存中获取，相信开放平台诸如android会更容易，不过手头没有样机，所以我是用一个已越狱的iPhone操作：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#登陆到手机</span>
+ssh root@192.168.1.103
+<span class="c">#进入应用沙盒目录</span>
+<span class="nb">cd</span> /var/mobile/Containers/Data/Application/
+<span class="c">#搜索所有缓存的小程序包</span>
+find <span class="nb">.</span> <span class="nt">-name</span> <span class="s2">"*wxapkg"</span>
+<span class="c">#或者建议在搜索的同时拷贝到桌面电脑</span>
+<span class="c">#桌面电脑在执行拷贝之前建立好保存的文件夹</span>
+find <span class="nb">.</span> <span class="nt">-name</span> <span class="s2">"*wxapkg"</span> <span class="nt">-exec</span> scp <span class="o">{}</span> andrew@192.168.1.105:~/Downloads/wx/ <span class="se">\;</span>
+<span class="c">#请注意以上手机的ip地址、台机的ip地址都应当换成你自己的</span>
+</code></pre></div></div>
+<p>至此将所有的wxapkg的小程序文件包拷贝到了桌面电脑。视你运行小程序的情况，一般近期的小程序都会在缓存中，你当前运行的小程序正常是肯定在的。</p>
+
+<p>2.第二步就是将这个小程序文件包解压缩成正常的文件。
+请使用如下解压缩工具：<br />
+<a href="https://github.com/Clarence-pan/unpack-wxapkg">https://github.com/Clarence-pan/unpack-wxapkg</a><br />
+此兄台使用了php语言写的解压缩脚本，请自行下载php源文件以及准备好php运行环境。<br />
+在mac电脑上解压缩的方法是：<code class="language-plaintext highlighter-rouge">php unpack-wxapkg.php 14.wxapkg</code>，执行后会生成一个<code class="language-plaintext highlighter-rouge">14.wxapkg</code>开头的文件夹，其中就是解压之后的文件。</p>
+
+<p>一般来说，脚本js文件已经经过了压缩，阅读起来非常困难，推荐两个在线工具。其一<a href="https://tool.lu/html/">https://tool.lu/html/</a>，将js文件所有内容拷贝至在线工具，然后使用美化功能，可以恢复到缩进排版的源码格式，这样可以便于你阅读学习。<br />
+另外一个在线工具对于更深度的js编译压缩有较好的反编译解压缩效果，可以酌情使用：<a href="http://jsbeautifier.org">http://jsbeautifier.org</a></p>
+
+<p>本文已经写完的时候，在网上又看到另外一篇文章，介绍将解包的小程序运行起来。所需步骤是：</p>
+<ul>
+  <li>首先下载微信小程序开发工具：<a href="https://mp.weixin.qq.com/debug/wxagame/dev/devtools/download.html?t=20171230">https://mp.weixin.qq.com/debug/wxagame/dev/devtools/download.html?t=20171230</a>,注意运行这个工具你需要有开发者账号，这个账号注册是免费的。</li>
+  <li>运行开发工具，新建一个项目，选择项目文件夹、选择没有AppID的最后一个体验小游戏（如果你是打算运行一个小程序就选择小程序），小游戏、小程序的区别，一个入口是game.js,一个是app.js。最后一项注意不使用程序模板，默认是使用的，把该选项的勾选取消。</li>
+  <li>把解包的所有文件拷贝到刚刚建立的新项目文件夹。</li>
+  <li>如果是一个小游戏，则建立一个game.json,其中根据手机使用的方向填写内容，比如纵向正常使用，可以如下填写：
+    <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+</span><span class="nl">"deviceOrientation"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"portrait"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>    </div>
+  </li>
+  <li>编译然后预览，就跑起来了。注意如果是小游戏，需要通过扫码传送到手机上进行预览和测试。</li>
+</ul>
+
+<p>这一部分参考了如下链接：
+<a href="https://juejin.im/post/5a4b0fc7f265da431956a2b7">https://juejin.im/post/5a4b0fc7f265da431956a2b7</a></p>
+
+:ET

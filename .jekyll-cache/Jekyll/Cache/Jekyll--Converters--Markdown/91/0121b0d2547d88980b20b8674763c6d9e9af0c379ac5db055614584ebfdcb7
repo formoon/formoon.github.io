@@ -1,0 +1,460 @@
+I"�<p><img src="http://115.182.41.123/files/201910/rust.jpeg" alt="" /></p>
+<h4 id="前言">前言</h4>
+<p>其实我一直弄不明白一点，那就是计算机技术的发展，是让这个世界变得简单了，还是变得更复杂了。 <br />
+当然这只是一个玩笑，可别把这个问题当真。</p>
+
+<p>然而对于IT从业者来说，这可不是一个玩笑。几乎每一次的技术发展，都让这个生态变得更为复杂。“英年早秃”已经成为一种很普遍的现象。</p>
+
+<p>Rust是近两年呼声比较高的一种新型开发语言。市场占有量并不大，但增长速度极为迅猛。<br />
+有人统计过，在计算机行业，平均每33.5天就有一种所谓的新型开发语言面世，这还不包括很多企业内部、项目内部的内置简易流程工具。然而大浪淘沙，如今仍然占据着市场地位的，不过仍然是耳熟能详的有限几种。<br />
+作为新来的搅局者，Rust到底值不值得学习并且在工作中应用呢？</p>
+
+<p>先说结论，这里粗略的把开发者分为初学者、小有经验的常规工程师和资深开发者三类。<br />
+对于初学者，Rust具有比较陡峭的学习曲线，虽然学习Rust能训练良好的编程习惯，从长远看对提高学习者的开发素养极具价值。但短期的大量付出很容易让初学者心力交瘁。并且尽管官方文档并不欠缺，但学习资料对于初学者来讲仍然是远远不够的。所以比较而言，得不偿失。因此建议初学者仍然由久经验证的语言入门加入软件开发的大家庭。比如说C/Java/Python/Js都是很好的入门选择。<br />
+对于有一定经验的常规工程师，他们已经有了一段时间的开发工作实践，对于软件开发的现状、发展都已经形成了自己的世界观。如果感觉并不很喜欢这个行业，希望将来转行管理岗位或者产品岗位。那当前应当做的更多是倾向业务领域，了解业务和技术的衔接和互动，完全不需要学习Rust。而如果醉心于技术，并从中获得了自己的乐趣，希望逐步提高自己的技术水平。那么Rust会是一个很好的桥梁，哪怕仅仅学习Rust而并不将其应用于工作，也能让开发者从中获取大量的有益习惯和软件底层经验，从而形成自己良好的代码风格。<br />
+对于资深工程师，即便并不从而底层系统级的开发工作，Rust也是一门很优秀的语言。它能弥补当前多种开发语言的不足，形成良好的开发哲学和思想导向，帮助开发者交付高质量的软件产品。因此，及早学习并应用Rust非常有价值。</p>
+
+<p>为了说明这个结论，下面从多个角度，采用同传统语言对比的方式来说一说我对Rust的理解。</p>
+
+<h4 id="rust是一种全面创新的语言">Rust是一种全面创新的语言</h4>
+<p>这几年有不少有影响的语言出现，但大多数都只是关键字或者小范围的语法创新，随后可能会有大量的特色库函数来丰富语言的功能。一个有经验的开发者，可能翻两天资料，就能快速的掌握。  <br />
+而Rust极具自身语言特点，是一种完全的创新，而不是简单的语法替换。简单的熟悉几个关键字和判断、循环等语法，远不足以掌握这门语言。<br />
+为了证明这一点，下面用Rust的“所有权”(Ownership)机制和“遮蔽”（Shadowing）来举例说明。</p>
+
+<h4 id="所有权机制ownership和遮蔽shadowing">“所有权”机制(Ownership)和“遮蔽”（Shadowing）</h4>
+<p>以C++为例，请看下面这段代码：</p>
+<div class="language-c++ highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include&lt;iostream&gt;
+</span><span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+    <span class="n">string</span> <span class="n">s1</span><span class="o">=</span><span class="s">"hello"</span><span class="p">;</span>
+    <span class="n">string</span> <span class="n">s2</span><span class="o">=</span><span class="n">s1</span><span class="p">;</span>
+    <span class="n">cout</span> <span class="o">&lt;&lt;</span> <span class="s">"s1="</span> <span class="o">&lt;&lt;</span> <span class="n">s1</span> <span class="o">&lt;&lt;</span> <span class="s">",s2="</span> <span class="o">&lt;&lt;</span> <span class="n">s2</span> <span class="o">&lt;&lt;</span> <span class="n">endl</span><span class="p">;</span>
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>编译执行后，程序输出：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">s1</span><span class="o">=</span>hello,s2<span class="o">=</span>hello
+</code></pre></div></div>
+<p>代码再简单不过，首先声明、赋值一个字符串变量s1，然后把变量s1赋值给变量s2，最后输出两者的值。</p>
+
+<p>对应的，我们看一个Rust的版本：</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fn</span> <span class="nf">main</span><span class="p">(){</span>
+    <span class="k">let</span> <span class="n">s1</span><span class="o">=</span><span class="nn">String</span><span class="p">::</span><span class="nf">from</span><span class="p">(</span><span class="s">"hello"</span><span class="p">);</span>
+    <span class="k">let</span> <span class="n">s2</span><span class="o">=</span><span class="n">s1</span><span class="p">;</span>
+    <span class="nd">println!</span><span class="p">(</span><span class="s">"s1={},s2={}"</span><span class="p">,</span><span class="n">s1</span><span class="p">,</span><span class="n">s2</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>除了细小的语法差异，看上去跟C++的版本没有什么不同。然而在Rust中，这段代码连编译都无法通过，得益于rustc编译程序详细的输出，我们能看到很细致的错误提示：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>2 |     <span class="nb">let </span><span class="nv">s1</span><span class="o">=</span>String::from<span class="o">(</span><span class="s2">"hello"</span><span class="o">)</span><span class="p">;</span>
+  |         <span class="nt">--</span> move occurs because <span class="sb">`</span>s1<span class="sb">`</span> has <span class="nb">type</span> <span class="sb">`</span>std::string::String<span class="sb">`</span>, which does not implement the <span class="sb">`</span>Copy<span class="sb">`</span> trait
+3 |     <span class="nb">let </span><span class="nv">s2</span><span class="o">=</span>s1<span class="p">;</span>
+  |            <span class="nt">--</span> value moved here
+4 |     println!<span class="o">(</span><span class="s2">"s1={},s2={}"</span>,s1,s2<span class="o">)</span><span class="p">;</span>
+  |                            ^^ value borrowed here after move
+</code></pre></div></div>
+<p>这个编译错误是指，上面代码中，当变量s1赋值给s2之后，s1变量名所指向的内存所有权，被“转移”(move)到了s2变量名拥有之下。而从此之后，s1变量名就无效了，不再指向任何一块内存。除非重新声明并为s1赋值（Rust中称为Shadow,”遮蔽”原有的s1）,s1不能再被使用。<br />
+所有权机制可以有效的防止内存泄露所导致的程序Bug，是Rust内存管理的核心理念。上面提到的所有权“转移”是所有权管理的重要特征之一。</p>
+
+<p>“遮蔽”也是一个有趣的概念，Rust的处理方式跟很多我们熟悉的语言不同。<br />
+请看下面C语言代码：</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include&lt;stdio.h&gt;
+</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+    <span class="kt">int</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"x=%d</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>这又是一段很基本的代码。首先声明、赋值一个整数变量x,接着把x的值加1，再赋值回变量x。这是各种开发语言中都常见的用法。编译执行的输出结果为<code class="language-plaintext highlighter-rouge">x=6</code>。<br />
+来看看Rust的版本：</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fn</span> <span class="nf">main</span><span class="p">(){</span>
+    <span class="k">let</span> <span class="n">x</span><span class="o">=</span><span class="mi">5</span><span class="p">;</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+    <span class="nd">println!</span><span class="p">(</span><span class="s">"x={}"</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>很不幸，这段代码同样无法编译通过，错误是：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>error[E0384]: cannot assign twice to immutable variable <span class="sb">`</span>x<span class="sb">`</span>
+ <span class="nt">--</span><span class="o">&gt;</span> test-own1.rs:3:5
+  |
+2 |     <span class="nb">let </span><span class="nv">x</span><span class="o">=</span>5<span class="p">;</span>
+  |         -
+  |         |
+  |         first assignment to <span class="sb">`</span>x<span class="sb">`</span>
+  |         <span class="nb">help</span>: make this binding mutable: <span class="sb">`</span>mut x<span class="sb">`</span>
+3 |     x <span class="o">=</span> x+1<span class="p">;</span>
+  |     ^^^^^^^ cannot assign twice to immutable variable
+</code></pre></div></div>
+<p>rustc这种“图示”型的输出信息让你排查错误更加方便。<br />
+错误的原因，在Rust中，默认所有变量都是只读类型的，除非在变量声明的时候就注明为可变类型”mut”。<br />
+因此两次对于一个只读变量赋值导致编译错误。<br />
+解决的办法或者注明变量为可读写，这样同C语言的版本具有完全相同的意义：</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">let</span> <span class="k">mut</span> <span class="n">x</span><span class="o">=</span><span class="mi">5</span><span class="p">;</span>
+</code></pre></div></div>
+<p>或者用我们上面提到过的“遮蔽”机制：</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fn</span> <span class="nf">main</span><span class="p">(){</span>
+    <span class="k">let</span> <span class="n">x</span><span class="o">=</span><span class="mi">5</span><span class="p">;</span>
+    <span class="k">let</span> <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+    <span class="nd">println!</span><span class="p">(</span><span class="s">"x={}"</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>注意上面<code class="language-plaintext highlighter-rouge">x=x+1</code>，这一行的开始我们再次使用let关键字，这表示再次声明了变量x。<br />
+与大多数语言不允许重复声明变量不同，这个x变量，跟第一次声明的变量x同名，并对其做出了“遮蔽”。之后除非再次遮蔽变量x，那起作用的，都将是本次新声明的x。</p>
+
+<p>通过这两个例子，可以看出Rust是从理念上做出了大量创新的一种语言。如果只是像学习其它语言一样只是对比学习语法和关键字，无法真正掌握这门语言。这些融汇在语言中的理念，才是Rust最宝贵的地方。<br />
+注意在这里“理念”可不是什么大而化之的套话，而是实际操作中很重要的原则。<br />
+很多语言的设计初衷是“简化”，在Rust中当然也有很多简化的地方，就像直接使用“let”关键字声明一个变量，而变量的类型可以通过赋值的操作从而推导出变量的类型。比如变量超出作用域，也会被自动的回收。<br />
+但Rust中也大量的存在了“复杂化”的操作，比如上面举例的所有权机制，再比如使用可读写变量需要额外标注“mut”。
+这些“复杂化”的部分，都基于“尽量在程序开发的早期，就将可能会出现问题的部分暴露出来，从而在设计中和编译时就解决掉。”这样一个理念。</p>
+
+<h4 id="引用references和借用borrowing">引用（References）和借用（Borrowing）</h4>
+<p>承接自Rust的拥有权机制。引用和借用在Rust中也迥异于大量的传统语言。<br />
+引用类似C语言中的指针，指向一块已经存在的数据：</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">let</span> <span class="k">mut</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+    <span class="k">let</span> <span class="n">y</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">x</span><span class="p">;</span>
+</code></pre></div></div>
+<p>上例中，y就是对变量x的引用，并且没有标注mut，所以是只读引用。写法跟C语言中获取指针的方式类似，就是一个<code class="language-plaintext highlighter-rouge">&amp;</code>符号。<br />
+y此时具有了变量x的一些权限，所以也称为“借用”，本例中因为只借用了读的功能，没有借用写的功能，所以称“一些”。当然也可以借用写的功能，我们后面会再举例。<br />
+借用看起来跟引用是一回事，但“借用”这个词更主要对应的是上面所说的所有权“转移”的概念，转移之后，原来的变量就无效了。而借用之后，原来的变量还有效，或者部分有效，比如只被借用了写权限。</p>
+
+<p>在函数参数中，使用引用的方式，从而让函数临时性的获得数据的访问权，也是典型的借用。事实上这种方式才是最常用到借用的地方：</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fn</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">fn</span> <span class="nf">sum_vec</span><span class="p">(</span><span class="n">v</span><span class="p">:</span> <span class="o">&amp;</span><span class="nb">Vec</span><span class="o">&lt;</span><span class="nb">i32</span><span class="o">&gt;</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">i32</span> <span class="p">{</span>
+        <span class="k">return</span> <span class="n">v</span><span class="nf">.iter</span><span class="p">()</span><span class="nf">.fold</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">|</span><span class="n">a</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">b</span><span class="p">|</span> <span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="k">let</span> <span class="n">v1</span> <span class="o">=</span> <span class="nd">vec!</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">];</span>
+    <span class="k">let</span> <span class="n">s1</span> <span class="o">=</span> <span class="nf">sum_vec</span><span class="p">(</span><span class="n">v1</span><span class="p">);</span>
+    <span class="nd">println!</span><span class="p">(</span><span class="s">"{}"</span><span class="p">,</span> <span class="n">s1</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>先别管我们使用到的令人困惑的关键字和函数名，那些进入到系统学习之后都不算什么。在函数sum_vec的参数中，我们就使用了借用。<br />
+顺便，我们还见识了Rust中函数的嵌套写法，当然现在新兴的语言，包括C++11之后的版本，都已经支持这种写法，这在函数式（Functional programming paradigm，注意不是函数化Functionalization）编程中是很重要的支持。</p>
+
+<p>引用和借用的概念，同C/C++语言中所使用的都是很类似的，尽管名称不同。主要的区别来自于对引用的管理理念，Rust对引用的管理规则如下：</p>
+<ul>
+  <li>对于一块内存，同时只能有一个可写引用存在</li>
+  <li>对于一块内存，同时可以有多个只读引用存在</li>
+  <li>对于一块内存，在有一个可写引用存在的时候，不能有其它引用存在，无论只读或者可写。</li>
+  <li>引用的原始对象必须在引用存在的生命期一直有效</li>
+</ul>
+
+<p>比如：</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">let</span> <span class="k">mut</span> <span class="n">x</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>
+    <span class="k">let</span> <span class="n">y</span> <span class="o">=</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">x</span><span class="p">;</span>
+    <span class="k">let</span> <span class="n">z</span> <span class="o">=</span> <span class="o">&amp;</span><span class="k">mut</span> <span class="n">x</span><span class="p">;</span>
+    <span class="nd">println!</span><span class="p">(</span><span class="s">"{} {} {}"</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">,</span><span class="n">z</span><span class="p">);</span>    
+</code></pre></div></div>
+<p>上面代码会产生编译错误，因为y已经是可写的引用，而同时再存在一个可写的引用z，违反了Rust对引用的管理规则。<br />
+如果把z变量这一行和后面显示z的部分去掉呢？去掉之后是可以编译通过的，但仍然要注意，y此时是可写的指针，“借用”了x的写权限。所以x此时只有读的权限，不能再对x进行赋值。因为它已经被“借用走”（Borrowed）了。</p>
+
+<p>这些复杂的规则，看起来就跟前面见过的所有权转移一样，似乎极大的限制了程序员的自由度。<br />
+但这些都是在强迫你，让你成为一个更优秀的程序员，产生出更高质量的代码，将Bug消灭在萌芽期。</p>
+
+<h4 id="生命期lifetime">生命期（Lifetime)</h4>
+<p>通常一个变量的生命期就是它的作用域。但在引用和借用出现后，这个问题变得复杂了。<br />
+熟悉C语言的程序员都碰到过数据失效了，而指针依然存在的情况，俗称“悬挂指针”。<br />
+Java为了解决这个问题干脆取消了指针，并且最终以引用计数器做为了内存管理的主要模式。</p>
+
+<p>这种情况出现最多的场景，是在某个函数中使用了变量或者申请了内存，并将其引用作为返回值传递到了调用者的时候。比如这段C语言代码：</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kt">int</span> <span class="o">*</span><span class="nf">getSomeData</span><span class="p">(){</span>
+    <span class="kt">int</span> <span class="n">c</span><span class="o">=</span><span class="mi">32767</span><span class="p">;</span>
+    <span class="k">return</span> <span class="o">&amp;</span><span class="n">c</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>c变量位于栈上，是一个局部变量，当函数返回指针的时候，指针在这个函数的调用者中依然存在，但c变量已经被回收了。<br />
+在新版本的编译器中，这种情况也会被警告，但可以编译成功。而在Rust中，这种情况是不允许编译通过的，比如下面类似代码：</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fn</span> <span class="nf">somestr</span><span class="p">()</span> <span class="k">-&gt;</span> <span class="o">&amp;</span><span class="nb">str</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="n">result</span> <span class="o">=</span> <span class="nn">String</span><span class="p">::</span><span class="nf">from</span><span class="p">(</span><span class="s">"a demo string"</span><span class="p">);</span>
+    <span class="c">// 直接使用方法返回值(或者变量)，之后没有分号，</span>
+    <span class="c">// 是将其作为返回值处理，</span>
+    <span class="c">// 不用像c语言一样return result.as_str()</span>
+    <span class="n">result</span><span class="nf">.as_str</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>编译的时候会报错“result变量没有足够长的生命期”：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>error[E0597]: <span class="sb">`</span>result<span class="sb">`</span> does not live long enough
+ <span class="nt">--</span><span class="o">&gt;</span> src/main.rs:3:5
+  |
+3 |     result.as_str<span class="o">()</span>
+  |     ^^^^^^ does not live long enough
+4 | <span class="o">}</span>
+  | - borrowed value only lives <span class="k">until </span>here
+</code></pre></div></div>
+<p>如果仅仅是这样断然的禁止返回悬挂引用也就“不过如此”了。事实上更复杂的问题来自于，如果数据源来自于函数的参数，参数本身就是引用的情况。比如请看下面的Rust代码：</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fn</span> <span class="nf">longest</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="o">&amp;</span><span class="nb">str</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="o">&amp;</span><span class="nb">str</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="o">&amp;</span><span class="nb">str</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="n">x</span><span class="nf">.len</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">y</span><span class="nf">.len</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">x</span> 
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">y</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>上面这个函数接受两个字符串的引用（实际是Slice，本文不是教学，请先忽略语法问题），比较其长度，将长的那个字符串作为结果返回调用者。顺便，这种返回值的方式一定让你印象深刻。<br />
+虽然示例简单，但不可否认，这种需求是很正当的。大量的应用场景都需要函数独立于外，处理固定的内存数据，进入和返回的，都只是指向内存的指针。<br />
+当然，尽管合理，上面的代码是无法编译通过的，报错是“丢失生命期指定”：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>error[E0106]: missing lifetime specifier
+ <span class="nt">--</span><span class="o">&gt;</span> src/main.rs:1:33
+  |
+1 | fn longest<span class="o">(</span>x: &amp;str, y: &amp;str<span class="o">)</span> -&gt; &amp;str <span class="o">{</span>
+  |                                 ^ expected lifetime parameter
+  |
+  <span class="o">=</span> <span class="nb">help</span>: this <span class="k">function</span><span class="s1">'s return type contains a borrowed value, but the
+signature does not say whether it is borrowed from `x` or `y`
+</span></code></pre></div></div>
+<p>Rust引入了生命期的概念，从而保证返回值，同给定的参数，具有相同的生命期。这即保证了程序的灵活性，而又不造成内存的泄露，同时还不把维护内存安全的责任，完全推给不可靠的人为因素。</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">fn</span> <span class="n">longest</span><span class="o">&lt;</span><span class="nv">'a</span><span class="o">&gt;</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="o">&amp;</span><span class="nv">'a</span> <span class="nb">str</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="o">&amp;</span><span class="nv">'a</span> <span class="nb">str</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="o">&amp;</span><span class="nv">'a</span> <span class="nb">str</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="n">x</span><span class="nf">.len</span><span class="p">()</span> <span class="o">&gt;</span> <span class="n">y</span><span class="nf">.len</span><span class="p">()</span> <span class="p">{</span>
+        <span class="n">x</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">y</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>上面的代码，添加了生命期指定。在函数名之后首先声明了生命期a,语法样式跟泛型的类型说明部分实际是一样的，都放在尖括号&lt;&gt;之中。生命期名称之前附加一个单引号<code class="language-plaintext highlighter-rouge">'</code>。<br />
+随后的两个引用参数x/y以及作为返回值的字符串引用，都直接在<code class="language-plaintext highlighter-rouge">&amp;</code>符号之后标注了生命期<code class="language-plaintext highlighter-rouge">'a</code>。这表示，这几个引用，具有相同的生命期。<br />
+当然从这里的例子，x/y是调用的参数，是外面传递进来的，所以完整的含义应当是：返回的引用值，同参数x/y一样具有相同的生命期。因此从调用者的角度来看，当x/y指向的内存，超出作用域销毁之后，所获得的函数返回值，也同时被销毁。</p>
+
+<p>有一个特殊的生命期<code class="language-plaintext highlighter-rouge">'static</code>，用于代表rust中的全局量或者静态量，专门表示这种引用具有贯穿于整个程序运行时的生命期长度。<br />
+比如Rust中通常用字面量赋值的字符串，实际都是<code class="language-plaintext highlighter-rouge">'static</code>，因为这些字面量实际在程序编译的时候就放置到了数据区并一直存在贯穿程序始终：</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="k">let</span> <span class="n">s</span> <span class="o">=</span> <span class="s">"I have a static lifetime."</span><span class="p">;</span>
+</code></pre></div></div>
+
+<h4 id="编译时检查和运行时开销">编译时检查和运行时开销</h4>
+<p>通过前面的几个个例子，我们对Rust的编译器rustc有了一个初步概念。丰富、详尽的编译错误输出对于排查源码中的错误帮助很大。<br />
+实际上远不止于此。Rust的编译器包含着Rust语言的另外一个核心思想，那就是，尽量在编译阶段就暴露出程序的设计错误，而不让这些错误带到生产环境从而付出昂贵的代价。<br />
+这也是Rust学习曲线陡峭的原因之一，很多在其它语言中可以编译通过的代码，在Rust中都无法通过编译（排除语法错误之外）。这种更严格的编译时检查很容易让初学者手足无措。<br />
+带来的优点也是显而易见的，除了刚才提过的不让程序Bug带入到生产环境之外，错误能在编译阶段就消除掉，无需在运行时进行更多不必要的错误检查，这也将大大的减少程序在运行时消耗。这个消耗包括编译所生成的代码体积和运行时检查所损耗的CPU资源两个方面。</p>
+
+<p>比如Rust中有多种不同功能的智能指针，以常见的Box和Rc为例，前者提供基本的指针功能，后者提供类似Java语言一样，基于引用统计的自动垃圾回收机制。<br />
+（请注意我们这里并不是做语言学习，所以请关注在Rust的设计理念上，先别在意具体的关键字和语法。）</p>
+
+<p>如果在程序中使用Box指针的话，当变量x被赋值给变量y，所有权同时被转移，变量x就不再可用了，这个我们在开始的所有权介绍时就见到了：</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">let</span> <span class="n">x</span> <span class="o">=</span> <span class="nn">Box</span><span class="p">::</span><span class="nf">new</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="k">let</span> <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="p">;</span>
+<span class="c">// x从此无效了</span>
+</code></pre></div></div>
+<p>与此规则对应的所有操作，在程序的编译器就可以做出检查，从而判断是否有错误存在。<br />
+但毕竟我们也有其它的需求，比如我们希望同时有多个指针指向同一块存储区域。这时候就需要使用Rc指针。</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">let</span> <span class="n">five</span> <span class="o">=</span> <span class="nn">Rc</span><span class="p">::</span><span class="nf">new</span><span class="p">(</span><span class="mi">5</span><span class="p">);</span>
+<span class="k">let</span> <span class="n">five1</span> <span class="o">=</span> <span class="n">five</span><span class="nf">.clone</span><span class="p">();</span>
+<span class="c">// 此时five/five1都是有效的</span>
+</code></pre></div></div>
+<p>但显然，使用Rc指针的时候，我们无法在编译过程中发现可能的错误。并且，Rc指针类似Java，当对一块内存的所有引用都失效之后，系统会释放这部分内存。而这个过程，都需要在程序执行的过程中，有对应的管理代码不停的工作，以保证跟踪内存的引用和内存的释放（垃圾回收）。这就产生了运行时开销。</p>
+
+<p>为了对运行时开销能够更精确的掌控，Rust在语言层面增加了许多选择，这些选择在其它语言中本来是不需要的。但一个经验丰富的程序员，则能充分的利用这些不同的选择写出高品质的代码。<br />
+比如Rc指针并不支持多线程，因为其中的引用计数器操作不是原子级的，所以Rust还提供了Arc用于多线程环境。当然，原子级的操作在运行时需要额外的开销。</p>
+
+<p>与Rust语言的编译设计相映成趣的是Go，Go语言提供非常快速的编译过程，从而提供流畅的开发体验，让Go语言易于学习和使用。但Go的编译质量早就为人所诟病。<br />
+当然更极端的例子是Python、Js等脚本型的语言，脚本语言完全无需编译。虽然执行效率方面这些年来随着电脑性能的提高已经不是严重问题，但大多错误几乎都只能通过代码的执行来发现。使得脚本语言在商业软件开发中占有率一直不高，更别说操作系统这一类的底层软件了。</p>
+
+<p>总结一下这一部分，Rust提供高级语言所具有的一些特征，比如自动的运行时垃圾回收机制。但同时也提供并且倾向于开发人员通过精细的设计，在开发和程序编译过程中就完成内存的设计和管理，从而及早发现错误，降低运行时开销，提高最终的代码质量。</p>
+
+<h4 id="有限的面向对象特征">有限的面向对象特征</h4>
+<p>面向对象是现代开发语言的基本能力。但Rust只提供了有限的面向对象支持。<br />
+我衷心的认为这是一件好事，我一直认为现在很多的程序员，往往为了面向对象而去面向对象开发。把原本很简单的事情做的过于复杂，使得代码量和运行开销高企不下，开发效率和执行效率完全失控。<br />
+Linus Torvalds曾经在那场著名的辩论中直呼C++是“糟糕程序员的垃圾语言”，有兴趣的可以翻墙去看原文：<a href="https://public-inbox.org/git/a1bbc6950709061721r537b153eu1b0bb3c27fb7bd51@mail.gmail.com/">Re: [RFC] Convert builin-mailinfo.c to use The Better String Library.</a></p>
+
+<p>在Rust中没有直接提供“类”(class)的概念，希望使用“对象”的程序员，可以直接在结构(struct)和枚举(enum)类型上附加函数方法，比如：</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">// 声明一个“圆”结构类型</span>
+<span class="k">struct</span> <span class="n">Circle</span> <span class="p">{</span>
+    <span class="n">x</span><span class="p">:</span> <span class="nb">f64</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">:</span> <span class="nb">f64</span><span class="p">,</span>
+    <span class="n">radius</span><span class="p">:</span> <span class="nb">f64</span><span class="p">,</span>
+<span class="p">}</span>
+<span class="c">// 为结构实现一个方法area</span>
+<span class="k">impl</span> <span class="n">Circle</span> <span class="p">{</span>
+    <span class="k">fn</span> <span class="nf">area</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">f64</span> <span class="p">{</span>
+        <span class="nn">std</span><span class="p">::</span><span class="nn">f64</span><span class="p">::</span><span class="nn">consts</span><span class="p">::</span><span class="n">PI</span> <span class="o">*</span> <span class="p">(</span><span class="k">self</span><span class="py">.radius</span> <span class="o">*</span> <span class="k">self</span><span class="py">.radius</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">fn</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">let</span> <span class="n">c</span> <span class="o">=</span> <span class="n">Circle</span> <span class="p">{</span> <span class="n">x</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="mf">2.0</span> <span class="p">};</span>
+    <span class="c">// 调用结构的内置方法，计算圆的面积</span>
+    <span class="nd">println!</span><span class="p">(</span><span class="s">"{}"</span><span class="p">,</span> <span class="n">c</span><span class="nf">.area</span><span class="p">());</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>看上去跟Go处理对象的方法很像是吧，其实在面向对象方面Go语言的理念也是高举了“简化”的大旗。<br />
+Rust也没有我们习惯了的构造函数和析构函数。上面代码中对Circle对象的初始化语句：</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">let</span> <span class="n">c</span> <span class="o">=</span> <span class="n">Circle</span> <span class="p">{</span> <span class="n">x</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">radius</span><span class="p">:</span> <span class="mf">2.0</span> <span class="p">};</span>
+</code></pre></div></div>
+<p>就是直接对成员变量的赋值。<br />
+这是因为Rust推崇“明确化”（being explicit）的代码方式，也就是所有要执行的代码，应当清晰的在代码中体现出来。而不是隐藏在一些容易忘记、容易出错的构造函数之后。</p>
+
+<p>与“简化对象”相反的，Rust对面向对象中“接口”(Java中的interface，或者C++中的多重继承)的概念做了发扬，贯穿在了Rust类型管理的方方面面。<br />
+当然我这样说有点不算贴切，其实应当先忘记“接口”的概念，从头理解Rust中的“特质”(trait)，因为特质和接口，只是在技术实现上有些类似，但在应用理念上还是很有区别的。<br />
+本质上说，“特质”也是实现多个对象中，共性的方法，比如：</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">trait</span> <span class="n">HasArea</span> <span class="p">{</span> <span class="c">//求取对象的面积</span>
+    <span class="k">fn</span> <span class="nf">area</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">f64</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>随后多个对象，都可以实现这个特质，从而都具有这个方法：</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">struct</span> <span class="n">Circle</span> <span class="p">{</span> <span class="c">//定义一个“圆”对象</span>
+    <span class="n">x</span><span class="p">:</span> <span class="nb">f64</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">:</span> <span class="nb">f64</span><span class="p">,</span>
+    <span class="n">radius</span><span class="p">:</span> <span class="nb">f64</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">impl</span> <span class="n">HasArea</span> <span class="k">for</span> <span class="n">Circle</span> <span class="p">{</span>
+    <span class="k">fn</span> <span class="nf">area</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">f64</span> <span class="p">{</span>
+        <span class="nn">std</span><span class="p">::</span><span class="nn">f64</span><span class="p">::</span><span class="nn">consts</span><span class="p">::</span><span class="n">PI</span> <span class="o">*</span> <span class="p">(</span><span class="k">self</span><span class="py">.radius</span> <span class="o">*</span> <span class="k">self</span><span class="py">.radius</span><span class="p">)</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+
+<span class="k">struct</span> <span class="n">Square</span> <span class="p">{</span> <span class="c">//”定义一个“方形”对象</span>
+    <span class="n">x</span><span class="p">:</span> <span class="nb">f64</span><span class="p">,</span>
+    <span class="n">y</span><span class="p">:</span> <span class="nb">f64</span><span class="p">,</span>
+    <span class="n">side</span><span class="p">:</span> <span class="nb">f64</span><span class="p">,</span>
+<span class="p">}</span>
+
+<span class="k">impl</span> <span class="n">HasArea</span> <span class="k">for</span> <span class="n">Square</span> <span class="p">{</span>
+    <span class="k">fn</span> <span class="nf">area</span><span class="p">(</span><span class="o">&amp;</span><span class="k">self</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">f64</span> <span class="p">{</span>
+        <span class="k">self</span><span class="py">.side</span> <span class="o">*</span> <span class="k">self</span><span class="py">.side</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>在Rust中，通过泛型的帮助，根据数据类型实现的不同特质，把类型分为不同的功能和用途。<br />
+比如具有“Send”特质的类型，才可以安全的在多个线程间传递从而共享数据。<br />
+比如具有“Copy”特质的类型，说明数据保存在栈(Stack)上，数据的复制（赋值给其它变量），不会产生所有权的转移（参考前面所有权的例子）。<br />
+还有比如，刚才说过了Rust中没有析构函数，但如果有一些数据并没有被Rust所管理，需要自己去释放，则可以为自己定义的对象实现一个Drop特质，在其中的drop方法中释放自己申请的内存：</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">impl</span> <span class="n">Drop</span> <span class="k">for</span> <span class="n">CustomSmartPointer</span> <span class="p">{</span>
+    <span class="k">fn</span> <span class="k">drop</span><span class="p">(</span><span class="o">&amp;</span><span class="k">mut</span> <span class="k">self</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nd">println!</span><span class="p">(</span><span class="s">"Dropping CustomSmartPointer with data `{}`!"</span><span class="p">,</span> <span class="k">self</span><span class="py">.data</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>其它面向对象的编程特征，比如“泛型”，比如“重载”，同其它语言并没有很大的区别，这里不再额外介绍。<br />
+这些相比较其它面向对象语言而言，并不算丰富的语法工具，是保留了面向对象开发模式最精华的部分。并不会对业务的描述造成什么障碍，反而会让建模工作更为简洁、务实，尽可能不造成代码上的晦涩和运行时的低效。</p>
+
+<h4 id="内置的综合管理工具">内置的综合管理工具</h4>
+<p>早期出现的开发语言，比如C，比如Java，本身并没有附加官方的管理工具。比如包管理、测试管理、编译管理。<br />
+在语言的发展过程中，因为开发工作的需求，往往会出现多个有影响的工具。在C/C++方面，常见的编译管理工具有Makefile/CMake/AutoMake等，包管理工具，往往同系统包管理工具结合在一起，常见的有APT/YUM/Aptitude/Dnf/HomeBrew。Java的情况也很类似。<br />
+新近风靡的语言，比如Python,Pip工具占了大部分市场。Nodejs则是NPM用户最多。Go语言的同名管理工具就更不用说了。这些现象，跟语言本身的官方支持密不可分。<br />
+Rust也由官方直接发布Cargo工具，功能涵盖版本升级、项目管理、包管理、测试管理、编译管理等多方面。<br />
+大多数初学者的Rust之旅，就是由执行<code class="language-plaintext highlighter-rouge">cargo new helloworld</code>开始的。<br />
+开发语言的综合管理工具，对于构建大型的软件项目必不可少。相信在cargo的帮助下，让学习者快速的学以致用，把一些项目迁移至Rust能轻松不少。</p>
+
+<h4 id="扩展库支持">扩展库支持</h4>
+<p>一门语言能否被大量用户支持，与语言所提供的扩展库功能密不可分。<br />
+我就见到不少程序员学习Python的原因，就是因为Python能够更好的支持PyTorch / TensorFlow等机器学习工具包。<br />
+Rust通过Crate（可以翻译为扩展箱）机制支持自己的扩展包。而且通过内置的Cargo工具可以直接使用大量的官方预置扩展包和社区共享的扩展包。<br />
+此外Rust还可以通过FFI接口（Foreign Function Interface）直接调用其它语言编写的函数库或者共享Rust函数给其它语言调用。<br />
+比如我们在Rust中调用c++写的snappy压缩、解压功能包。Snappy官方网站为：<a href="https://google.github.io/snappy/">https://google.github.io/snappy/</a>，在macOS下安装Snappy包可以使用命令：<code class="language-plaintext highlighter-rouge">brew install snappy</code>。</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">extern</span> <span class="n">crate</span> <span class="n">libc</span><span class="p">;</span>
+<span class="k">use</span> <span class="nn">libc</span><span class="p">::</span><span class="nb">size_t</span><span class="p">;</span>
+
+<span class="c">// 下面这条宏命令，表示紧接着的extern块中的函数，在snappy库中链接，</span>
+<span class="c">// rustc会自动链接libsnappy.dylib库</span>
+<span class="c">// 如果是linux则是链接libsnappy.so文件</span>
+<span class="c">// 如果使用宏命令：#[link(name = "snappy",kind = "static")]</span>
+<span class="c">// 则会链接libsnappy.a静态库文件</span>
+<span class="nd">#[link(name</span> <span class="nd">=</span> <span class="s">"snappy"</span><span class="nd">)]</span>
+<span class="k">extern</span> <span class="p">{</span>
+    <span class="c">// 调用函数仅为示例，本函数估算所给定尺寸的数据，</span>
+    <span class="c">// 压缩后最大的长度，供用户申请输出缓存空间</span>
+    <span class="k">fn</span> <span class="nf">snappy_max_compressed_length</span><span class="p">(</span><span class="n">source_length</span><span class="p">:</span> <span class="nb">size_t</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">size_t</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="k">fn</span> <span class="nf">main</span><span class="p">()</span> <span class="p">{</span>
+    <span class="c">// 对于外部的非Rust语言库函数调用，需要在unsafe块中调用</span>
+    <span class="k">let</span> <span class="n">x</span> <span class="o">=</span> <span class="k">unsafe</span> <span class="p">{</span> <span class="nf">snappy_max_compressed_length</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span> <span class="p">};</span>
+    <span class="nd">println!</span><span class="p">(</span><span class="s">"max compressed length of a 100 byte buffer: {}"</span><span class="p">,</span> <span class="n">x</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>因为使用了libc扩展库，需要在Cargo.toml中设置库依赖：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>dependencies]
+libc <span class="o">=</span> <span class="s2">"0.2.0"</span>
+</code></pre></div></div>
+<p>编译的时候，rustc会自动链接libc库和宏定义指明的snappy压缩解压库。</p>
+
+<p>把Rust中定义的函数，共享给c语言调用也很类似，请看Rust代码：</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">extern</span> <span class="n">crate</span> <span class="n">libc</span><span class="p">;</span>
+<span class="k">use</span> <span class="nn">libc</span><span class="p">::</span><span class="n">uint32_t</span><span class="p">;</span>
+
+<span class="nd">#[no_mangle]</span>
+<span class="k">pub</span> <span class="k">extern</span> <span class="k">fn</span> <span class="nf">add</span><span class="p">(</span><span class="n">a</span><span class="p">:</span> <span class="n">uint32_t</span><span class="p">,</span> <span class="n">b</span><span class="p">:</span> <span class="n">uint32_t</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="n">uint32_t</span> <span class="p">{</span>
+    <span class="n">a</span> <span class="o">+</span> <span class="n">b</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>上面的代码，需要设置Cargo.toml文件的lib参数：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>lib]
+crate-type <span class="o">=[</span><span class="s2">"cdylib"</span><span class="o">]</span>
+</code></pre></div></div>
+<p>从而让rustc将项目编译为.dylib动态链接库文件(macOS)或者.so动态链接库文件(Linux)。<br />
+对应的C语言代码：</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;stdint.h&gt;
+</span><span class="k">extern</span> <span class="s">"C"</span> <span class="kt">uint32_t</span> <span class="nf">add</span><span class="p">(</span><span class="kt">uint32_t</span><span class="p">,</span> <span class="kt">uint32_t</span><span class="p">);</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(){</span>
+	<span class="kt">uint32_t</span> <span class="n">sum</span> <span class="o">=</span> <span class="n">add</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">);</span>
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>C代码编译的时候，记着使用-l参数链接rust生成的动态链接库。<br />
+综上，迁移至Rust完全不用担心扩展库的限制，也完全不用担心同现有软件资源之间的互动、共享。可以从一个小的项目作为切入点，边学边用，在享受Rust安全可靠的同时，逐渐达成软件架构的迁移。</p>
+
+<h4 id="rust是一种可以进行底层开发的高级语言">Rust是一种可以进行底层开发的高级语言</h4>
+<p>现在流行的开发语言很多，但能够进行操作系统底层开发的选择项并没有几个。<br />
+除了传统的C、新近的Go，Rust是另一个不错的选择。<br />
+做到这一点，除了Rust是真正的二进制编译之外，Rust还具有非常小并且可控的“脚印”(footprint)。这代表Rust可以做到完全没有自己的运行时库支持下运行。<br />
+比如官方文档中提供的一个例子：</p>
+<div class="language-rust highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nd">#![feature(lang_items)]</span>
+<span class="nd">#![feature(start)]</span>
+<span class="nd">#![no_std]</span>
+
+<span class="c">// Pull in the system libc library for what crt0.o likely requires</span>
+<span class="k">extern</span> <span class="n">crate</span> <span class="n">libc</span><span class="p">;</span>
+
+<span class="c">// Entry point for this program</span>
+<span class="nd">#[start]</span>
+<span class="k">fn</span> <span class="nf">start</span><span class="p">(</span><span class="mi">_</span><span class="n">argc</span><span class="p">:</span> <span class="nb">isize</span><span class="p">,</span> <span class="mi">_</span><span class="n">argv</span><span class="p">:</span> <span class="o">*</span><span class="k">const</span> <span class="o">*</span><span class="k">const</span> <span class="nb">u8</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="nb">isize</span> <span class="p">{</span>
+    <span class="mi">0</span>
+<span class="p">}</span>
+
+<span class="c">// These functions are used by the compiler, but not</span>
+<span class="c">// for a bare-bones hello world. These are normally</span>
+<span class="c">// provided by libstd.</span>
+<span class="nd">#[lang</span> <span class="nd">=</span> <span class="s">"eh_personality"</span><span class="nd">]</span>
+<span class="nd">#[no_mangle]</span>
+<span class="k">pub</span> <span class="k">extern</span> <span class="k">fn</span> <span class="nf">rust_eh_personality</span><span class="p">()</span> <span class="p">{</span>
+<span class="p">}</span>
+
+<span class="c">// This function may be needed based on the compilation target.</span>
+<span class="nd">#[lang</span> <span class="nd">=</span> <span class="s">"eh_unwind_resume"</span><span class="nd">]</span>
+<span class="nd">#[no_mangle]</span>
+<span class="k">pub</span> <span class="k">extern</span> <span class="k">fn</span> <span class="nf">rust_eh_unwind_resume</span><span class="p">()</span> <span class="p">{</span>
+<span class="p">}</span>
+
+<span class="nd">#[lang</span> <span class="nd">=</span> <span class="s">"panic_fmt"</span><span class="nd">]</span>
+<span class="nd">#[no_mangle]</span>
+<span class="k">pub</span> <span class="k">extern</span> <span class="k">fn</span> <span class="nf">rust_begin_panic</span><span class="p">(</span><span class="mi">_</span><span class="n">msg</span><span class="p">:</span> <span class="nn">core</span><span class="p">::</span><span class="nn">fmt</span><span class="p">::</span><span class="n">Arguments</span><span class="p">,</span>
+                               <span class="mi">_</span><span class="n">file</span><span class="p">:</span> <span class="o">&amp;</span><span class="nv">'static</span> <span class="nb">str</span><span class="p">,</span>
+                               <span class="mi">_</span><span class="n">line</span><span class="p">:</span> <span class="nb">u32</span><span class="p">)</span> <span class="k">-&gt;</span> <span class="o">!</span> <span class="p">{</span>
+    <span class="k">loop</span> <span class="p">{}</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>其中<code class="language-plaintext highlighter-rouge">#![no_std]</code>宏代码就表示本代码编译时不使用rust标准库。<br />
+想要真正从头编写一个操作系统，这个话题还是比较大，有兴趣的可以参考一下这个博客：<a href="https://os.phil-opp.com/">https://os.phil-opp.com/</a>作者Philipp Oppermann循序渐进的演示用Rust在没有标准库甚至没有libc库的支持下从头开始编写一个操作系统，该博客提供了一个学习性的实现。</p>
+
+<h4 id="其它">其它</h4>
+<p>作为新兴的开发语言，Rust在函数式编程、网络编程、多线程、消息同步、锁、测试代码、异常处理等方面都有不俗表现。但本文不是Rust教学，所以这里不再介绍。建议在学习Rust的过程中，根据所选教程的组织结构来逐步了解。</p>
+
+<p>企业应用中，Web框架和ORM是最常用到的组件，但这应当说是Rust当前的一个短板。<br />
+因为毕竟Rust是一个新兴的生态系统，尽管选择很多，但尚没有重量级的选手出现。在性能和规模化的应用方面还有待市场验证。<br />
+但Rust本身对内存、性能的精细管理，让我们可以对项目的总体性能保持信心。<br />
+Actix-web、hyper的web框架，以及Diesel作为ORM是比较常见的组合。</p>
+
+<h4 id="小结">小结</h4>
+<p>Rust首先包含了长期软件工程中对于高频Bug的经验总结，从而开创性的提出了大量的全新编程理念。<br />
+不同于很多新式语言给予开发者更多的便利和自由，Rust更苛刻的对待程序员的开发工作……尽管在易用方面Rust也下了不少的功夫，但相对于繁复的规则，这些努力很容易被忽视。<br />
+而这些“成长的代价”保证了更高品质的开发输出。</p>
+
+<p>比如自2004年以来，微软安全响应中心（MSRC）已对所有报告过的微软安全漏洞进行了分类。根据他们提供的数据，所有微软年度补丁中约有 70%是针对内存安全漏洞的修复程序。恐怕没有人再继续做延伸统计，比如这些安全漏洞造成了多少的经济损失。<br />
+所以甚至已有传闻微软正在探索使用Rust编程语言作为 C、C++和其他语言的替代方案，以此来改善应用程序的安全状况。</p>
+
+<p>Rust并不适合初学者，只有经历过大量实践磨炼，甚至被安全漏洞痛苦折磨的资深开发者，才能更理解Rust的价值。</p>
+
+<p>自由还是安全，终要有所取舍。</p>
+
+:ET

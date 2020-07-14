@@ -2,12 +2,12 @@
 layout:         page
 title:          在国内使用golang的小技巧
 subtitle:       下载资源包和查看文档
-card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513241513463&di=cff690a53d3399411c18eaef837fb2e3&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimage%2Fc0%253Dshijue1%252C0%252C0%252C294%252C40%2Fsign%3D12b608fb02fa513d45a7649d55043f8e%2F279759ee3d6d55fb31c2eb0167224f4a20a4dd95.jpg
+card-image:     http://115.182.41.123/files/201712/wall.jpeg
 date:           2017-12-14
 tags:           golang 
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513241513463&di=cff690a53d3399411c18eaef837fb2e3&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimage%2Fc0%253Dshijue1%252C0%252C0%252C294%252C40%2Fsign%3D12b608fb02fa513d45a7649d55043f8e%2F279759ee3d6d55fb31c2eb0167224f4a20a4dd95.jpg)
+![](http://115.182.41.123/files/201712/wall.jpeg)
 (图文无关)
 
 go是一种好语言，从业几十年，接触到go语言就有一种“众里寻他千百度，眸然回首，那人就在灯火阑珊处”的感觉。  

@@ -2,12 +2,12 @@
 layout:         page
 title:          MacPro4,1升级到MacPro5,1
 subtitle:       MacPro4,1 firmware patch and upgrade 
-card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1514534533&di=0c6ea22bff1630d62b5d095ff7470481&imgtype=jpg&er=1&src=http%3A%2F%2Fmac.tgbus.com%2Fmacpro%2Fimages%2Fdesign_io_hero20080108.png
+card-image:     http://115.182.41.123/files/201712/macpro.jpg
 date:           2017-12-22
 tags:           mac
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1514534533&di=0c6ea22bff1630d62b5d095ff7470481&imgtype=jpg&er=1&src=http%3A%2F%2Fmac.tgbus.com%2Fmacpro%2Fimages%2Fdesign_io_hero20080108.png)
+![](http://115.182.41.123/files/201712/macpro.jpg)
 
 收了一台老MacPro,2009年版本，准确型号是“MacPro4,1”。机器很好，美中不足的是，太老了。硬件还好说，很多部件都可以单独采购升级，特别是有了淘宝，几乎只要有的东西，都可以买到。软件就麻烦了，macOS sierra已经不支持，更别说high sierra。  
 而如果不能用最新的系统，对于研发人员来讲，MacPro的价值将大大降低，因为从开发系统到测试环境，都是非常严格的版本相关的。比如对于iPhone这类产品，Apple更是发布新版本后几个小时，老版本的验证服务器就会关闭从而强制用户升级。  

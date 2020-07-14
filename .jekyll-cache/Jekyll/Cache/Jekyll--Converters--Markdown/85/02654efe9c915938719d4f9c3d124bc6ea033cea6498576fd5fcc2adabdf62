@@ -1,0 +1,48 @@
+I"�&<p><img src="http://115.182.41.123/files/201712/golang.jpg" alt="" />
+今天接到一个任务是将原来运行在mac的应用移植到linux，原因当然是因为客户那边当前是linux环境，也不想再采购mac电脑。<br />
+通常来说，这个工作并不难，因为我选用的服务器端技术是c或者golang,这两种技术具有很好的可移植性，而且大多是重新编译即可运行，所以接到任务的开始并没有把这个当一回事。<br />
+跟想象中的也差不多，搭建好linux测试服务器，在mac上把运行很久的应用重新交叉编译了一遍，部署到linux实验环境，启动、测试，看起来一切正常。准备打包交活，这时候发现一个问题，程序无法终止。<br />
+简单调试后就找到了原因，在系统中启动的子进程，发出终止信号之后居然仍在运行，导致父进程也一直无法退出，尴尬了。<br />
+列一下采用的代码(代码为简化版仅供示例）：</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span> <span class="n">startChild1</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">cmd</span> <span class="o">:=</span> <span class="n">exec</span><span class="o">.</span><span class="n">Command</span><span class="p">(</span><span class="s">"/bin/sh"</span><span class="p">,</span> <span class="s">"-c"</span><span class="p">,</span> <span class="s">"sleep 1000"</span><span class="p">)</span>
+	<span class="n">time</span><span class="o">.</span><span class="n">AfterFunc</span><span class="p">(</span><span class="m">10</span><span class="o">*</span><span class="n">time</span><span class="o">.</span><span class="n">Second</span><span class="p">,</span> <span class="k">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"PID1="</span><span class="p">,</span> <span class="n">cmd</span><span class="o">.</span><span class="n">Process</span><span class="o">.</span><span class="n">Pid</span><span class="p">)</span>
+		<span class="n">syscall</span><span class="o">.</span><span class="n">Kill</span><span class="p">(</span><span class="o">-</span><span class="n">cmd</span><span class="o">.</span><span class="n">Process</span><span class="o">.</span><span class="n">Pid</span><span class="p">,</span> <span class="n">syscall</span><span class="o">.</span><span class="n">SIGQUIT</span><span class="p">)</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"killed"</span><span class="p">)</span>
+	<span class="p">})</span>
+	<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"begin run"</span><span class="p">)</span>
+	<span class="n">cmd</span><span class="o">.</span><span class="n">Run</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>示例代码首先启动一个sleep的子进程，表示某个子业务开始工作，然后延时10秒钟之后，把这个子进程杀死。这段代码启动子进程和关闭子进程在mac电脑的原有系统上工作都很正常，但是到了linux，启动子进程仍然没有问题，关闭子进程不成功。<br />
+检查了一下在linux的工作过程，发现启动子进程之后，实际上是启动了两个进程，一个进程是<code class="language-plaintext highlighter-rouge">/bin/sh</code>,随后sh又启动了一个子进程自身的子进程sleep。而发出退出命令的时候，只有sh退出了，sleep进程仍然继续运行。对比同样的mac电脑上，sh进程是没有出现的，只有一个sleep进程，所以发出退出命令的时候，sleep正常关闭，系统表现正常。<br />
+使用/bin/sh来启动另外的命令行程序是有原因的，这源于golang本身的设计，golang的exec.Command,后面第一个参数是命令行程序本身，之后的每一个exec.Command参数，都代表命令行程序的一个参数,而不是我们常用的，命令行程序路径和参数都可以写在一个字符串，用空格隔开即可。所以有的时候我们是为了省事，也有的时候是顺手移植了别的语言的代码，就使用/bin/sh来启动需要的命令行程序，就如同上面示例代码一样，这样情况下，除了-c参数要单独占用一个字符串，我们原本要启动的字符串程序及其参数，就可以如同常见语言处理方式那样，放在一个字符串了。<br />
+我们可以尝试一下这个代码：</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span> <span class="n">startChild2</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">cmd</span> <span class="o">:=</span> <span class="n">exec</span><span class="o">.</span><span class="n">Command</span><span class="p">(</span><span class="s">"sleep"</span><span class="p">,</span> <span class="s">"1000"</span><span class="p">)</span>
+	<span class="n">time</span><span class="o">.</span><span class="n">AfterFunc</span><span class="p">(</span><span class="m">10</span><span class="o">*</span><span class="n">time</span><span class="o">.</span><span class="n">Second</span><span class="p">,</span> <span class="k">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"PID2="</span><span class="p">,</span> <span class="n">cmd</span><span class="o">.</span><span class="n">Process</span><span class="o">.</span><span class="n">Pid</span><span class="p">)</span>
+		<span class="n">syscall</span><span class="o">.</span><span class="n">Kill</span><span class="p">(</span><span class="o">-</span><span class="n">cmd</span><span class="o">.</span><span class="n">Process</span><span class="o">.</span><span class="n">Pid</span><span class="p">,</span> <span class="n">syscall</span><span class="o">.</span><span class="n">SIGQUIT</span><span class="p">)</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"killed"</span><span class="p">)</span>
+	<span class="p">})</span>
+	<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"begin run"</span><span class="p">)</span>
+	<span class="n">cmd</span><span class="o">.</span><span class="n">Run</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>测试一下，这段代码因为没有经过/bin/sh程序，在linux上也只有sleep这一个进程被建立，直接向其发出退出指令是可以正常工作的。这从进程的观察中及实验的结果中，都可以证实我们的判断。 
+知道了原因，处理起来也很容易，一是把程序改成类似上面这样的方式启动进程。另外一个办法则是直接为/bin/sh及我们的命令行进程建立一个进程组，这样最后发出的指令退出这个进程组，同样可以同时退出/bin/sh及sleep两个进程，达到我们的需求。写代码测试一下：</p>
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span> <span class="n">startChild3</span><span class="p">()</span> <span class="p">{</span>
+	<span class="n">cmd</span> <span class="o">:=</span> <span class="n">exec</span><span class="o">.</span><span class="n">Command</span><span class="p">(</span><span class="s">"/bin/sh"</span><span class="p">,</span> <span class="s">"-c"</span><span class="p">,</span> <span class="s">"sleep 1000"</span><span class="p">)</span>
+	<span class="n">cmd</span><span class="o">.</span><span class="n">SysProcAttr</span> <span class="o">=</span> <span class="o">&amp;</span><span class="n">syscall</span><span class="o">.</span><span class="n">SysProcAttr</span><span class="p">{</span><span class="n">Setpgid</span><span class="o">:</span> <span class="no">true</span><span class="p">}</span>
+	<span class="n">time</span><span class="o">.</span><span class="n">AfterFunc</span><span class="p">(</span><span class="m">10</span><span class="o">*</span><span class="n">time</span><span class="o">.</span><span class="n">Second</span><span class="p">,</span> <span class="k">func</span><span class="p">()</span> <span class="p">{</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"PID3="</span><span class="p">,</span> <span class="n">cmd</span><span class="o">.</span><span class="n">Process</span><span class="o">.</span><span class="n">Pid</span><span class="p">)</span>
+		<span class="n">syscall</span><span class="o">.</span><span class="n">Kill</span><span class="p">(</span><span class="o">-</span><span class="n">cmd</span><span class="o">.</span><span class="n">Process</span><span class="o">.</span><span class="n">Pid</span><span class="p">,</span> <span class="n">syscall</span><span class="o">.</span><span class="n">SIGQUIT</span><span class="p">)</span>
+		<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"killed"</span><span class="p">)</span>
+	<span class="p">})</span>
+	<span class="n">fmt</span><span class="o">.</span><span class="n">Println</span><span class="p">(</span><span class="s">"begin run"</span><span class="p">)</span>
+	<span class="n">cmd</span><span class="o">.</span><span class="n">Run</span><span class="p">()</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>经过实际测试，这段代码在不改变原有的命令行参数传递习惯的基础上，可以正常在linux及mac电脑顺利执行。</p>
+:ET

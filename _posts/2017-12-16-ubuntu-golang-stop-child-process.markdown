@@ -2,12 +2,12 @@
 layout:         post
 title:          golang子进程的启动和停止
 subtitle:       mac与linux的区别
-card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513447113487&di=c73f02fddca8c7917d825fd8f90aa69e&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2Fd000baa1cd11728b7e303b08c3fcc3cec3fd2cfe.jpg
+card-image:     http://115.182.41.123/files/201712/golang.jpg
 date:           2017-12-16
 tags:           linux mac golang
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1513447113487&di=c73f02fddca8c7917d825fd8f90aa69e&imgtype=0&src=http%3A%2F%2Fimgsrc.baidu.com%2Fimgad%2Fpic%2Fitem%2Fd000baa1cd11728b7e303b08c3fcc3cec3fd2cfe.jpg)
+![](http://115.182.41.123/files/201712/golang.jpg)
 今天接到一个任务是将原来运行在mac的应用移植到linux，原因当然是因为客户那边当前是linux环境，也不想再采购mac电脑。  
 通常来说，这个工作并不难，因为我选用的服务器端技术是c或者golang,这两种技术具有很好的可移植性，而且大多是重新编译即可运行，所以接到任务的开始并没有把这个当一回事。  
 跟想象中的也差不多，搭建好linux测试服务器，在mac上把运行很久的应用重新交叉编译了一遍，部署到linux实验环境，启动、测试，看起来一切正常。准备打包交活，这时候发现一个问题，程序无法终止。  

@@ -2,7 +2,7 @@
 layout:         page
 title:          5分钟搭建一个quic服务器
 subtitle:       mac电脑很好用
-card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1515588532278&di=a9905d0faf61dacb7d47a66af3e4f892&imgtype=0&src=http%3A%2F%2Fwww.qingpingshan.com%2Fuploads%2Fallimg%2F161114%2F21005054D-0.png
+card-image:     http://115.182.41.123/files/201801/quic.jpg
 date:           2018-01-10
 tags:           mac
 post-card-type: image

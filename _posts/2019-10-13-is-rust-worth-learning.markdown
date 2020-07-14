@@ -2,12 +2,12 @@
 layout:         page
 title:          Rust到底值不值得学
 subtitle:       Rust对比、特色和理念
-card-image:		https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1570786841653&di=c11b53cab11b9b1f4fece5210cd4afcb&imgtype=0&src=http%3A%2F%2Fpic2.zhimg.com%2Fv2-a75a1c17268a96f64e40e8a0c9efdc87_1200x500.jpg
+card-image:		http://115.182.41.123/files/201910/rust.jpeg
 date:           2019-10-11
 tags:           html
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1570786841653&di=c11b53cab11b9b1f4fece5210cd4afcb&imgtype=0&src=http%3A%2F%2Fpic2.zhimg.com%2Fv2-a75a1c17268a96f64e40e8a0c9efdc87_1200x500.jpg)  
+![](http://115.182.41.123/files/201910/rust.jpeg)  
 #### 前言
 其实我一直弄不明白一点，那就是计算机技术的发展，是让这个世界变得简单了，还是变得更复杂了。   
 当然这只是一个玩笑，可别把这个问题当真。  

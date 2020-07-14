@@ -2,22 +2,22 @@
 layout:         page
 title:          RS232串口的Windows编程纪要
 subtitle:      	VC6 AND RS232
-card-image:		https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525924702662&di=8612341bb8a17f23cb6630d84e154c3a&imgtype=0&src=http%3A%2F%2Fimg009.hc360.cn%2Fhb%2FMTQ2MTM2MDc3NTE2Njg3MDcxNzUzNA%3D%3D.jpg
+card-image:		http://115.182.41.123/files/201805/232cable1.jpg
 date:           2018-05-10
 tags:           seven win
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525924702662&di=8612341bb8a17f23cb6630d84e154c3a&imgtype=0&src=http%3A%2F%2Fimg009.hc360.cn%2Fhb%2FMTQ2MTM2MDc3NTE2Njg3MDcxNzUzNA%3D%3D.jpg)  
+![](http://115.182.41.123/files/201805/232cable1.jpg)  
 再次是一篇入门文，各路神仙退散。  
 直接进入主题，又不是历史课，关于RS232那些前世今生的故事就不摆了。  
 
 #### 硬件链接
 首先以9针小口为例（大口应当只能去博物馆看了吧）看一下管脚排布，其实RS232本身没进博物馆都已经够让我惊讶了。  
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525925050541&di=bde37f8e92b3631c9fc73e3181975a8a&imgtype=0&src=http%3A%2F%2Fstatic.gkong.com%2Fupload%2Fnews%2F201303%2Fd1109363b9efaa6b0345f96aac4ee9e1.jpg)
+![](http://115.182.41.123/files/201805/232pic1.jpg)
 (图片来自互联网)  
 
 通常使用的接线图：  
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525925212205&di=0f930bf988e0dabfc32c675a8eaac17e&imgtype=0&src=http%3A%2F%2Fimg005.hc360.cn%2Fhb%2FMTQ2MTM2MDc5Njk3OC0xNjM4NDkyNjYy.jpg)
+![](http://115.182.41.123/files/201805/232pic2.jpg)
 (图片来自互联网)  
 
 

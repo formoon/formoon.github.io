@@ -2,12 +2,12 @@
 layout:         page
 title:          七牛对象存储的使用
 subtitle:       兼说在jekyll页面中添加照片引用
-card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1514451286&di=667dd6643fdb29539489c69b82d47449&imgtype=jpg&er=1&src=http%3A%2F%2Fg-search4.alicdn.com%2Fbao%2Fuploaded%2Fi2%2F36023082%2FTB2v0dnkXXXXXcMXXXXXXXXXXXX_%21%2136023082.png
+card-image:     http://115.182.41.123/files/201712/7niu.jpg
 date:           2017-12-21
 tags:           mac jekyll
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1514451286&di=667dd6643fdb29539489c69b82d47449&imgtype=jpg&er=1&src=http%3A%2F%2Fg-search4.alicdn.com%2Fbao%2Fuploaded%2Fi2%2F36023082%2FTB2v0dnkXXXXXcMXXXXXXXXXXXX_%21%2136023082.png)
+![](http://115.182.41.123/files/201712/7niu.jpg)
 
 Jekyll个人网页是个好技术，github.com是个好网站，不过存储容量和流量的限制是个头痛的事情，当然，也在情理之中。  
 好在我们生于“云”的时代，有很多办法来扩展我们的世界。在引用图片方面，主要的要求就是服务商可以提供外链。由于在国内，我们的选择少了一些，不过还是有几个优选的：
