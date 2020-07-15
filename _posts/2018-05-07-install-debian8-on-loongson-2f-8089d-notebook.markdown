@@ -2,12 +2,12 @@
 layout:         page
 title:          在龙芯小本上安装Debain8.10
 subtitle:      	安装过程流水账
-card-image:		https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525697405827&di=13fb5f05342d68bc8f014ea7a194ab87&imgtype=0&src=http%3A%2F%2Fimg.ruanman.net%2Ffiles%2F201411%2F26%2F201411260913378153.jpg
+card-image:		http://115.182.41.123/files/201805/longxinbook.jpg
 date:           2018-05-07
 tags:           linux
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1525697405827&di=13fb5f05342d68bc8f014ea7a194ab87&imgtype=0&src=http%3A%2F%2Fimg.ruanman.net%2Ffiles%2F201411%2F26%2F201411260913378153.jpg)  
+![](http://115.182.41.123/files/201805/longxinbook.jpg)  
 (图片是LEMOTE8089D笔记本，来自互联网)  
 YX原来送了一个LEMOTE笔记本给我。CPU是首款真正的国产，龙芯2F,兼容mips的指令集。  
 笔记本原来的操作系统是Debian6,后来升级到了7，随后一直是当做玩具放着。最近因为中兴受制裁的事件又想了起来，拿出来尝试看能做点什么。  

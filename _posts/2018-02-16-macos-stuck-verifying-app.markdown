@@ -2,7 +2,7 @@
 layout:         page
 title:          mac应用启动时卡死在“验证...”
 subtitle:       Stuck on verifying app
-card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1518786348681&di=24164c9cae589ea48e64a4f803cbc9b6&imgtype=0&src=http%3A%2F%2Fi4.ask.fd.zol-img.com.cn%2Fg5%2FM00%2F01%2F0F%2FChMkJ1gJw0yIMsJrAAFk7QRNkHsAAXE9ADjFJkAAWUF824.jpg
+card-image:     http://115.182.41.123/files/201802/macbook1.jpg
 date:           2018-02-16
 tags:           mac
 post-card-type: image

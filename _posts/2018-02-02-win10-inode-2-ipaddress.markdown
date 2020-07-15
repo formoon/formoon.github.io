@@ -2,7 +2,7 @@
 layout:         page
 title:          iNode环境Windows 10配置固定IP地址
 subtitle:       在Win10设置DHCP+静态 双IP
-card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1517559430288&di=a6ecd482c7c27a34ccd76ec1164a1d8e&imgtype=0&src=http%3A%2F%2Fwww.pinchengnet.com%2FUploads%2F201405%2F5367145ac5f07.jpg
+card-image:     http://115.182.41.123/files/201802/ipv4.jpg
 date:           2018-02-02
 tags:           win10
 post-card-type: image

@@ -1,0 +1,422 @@
+I"F�<p><img src="http://115.182.41.123/files/201806/llk1.jpg" alt="" />
+（图片是游戏的示意图，来自互联网，与本文程序无关）</p>
+
+<p>看题目就知道是写给初学者的，没需要的就别看了，自己都觉得怪无聊的。</p>
+
+<p>很多游戏的耐玩性都来自精巧的算法，特别是人工智能的水平。比如前几天看了著名的Alpha GO的算法，用了复杂的人工智能网络。而最简单的，可能就是连连看了，所以很多老师留作业，直接就是实现连连看。</p>
+
+<p>连连看游戏的规则非常简单：</p>
+<ol>
+  <li>两个图片相同。</li>
+  <li>两个图片之间，沿着相邻的格子画线，中间不能有障碍物。</li>
+  <li>画线中间最多允许2个转折。</li>
+</ol>
+
+<p>所以算法主要是这样几部分：</p>
+<ol>
+  <li>用数据结构描述图板。很简单，一个2维的整数数组，数组的值就是图片的标志，相同的数字表示相同的图片。有一个小的重点就是，有些连连看的地图中，允许在边界的两个图片，从地图外连线消除。这种情况一般需要建立的图板尺寸，比实际显示的图板，周边大一个格子，从而描述可以连线的空白外边界。本例中只是简单的使用完整的图板，不允许利用边界外连线。</li>
+  <li>生成图板。通常用随机数产生图片ID来填充图板就好。比较复杂的游戏，会有多种的布局方式，例如两个三角形。这种一般要手工编辑图板模板，在允许填充的区域事先用某个特定的整数值来标注，随后的随机数填充只填充允许填充的区域。本例中只是简单的随机填充。</li>
+  <li>检查连线中的障碍物。确定有障碍物的关键在于确定什么样的格子是空。通常定义格子的值为0就算空。要求所有的图片ID从1开始顺序编码。复杂的游戏还会定义负数作为特定的标志，比如允许填充区之类的。</li>
+  <li>检查直接连接：两张图片的坐标，必然x轴或者y轴有一项相同，表示两张图片在x轴或者y轴的同一条线上才可能出现直接连接。随后循环检查两者之间是否有障碍物即可确定。</li>
+  <li>检查一折连接：与检查直接连接相反，两个图片必须不在一条直线上，才可能出现一折连接，也就是x/y必须都不相同。随后以两张图片坐标，可以形成一个矩阵，矩阵的一对对角是两张图片，假设是A/B两点。矩阵另外两个对角分别是C1/C2,分别检查A/C1和C1/B或者A/C2和C2/B能同时形成直线连接，则A图片到B图片的1折连接可以成立。描述比较苍白，建议你自己画张简单的图就容易理解了。在一折连接的检查中，会调用上面的直线连接的检测至少2次，这种调用的方式有点类似递归的调用。</li>
+  <li>检查两折连接：同样假设两张图片分别为A/B两点，在A点的X+/X-方向/Y+方向/Y-方向，共4个方向上循环查找是否存在一个点C,使得A到C为直线连接，C到B为1折连接，则两折连接成立。这中间，会调用前面的直接连接检测和一折连接检测。</li>
+</ol>
+
+<p>用到的算法基本就是这些，下面看程序。本程序使用GCC或者CLANG编译的，可以在Linux或者Mac直接编译执行。</p>
+
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include&lt;stdio.h&gt;
+#include&lt;stdlib.h&gt;
+#include&lt;string.h&gt;
+#include&lt;time.h&gt;
+</span>
+<span class="c1">//常量习惯定义在程序一开始，以便将来的修改，比如重新定义一个更大的地图界限</span>
+<span class="c1">//定义图板尺寸</span>
+<span class="cp">#define _width 20
+#define _height 20
+</span><span class="c1">//定义数组矩阵中，0表示该格子为空</span>
+<span class="cp">#define empty (0)
+</span><span class="c1">//定义共有20种图片</span>
+<span class="cp">#define _pics (20)
+</span><span class="c1">//定义在图板中随机产生100*2个图片的填充</span>
+<span class="c1">//使用100是为了每次产生2个相同的图片，从而保证整个图可以消除完</span>
+<span class="cp">#define _datas (100)
+</span><span class="c1">//c语言没有bool类型，为了方便自定义一个</span>
+<span class="k">typedef</span> <span class="kt">int</span> <span class="n">bool</span><span class="p">;</span>
+<span class="cp">#define TRUE (1)
+#define FALSE (0)
+</span><span class="c1">//定义一个结构用来描述一个点坐标</span>
+<span class="k">typedef</span> <span class="k">struct</span> <span class="p">{</span>
+    <span class="kt">int</span> <span class="n">x</span><span class="p">;</span>
+    <span class="kt">int</span> <span class="n">y</span><span class="p">;</span>
+<span class="p">}</span> <span class="n">_point</span><span class="p">;</span>
+<span class="c1">//描述图板的数组</span>
+<span class="kt">int</span> <span class="n">map</span><span class="p">[</span><span class="n">_width</span><span class="p">][</span><span class="n">_height</span><span class="p">];</span>
+
+<span class="c1">//-------------------------init map----------------------</span>
+<span class="c1">//从图板中获取一个空白格子的坐标，这种方法随着填充图片的增加，</span>
+<span class="c1">//效率会急剧降低,不过简单实用，这么小的图板对cpu来说也不算什么</span>
+<span class="n">_point</span> <span class="nf">getRndEmptyBox</span><span class="p">(){</span>
+    <span class="kt">int</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">;</span>
+    <span class="k">while</span><span class="p">(</span><span class="n">TRUE</span><span class="p">){</span>
+        <span class="c1">//gcc的随机数跟windows的随机数产生规则不同</span>
+        <span class="c1">//linux是产生从0开始到RAND_MAX的一个正整数</span>
+        <span class="c1">//如果移植到windows,这部分要修改</span>
+        <span class="kt">int</span> <span class="n">x</span><span class="o">=</span><span class="n">rand</span><span class="p">()</span> <span class="o">%</span> <span class="n">_width</span><span class="p">;</span>
+        <span class="kt">int</span> <span class="n">y</span><span class="o">=</span><span class="n">rand</span><span class="p">()</span> <span class="o">%</span> <span class="n">_height</span><span class="p">;</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">map</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]</span><span class="o">==</span><span class="n">empty</span><span class="p">){</span>
+            <span class="n">_point</span> <span class="n">r</span><span class="p">;</span>
+            <span class="n">r</span><span class="p">.</span><span class="n">x</span><span class="o">=</span><span class="n">x</span><span class="p">;</span>
+            <span class="n">r</span><span class="p">.</span><span class="n">y</span><span class="o">=</span><span class="n">y</span><span class="p">;</span>
+            <span class="k">return</span> <span class="n">r</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">//设置一对随机图片</span>
+<span class="kt">void</span> <span class="nf">setRandPic</span><span class="p">(){</span>
+    <span class="n">_point</span> <span class="n">p</span><span class="p">;</span>
+    <span class="c1">//+1是为了防止出现随机数为0的情况，那样等于填充了空白</span>
+    <span class="kt">int</span> <span class="n">pic</span><span class="o">=</span><span class="n">rand</span><span class="p">()</span> <span class="o">%</span> <span class="n">_pics</span> <span class="o">+</span> <span class="mi">1</span><span class="p">;</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">getRndEmptyBox</span><span class="p">();</span>
+    <span class="n">map</span><span class="p">[</span><span class="n">p</span><span class="p">.</span><span class="n">x</span><span class="p">][</span><span class="n">p</span><span class="p">.</span><span class="n">y</span><span class="p">]</span><span class="o">=</span><span class="n">pic</span><span class="p">;</span>
+    <span class="c1">//printf("[%02d,%02d]=%02d\n",p.x,p.y,pic);</span>
+    <span class="n">p</span> <span class="o">=</span> <span class="n">getRndEmptyBox</span><span class="p">();</span>
+    <span class="n">map</span><span class="p">[</span><span class="n">p</span><span class="p">.</span><span class="n">x</span><span class="p">][</span><span class="n">p</span><span class="p">.</span><span class="n">y</span><span class="p">]</span><span class="o">=</span><span class="n">pic</span><span class="p">;</span>
+    <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">//用随机图片填充整个图板</span>
+<span class="kt">void</span> <span class="nf">setRndMap</span><span class="p">(){</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+    <span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">_datas</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="n">setRandPic</span><span class="p">();</span>
+    <span class="p">}</span>
+    <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">//-----------------------------show status --------------------</span>
+<span class="c1">//显示当前的图板情况</span>
+<span class="kt">void</span> <span class="nf">dumpMap</span><span class="p">(){</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span><span class="p">;</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"--: "</span><span class="p">);</span>
+    <span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">_width</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"%02d "</span><span class="p">,</span><span class="n">i</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">_height</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"%02d: "</span><span class="p">,</span><span class="n">i</span><span class="p">);</span>
+        <span class="k">for</span><span class="p">(</span><span class="n">j</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">j</span><span class="o">&lt;</span><span class="n">_width</span><span class="p">;</span><span class="n">j</span><span class="o">++</span><span class="p">){</span>
+            <span class="n">printf</span><span class="p">(</span><span class="s">"%02d "</span><span class="p">,</span><span class="n">map</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">]);</span>
+        <span class="p">}</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">//显示当前的图板情况，并且使用红色标注上将要消除的2个点</span>
+<span class="c1">//显示部分使用了linux的终端控制专用方式，移植到windows时需要修改</span>
+<span class="kt">void</span> <span class="nf">dumpMapWithHotPoint</span><span class="p">(</span><span class="n">_point</span> <span class="n">c1</span><span class="p">,</span><span class="n">_point</span> <span class="n">c2</span><span class="p">){</span>
+    <span class="kt">int</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">;</span>
+    <span class="c1">//为了方便计数，显示x/y轴格子编号</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"--: "</span><span class="p">);</span>
+    <span class="k">for</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">x</span><span class="o">&lt;</span><span class="n">_width</span><span class="p">;</span><span class="n">x</span><span class="o">++</span><span class="p">){</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"%02d "</span><span class="p">,</span><span class="n">x</span><span class="p">);</span>
+    <span class="p">}</span>
+    <span class="n">printf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="k">for</span><span class="p">(</span><span class="n">y</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">y</span><span class="o">&lt;</span><span class="n">_height</span><span class="p">;</span><span class="n">y</span><span class="o">++</span><span class="p">){</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"%02d: "</span><span class="p">,</span><span class="n">y</span><span class="p">);</span>
+        <span class="k">for</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">x</span><span class="o">&lt;</span><span class="n">_width</span><span class="p">;</span><span class="n">x</span><span class="o">++</span><span class="p">){</span>
+            <span class="k">if</span> <span class="p">((</span><span class="n">c1</span><span class="p">.</span><span class="n">x</span><span class="o">==</span><span class="n">x</span> <span class="o">&amp;&amp;</span> <span class="n">c1</span><span class="p">.</span><span class="n">y</span><span class="o">==</span><span class="n">y</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">c2</span><span class="p">.</span><span class="n">x</span><span class="o">==</span><span class="n">x</span> <span class="o">&amp;&amp;</span> <span class="n">c2</span><span class="p">.</span><span class="n">y</span><span class="o">==</span><span class="n">y</span><span class="p">))</span>
+                <span class="n">printf</span><span class="p">(</span><span class="s">"\e[1;31m%02d\e[0m "</span><span class="p">,</span><span class="n">map</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]);</span>
+            <span class="k">else</span>
+                <span class="n">printf</span><span class="p">(</span><span class="s">"%02d "</span><span class="p">,</span><span class="n">map</span><span class="p">[</span><span class="n">x</span><span class="p">][</span><span class="n">y</span><span class="p">]);</span>
+        <span class="p">}</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}</span>
+<span class="c1">//-------------------------search path--------------------</span>
+<span class="c1">//检查直接连接，返回成功或者失败</span>
+<span class="n">bool</span> <span class="nf">havePathCorner0</span><span class="p">(</span><span class="n">_point</span> <span class="n">p1</span><span class="p">,</span><span class="n">_point</span> <span class="n">p2</span><span class="p">){</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">p1</span><span class="p">.</span><span class="n">x</span> <span class="o">!=</span> <span class="n">p2</span><span class="p">.</span><span class="n">x</span> <span class="o">&amp;&amp;</span> <span class="n">p1</span><span class="p">.</span><span class="n">y</span> <span class="o">!=</span> <span class="n">p2</span><span class="p">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span> <span class="c1">// not in the same line</span>
+    <span class="kt">int</span> <span class="n">min</span><span class="p">,</span><span class="n">max</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">p1</span><span class="p">.</span><span class="n">x</span> <span class="o">==</span> <span class="n">p2</span><span class="p">.</span><span class="n">x</span><span class="p">){</span>
+        <span class="n">min</span> <span class="o">=</span> <span class="n">p1</span><span class="p">.</span><span class="n">y</span> <span class="o">&lt;</span> <span class="n">p2</span><span class="p">.</span><span class="n">y</span> <span class="o">?</span> <span class="n">p1</span><span class="p">.</span><span class="n">y</span> <span class="o">:</span> <span class="n">p2</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+        <span class="n">max</span> <span class="o">=</span> <span class="n">p1</span><span class="p">.</span><span class="n">y</span> <span class="o">&gt;</span> <span class="n">p2</span><span class="p">.</span><span class="n">y</span> <span class="o">?</span> <span class="n">p1</span><span class="p">.</span><span class="n">y</span> <span class="o">:</span> <span class="n">p2</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+        <span class="k">for</span><span class="p">(</span><span class="n">min</span><span class="o">++</span><span class="p">;</span><span class="n">min</span> <span class="o">&lt;</span> <span class="n">max</span><span class="p">;</span><span class="n">min</span><span class="o">++</span><span class="p">){</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">map</span><span class="p">[</span><span class="n">p1</span><span class="p">.</span><span class="n">x</span><span class="p">][</span><span class="n">min</span><span class="p">]</span> <span class="o">!=</span> <span class="n">empty</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>  <span class="c1">//have block false</span>
+        <span class="p">}</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">min</span> <span class="o">=</span> <span class="n">p1</span><span class="p">.</span><span class="n">x</span> <span class="o">&lt;</span> <span class="n">p2</span><span class="p">.</span><span class="n">x</span> <span class="o">?</span> <span class="n">p1</span><span class="p">.</span><span class="n">x</span> <span class="o">:</span> <span class="n">p2</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+        <span class="n">max</span> <span class="o">=</span> <span class="n">p1</span><span class="p">.</span><span class="n">x</span> <span class="o">&gt;</span> <span class="n">p2</span><span class="p">.</span><span class="n">x</span> <span class="o">?</span> <span class="n">p1</span><span class="p">.</span><span class="n">x</span> <span class="o">:</span> <span class="n">p2</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+        <span class="k">for</span><span class="p">(</span><span class="n">min</span><span class="o">++</span><span class="p">;</span><span class="n">min</span> <span class="o">&lt;</span> <span class="n">max</span><span class="p">;</span><span class="n">min</span><span class="o">++</span><span class="p">){</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">map</span><span class="p">[</span><span class="n">min</span><span class="p">][</span><span class="n">p1</span><span class="p">.</span><span class="n">y</span><span class="p">]</span> <span class="o">!=</span> <span class="n">empty</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span> <span class="c1">//have block false</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">//检查1折连接，返回1个点，</span>
+<span class="c1">//如果点的坐标为负表示不存在1折连接</span>
+<span class="n">_point</span> <span class="nf">havePathCorner1</span><span class="p">(</span><span class="n">_point</span> <span class="n">p1</span><span class="p">,</span><span class="n">_point</span> <span class="n">p2</span><span class="p">){</span>
+    <span class="n">_point</span> <span class="n">nullPoint</span><span class="p">;</span>
+    <span class="n">nullPoint</span><span class="p">.</span><span class="n">x</span><span class="o">=</span><span class="n">nullPoint</span><span class="p">.</span><span class="n">y</span><span class="o">=-</span><span class="mi">1</span><span class="p">;</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">p1</span><span class="p">.</span><span class="n">x</span> <span class="o">==</span> <span class="n">p2</span><span class="p">.</span><span class="n">x</span> <span class="o">||</span> <span class="n">p1</span><span class="p">.</span><span class="n">y</span> <span class="o">==</span> <span class="n">p2</span><span class="p">.</span><span class="n">y</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">nullPoint</span><span class="p">;</span>
+    <span class="n">_point</span> <span class="n">c1</span><span class="p">,</span><span class="n">c2</span><span class="p">;</span>
+    <span class="n">c1</span><span class="p">.</span><span class="n">x</span><span class="o">=</span><span class="n">p1</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+    <span class="n">c1</span><span class="p">.</span><span class="n">y</span><span class="o">=</span><span class="n">p2</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+    <span class="n">c2</span><span class="p">.</span><span class="n">x</span><span class="o">=</span><span class="n">p2</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+    <span class="n">c2</span><span class="p">.</span><span class="n">y</span><span class="o">=</span><span class="n">p1</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">map</span><span class="p">[</span><span class="n">c1</span><span class="p">.</span><span class="n">x</span><span class="p">][</span><span class="n">c1</span><span class="p">.</span><span class="n">y</span><span class="p">]</span> <span class="o">==</span>  <span class="n">empty</span><span class="p">){</span>
+        <span class="n">bool</span> <span class="n">b1</span><span class="o">=</span><span class="n">havePathCorner0</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="n">c1</span><span class="p">);</span>
+        <span class="n">bool</span> <span class="n">b2</span><span class="o">=</span><span class="n">havePathCorner0</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span><span class="n">p2</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">b1</span> <span class="o">&amp;&amp;</span> <span class="n">b2</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">c1</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">map</span><span class="p">[</span><span class="n">c2</span><span class="p">.</span><span class="n">x</span><span class="p">][</span><span class="n">c2</span><span class="p">.</span><span class="n">y</span><span class="p">]</span> <span class="o">==</span>  <span class="n">empty</span><span class="p">){</span>
+        <span class="n">bool</span> <span class="n">b1</span><span class="o">=</span><span class="n">havePathCorner0</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="n">c2</span><span class="p">);</span>
+        <span class="n">bool</span> <span class="n">b2</span><span class="o">=</span><span class="n">havePathCorner0</span><span class="p">(</span><span class="n">c2</span><span class="p">,</span><span class="n">p2</span><span class="p">);</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">b1</span> <span class="o">&amp;&amp;</span> <span class="n">b2</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">c2</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">nullPoint</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">//检查两折连接，返回两个点，</span>
+<span class="c1">//返回点坐标为负表示不存在两折连接</span>
+<span class="c1">//其中使用了4个方向的循环查找</span>
+<span class="n">_point</span> <span class="n">result</span><span class="p">[</span><span class="mi">2</span><span class="p">];</span>
+<span class="n">_point</span> <span class="o">*</span><span class="nf">havePathCorner2</span><span class="p">(</span><span class="n">_point</span> <span class="n">p1</span><span class="p">,</span><span class="n">_point</span> <span class="n">p2</span><span class="p">){</span>
+    <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+    <span class="n">_point</span> <span class="o">*</span><span class="n">r</span><span class="o">=</span><span class="n">result</span><span class="p">;</span>
+    <span class="c1">//search direction 1</span>
+    <span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="n">p1</span><span class="p">.</span><span class="n">y</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">_height</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">map</span><span class="p">[</span><span class="n">p1</span><span class="p">.</span><span class="n">x</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">empty</span><span class="p">){</span>
+            <span class="n">_point</span> <span class="n">c1</span><span class="p">;</span>
+            <span class="n">c1</span><span class="p">.</span><span class="n">x</span><span class="o">=</span><span class="n">p1</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+            <span class="n">c1</span><span class="p">.</span><span class="n">y</span><span class="o">=</span><span class="n">i</span><span class="p">;</span>
+            <span class="n">_point</span> <span class="n">d1</span><span class="o">=</span><span class="n">havePathCorner1</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span><span class="n">p2</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">d1</span><span class="p">.</span><span class="n">x</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">){</span>
+                <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">x</span><span class="o">=</span><span class="n">c1</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+                <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">y</span><span class="o">=</span><span class="n">c1</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+                <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">x</span><span class="o">=</span><span class="n">d1</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+                <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">y</span><span class="o">=</span><span class="n">d1</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+                <span class="k">return</span> <span class="n">r</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="k">else</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">//search direction 2</span>
+    <span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="n">p1</span><span class="p">.</span><span class="n">y</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="n">i</span><span class="o">&gt;-</span><span class="mi">1</span><span class="p">;</span><span class="n">i</span><span class="o">--</span><span class="p">){</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">map</span><span class="p">[</span><span class="n">p1</span><span class="p">.</span><span class="n">x</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">==</span> <span class="n">empty</span><span class="p">){</span>
+            <span class="n">_point</span> <span class="n">c1</span><span class="p">;</span>
+            <span class="n">c1</span><span class="p">.</span><span class="n">x</span><span class="o">=</span><span class="n">p1</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+            <span class="n">c1</span><span class="p">.</span><span class="n">y</span><span class="o">=</span><span class="n">i</span><span class="p">;</span>
+            <span class="n">_point</span> <span class="n">d1</span><span class="o">=</span><span class="n">havePathCorner1</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span><span class="n">p2</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">d1</span><span class="p">.</span><span class="n">x</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">){</span>
+                <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">x</span><span class="o">=</span><span class="n">c1</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+                <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">y</span><span class="o">=</span><span class="n">c1</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+                <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">x</span><span class="o">=</span><span class="n">d1</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+                <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">y</span><span class="o">=</span><span class="n">d1</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+                <span class="k">return</span> <span class="n">r</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="k">else</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">//search direction 3</span>
+    <span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="n">p1</span><span class="p">.</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">_width</span><span class="p">;</span><span class="n">i</span><span class="o">++</span><span class="p">){</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">map</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">p1</span><span class="p">.</span><span class="n">y</span><span class="p">]</span> <span class="o">==</span> <span class="n">empty</span><span class="p">){</span>
+            <span class="n">_point</span> <span class="n">c1</span><span class="p">;</span>
+            <span class="n">c1</span><span class="p">.</span><span class="n">x</span><span class="o">=</span><span class="n">i</span><span class="p">;</span>
+            <span class="n">c1</span><span class="p">.</span><span class="n">y</span><span class="o">=</span><span class="n">p1</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+            <span class="n">_point</span> <span class="n">d1</span><span class="o">=</span><span class="n">havePathCorner1</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span><span class="n">p2</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">d1</span><span class="p">.</span><span class="n">x</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">){</span>
+                <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">x</span><span class="o">=</span><span class="n">c1</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+                <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">y</span><span class="o">=</span><span class="n">c1</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+                <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">x</span><span class="o">=</span><span class="n">d1</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+                <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">y</span><span class="o">=</span><span class="n">d1</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+                <span class="k">return</span> <span class="n">r</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="k">else</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="c1">//search direction 4</span>
+    <span class="k">for</span><span class="p">(</span><span class="n">i</span><span class="o">=</span><span class="n">p1</span><span class="p">.</span><span class="n">x</span><span class="o">-</span><span class="mi">1</span><span class="p">;</span><span class="n">i</span><span class="o">&gt;-</span><span class="mi">1</span><span class="p">;</span><span class="n">i</span><span class="o">--</span><span class="p">){</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">map</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">p1</span><span class="p">.</span><span class="n">y</span><span class="p">]</span> <span class="o">==</span> <span class="n">empty</span><span class="p">){</span>
+            <span class="n">_point</span> <span class="n">c1</span><span class="p">;</span>
+            <span class="n">c1</span><span class="p">.</span><span class="n">x</span><span class="o">=</span><span class="n">i</span><span class="p">;</span>
+            <span class="n">c1</span><span class="p">.</span><span class="n">y</span><span class="o">=</span><span class="n">p1</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+            <span class="n">_point</span> <span class="n">d1</span><span class="o">=</span><span class="n">havePathCorner1</span><span class="p">(</span><span class="n">c1</span><span class="p">,</span><span class="n">p2</span><span class="p">);</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">d1</span><span class="p">.</span><span class="n">x</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">){</span>
+                <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">x</span><span class="o">=</span><span class="n">c1</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+                <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">y</span><span class="o">=</span><span class="n">c1</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+                <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">x</span><span class="o">=</span><span class="n">d1</span><span class="p">.</span><span class="n">x</span><span class="p">;</span>
+                <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">y</span><span class="o">=</span><span class="n">d1</span><span class="p">.</span><span class="n">y</span><span class="p">;</span>
+                <span class="k">return</span> <span class="n">r</span><span class="p">;</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="k">else</span>
+        <span class="k">break</span><span class="p">;</span>
+    <span class="p">}</span>
+    <span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">x</span><span class="o">=</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">x</span><span class="o">=</span><span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">y</span><span class="o">=</span><span class="n">r</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">y</span><span class="o">=-</span><span class="mi">1</span><span class="p">;</span>
+    <span class="k">return</span> <span class="n">r</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">//汇总上面的3种情况，查找两个点之间是否存在合法连接</span>
+<span class="n">bool</span> <span class="nf">havePath</span><span class="p">(</span><span class="n">_point</span> <span class="n">p1</span><span class="p">,</span><span class="n">_point</span> <span class="n">p2</span><span class="p">){</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">havePathCorner0</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">)){</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[%d,%d] to [%d,%d] have a direct path.</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span><span class="n">p1</span><span class="p">.</span><span class="n">x</span><span class="p">,</span><span class="n">p1</span><span class="p">.</span><span class="n">y</span><span class="p">,</span><span class="n">p2</span><span class="p">.</span><span class="n">x</span><span class="p">,</span><span class="n">p2</span><span class="p">.</span><span class="n">y</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+    <span class="p">}</span> 
+    <span class="n">_point</span> <span class="n">r</span><span class="o">=</span><span class="n">havePathCorner1</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">r</span><span class="p">.</span><span class="n">x</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">){</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[%d,%d] to [%d,%d] have a 1 cornor path throught [%d,%d].</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+            <span class="n">p1</span><span class="p">.</span><span class="n">x</span><span class="p">,</span><span class="n">p1</span><span class="p">.</span><span class="n">y</span><span class="p">,</span><span class="n">p2</span><span class="p">.</span><span class="n">x</span><span class="p">,</span><span class="n">p2</span><span class="p">.</span><span class="n">y</span><span class="p">,</span><span class="n">r</span><span class="p">.</span><span class="n">x</span><span class="p">,</span><span class="n">r</span><span class="p">.</span><span class="n">y</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+    <span class="p">}</span> 
+    <span class="n">_point</span> <span class="o">*</span><span class="n">c</span><span class="o">=</span><span class="n">havePathCorner2</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">);</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">x</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">){</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"[%d,%d] to [%d,%d] have a 2 cornor path throught [%d,%d] and [%d,%d].</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span>
+            <span class="n">p1</span><span class="p">.</span><span class="n">x</span><span class="p">,</span><span class="n">p1</span><span class="p">.</span><span class="n">y</span><span class="p">,</span><span class="n">p2</span><span class="p">.</span><span class="n">x</span><span class="p">,</span><span class="n">p2</span><span class="p">.</span><span class="n">y</span><span class="p">,</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">x</span><span class="p">,</span><span class="n">c</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">y</span><span class="p">,</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">x</span><span class="p">,</span><span class="n">c</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">y</span><span class="p">);</span>
+        <span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+    <span class="p">}</span> 
+    <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">//对于给定的起始点，查找在整个图板中，起始点之后的所有点，</span>
+<span class="c1">//是否存在相同图片，并且两张图片之间可以合法连线</span>
+<span class="n">bool</span> <span class="nf">searchMap</span><span class="p">(</span><span class="n">_point</span> <span class="n">p1</span><span class="p">){</span>
+    <span class="kt">int</span> <span class="n">ix</span><span class="p">,</span><span class="n">iy</span><span class="p">;</span>
+    <span class="n">bool</span> <span class="n">inner1</span><span class="o">=</span><span class="n">TRUE</span><span class="p">;</span>
+
+    <span class="c1">//printf("begin match:%d,%d\n",p1.x,p1.y);</span>
+    <span class="kt">int</span> <span class="n">c1</span><span class="o">=</span><span class="n">map</span><span class="p">[</span><span class="n">p1</span><span class="p">.</span><span class="n">x</span><span class="p">][</span><span class="n">p1</span><span class="p">.</span><span class="n">y</span><span class="p">];</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">iy</span><span class="o">=</span><span class="n">p1</span><span class="p">.</span><span class="n">y</span><span class="p">;</span><span class="n">iy</span><span class="o">&lt;</span><span class="n">_height</span><span class="p">;</span><span class="n">iy</span><span class="o">++</span><span class="p">){</span>
+        <span class="k">for</span><span class="p">(</span><span class="n">ix</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">ix</span><span class="o">&lt;</span><span class="n">_width</span><span class="p">;</span><span class="n">ix</span><span class="o">++</span><span class="p">){</span>
+            <span class="c1">//遍历查找整个图板的时候，图板中，起始点之前的图片实际已经查找过</span>
+            <span class="c1">//所以应当从图片之后的部分开始查找才有效率</span>
+            <span class="c1">//遍历的方式是逐行、每行中逐个遍历</span>
+            <span class="c1">//在第一次循环的时候，x坐标应当也是起始点的下一个，所以使用inner1来确认第一行循环</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">inner1</span><span class="p">){</span>
+                <span class="n">ix</span><span class="o">=</span><span class="n">p1</span><span class="p">.</span><span class="n">x</span><span class="o">+</span><span class="mi">1</span><span class="p">;</span>
+                <span class="n">inner1</span><span class="o">=</span><span class="n">FALSE</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">map</span><span class="p">[</span><span class="n">ix</span><span class="p">][</span><span class="n">iy</span><span class="p">]</span> <span class="o">!=</span> <span class="n">c1</span><span class="p">){</span>
+                <span class="c1">//printf("skip:%d,%d\n",ix,iy);</span>
+                <span class="c1">//continue;</span>
+            <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                <span class="n">_point</span> <span class="n">p2</span><span class="p">;</span>
+                <span class="n">p2</span><span class="p">.</span><span class="n">x</span><span class="o">=</span><span class="n">ix</span><span class="p">;</span>
+                <span class="n">p2</span><span class="p">.</span><span class="n">y</span><span class="o">=</span><span class="n">iy</span><span class="p">;</span>
+                <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">havePath</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">)){</span>
+                    <span class="c1">//printf("No path from [%d,%d] to [%d,%d]\n",p1.x,p1.y,p2.x,p2.y);</span>
+                <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+                    <span class="n">dumpMapWithHotPoint</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span><span class="n">p2</span><span class="p">);</span>
+                    <span class="n">map</span><span class="p">[</span><span class="n">p1</span><span class="p">.</span><span class="n">x</span><span class="p">][</span><span class="n">p1</span><span class="p">.</span><span class="n">y</span><span class="p">]</span><span class="o">=</span><span class="n">empty</span><span class="p">;</span>
+                    <span class="n">map</span><span class="p">[</span><span class="n">p2</span><span class="p">.</span><span class="n">x</span><span class="p">][</span><span class="n">p2</span><span class="p">.</span><span class="n">y</span><span class="p">]</span><span class="o">=</span><span class="n">empty</span><span class="p">;</span>
+                    <span class="c1">//dumpMap();</span>
+                    <span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">};</span>
+    <span class="k">return</span> <span class="n">FALSE</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">//这个函数式扫描全图板，自动连连看</span>
+<span class="n">bool</span> <span class="nf">searchAllMap</span><span class="p">(){</span>
+    <span class="kt">int</span> <span class="n">ix</span><span class="p">,</span><span class="n">iy</span><span class="p">;</span>
+    <span class="n">bool</span> <span class="n">noPathLeft</span><span class="o">=</span><span class="n">FALSE</span><span class="p">;</span>
+    <span class="k">while</span><span class="p">(</span><span class="o">!</span><span class="n">noPathLeft</span><span class="p">){</span>
+        <span class="n">noPathLeft</span><span class="o">=</span><span class="n">TRUE</span><span class="p">;</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">iy</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">iy</span><span class="o">&lt;</span><span class="n">_height</span><span class="p">;</span><span class="n">iy</span><span class="o">++</span><span class="p">){</span>
+            <span class="k">for</span><span class="p">(</span><span class="n">ix</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">ix</span><span class="o">&lt;</span><span class="n">_width</span><span class="p">;</span><span class="n">ix</span><span class="o">++</span><span class="p">){</span>
+                <span class="k">if</span><span class="p">(</span><span class="n">map</span><span class="p">[</span><span class="n">ix</span><span class="p">][</span><span class="n">iy</span><span class="p">]</span> <span class="o">!=</span> <span class="n">empty</span><span class="p">){</span>
+                    <span class="n">_point</span> <span class="n">p</span><span class="p">;</span>
+                    <span class="n">p</span><span class="p">.</span><span class="n">x</span><span class="o">=</span><span class="n">ix</span><span class="p">;</span>
+                    <span class="n">p</span><span class="p">.</span><span class="n">y</span><span class="o">=</span><span class="n">iy</span><span class="p">;</span>
+                    <span class="k">if</span><span class="p">(</span><span class="n">searchMap</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">&amp;&amp;</span> <span class="n">noPathLeft</span><span class="p">)</span>
+                        <span class="n">noPathLeft</span><span class="o">=</span><span class="n">FALSE</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="n">printf</span><span class="p">(</span><span class="s">"next loop...</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+    <span class="p">};</span>
+    <span class="k">return</span> <span class="n">TRUE</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">//-----------------main-----------------------------</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span><span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">){</span>
+    <span class="n">srand</span><span class="p">((</span><span class="kt">unsigned</span><span class="p">)</span><span class="n">time</span><span class="p">(</span><span class="nb">NULL</span><span class="p">));</span>
+    <span class="n">memset</span><span class="p">(</span><span class="n">map</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="k">sizeof</span><span class="p">(</span><span class="n">map</span><span class="p">));</span>
+    <span class="n">setRndMap</span><span class="p">();</span>
+    <span class="n">dumpMap</span><span class="p">();</span>
+    <span class="n">searchAllMap</span><span class="p">();</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>运行结果会是类似这样：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">link</span><span class="o">&gt;</span> ./linktest 
+<span class="nt">--</span>: 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 
+00: 14 00 02 16 18 06 00 00 00 00 00 12 13 04 00 00 00 19 18 00 
+01: 00 10 00 12 00 05 00 00 00 00 00 00 00 15 09 00 00 00 18 00 
+02: 00 00 03 00 00 13 16 00 05 17 00 17 00 00 07 05 00 00 05 16 
+03: 02 00 00 00 00 13 00 17 15 00 00 00 00 00 00 02 00 11 15 08 
+04: 05 11 00 08 05 00 06 00 00 00 07 06 00 00 06 00 15 17 00 00 
+05: 17 18 16 11 01 04 00 16 18 00 04 01 00 02 19 18 00 11 16 00 
+06: 00 01 00 11 00 00 00 12 03 00 02 17 01 00 00 19 00 13 07 03 
+07: 06 10 00 10 10 00 00 02 00 00 11 15 09 18 00 00 00 00 07 00 
+08: 09 14 06 19 00 09 00 00 09 18 00 00 00 12 18 05 00 11 00 18 
+09: 01 00 00 07 06 00 15 00 00 00 00 00 00 02 11 00 00 00 08 00 
+10: 00 00 02 03 00 15 00 00 19 00 00 07 00 12 00 00 10 00 19 00 
+11: 12 11 14 09 10 00 00 00 19 18 00 13 05 11 05 00 00 18 00 07 
+12: 11 00 09 00 00 00 00 10 03 00 00 00 00 00 00 00 16 05 12 00 
+13: 02 17 00 05 00 00 00 00 04 00 07 00 01 00 09 00 00 00 19 00 
+14: 07 00 00 17 00 00 06 00 00 14 00 00 05 00 09 00 08 00 18 00 
+15: 00 02 19 00 04 16 00 00 14 00 00 15 16 14 00 00 00 00 00 12 
+16: 00 02 00 16 09 00 00 00 00 00 00 09 13 01 19 15 00 17 00 15 
+17: 00 18 00 00 08 00 00 00 10 00 00 00 00 06 00 09 02 06 00 01 
+18: 00 00 15 00 00 02 08 00 09 07 00 18 06 00 09 00 11 00 00 15 
+19: 06 18 00 00 00 02 17 00 00 00 19 00 19 00 00 00 00 04 00 03 
+<span class="o">[</span>18,0] to <span class="o">[</span>18,1] have a direct path.
+<span class="nt">--</span>: 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 
+00: 14 00 02 16 18 06 00 00 00 00 00 12 13 04 00 00 00 19 18 00 
+01: 00 10 00 12 00 05 00 00 00 00 00 00 00 15 09 00 00 00 18 00 
+02: 00 00 03 00 00 13 16 00 05 17 00 17 00 00 07 05 00 00 05 16 
+03: 02 00 00 00 00 13 00 17 15 00 00 00 00 00 00 02 00 11 15 08 
+04: 05 11 00 08 05 00 06 00 00 00 07 06 00 00 06 00 15 17 00 00 
+05: 17 18 16 11 01 04 00 16 18 00 04 01 00 02 19 18 00 11 16 00 
+06: 00 01 00 11 00 00 00 12 03 00 02 17 01 00 00 19 00 13 07 03 
+07: 06 10 00 10 10 00 00 02 00 00 11 15 09 18 00 00 00 00 07 00 
+08: 09 14 06 19 00 09 00 00 09 18 00 00 00 12 18 05 00 11 00 18 
+09: 01 00 00 07 06 00 15 00 00 00 00 00 00 02 11 00 00 00 08 00 
+10: 00 00 02 03 00 15 00 00 19 00 00 07 00 12 00 00 10 00 19 00 
+11: 12 11 14 09 10 00 00 00 19 18 00 13 05 11 05 00 00 18 00 07 
+12: 11 00 09 00 00 00 00 10 03 00 00 00 00 00 00 00 16 05 12 00 
+13: 02 17 00 05 00 00 00 00 04 00 07 00 01 00 09 00 00 00 19 00 
+14: 07 00 00 17 00 00 06 00 00 14 00 00 05 00 09 00 08 00 18 00 
+15: 00 02 19 00 04 16 00 00 14 00 00 15 16 14 00 00 00 00 00 12 
+16: 00 02 00 16 09 00 00 00 00 00 00 09 13 01 19 15 00 17 00 15 
+17: 00 18 00 00 08 00 00 00 10 00 00 00 00 06 00 09 02 06 00 01 
+18: 00 00 15 00 00 02 08 00 09 07 00 18 06 00 09 00 11 00 00 15 
+19: 06 18 00 00 00 02 17 00 00 00 19 00 19 00 00 00 00 04 00 03 
+......
+<span class="o">[</span>10,17] to <span class="o">[</span>19,18] have a 1 cornor path throught <span class="o">[</span>10,18].
+<span class="nt">--</span>: 00 01 02 03 04 05 06 07 08 09 10 11 12 13 14 15 16 17 18 19 
+00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+01: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+02: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+03: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+04: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+05: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+06: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+07: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+08: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+09: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+10: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+11: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+12: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+13: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+14: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+15: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+16: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+17: 00 00 00 00 00 00 00 00 00 00 12 00 00 00 00 00 00 00 00 00 
+18: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 12 
+19: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 
+next loop...
+
+</code></pre></div></div>
+
+:ET

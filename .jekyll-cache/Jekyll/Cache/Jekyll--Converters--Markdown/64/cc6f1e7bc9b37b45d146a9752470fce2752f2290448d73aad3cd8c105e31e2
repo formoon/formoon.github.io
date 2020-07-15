@@ -1,0 +1,37 @@
+I"�<p><img src="http://115.182.41.123/files/201801/ruby1.jpg" alt="" /></p>
+
+<p>挺少用gem update，因为我基本不怎么用ruby，本博的维护使用jekyll，似乎就躲不开了。<br />
+今天运行<code class="language-plaintext highlighter-rouge">sudo gem update --system</code>得到报错信息：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ERROR:  SSL verification error at depth 1: unable to get <span class="nb">local </span>issuer certificate <span class="o">(</span>20<span class="o">)</span>
+ERROR:  You must add /O<span class="o">=</span>Digital Signature Trust Co./CN<span class="o">=</span>DST Root CA X3 to your <span class="nb">local </span>trusted store
+</code></pre></div></div>
+<p>网上搜索有两种解决方案，一是把国外的源换成国内的源，此外TAOBAO的源已经不维护了，都应当更换成ruby-china.org；<br />
+第二就是设置不检查SSL签名，也就是设置<code class="language-plaintext highlighter-rouge">~/.gemrc</code>增加参数<code class="language-plaintext highlighter-rouge">:ssl_verify_mode:0</code>：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- https://gems.ruby-china.org/
+:update_sources: <span class="nb">true</span>
+:verbose: <span class="nb">true</span>
+:ssl_verify_mode: 0
+</code></pre></div></div>
+<p>两种方法都试了，仍然报错。</p>
+
+<p>最后尝试升级ruby到2.3版本。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>brew <span class="nb">install </span>ruby@2.3
+</code></pre></div></div>
+<p>安装完成后，ruby新版和老版本都会共存的，所以让新版本生效需要修改环境文件中的路径设置，我是用fish shell，可以按照提示做如下操作：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">echo</span> <span class="s1">'set -g fish_user_paths "/usr/local/opt/ruby@2.3/bin" $fish_user_paths'</span> <span class="o">&gt;&gt;</span> ~/.config/fish/config.fish
+</code></pre></div></div>
+<p>关掉终端，重启一个窗口，执行<code class="language-plaintext highlighter-rouge">ruby --version</code>检查，版本已经是2.3了。<br />
+随后再次运行<code class="language-plaintext highlighter-rouge">sudo gem update --system</code>，错误消失。</p>
+
+<p>最后还有一个麻烦事，因为ruby的多版本并存，以前安装的各种ruby包，在2.3版本中实际并不存在，如果需要使用的话，需要重新安装。[哭脸]<br />
+以jekyll为例，以前博文写过，但不完整，再补充一下：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="c">#首先安装jekyll及包管理器</span>
+<span class="nb">sudo </span>gem <span class="nb">install </span>jekyll bundler
+	<span class="c">#到博文目录</span>
+<span class="nb">cd </span>jekyll_blog
+	<span class="c">#升级相关包</span>
+bundle update
+</code></pre></div></div>
+<p>接着运行<code class="language-plaintext highlighter-rouge">jekyll server</code>可以正常进入环境。</p>
+
+:ET

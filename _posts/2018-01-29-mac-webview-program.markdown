@@ -2,7 +2,7 @@
 layout:         page
 title:          macOS webview编程
 subtitle:       老树依然有新发
-card-image:     https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1517214955029&di=db8c16635139ada629988c5bd1351150&imgtype=0&src=http%3A%2F%2Fi2.sinaimg.cn%2FIT%2Fmobile%2Fn%2Fapple%2F2015-01-16%2FU10175P2T1D9966574F13DT20150116090315.jpg
+card-image:     http://115.182.41.123/files/201801/swift.jpg
 date:           2018-01-29
 tags:           mac
 post-card-type: image

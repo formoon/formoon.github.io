@@ -2,12 +2,12 @@
 layout:         page
 title:          Angular7那些不得不说的事故
 subtitle:       说说那些坑
-card-image:		https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1572063023449&di=09176f269d178aa171bcb02202245ddc&imgtype=0&src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fq_70%2Cc_zoom%2Cw_640%2Fimages%2F20180725%2F052e834ddacf4228bd9b6fd5427b3bfe.jpg
+card-image:		  http://115.182.41.123/files/201812/angular.jpg
 date:           2018-12-14
 tags:           angular
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1572063023449&di=09176f269d178aa171bcb02202245ddc&imgtype=0&src=http%3A%2F%2F5b0988e595225.cdn.sohucs.com%2Fq_70%2Cc_zoom%2Cw_640%2Fimages%2F20180725%2F052e834ddacf4228bd9b6fd5427b3bfe.jpg)
+![](http://115.182.41.123/files/201812/angular.jpg)
 #### 题外话
 &emsp;&emsp;最近简直要忙死，所以停更了很久，你们会不会以为我人间蒸发了？  
 &emsp;&emsp;正文之前，请允许我先跑个题，就是关于忙的问题。  

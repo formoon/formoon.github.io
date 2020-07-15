@@ -2,12 +2,12 @@
 layout:         page
 title:          大恒工业相机多实例使用
 subtitle:       
-card-image:		https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559035741706&di=d35babd9650b9d2265eb39e2790e0f59&imgtype=0&src=http%3A%2F%2Fpic4.58cdn.com.cn%2Fzhuanzh%2Fn_v299b275a11d134fe8aff13ea5e83e046e.jpg%3Fw%3D750%26h%3D0
+card-image:		http://115.182.41.123/files/201804/camerai.jpg
 date:           2018-04-04
 tags:           ml videoaudio
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1559035741706&di=d35babd9650b9d2265eb39e2790e0f59&imgtype=0&src=http%3A%2F%2Fpic4.58cdn.com.cn%2Fzhuanzh%2Fn_v299b275a11d134fe8aff13ea5e83e046e.jpg%3Fw%3D750%26h%3D0)
+![](http://115.182.41.123/files/201804/camerai.jpg)
 工作环境比较恶劣并且有较多干扰源的环境做视觉识别一般都使用工业相机，大恒水晶相机是比较常用的一种。比起来进口相机，虽然用起来会更麻烦，但好在价格便宜，各项指标也不低。  
 大恒水晶相机是提供SDK的方式跟OPENCV类的系统做集成，还做不到像很多进口相机一样直接就有了系统级的驱动，这方面的资料还是不少的，下面是在网上摘的一个例子：（[来源](https://blog.csdn.net/nameix/article/details/78308778)）  
 ```cpp

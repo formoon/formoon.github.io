@@ -2,12 +2,12 @@
 layout:         page
 title:          《连连看》算法c语言演示
 subtitle:      	自动连连看
-card-image:		https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528950362647&di=1a3a97351ea2a503ec25c51bc6494e55&imgtype=0&src=http%3A%2F%2Fpic.962.net%2Fup%2F2013-1%2F20131171730118200.jpg
+card-image:		http://115.182.41.123/files/201806/llk1.jpg
 date:           2018-06-14
 tags:           seven c
 post-card-type: image
 ---
-![](https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1528950362647&di=1a3a97351ea2a503ec25c51bc6494e55&imgtype=0&src=http%3A%2F%2Fpic.962.net%2Fup%2F2013-1%2F20131171730118200.jpg)
+![](http://115.182.41.123/files/201806/llk1.jpg)
 （图片是游戏的示意图，来自互联网，与本文程序无关）  
 
 看题目就知道是写给初学者的，没需要的就别看了，自己都觉得怪无聊的。  
