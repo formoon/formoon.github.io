@@ -1,4 +1,0 @@
-I"�<p><img src="https://timgsa.baidu.com/timg?image&amp;quality=80&amp;size=b9999_10000&amp;sec=1521563892190&amp;di=e2d1bbf77ab139e26fd6c930001984c2&amp;imgtype=jpg&amp;src=http%3A%2F%2Fimg4.imgtn.bdimg.com%2Fit%2Fu%3D3939126519%2C2958197558%26fm%3D214%26gp%3D0.jpg" alt="" />
-Angular2以后已经非常充分的面向对象化，所以很多原来在javascript中积累的技巧，都需要做出相应的调整。<br />
-检测当前浏览器类型、版本及设备类型，推荐使用：<a href="https://github.com/KoderLabs/ng2-device-detector">https://github.com/KoderLabs/ng2-device-detector</a>。github页面的介绍已经写的很详细，请直接阅读原文文档。这里只讲几个重点：</p>
-:ET

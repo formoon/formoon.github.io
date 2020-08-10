@@ -1,0 +1,28 @@
+I"><p><img src="/assets/cimages/201812/hwStory/iconbig512.png" alt="" /></p>
+
+<figure class="highlight"><pre><code class="language-cpp" data-lang="cpp"><table class="rouge-table"><tbody><tr><td class="gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="code"><pre><span class="c1">//  YOUR CODE HERE</span>
+<span class="c1">//  YOUR CODE HERE</span>
+<span class="c1">//  YOUR CODE HERE</span>
+<span class="n">a</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+<span class="k">while</span><span class="p">(</span><span class="n">i</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+	<span class="n">file</span><span class="p">(</span><span class="mi">1</span><span class="p">);</span>
+<span class="p">};</span>
+</pre></td></tr></tbody></table></code></pre></figure>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>//  YOUR CODE HERE
+//  YOUR CODE HERE
+//  YOUR CODE HERE
+a <span class="o">=</span> 1<span class="p">;</span>
+<span class="k">while</span><span class="o">(</span>i &lt; 1<span class="o">)</span> <span class="o">{</span>
+	file<span class="o">(</span>1<span class="o">)</span><span class="p">;</span>
+<span class="o">}</span><span class="p">;</span>
+</code></pre></div></div>
+
+:ET
