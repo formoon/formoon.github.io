@@ -1,4 +1,4 @@
-I"�(<p><img src="http://115.182.41.123/files/201807/proxy.jpg" alt="" />
+I"�(<p><img src="http://115.182.41.123/files/201807/proxy.jpg" alt="" />
 我通常上网使用两个浏览器，safari用于一般上网；Chrome安装SwitchyOmega插件，在不同的代理中切换，来保证某些网站的上网速度。<br />
 但是这种方式到了手机上就有点懵，几乎所有的iPhone浏览器都不支持代理的自动切换和设置，所以只能选一个相对兼容性比较好的网络方式一直用下去。很不爽利。。。<br />
 后来发现代理自动配置文件PAC是个好东西，跟SwitchyOmega类似，能够比较智能的切换所需，所以给大家推荐一下。</p>
@@ -12,11 +12,11 @@ PAC文件本质是js的一个子集，其中必须实现一个函数：</p>
 每次浏览器访问任何一个网址的时候，都会调用这个脚本，根据脚本的返回值，选择浏览器使用哪个代理来访问互联网。<br />
 FindProxyForURL函数返回的访问方式，可以支持三种：</p>
 <div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">DIRECT</span>
-	<span class="err">直接访问，不适用任何代理</span>
+	<span class="nx">直接访问</span><span class="err">，</span><span class="nx">不适用任何代理</span>
 <span class="nx">PROXY</span> <span class="nx">host</span><span class="p">:</span><span class="nx">port</span>
-	<span class="err">设置</span><span class="nx">http</span><span class="err">代理，</span><span class="nx">host</span><span class="err">是代理主机，</span><span class="nx">port</span><span class="err">是代理端口</span>
+	<span class="nx">设置http代理</span><span class="err">，</span><span class="nx">host是代理主机</span><span class="err">，</span><span class="nx">port是代理端口</span>
 <span class="nx">SOCKS</span> <span class="nx">host</span><span class="p">:</span><span class="nx">port</span>
-	<span class="err">使用</span><span class="nx">SOCKS</span><span class="err">代理模式，后面是主机及端口号</span>
+	<span class="nx">使用SOCKS代理模式</span><span class="err">，</span><span class="nx">后面是主机及端口号</span>
 </code></pre></div></div>
 <p>这三种方式，前两种是所有浏览器都支持的。第三种SOCKS，有的浏览器会解释为SOCKS5，有的浏览器会解释为SOCKS4，还有的浏览器还另外提供了SOCKS5方式。在mac Safari浏览器上及iPhone中是将SOCKS解释为SOCKS5协议。</p>
 

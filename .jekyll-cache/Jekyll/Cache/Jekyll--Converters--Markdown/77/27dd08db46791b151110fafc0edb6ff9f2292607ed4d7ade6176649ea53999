@@ -1,4 +1,4 @@
-I"�<p><img src="/assets/cimages/201812/hwStory/iconbig512.png" alt="" /><br />
+I"�<p><img src="/assets/cimages/201812/hwStory/iconbig512.png" alt="" /><br />
 《写字练习》是根据make me hanzi等开源项目资源制作的，提供给非汉语母语学习者或者低年级儿童学习汉字书写的有效工具。</p>
 
 <p>练习的有效性，非常取决于学习时的词库针对性。<br />
@@ -26,9 +26,9 @@
 </ul>
 
 <h4 id="词库文件的示例">词库文件的示例</h4>
-<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">珍珠</span>	<span class="nx">zhen1zhu1</span>	<span class="err">某些贝类形成与贝壳层相似的固体粒状物。</span>
-<span class="err">游戏</span>	<span class="nx">you2xi4</span>	<span class="err">体育运动的一类</span><span class="p">,</span><span class="err">具有竞赛性。</span> 
-<span class="err">皂</span>	<span class="nx">zao4</span>	<span class="err">一种洗涤用品</span>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nx">珍珠</span>	<span class="nx">zhen1zhu1</span>	<span class="nx">某些贝类形成与贝壳层相似的固体粒状物</span><span class="err">。</span>
+<span class="nx">游戏</span>	<span class="nx">you2xi4</span>	<span class="nx">体育运动的一类</span><span class="p">,</span><span class="nx">具有竞赛性</span><span class="err">。</span> 
+<span class="nx">皂</span>	<span class="nx">zao4</span>	<span class="nx">一种洗涤用品</span>
 </code></pre></div></div>
 
 <h4 id="详细说明">详细说明</h4>

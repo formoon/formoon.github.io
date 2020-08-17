@@ -1,0 +1,792 @@
+I"��<p><img src="http://115.182.41.123/files/202008/linearAlgerbra1.jpeg" alt="" /><br />
+<script src="https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script></p>
+<h4 id="前言">前言</h4>
+<p>MATLAB一向是理工科学生的必备神器，但随着中美贸易冲突的一再升级，禁售与禁用的阴云也持续笼罩在高等学院的头顶。也许我们都应当考虑更多的途径，来辅助我们的学习和研究工作。<br />
+虽然PYTHON和众多模块也属于美国技术的范围，但开源软件的自由度毕竟不是商业软件可比拟的。</p>
+
+<p>本文是一篇入门性文章，以麻省理工学院（MIT) 18.06版本线性代数课程为例，按照学习顺序介绍PYTHON在代数运算中的基本应用。介绍PYTHON代数计算的文章非常多，但通常都是按照模块作为划分顺序，在实际应用中仍然有较多困扰。而按照代数课程学习的顺序，循序渐进，集注在最常用和最实用的功能上，比较符合典型的应用逻辑。可以用较低的门槛逐步完成PYTHON在线性代数中各项功能的学习和应用。<br />
+MIT 2020版本的线性代数课程也已发布，但基本是在18.06版本上的修正。Gilbert教授的年龄已经很大，只录制了一个5节课的串讲。所以系统性还是18.06版本更为完整。<br />
+很讽刺是吧，课程本身也是美国的-_-#。阿Q一下吧，就当是“师夷长技以制夷”。</p>
+
+<p>首先给出几个相关链接：<br />
+<a href="https://mitmath.github.io/1806/">MIT 18.06 Linear Algebra课程主页</a><br />
+<a href="https://www.bilibili.com/video/BV1ix411f7Yp">B站完整版34讲Gilbert教授课程视频</a><br />
+<a href="https://pan.baidu.com/s/1S7Glgli2JywSz5EQXgmzCw">配套第三版线性代数教材(百度网盘)</a> 提取码：uhvc<br />
+最新发行的教材是第5版，建议听课时使用配套的第3版教材。课程完成后，把第5版教材作为辅助读物。不然在章节、内容方面会碰到很多困惑。</p>
+
+<h4 id="版本选择">版本选择</h4>
+<p>PYTHON版本的选择现在已经没有什么困惑了，PYTHON2停止了支持，PYTHON3现在是必选项。我是用Mac电脑，通常使用brew安装PYTHON3，每次有新版本的时候执行brew upgrade会自动升级。不使用内置的PYTHON3是为了防止安装很多扩展库的时候会有系统完整性检查导致的不兼容，不过只是跑一跑数学运算的话倒也不用担心这些。<br />
+Linux各发行版则不用考虑这些，内置的PYTHON3就很好用。使用apt/yum等包管理工具升级的时候会自动完成版本维护。<br />
+PYTHON在Windows/Linux/Mac等各平台上兼容性非常好，特别是在数学计算方面基本不用担心互相之间的通用问题。</p>
+
+<p>计算模块方面则有了很多的选择，常见的有NumPy/SciPy/SymPy。<br />
+其中在数值计算方面，NumPy应用非常广泛，特别是TensorFlow/PyTorch等机器学习平台也把NumPy当做默认支持之后。所以本文会把NumPy当做一个选择。<br />
+在课程学习和理论研究方面，符号计算更为重要。SymPy在这方面有比较多的优势，所以本文会把SymPy当做另外一个选择。<br />
+SciPy以及还有一些小众计算模块同样非常优秀，但限于篇幅，本文中只好做一些取舍。</p>
+
+<p>在PYTHON3环境下安装NumPy/SymPy模块的方法很简单：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>pip3 <span class="nb">install </span>numpy sympy
+</code></pre></div></div>
+<p>如果碰到麻烦，一般是因为网络速度造成的。特别是默认的国外软件源。修改软件源到国内的服务器会提高不少下载速度，方法是修改文件~/.pip/pip.conf，默认是没有这个文件的，要自己建立~/.pip目录和新建对应的文本文件，内容为：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>global]
+<span class="nb">timeout</span> <span class="o">=</span> 6000
+index-url <span class="o">=</span> https://pypi.tuna.tsinghua.edu.cn/simple
+trusted-host <span class="o">=</span> pypi.tuna.tsinghua.edu.cn
+</code></pre></div></div>
+<p>这里使用了清华大学的镜像服务器。<br />
+以上是在Linux/Mac之上的操作方法。Windows用户，虽然PYTHON3本身没有兼容问题，但还是建议你使用Windows10内置的Linux子系统来学习。能让你节省很多时间。</p>
+
+<h4 id="矩阵的表达">矩阵的表达</h4>
+<p>在Pyhton中使用扩展库，首先要做引用，比如引入NumPy库：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+</code></pre></div></div>
+<p>意思是引用numpy计算库，并重新命名为np。使用numpy中的方法时，首先要以“np.”开头。<br />
+SymPy库的引用，通常会直接从中将所有资源直接引用到当前作用域，像使用原生方法一样使用SymPy中定义的方法，这也是SymPy官方推荐的：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="nn">sympy</span> <span class="kn">import</span> <span class="o">*</span>
+</code></pre></div></div>
+<p>出于个人习惯，我还是更喜欢同使用NumPy一样使用SymPy:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">sympy</span> <span class="k">as</span> <span class="n">sp</span>
+</code></pre></div></div>
+<p>虽然因此所有的SymPy的方法都要冠以“sp.”前缀，但这样不容易造成混淆从而导致错误。</p>
+
+<p>以下内容大致对应课程（MIT 18.06 Linear Algebra课程，以下简称课程）第1、2讲的内容。<br />
+在线性代数中，主要涉及3种数据类型，常量、标量（Scalar)、向量(Vector)、矩阵（Matrix)。
+无论NumPy还是SymPy，都直接使用了基本Python类型作为标量，比如：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">c1</span> <span class="o">=</span> <span class="mi">5</span>
+</code></pre></div></div>
+<p>而对于向量和矩阵，处理方法则有很大区别，下面先讲述NumPy中的方法。</p>
+
+<p>假设我们有v1、v2两个向量，及A、B两个矩阵：</p>
+
+\[v1 = \left[\begin{matrix}1\\2\\\end{matrix}\right]\]
+
+\[v2 = \left[\begin{matrix}3\\4\\\end{matrix}\right]\]
+
+\[A = \left[\begin{matrix}1&amp;2\\3&amp;4\\\end{matrix}\right]\]
+
+\[B = \left[\begin{matrix}5&amp;6\\7&amp;8\\\end{matrix}\right]\]
+
+<ol>
+  <li>首先，NumPy接受Python原生的数组当做向量和矩阵
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 除非特别注明，我们的示例都在交互方式使用Python
+# 每一行开始的“&gt;&gt;&gt;”就是交互方式下Python给出的提示符
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">v1c</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">v2c</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">Ac</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">Bc</span> <span class="o">=</span> <span class="p">[[</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">],[</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">]]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">v1c</span>		<span class="c1">#交互方式直接给出变量名是显示变量内容的意思
+</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">v2c</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">Ac</span>
+<span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">Bc</span>
+<span class="p">[[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">]]</span>
+</code></pre></div>    </div>
+  </li>
+  <li>其次，NumPy内置的数组类型（Array)也可以用来表示向量和矩阵
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>	<span class="c1">#别忘记引用numpy,以后不再特别注明
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">v1n</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">v2n</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">v2c</span><span class="p">)</span>	<span class="c1">#直接使用前面定义好的内部数组类型初始化向量是一样的
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">An</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">Bn</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">Bc</span><span class="p">)</span>	<span class="c1">#直接使用前面定义好的内部数组类型初始化矩阵
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">v1n</span>
+<span class="n">array</span><span class="p">([</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">v2n</span>
+<span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">An</span>
+<span class="n">array</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">Bn</span>
+<span class="n">array</span><span class="p">([[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">]])</span>
+</code></pre></div>    </div>
+  </li>
+  <li>最正规的表示方法，使用NumPy内置的Matrix类型
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">v1</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">([[</span><span class="mi">1</span><span class="p">],[</span><span class="mi">2</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">v2</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">([[</span><span class="mi">3</span><span class="p">],[</span><span class="mi">4</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">A</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">B</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="n">Bc</span><span class="p">)</span>	<span class="c1">#使用以前定义过的内部数组类型来定义矩阵
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">v1</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">v2</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mi">3</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">4</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">A</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">B</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">]])</span>
+</code></pre></div>    </div>
+    <p>第1、2种方法，虽然在很多情况下都能正常的使用，但都算不上规范化的矩阵表示方法。特别是对于向量的表示，向量本来是纵向的，代表矩阵中的一列。但在方法1、2中，都成为了横向的。这很容易造成概念的混淆，和计算中的错误。<br />
+在NumPy中，很多计算，对于内部数组及NumPy数组的处理中，也会不按照矩阵的方式处理。因此建议大家在对Python及NumPy非常熟悉之前，不要使用方法1、2中的方式来处理向量和矩阵，虽然看起来可能会方便那么一点。<br />
+为了让大家对这种差异有更清晰的认识，这里举几个例子，也顺便看一看最基本的矩阵计算：</p>
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c1"># 计算 矩阵*常量
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">Ac</span><span class="o">*</span><span class="mi">3</span>	<span class="c1">#完全错误的结果，不可用
+</span><span class="p">[[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span> <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">An</span><span class="o">*</span><span class="mi">3</span>
+<span class="n">array</span><span class="p">([[</span> <span class="mi">3</span><span class="p">,</span>  <span class="mi">6</span><span class="p">],</span>
+    <span class="p">[</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">A</span><span class="o">*</span><span class="mi">3</span>
+<span class="n">matrix</span><span class="p">([[</span> <span class="mi">3</span><span class="p">,</span>  <span class="mi">6</span><span class="p">],</span>
+     <span class="p">[</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">]])</span>
+
+ <span class="c1"># 计算 向量*常量
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">v1c</span><span class="o">*</span><span class="mi">3</span>	<span class="c1">#完全错误的结果，不可用
+</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">v1n</span><span class="o">*</span><span class="mi">3</span>
+<span class="n">array</span><span class="p">([</span><span class="mi">3</span><span class="p">,</span> <span class="mi">6</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">v1</span><span class="o">*</span><span class="mi">3</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mi">3</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">6</span><span class="p">]])</span>
+
+ <span class="c1"># 计算向量加法
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">v1c</span><span class="o">+</span><span class="n">v2c</span>	<span class="c1">#完全错误的结果，不可用
+</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">v1n</span><span class="o">+</span><span class="n">v2n</span>
+<span class="n">array</span><span class="p">([</span><span class="mi">4</span><span class="p">,</span> <span class="mi">6</span><span class="p">])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">v1</span><span class="o">+</span><span class="n">v2</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mi">4</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">6</span><span class="p">]])</span>
+
+ <span class="c1"># 计算矩阵乘法
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">Ac</span><span class="o">*</span><span class="n">Bc</span>	<span class="c1">#Python内部没有定义对应操作，不可用
+</span><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+  <span class="n">File</span> <span class="s">"&lt;stdin&gt;"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">1</span><span class="p">,</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+<span class="nb">TypeError</span><span class="p">:</span> <span class="n">can</span><span class="err">‘</span><span class="n">t</span> <span class="n">multiply</span> <span class="n">sequence</span> <span class="n">by</span> <span class="n">non</span><span class="o">-</span><span class="nb">int</span> <span class="n">of</span> <span class="nb">type</span> <span class="s">'list'</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">An</span><span class="o">*</span><span class="n">Bn</span>	<span class="c1">#只是对应行列数字相乘，不是真正的矩阵乘法
+</span><span class="n">array</span><span class="p">([[</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">12</span><span class="p">],</span>
+    <span class="p">[</span><span class="mi">21</span><span class="p">,</span> <span class="mi">32</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">A</span><span class="o">*</span><span class="n">B</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mi">19</span><span class="p">,</span> <span class="mi">22</span><span class="p">],</span>
+     <span class="p">[</span><span class="mi">43</span><span class="p">,</span> <span class="mi">50</span><span class="p">]])</span>
+</code></pre></div>    </div>
+    <p>以上的示例可以明显看出，对于Python内置数组类型，并没有定义对应的矩阵操作，所以不能直接用于线性代数的计算。NumPy的很多方法都接受使用Python内部数组作为参数来表达向量和矩阵，所以给人的印象，这些类型之间没有什么区别。  <br />
+NumPy内置的数组类型和矩阵类型，在简单运算中都能得到正确的结果，可以用于常用的计算。但实际上很多高级函数及算法，对两种类型的处理仍然存在很大区别，就类似示例中出现的矩阵乘法。所以在彻底了解之前，不建议使用np.array类型当做矩阵类型来使用。否则在复杂的项目中，很多莫名其妙的计算错误会让你排错工作异常复杂。</p>
+  </li>
+</ol>
+
+<p>NumPy还提供了一种更方便的方法来定义向量和矩阵，这也能帮助你彻底放弃使用np.array来当做矩阵使用：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">v1</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"1;2"</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">v2</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"3;4"</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"1 2;3 4"</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">B</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"5 6;7 8"</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">v1</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">v2</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mi">3</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">4</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">A</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">B</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">]])</span>
+
+<span class="o">&gt;&gt;&gt;</span> <span class="n">As</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>	<span class="c1">#sympy的Matrix定义方法太麻烦了，有的时候你会喜欢用np.mat转换过来
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">As</span>
+<span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+</code></pre></div></div>
+<p>熟悉MATLAB的同学应当开心了，这跟MATLAB中定义矩阵的方法完全一样，算是Python环境中最方便的方法。</p>
+
+<p>在线性代数课程中，经常会需要选取一个典型矩阵，做一些计算的练习。课堂上Gilbert教授经常随手就可以举出一个矩阵的例子，并且各行列线性无关，而我们往往很难做到这一点。这时候可以使用随机数初始化矩阵的方法：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">C</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>	<span class="c1">#使用随机数初始化一个3x3矩阵
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">C</span>
+<span class="n">array</span><span class="p">([[</span><span class="mf">0.58896997</span><span class="p">,</span> <span class="mf">0.45879526</span><span class="p">,</span> <span class="mf">0.34384609</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.78480365</span><span class="p">,</span> <span class="mf">0.19043321</span><span class="p">,</span> <span class="mf">0.69538183</span><span class="p">],</span>
+       <span class="p">[</span><span class="mf">0.66016878</span><span class="p">,</span> <span class="mf">0.81037627</span><span class="p">,</span> <span class="mf">0.75616191</span><span class="p">]])</span>
+	<span class="c1">#也可以选择整数的版本，第一个参数100的意思是产生1-100的随机数 
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="n">array</span><span class="p">([[</span><span class="mi">51</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span> <span class="mi">75</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">64</span><span class="p">,</span> <span class="mi">67</span><span class="p">,</span> <span class="mi">20</span><span class="p">]])</span>
+</code></pre></div></div>
+<p>与此类似的，还有初始化一个全0矩阵、全1矩阵、单位方阵I的方法，如果你打算用程序逻辑建立一个矩阵，那这些往往是开始的第一步：</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	#定义并初始化一个全0矩阵，第一个参数为维度形状(m,n)
+&gt;&gt;&gt; np.zeros((4,3))
+array([[0., 0., 0.],
+       [0., 0., 0.],
+       [0., 0., 0.],
+       [0., 0., 0.]])
+	#定义并初始化一个全1矩阵，第一个参数为维度形状(m,n)
+&gt;&gt;&gt; np.ones((3,3),dtype=float)
+array([[1., 1., 1.],
+       [1., 1., 1.],
+       [1., 1., 1.]])
+	#定义并初始化一个单位矩阵I
+&gt;&gt;&gt; np.eye(3,3)
+array([[1., 0., 0.],
+       [0., 1., 0.],
+       [0., 0., 1.]])
+</code></pre></div></div>
+<p>下面看看SymPy定义向量、矩阵的方法。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">sympy</span> <span class="k">as</span> <span class="n">sp</span>	<span class="c1">#别忘记引入函数库，以后将不再提醒
+</span>	<span class="c1">#喜欢使用from sympy import *方式的自行修改对应代码
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">v1s</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">Matrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">],[</span><span class="mi">2</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">v2s</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">Matrix</span><span class="p">([[</span><span class="mi">3</span><span class="p">],[</span><span class="mi">4</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">As</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">Matrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">Bs</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">Bc</span><span class="p">)</span>	<span class="c1">#使用Python内置数组当做参数初始化矩阵
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">v1s</span>
+<span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">v2s</span>
+<span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">4</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">As</span>
+<span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">Bs</span>
+<span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">]])</span>
+
+	<span class="c1"># 基本运算示例
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">v1s</span><span class="o">+</span><span class="n">v2s</span>
+<span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">4</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">6</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">As</span><span class="o">*</span><span class="n">Bs</span>
+<span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">19</span><span class="p">,</span> <span class="mi">22</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">43</span><span class="p">,</span> <span class="mi">50</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">As</span><span class="o">*</span><span class="mi">3</span>
+<span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">,</span>  <span class="mi">6</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">12</span><span class="p">]])</span>
+
+	<span class="c1"># sympy定义并初始化一个随机矩阵
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">sp</span><span class="p">.</span><span class="n">randMatrix</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">44</span><span class="p">,</span> <span class="mi">34</span><span class="p">,</span> <span class="mi">34</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">33</span><span class="p">,</span> <span class="mi">15</span><span class="p">,</span> <span class="mi">96</span><span class="p">]])</span>
+	<span class="c1"># 定义并初始化一个全0矩阵
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">sp</span><span class="p">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]])</span>
+	<span class="c1"># 定义并初始化一个全1矩阵
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">sp</span><span class="p">.</span><span class="n">ones</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+	<span class="c1"># 定义并初始化一个单位矩阵I
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">sp</span><span class="p">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+</code></pre></div></div>
+<p>作为符号计算的代表，SymPy的计算结果通常都是公式形式，所以SymPy专门提供了LaTeX的输出方式：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">sp</span><span class="p">.</span><span class="n">latex</span><span class="p">(</span><span class="n">As</span><span class="p">)</span>
+<span class="s">'</span><span class="se">\\</span><span class="s">left[</span><span class="se">\\</span><span class="s">begin{matrix}1 &amp; 2</span><span class="se">\\\\</span><span class="s">3 &amp; 4</span><span class="se">\\</span><span class="s">end{matrix}</span><span class="se">\\</span><span class="s">right]'</span>
+</code></pre></div></div>
+<p>这种输出格式对通常的程序没有什么意义。但如果是用于论文写作的话，可以直接拷贝到LaTex编辑器，成为一个精致的公式输出。就类似本文中的公式，通常也是采用LaTeX格式输入。</p>
+
+<h4 id="求解线性方程">求解线性方程</h4>
+<p>这也是课程第1、2讲中的内容。方程组是矩阵的起源，也是矩阵最初的目的。以课程中的方程组为例：</p>
+
+\[\left\{
+    \begin{array}{l}
+2x-y=0\\
+-x+2y=3
+        \end{array}
+\right.\]
+
+<p>可以得到矩阵A及向量b:</p>
+
+\[A = \left[\begin{matrix}2&amp;-1\\-1&amp;2\\\end{matrix}\right]\]
+
+\[b = \left[\begin{matrix}0\\3\\\end{matrix}\right]\]
+
+\[Ax=b\]
+
+<p>这里的x实际代表两个未知数组成的向量：</p>
+
+\[x = \left[\begin{matrix}x\\y\\\end{matrix}\right]\]
+
+<p>使用NumPy解方程组示例：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"2 -1;-1 2"</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">b</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"0;3"</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="n">solve</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mf">1.</span><span class="p">],</span>	<span class="c1">#未知数x
+</span>        <span class="p">[</span><span class="mf">2.</span><span class="p">]])</span>	<span class="c1">#未知数y
+</span></code></pre></div></div>
+<p>使用SymPy解方程组示例：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">Matrix</span><span class="p">([[</span><span class="mi">2</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">],[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">b</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">Matrix</span><span class="p">([[</span><span class="mi">0</span><span class="p">],[</span><span class="mi">3</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">A</span><span class="p">.</span><span class="n">LDLsolve</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">]])</span>
+</code></pre></div></div>
+<p>作为符号计算的优势，SymPy中可以定义未知数符号之后，再使用跟NumPy中同名的方法solve()来直接对一个方程组求解，但那个不属于本文的主题范畴，所以不做介绍。有兴趣的话也可以参考这篇老博文<a href="http://blog.17study.com.cn/2018/12/28/python3-lesson11/">《从零开始学习PYTHON3讲义（十一）》</a>。<br />
+SymPy跟NumPy在使用中语法差异还是比较大的，使用中需要特别注意。两个软件包，虽然都是Python中的实现，但并不是由同一支开发团队完成的。所以这种差异感始终是存在的。</p>
+
+<h4 id="矩阵乘法和逆矩阵">矩阵乘法和逆矩阵</h4>
+<p>这是课程第三讲的内容，其中矩阵同矩阵的乘法运算在前面一开始就演示过了，对于手工计算来讲，这是最繁琐的部分。而对于Python,这是最简单的部分。<br />
+矩阵的逆在线性代数中会频繁出现，经常用到，两个软件包中都已经有了内置的方法。</p>
+
+<p>下面在同一个代码块中分别演示NumPy和SymPy的方法：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="c1">#numpy矩阵定义及矩阵乘法
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"1 2;3 4"</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">B</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"5 6;7 8"</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">A</span><span class="o">*</span><span class="n">B</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mi">19</span><span class="p">,</span> <span class="mi">22</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">43</span><span class="p">,</span> <span class="mi">50</span><span class="p">]])</span>
+	<span class="c1">#sympy矩阵定义及矩阵乘法
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">As</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">Matrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">],[</span><span class="mi">3</span><span class="p">,</span><span class="mi">4</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">Bs</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">Matrix</span><span class="p">([[</span><span class="mi">5</span><span class="p">,</span><span class="mi">6</span><span class="p">],[</span><span class="mi">7</span><span class="p">,</span><span class="mi">8</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">As</span><span class="o">*</span><span class="n">Bs</span>
+<span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">19</span><span class="p">,</span> <span class="mi">22</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">43</span><span class="p">,</span> <span class="mi">50</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">A</span><span class="o">*</span><span class="n">Bs</span>	<span class="c1">#numpy的矩阵*sympy矩阵，两个软件包的变量是可以相互通用的，但通常尽量不这样做
+</span><span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">19</span><span class="p">,</span> <span class="mi">22</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">43</span><span class="p">,</span> <span class="mi">50</span><span class="p">]])</span>
+	<span class="c1"># numpy求逆
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="n">inv</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="o">-</span><span class="mf">2.</span> <span class="p">,</span>  <span class="mf">1.</span> <span class="p">],</span>
+        <span class="p">[</span> <span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">]])</span>	<span class="c1">#数值计算会尽量求得精确小数
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">A</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span>		<span class="c1">#使用求幂的方式获得逆矩阵，**是Python内置的求幂运算符，numpy做了重载
+</span><span class="n">matrix</span><span class="p">([[</span><span class="o">-</span><span class="mf">2.</span> <span class="p">,</span>  <span class="mf">1.</span> <span class="p">],</span>
+        <span class="p">[</span> <span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="n">matrix_power</span><span class="p">(</span><span class="n">A</span><span class="p">,</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>	<span class="c1">#numpy中的求幂函数
+</span><span class="n">matrix</span><span class="p">([[</span><span class="o">-</span><span class="mf">2.</span> <span class="p">,</span>  <span class="mf">1.</span> <span class="p">],</span>
+        <span class="p">[</span> <span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">]])</span>
+
+	<span class="c1"># sympy求逆
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">As</span><span class="p">.</span><span class="n">inv</span><span class="p">()</span>
+<span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span>    <span class="mi">1</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">3</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">]])</span>	<span class="c1">#符号计算会保持分数形式
+</span>
+	<span class="c1">#numpy也可以从sympy的计算结果中，获取计算数值，通常，这能提供更高的精度
+</span>	<span class="c1">#当然，sympy并不以速度见长
+</span>	<span class="c1">#后面的参数是将结果转换为浮点数，否则sympy数据会当做对象存储在numpy矩阵
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="n">As</span><span class="p">.</span><span class="n">inv</span><span class="p">(),</span><span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="o">-</span><span class="mf">2.</span> <span class="p">,</span>  <span class="mf">1.</span> <span class="p">],</span>
+        <span class="p">[</span> <span class="mf">1.5</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">]])</span>
+
+	<span class="c1">#sympy中使用求幂的方式获得逆矩阵
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">As</span> <span class="o">**</span> <span class="o">-</span><span class="mi">1</span>	<span class="c1">#sympy所重载的求幂运算符
+</span><span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span>    <span class="mi">1</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">3</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">As</span><span class="p">.</span><span class="nb">pow</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>	<span class="c1">#sympy标准的求幂函数
+</span><span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span> <span class="o">-</span><span class="mi">2</span><span class="p">,</span>    <span class="mi">1</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">3</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="o">/</span><span class="mi">2</span><span class="p">]])</span>
+
+	<span class="c1"># 分别证明A的逆*A=单位矩阵I
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="n">inv</span><span class="p">(</span><span class="n">A</span><span class="p">)</span><span class="o">*</span><span class="n">A</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mf">1.00000000e+00</span><span class="p">,</span> <span class="mf">0.00000000e+00</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">1.11022302e-16</span><span class="p">,</span> <span class="mf">1.00000000e+00</span><span class="p">]])</span>	<span class="c1">#注意左边的值e-16,是一个很接近0的小数
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">As</span><span class="o">*</span><span class="n">As</span><span class="p">.</span><span class="n">inv</span><span class="p">()</span>
+<span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>	<span class="c1">#符号计算通常能精确的还原应有的整数
+</span></code></pre></div></div>
+<p>上面代码非常明显的体现出了NumPy数值计算和SymPy符号计算的不同。前者会因精度所限有极小的误差，而后者通常能保持美观的整数数字。但前者的数字可以直接应用到机器学习等业务系统。而后者是对人的理解更有益，归根结底还是符号，不能当做数值使用。<br />
+好在Python之中，如果不考虑转换速度，不同模块之间共享数据非常容易。前面的演示中已经有了将NumPy矩阵转换为SymPy矩阵，以及将SymPy的计算结果转换到NumPy的实例。这对用户来说，是非常方便的。</p>
+
+<h4 id="矩阵的lu分解">矩阵的LU分解</h4>
+<p>课程第四讲重点讲解了矩阵的LU分解。对于一个给定矩阵A,可以表现为一个下三角矩阵和一个上三角矩阵乘积的形式：</p>
+
+\[A=LU\]
+
+<p>其中上三角矩阵U是求解方程组的初步中间产物。由这一步开始，逐步求解靠后的主元，再回代至方程，以求解更多的未知数主元。重复这个步骤，直到完成所有未知数的求解。<br />
+NumPy中，并没有提供矩阵的LU分解功能。可能是因为觉得L、U矩阵用途并不是那么广泛，并且可以直接用方程求解来替代。<br />
+如果需要用到的话，通常方式是使用其它软件包替代，比如SciPy。<br />
+这里也提供一个架构于NumPy之上的子程序，来完成LU分解的功能。子程序内部是将矩阵类型转换为数组类型，从而方便遍历。接着是使用手工消元相同的方式循环完成LU分解。<br />
+需要说明的是，这类附带了子程序的Python片段，建议还是保存到一个文本文件中，以脚本方式执行。在交互式方式下很容易出现各种错误。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+
+<span class="k">def</span> <span class="nf">LUdecomposition</span><span class="p">(</span><span class="n">mat</span><span class="p">):</span>
+    <span class="n">A</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">(</span><span class="n">mat</span><span class="p">)</span>
+    <span class="n">n</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="n">L</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n</span><span class="p">,</span><span class="n">n</span><span class="p">])</span>
+    <span class="n">U</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros</span><span class="p">([</span><span class="n">n</span><span class="p">,</span> <span class="n">n</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">L</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="mi">1</span>
+        <span class="k">if</span> <span class="n">i</span><span class="o">==</span><span class="mi">0</span><span class="p">:</span>
+            <span class="n">U</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="n">n</span><span class="p">):</span>
+                <span class="n">U</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">=</span><span class="n">A</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">L</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">=</span><span class="n">A</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">/</span><span class="n">U</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span><span class="c1">#U
+</span>                <span class="n">temp</span><span class="o">=</span><span class="mi">0</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span><span class="p">):</span>
+                    <span class="n">temp</span> <span class="o">=</span> <span class="n">temp</span><span class="o">+</span><span class="n">L</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">U</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                <span class="n">U</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">=</span><span class="n">A</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">]</span><span class="o">-</span><span class="n">temp</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span><span class="c1">#L
+</span>                <span class="n">temp</span> <span class="o">=</span> <span class="mi">0</span>
+                <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">i</span> <span class="p">):</span>
+                    <span class="n">temp</span> <span class="o">=</span> <span class="n">temp</span> <span class="o">+</span> <span class="n">L</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">k</span><span class="p">]</span> <span class="o">*</span> <span class="n">U</span><span class="p">[</span><span class="n">k</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">L</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">A</span><span class="p">[</span><span class="n">j</span><span class="p">][</span><span class="n">i</span><span class="p">]</span> <span class="o">-</span> <span class="n">temp</span><span class="p">)</span><span class="o">/</span><span class="n">U</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">i</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="n">L</span><span class="p">),</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="n">U</span><span class="p">)</span>
+
+<span class="n">A</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"1 2;3 4"</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">LUdecomposition</span><span class="p">(</span><span class="n">A</span><span class="p">))</span>
+</code></pre></div></div>
+<p>程序执行可以获得类似这样的输出：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">(</span><span class="n">matrix</span><span class="p">([[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">3.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">]]),</span> <span class="n">matrix</span><span class="p">([[</span> <span class="mf">1.</span><span class="p">,</span>  <span class="mf">2.</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.</span><span class="p">,</span> <span class="o">-</span><span class="mf">2.</span><span class="p">]]))</span>
+</code></pre></div></div>
+<p>偏重于计算分析的SymPy则直接内置了LU分解功能，对速度不敏感的场合，使用SymPy做LU分解，再转换到NumPy矩阵也是一个好办法：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">As</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"1 2;3 4"</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">L</span><span class="p">,</span><span class="n">U</span><span class="p">,</span><span class="n">_</span><span class="o">=</span><span class="n">As</span><span class="p">.</span><span class="n">LUdecomposition</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">L</span>
+<span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">U</span>
+<span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span>  <span class="mi">2</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">]])</span>
+</code></pre></div></div>
+<p>LU分解那一行的代码，使用下划线忽略的部分是函数返回的行交换矩阵。<br />
+在消元过程中，对应主元位置如果为0的话会导致消元失败，此时会产生行交换。这种情况下，会由单位矩阵I变换而来的行交换矩阵先同矩阵A相乘，从而将主元为0的行交换到其它行，保证消元的顺利进行。<br />
+使用Python辅助解方程，这些步骤都是很少需要手工操作了，如果有必要，就自行赋值给矩阵变量保留吧。<br />
+顺便提一句，讲到置换矩阵的时候，教授还提到了对于一个n*n的方阵，置换矩阵可能有多少种呢？答案是n!，也就是n的阶乘。<br />
+在Python内置的数学库、NumPy、SymPy中，都有求阶乘的函数：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">math</span><span class="p">.</span><span class="n">factorial</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>	<span class="c1">#Python内置数学库求阶乘
+</span><span class="mi">24</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">np</span><span class="p">.</span><span class="n">math</span><span class="p">.</span><span class="n">factorial</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>	<span class="c1">#numpy求阶乘
+</span><span class="mi">24</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">sp</span><span class="p">.</span><span class="n">factorial</span><span class="p">(</span><span class="mi">4</span><span class="p">)</span>	<span class="c1">#sympy求阶乘
+</span><span class="mi">24</span>
+</code></pre></div></div>
+<p>第四讲还介绍了矩阵的转置，这是线性代数中使用极为高频的功能：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"1 2;3 4"</span><span class="p">)</span>		<span class="c1">#定义一个numpy矩阵
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">As</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>			<span class="c1">#定义一个相同的sympy矩阵
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">A</span><span class="p">.</span><span class="n">T</span>		<span class="c1">#numpy求转置
+</span><span class="n">matrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">As</span><span class="p">.</span><span class="n">T</span>	<span class="c1">#sympy求转置
+</span><span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">2</span><span class="p">,</span> <span class="mi">4</span><span class="p">]])</span>
+</code></pre></div></div>
+<h4 id="简化行阶梯矩阵0空间基特解通解">简化行阶梯矩阵、0空间基、特解、通解</h4>
+<p>课程第五至第十讲围绕着矩阵的四个基本空间展开。推导和计算很多，但都是基础线性组合，用Python当成计算器就够用了。<br />
+在空间维度判断方面，我们倒是能帮上一些小忙，就是计算矩阵的轶。<br />
+矩阵的行空间、列空间轶都是相同的。0空间维度是n-r,左0空间维度是m-r。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"1 2 3 1;1 1 2 1;1 2 3 1"</span><span class="p">)</span>	<span class="c1">#numpy在这里只是帮助简化输入
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">As</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="n">matrix_rank</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>	<span class="c1">#numpy求矩阵的轶
+</span><span class="mi">2</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">As</span><span class="p">.</span><span class="n">rank</span><span class="p">()</span>	<span class="c1">#sympy求矩阵的轶
+</span><span class="mi">2</span>
+</code></pre></div></div>
+<p>如果方程组满轶，也就是方程组有解的情况下，开始一节介绍的解线性方程组很不错。<br />
+非满轶的情况，求方程组的特解和通解。将矩阵化简为“简化行阶梯矩阵（Reduced Row Echelon Form）”会非常有用。可惜的是，NumPy依然没有提供内置的支持。自己实现的话，代码还挺长的，远不如使用现有的软件包更方便。所以在这里我们主要看SymPy的实现：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">A</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"1 2 3 1;1 1 2 1;1 2 3 1"</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">As</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">As</span><span class="p">.</span><span class="n">rref</span><span class="p">()</span>
+<span class="p">(</span><span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]]),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+	<span class="c1">#另一个例子
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">Bs</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"1 2 2 2;2 4 6 8; 3 6 8 10"</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">Bs</span><span class="p">.</span><span class="n">rref</span><span class="p">()</span>
+<span class="p">(</span><span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">2</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">2</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span>  <span class="mi">0</span><span class="p">]]),</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+</code></pre></div></div>
+<p>函数返回一个RREF矩阵还有一个元组，元组指示RREF矩阵中主元所在的列。这个元组是非常必要的，在第二个例子中就能明显看出，主列并不一定是从左到右相邻排列的。<br />
+此时，可以通过RREF最下面的全0行跟方程组b向量的情况判断函数可解性。以及根据自由变量F子矩阵的情况获得方程的0空间解。<br />
+当然，如同前面的解方程一样，SymPy中直接提供了函数获取0空间解。RREF这些中间过程主要用于分析学习，对于使用工具自动解方程意义并不大：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">As</span><span class="p">.</span><span class="n">nullspace</span><span class="p">()</span>
+<span class="p">[</span><span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+<span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+<span class="p">[</span> <span class="mi">1</span><span class="p">],</span>
+<span class="p">[</span> <span class="mi">0</span><span class="p">]]),</span> <span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+<span class="p">[</span> <span class="mi">0</span><span class="p">],</span>
+<span class="p">[</span> <span class="mi">0</span><span class="p">],</span>
+<span class="p">[</span> <span class="mi">1</span><span class="p">]])]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">Bs</span><span class="p">.</span><span class="n">nullspace</span><span class="p">()</span>
+<span class="p">[</span><span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span>
+<span class="p">[</span> <span class="mi">1</span><span class="p">],</span>
+<span class="p">[</span> <span class="mi">0</span><span class="p">],</span>
+<span class="p">[</span> <span class="mi">0</span><span class="p">]]),</span> <span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span> <span class="mi">2</span><span class="p">],</span>
+<span class="p">[</span> <span class="mi">0</span><span class="p">],</span>
+<span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">],</span>
+<span class="p">[</span> <span class="mi">1</span><span class="p">]])]</span>
+</code></pre></div></div>
+<p>方程组的通解包括特解和0空间基两部分。前面获得的是0空间的基。特解则需要方程式右侧向量的配合：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="c1">#设置b值,这代表方程组右侧的常数
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">b</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"1;5;6"</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">sp</span><span class="p">.</span><span class="n">linsolve</span><span class="p">((</span><span class="n">As</span><span class="p">,</span><span class="n">b</span><span class="p">))</span>	<span class="c1">#(As,b)这种写法是将As矩阵跟b矩阵组合在一起，以增广矩阵的方式求解
+</span><span class="n">EmptySet</span>		<span class="c1">#参考前面rref矩阵，因为有全0行，b不符合可解性要求，所以方程组使用b向量不可解
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">sp</span><span class="p">.</span><span class="n">linsolve</span><span class="p">((</span><span class="n">Bs</span><span class="p">,</span><span class="n">b</span><span class="p">))</span>
+<span class="n">FiniteSet</span><span class="p">((</span><span class="o">-</span><span class="mi">2</span><span class="o">*</span><span class="n">tau0</span> <span class="o">+</span> <span class="mi">2</span><span class="o">*</span><span class="n">tau1</span> <span class="o">-</span> <span class="mi">2</span><span class="p">,</span> <span class="n">tau0</span><span class="p">,</span> <span class="mi">3</span><span class="o">/</span><span class="mi">2</span> <span class="o">-</span> <span class="mi">2</span><span class="o">*</span><span class="n">tau1</span><span class="p">,</span> <span class="n">tau1</span><span class="p">))</span>
+</code></pre></div></div>
+<p>Bs矩阵同b向量的组合获得一个有限集的解，那么这个解中的tau0/tau1是什么意思呢？<br />
+参考前面的rank计算或者rref矩阵，我们知道Bs矩阵有两个自由变量（由n-r得来），tau0/tau1就是这两个自由变量。这也是因为我们没有定义未知数符号所导致的自动命名。如果需要，我们可以定义x1/x2…这样的未知数。不过这不是我们的重点，请忽略这个命名。<br />
+方程的特解是当自由变量为0的时候，方程的解。因此将tau0/tau1都设为0，化简一下，很容易得到方程的特解为：<br />
+     (-2,0,3/2,0)。<br />
+再结合上面计算的Bs矩阵在0空间的2个基，就是方程组的通解:</p>
+
+\[X_{Complete}= \left[\begin{matrix}-2\\0\\\frac32\\0\\\end{matrix}\right]+
+        k1\left[\begin{matrix}-2\\1\\0\\0\\\end{matrix}\right]+
+        k2\left[\begin{matrix}2\\0\\-2\\1\\\end{matrix}\right]\]
+
+<h4 id="点积获取指定行向量和列向量正交判定">点积、获取指定行向量和列向量、正交判定</h4>
+<p>点积也称作点乘、内积，是向量、矩阵中最常用的一种运算。NumPy和SymPy中都有支持。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="c1">#numpy中计算点积
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"1;2;3"</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">b</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"4;5;6"</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">a</span><span class="p">.</span><span class="n">T</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mi">32</span><span class="p">]])</span>
+        <span class="c1">#sympy中计算点积
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">a1</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">b1</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">a1</span><span class="p">.</span><span class="n">T</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span>
+<span class="mi">32</span>
+</code></pre></div></div>
+<p>矩阵运算中，使用一个向量的转至乘另外一个向量，或者乘自己用于求平方，都是非常常用的使用方法。在使用NumPy做运算的时候要特别注意一点，这样点积的结果仍然是一个矩阵，只是1维*1维。<br />
+在线性代数课程上，都会直接把这个点积结果继续用于计算，但在使用NumPy的时候，要特别注意应当将其转换为浮点数，然后再用于计算。不然会出现矩阵维度不符的错误。示例如下：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span><span class="p">.</span><span class="n">T</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">b</span><span class="p">)</span> <span class="o">*</span> <span class="n">a</span>
+<span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+  <span class="n">File</span> <span class="s">"&lt;stdin&gt;"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">1</span><span class="p">,</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+  <span class="n">File</span> <span class="s">"/usr/local/lib/python3.8/site-packages/numpy/matrixlib/defmatrix.py"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">218</span><span class="p">,</span> <span class="ow">in</span> <span class="n">__mul__</span>
+    <span class="k">return</span> <span class="n">N</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">asmatrix</span><span class="p">(</span><span class="n">other</span><span class="p">))</span>
+  <span class="n">File</span> <span class="s">"&lt;__array_function__ internals&gt;"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">5</span><span class="p">,</span> <span class="ow">in</span> <span class="n">dot</span>
+<span class="nb">ValueError</span><span class="p">:</span> <span class="n">shapes</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="ow">not</span> <span class="n">aligned</span><span class="p">:</span> <span class="mi">1</span> <span class="p">(</span><span class="n">dim</span> <span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span> <span class="p">(</span><span class="n">dim</span> <span class="mi">0</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">float</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">T</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">b</span><span class="p">))</span>
+<span class="mf">32.0</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="nb">float</span><span class="p">(</span><span class="n">a</span><span class="p">.</span><span class="n">T</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">b</span><span class="p">))</span> <span class="o">*</span> <span class="n">a</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mf">32.</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">64.</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">96.</span><span class="p">]])</span>
+</code></pre></div></div>
+<p>SymPy作为主要用于实验分析的符号计算工具，点击结果直接就是可继续用于计算的数字，不需要另行转换。</p>
+
+<p>获取矩阵的特定行向量和列向量，在NumPy/SymPy中都是重载了Python语言的列表（数组）操作符，所以方法都是相同的。<br />
+需要注意的是在数学中，矩阵行列的计数通常从1开始，第1行、第2行…第1列、第2列。而在Python中，遵循了计算机语言一贯的习俗，是从0开始计数的。Python中矩阵的第0行，就相当于通常数学课程上所说的第1行。<br />
+先来看获取矩阵中特定元素的方法：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="c1">#一下方法由numpy演示，在sympy中是相同的，不再另外演示
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"1 2 3;4 5 6;7 8 9"</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">a</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">]])</span>
+        <span class="c1">#获取a矩阵第0行、第2列的元素，也既通常所说的第一行、第三列
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span>
+<span class="mi">3</span>
+        <span class="c1">#修改矩阵中某一特定元素的值
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">]</span><span class="o">=</span><span class="mi">24</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">a</span>
+<span class="n">matrix</span><span class="p">([[</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span> <span class="mi">24</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">4</span><span class="p">,</span>  <span class="mi">5</span><span class="p">,</span>  <span class="mi">6</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mi">7</span><span class="p">,</span>  <span class="mi">8</span><span class="p">,</span>  <span class="mi">9</span><span class="p">]])</span>
+</code></pre></div></div>
+<p>获取行向量、列向量，相当于获取矩阵某一行或者某一列所有的数据。在Python中，使用’:’字符放置在行、列参数的位置，就代表获取完整行或者列的数据：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="c1">#获取第1列的列向量，也就是通常数学课上所说的第二列(后略)
+</span>        <span class="c1">#在行参数位置使用':'字符，表示任意一行的数据都要，从而组成了列
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span><span class="p">[:,</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mi">2</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">5</span><span class="p">],</span>
+        <span class="p">[</span><span class="mi">8</span><span class="p">]])</span>
+        <span class="c1">#获取第0行的行向量
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span>
+<span class="n">matrix</span><span class="p">([[</span> <span class="mi">1</span><span class="p">,</span>  <span class="mi">2</span><span class="p">,</span> <span class="mi">24</span><span class="p">]])</span>
+
+        <span class="c1">#判断第1列同第0列是否正交
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span><span class="p">[:,</span><span class="mi">1</span><span class="p">].</span><span class="n">T</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">a</span><span class="p">[:,</span><span class="mi">0</span><span class="p">])</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mi">78</span><span class="p">]])</span>  <span class="c1">#结果不为0，表示没有正交
+</span></code></pre></div></div>
+<p>点积和正交判断是在课程第十四讲中引入的。<br />
+判断两个向量是否正交，就是用一个向量的转置，点积另外一个向量。相互正交的向量，点积结果为0。上面的例子说明，我们随意定义的矩阵，前两列并不正交。<br />
+单位矩阵I的每一行、每一列都是正交的，我们测试一下：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="c1">#定义一个5x5的单位矩阵，eye方法默认返回是多维列表，在本实验中可以直接使用，
+</span>        <span class="c1">#但为了良好的习惯，还是转换为mat类型。
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">I</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">I</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">],</span>
+        <span class="p">[</span><span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">0.</span><span class="p">,</span> <span class="mf">1.</span><span class="p">]])</span>
+        <span class="c1">#判断第0行跟第1行的向量是否正交
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">I</span><span class="p">[</span><span class="mi">0</span><span class="p">,:].</span><span class="n">dot</span><span class="p">(</span><span class="n">I</span><span class="p">[</span><span class="mi">1</span><span class="p">,:].</span><span class="n">T</span><span class="p">)</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mf">0.</span><span class="p">]])</span>  <span class="c1">#说明两行是正交的
+</span></code></pre></div></div>
+<p>此外在NumPy和SymPy的运算符重载中，乘法运算符’*‘直接就定义为了点积运算，是可以直接使用的：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">I</span><span class="p">[</span><span class="mi">0</span><span class="p">,:]</span> <span class="o">*</span> <span class="n">I</span><span class="p">[</span><span class="mi">1</span><span class="p">,:].</span><span class="n">T</span>
+<span class="n">matrix</span><span class="p">([[</span><span class="mf">0.</span><span class="p">]])</span>
+</code></pre></div></div>
+
+<h4 id="方程组的最优解">方程组的最优解</h4>
+<p>内容同样来自课程第十四讲。<br />
+在实际的应用中，方程组的数据来源经常是测量的结果。在一组实验中，测到了多组结果，这代表方程有多行。但因为测量误差以及干扰因素，这些不准确的测量值所形成的方程组，往往因为误差导致的矛盾因素是无解的。<br />
+这时候，通过计算测量数据到方程组矩阵列空间的投影信息，形成新的方程组，可以得到最接近真实结果的答案，这就是最优解。<br />
+对于一个原始方程：</p>
+
+\[Ax=b\]
+
+<p>其最优解方程为：</p>
+
+\[A^TA\hat{x}=A^Tb\]
+
+<p>求得的\(\hat{x}\)就是方程的最优解。它并不是原来的x,而是最接近合理值的近似解，所以称为最优解。<br />
+下面使用SymPy为例演示方程组求解最优解,NumPy可以使用同样的方法：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"1 1; 1 2; 1 5"</span><span class="p">))</span>        <span class="c1">#定义A矩阵
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">b</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">Matrix</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"1;2;2"</span><span class="p">))</span>        <span class="c1">#定义向量b
+</span>        <span class="c1">#先尝试求解Ax=b
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span><span class="p">.</span><span class="n">solve</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>  <span class="c1">#报错信息提示A矩阵不可逆，无法求解
+</span><span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+  <span class="n">File</span> <span class="s">"/usr/local/lib/python3.8/site-packages/sympy/matrices/solvers.py"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">727</span><span class="p">,</span> <span class="ow">in</span> <span class="n">_solve</span>
+    <span class="n">soln</span><span class="p">,</span> <span class="n">param</span> <span class="o">=</span> <span class="n">M</span><span class="p">.</span><span class="n">gauss_jordan_solve</span><span class="p">(</span><span class="n">rhs</span><span class="p">)</span>
+  <span class="n">File</span> <span class="s">"/usr/local/lib/python3.8/site-packages/sympy/matrices/matrices.py"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">2212</span><span class="p">,</span> <span class="ow">in</span> <span class="n">gauss_jordan_solve</span>
+    <span class="k">return</span> <span class="n">_gauss_jordan_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="n">freevar</span><span class="o">=</span><span class="n">freevar</span><span class="p">)</span>
+  <span class="n">File</span> <span class="s">"/usr/local/lib/python3.8/site-packages/sympy/matrices/solvers.py"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">553</span><span class="p">,</span> <span class="ow">in</span> <span class="n">_gauss_jordan_solve</span>
+    <span class="k">raise</span> <span class="nb">ValueError</span><span class="p">(</span><span class="s">"Linear system has no solution"</span><span class="p">)</span>
+<span class="nb">ValueError</span><span class="p">:</span> <span class="n">Linear</span> <span class="n">system</span> <span class="n">has</span> <span class="n">no</span> <span class="n">solution</span>
+
+<span class="n">During</span> <span class="n">handling</span> <span class="n">of</span> <span class="n">the</span> <span class="n">above</span> <span class="n">exception</span><span class="p">,</span> <span class="n">another</span> <span class="n">exception</span> <span class="n">occurred</span><span class="p">:</span>
+
+<span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+  <span class="n">File</span> <span class="s">"&lt;stdin&gt;"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">1</span><span class="p">,</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+  <span class="n">File</span> <span class="s">"/usr/local/lib/python3.8/site-packages/sympy/matrices/matrices.py"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">2218</span><span class="p">,</span> <span class="ow">in</span> <span class="n">solve</span>
+    <span class="k">return</span> <span class="n">_solve</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+  <span class="n">File</span> <span class="s">"/usr/local/lib/python3.8/site-packages/sympy/matrices/solvers.py"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">734</span><span class="p">,</span> <span class="ow">in</span> <span class="n">_solve</span>
+    <span class="k">raise</span> <span class="n">NonInvertibleMatrixError</span><span class="p">(</span><span class="s">"Matrix det == 0; not invertible."</span><span class="p">)</span>
+<span class="n">sympy</span><span class="p">.</span><span class="n">matrices</span><span class="p">.</span><span class="n">common</span><span class="p">.</span><span class="n">NonInvertibleMatrixError</span><span class="p">:</span> <span class="n">Matrix</span> <span class="n">det</span> <span class="o">==</span> <span class="mi">0</span><span class="p">;</span> <span class="ow">not</span> <span class="n">invertible</span><span class="p">.</span>
+        <span class="c1">#使用映射的方式将b投影到A的列空间
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">a1</span><span class="o">=</span><span class="n">a</span><span class="p">.</span><span class="n">T</span><span class="o">*</span><span class="n">a</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">b1</span><span class="o">=</span><span class="n">a</span><span class="p">.</span><span class="n">T</span><span class="o">*</span><span class="n">b</span>
+        <span class="c1">#求解最优解
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">a1</span><span class="p">.</span><span class="n">solve</span><span class="p">(</span><span class="n">b1</span><span class="p">)</span>
+<span class="n">Matrix</span><span class="p">([</span>        <span class="c1">#得到的最优解
+</span><span class="p">[</span><span class="mi">15</span><span class="o">/</span><span class="mi">13</span><span class="p">],</span>
+<span class="p">[</span> <span class="mi">5</span><span class="o">/</span><span class="mi">26</span><span class="p">]])</span>
+</code></pre></div></div>
+
+<h4 id="投影矩阵">投影矩阵</h4>
+<p>投影矩阵的概念来自课程第十五讲。<br />
+使用投影矩阵公式可以求得矩阵A的投影矩阵：</p>
+
+\[P=A(A^TA)^{-1}A^T\]
+
+<p>下面以NumPy为例，演示计算投影矩阵：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="c1">#定义一个求投影矩阵的子程序
+</span><span class="k">def</span> <span class="nf">project_matrix</span><span class="p">(</span><span class="n">mat</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">mat</span><span class="o">*</span><span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="n">inv</span><span class="p">(</span><span class="n">mat</span><span class="p">.</span><span class="n">T</span><span class="o">*</span><span class="n">mat</span><span class="p">)</span><span class="o">*</span><span class="n">mat</span><span class="p">.</span><span class="n">T</span>
+
+        <span class="c1">#定义一个矩阵A,注意A矩阵需要是列满轶的
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="s">"3 7;1 5;2 4"</span><span class="p">)</span>
+        <span class="c1">#求A的映射矩阵
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">p</span><span class="o">=</span><span class="n">project_matrix</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">p</span>
+<span class="n">matrix</span><span class="p">([[</span> <span class="mf">0.65384615</span><span class="p">,</span>  <span class="mf">0.11538462</span><span class="p">,</span>  <span class="mf">0.46153846</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.11538462</span><span class="p">,</span>  <span class="mf">0.96153846</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.15384615</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">0.46153846</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.15384615</span><span class="p">,</span>  <span class="mf">0.38461538</span><span class="p">]])</span>
+
+        <span class="c1">#下面验证几个投影矩阵的性质
+</span>        <span class="c1">#1.投影矩阵是对称的
+</span>        <span class="c1">#因为numpy是数值计算，小数值很长，所以提供了专门方法np.allclose()用于比较两个矩阵
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">np</span><span class="p">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">p</span><span class="p">.</span><span class="n">T</span><span class="p">,</span><span class="n">p</span><span class="p">)</span>
+<span class="bp">True</span>    <span class="c1">#返回True,表示两个矩阵相等        
+</span>        <span class="c1">#2.投影矩阵的平方等于投影矩阵自身,表示多次投影也是同一个垂足本身
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">np</span><span class="p">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">p</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span><span class="n">p</span><span class="p">)</span>
+<span class="bp">True</span>
+        <span class="c1">#3.一个可逆矩阵，其投影矩阵为单位矩阵I。这代表对于可逆矩阵，b直接就在其列空间，所以投影为自身
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)))</span> <span class="c1">#随机生成的矩阵为多维列表模式，要转换为矩阵
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">project_matrix</span><span class="p">(</span><span class="n">a</span><span class="p">)</span>
+<span class="n">matrix</span><span class="p">([[</span> <span class="mf">1.00000000e+00</span><span class="p">,</span>  <span class="mf">1.02695630e-15</span><span class="p">,</span> <span class="o">-</span><span class="mf">8.25728375e-16</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">5.20417043e-16</span><span class="p">,</span>  <span class="mf">1.00000000e+00</span><span class="p">,</span>  <span class="mf">3.69496100e-16</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">1.66533454e-16</span><span class="p">,</span>  <span class="mf">2.77555756e-17</span><span class="p">,</span>  <span class="mf">1.00000000e+00</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">np</span><span class="p">.</span><span class="n">allclose</span><span class="p">(</span><span class="n">project_matrix</span><span class="p">(</span><span class="n">a</span><span class="p">),</span><span class="n">np</span><span class="p">.</span><span class="n">eye</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+<span class="bp">True</span>
+</code></pre></div></div>
+
+<h4 id="正交矩阵和正交化法">正交矩阵和正交化法</h4>
+<p>这部分内容来自课程第十七讲。<br />
+按照教授的说法，标准正交矩阵是能得到的最好的矩阵，有很多优良的性质，便于计算和分析。<br />
+标准正交矩阵每一列都互相垂直，模长为1。通常把标准正交矩阵记为Q。<br />
+但很可惜，通常的矩阵都不是标准正交矩阵。课程中介绍了格拉姆-施密特(Graham-Schmidt)正交化法，将一个列满轶的矩阵A，转换为一个由标准正交向量组构成的矩阵Q。<br />
+SymPy内置了这个算法，用于将一组线性无关的向量正交化，来看看示例：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="nn">sympy</span> <span class="k">as</span> <span class="n">sp</span>
+
+<span class="n">vlist</span><span class="o">=</span><span class="p">[]</span>        <span class="c1">#定义一个列表用于保存多个希望进行正交化的列向量
+</span><span class="n">Q</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span> <span class="c1">#定义一个空白的5*5矩阵，用于保存最终生成的标准正交矩阵
+</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">):</span>    <span class="c1">#循环5次，随机生成5个向量
+</span>    <span class="n">vlist</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">sp</span><span class="p">.</span><span class="n">randMatrix</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1">#格拉姆-施密特正交化法，orthonormal参数表示希望进行标准化
+</span><span class="n">qlist</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">GramSchmidt</span><span class="p">(</span><span class="n">vlist</span><span class="p">,</span><span class="n">orthonormal</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">5</span><span class="p">):</span>    <span class="c1">#循环5次，使用我们前面介绍过读写矩阵特定一列的方法，
+</span>    <span class="n">Q</span><span class="p">[:,</span><span class="n">i</span><span class="p">]</span><span class="o">=</span><span class="n">qlist</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>     <span class="c1">#将标准正交向量组成标准正交矩阵
+</span>
+<span class="k">print</span><span class="p">(</span><span class="n">Q</span><span class="p">)</span>        <span class="c1">#输出标准正交矩阵
+</span><span class="k">print</span><span class="p">(</span><span class="n">Q</span><span class="p">.</span><span class="n">T</span><span class="o">*</span><span class="n">Q</span><span class="p">)</span>    <span class="c1">#测试标准正交矩阵的特性，转置*自身=单位矩阵I
+</span></code></pre></div></div>
+<p>这个小程序段需要单独保存为一个脚本来执行，输出因为SymPy符号计算的特点，会变得极为复杂。这种复杂主要来自于标准化除以模长所导致的分数化。</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Matrix<span class="o">([[</span>41<span class="k">*</span>sqrt<span class="o">(</span>16898<span class="o">)</span>/8449, <span class="nt">-94603</span><span class="k">*</span>sqrt<span class="o">(</span>269690238118<span class="o">)</span>/134845119059, <span class="nt">-15748588</span><span class="k">*</span>sqrt<span class="o">(</span>1302577778973635969<span class="o">)</span>/186082539853376567, <span class="nt">-425130641780</span><span class="k">*</span>sqrt<span class="o">(</span>23692552673045367710006107<span class="o">)</span>/3384650381863623958572301, 5002949<span class="k">*</span>sqrt<span class="o">(</span>290294034089473<span class="o">)</span>/290294034089473], <span class="o">[</span>45<span class="k">*</span>sqrt<span class="o">(</span>16898<span class="o">)</span>/16898, 317381<span class="k">*</span>sqrt<span class="o">(</span>269690238118<span class="o">)</span>/269690238118, 781784552<span class="k">*</span>sqrt<span class="o">(</span>1302577778973635969<span class="o">)</span>/1302577778973635969, <span class="nt">-111786279859</span><span class="k">*</span>sqrt<span class="o">(</span>23692552673045367710006107<span class="o">)</span>/23692552673045367710006107, 3273660<span class="k">*</span>sqrt<span class="o">(</span>290294034089473<span class="o">)</span>/290294034089473], <span class="o">[</span>33<span class="k">*</span>sqrt<span class="o">(</span>16898<span class="o">)</span>/8449, 129105<span class="k">*</span>sqrt<span class="o">(</span>269690238118<span class="o">)</span>/134845119059, <span class="nt">-718289251</span><span class="k">*</span>sqrt<span class="o">(</span>1302577778973635969<span class="o">)</span>/1302577778973635969, 1062149555036<span class="k">*</span>sqrt<span class="o">(</span>23692552673045367710006107<span class="o">)</span>/23692552673045367710006107, <span class="nt">-3858716</span><span class="k">*</span>sqrt<span class="o">(</span>290294034089473<span class="o">)</span>/290294034089473], <span class="o">[</span>33<span class="k">*</span>sqrt<span class="o">(</span>16898<span class="o">)</span>/16898, <span class="nt">-158161</span><span class="k">*</span>sqrt<span class="o">(</span>269690238118<span class="o">)</span>/269690238118, 7790318<span class="k">*</span>sqrt<span class="o">(</span>1302577778973635969<span class="o">)</span>/1302577778973635969, 3492057859131<span class="k">*</span>sqrt<span class="o">(</span>23692552673045367710006107<span class="o">)</span>/23692552673045367710006107, 9758746<span class="k">*</span>sqrt<span class="o">(</span>290294034089473<span class="o">)</span>/290294034089473], <span class="o">[</span>26<span class="k">*</span>sqrt<span class="o">(</span>16898<span class="o">)</span>/8449, <span class="nt">-101825</span><span class="k">*</span>sqrt<span class="o">(</span>269690238118<span class="o">)</span>/134845119059, 404026822<span class="k">*</span>sqrt<span class="o">(</span>1302577778973635969<span class="o">)</span>/1302577778973635969, 1225299826763<span class="k">*</span>sqrt<span class="o">(</span>23692552673045367710006107<span class="o">)</span>/23692552673045367710006107, <span class="nt">-12017690</span><span class="k">*</span>sqrt<span class="o">(</span>290294034089473<span class="o">)</span>/290294034089473]]<span class="o">)</span>
+Matrix<span class="o">([[</span>1, 0, 0, 0, 0], <span class="o">[</span>0, 1, 0, 0, 0], <span class="o">[</span>0, 0, 1, 0, 0], <span class="o">[</span>0, 0, 0, 1, 0], <span class="o">[</span>0, 0, 0, 0, 1]]<span class="o">)</span>
+</code></pre></div></div>
+<p>毕竟不是编程的课程，所以虽然是很短一个小程序，非IT专业的同学看起来可能也会觉得晕。这是由于SymPy中内置的格拉姆-施密特算法主要用于处理向量所导致的。我们不得不把矩阵变为向量，完成正交化后，再转换回矩阵。<br />
+实际上有更好的办法，就是使用QR分解。QR分解在课程中并没有介绍，大意是，任何一个列满轶的矩阵A,都可以分解为一个标准正交向量Q和一个上三角矩阵R的乘积形式。上三角矩阵前面见过，就是我们使用高斯消元的中间步骤产物。<br />
+SymPy和NumPy中都内置了QR分解算法，请看示例：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="c1">#先是sympy的操作
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">a1</span><span class="o">=</span><span class="n">sp</span><span class="p">.</span><span class="n">randMatrix</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">)</span>       <span class="c1">#随机生成一个3*3的矩阵，这次用小一点的维度，容易看清楚
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">q</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="n">a1</span><span class="p">.</span><span class="n">QRdecomposition</span><span class="p">()</span>    <span class="c1">#QR分解
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">q</span>   <span class="c1">#标准正交矩阵
+</span><span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">33</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">4166</span><span class="p">)</span><span class="o">/</span><span class="mi">4166</span><span class="p">,</span>    <span class="mi">1257</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">736017635</span><span class="p">)</span><span class="o">/</span><span class="mi">43295155</span><span class="p">,</span>    <span class="mi">17</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">706690</span><span class="p">)</span><span class="o">/</span><span class="mi">41570</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">31</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">4166</span><span class="p">)</span><span class="o">/</span><span class="mi">4166</span><span class="p">,</span>    <span class="mi">379</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">736017635</span><span class="p">)</span><span class="o">/</span><span class="mi">147203527</span><span class="p">,</span> <span class="o">-</span><span class="mi">147</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">706690</span><span class="p">)</span><span class="o">/</span><span class="mi">141338</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">23</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">4166</span><span class="p">)</span><span class="o">/</span><span class="mi">2083</span><span class="p">,</span> <span class="o">-</span><span class="mi">16607</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">736017635</span><span class="p">)</span><span class="o">/</span><span class="mi">736017635</span><span class="p">,</span>  <span class="mi">144</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">706690</span><span class="p">)</span><span class="o">/</span><span class="mi">353345</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">r</span>   <span class="c1">#上三角矩阵
+</span><span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">2</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">4166</span><span class="p">),</span>   <span class="mi">2034</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">4166</span><span class="p">)</span><span class="o">/</span><span class="mi">2083</span><span class="p">,</span>             <span class="mi">4415</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">4166</span><span class="p">)</span><span class="o">/</span><span class="mi">4166</span><span class="p">],</span>
+<span class="p">[</span>           <span class="mi">0</span><span class="p">,</span> <span class="mi">3</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">736017635</span><span class="p">)</span><span class="o">/</span><span class="mi">2083</span><span class="p">,</span> <span class="mi">219945</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">736017635</span><span class="p">)</span><span class="o">/</span><span class="mi">147203527</span><span class="p">],</span>
+<span class="p">[</span>           <span class="mi">0</span><span class="p">,</span>                      <span class="mi">0</span><span class="p">,</span>         <span class="mi">4939</span><span class="o">*</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">706690</span><span class="p">)</span><span class="o">/</span><span class="mi">141338</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span><span class="p">[:,</span><span class="mi">0</span><span class="p">].</span><span class="n">T</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">q</span><span class="p">[:,</span><span class="mi">1</span><span class="p">])</span>        <span class="c1">#验证第0列跟第1列垂直
+</span><span class="mi">0</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span><span class="p">[:,</span><span class="mi">0</span><span class="p">].</span><span class="n">T</span><span class="p">.</span><span class="n">dot</span><span class="p">(</span><span class="n">q</span><span class="p">[:,</span><span class="mi">0</span><span class="p">])</span>        <span class="c1">#验证列模长为1
+</span><span class="mi">1</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span><span class="p">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">q</span>     <span class="c1">#标准正交矩阵，逆*自身=I
+</span><span class="n">Matrix</span><span class="p">([</span>
+<span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+<span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span><span class="p">.</span><span class="n">T</span> <span class="o">==</span> <span class="n">q</span><span class="o">**-</span><span class="mi">1</span>        <span class="c1">#验证标准正交矩阵重要特征：逆=转置
+</span><span class="bp">True</span>
+
+        <span class="c1">#下面是numpy操作部分，生成一个numpy随机矩阵
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">a</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span><span class="n">size</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">))</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">a</span>
+<span class="n">array</span><span class="p">([[</span><span class="mi">29</span><span class="p">,</span> <span class="mi">47</span><span class="p">,</span> <span class="mi">45</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">48</span><span class="p">,</span>  <span class="mi">0</span><span class="p">,</span> <span class="mi">76</span><span class="p">],</span>
+       <span class="p">[</span><span class="mi">30</span><span class="p">,</span> <span class="mi">84</span><span class="p">,</span> <span class="mi">64</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span><span class="p">,</span><span class="n">r</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="n">qr</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="c1">#使用numpy的QR分解
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">q</span><span class="p">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">q</span>     <span class="c1">#此时q是多重列表类型，进行矩阵操作会得到错误的结果
+</span><span class="n">array</span><span class="p">([[</span> <span class="mf">0.207911</span>  <span class="p">,</span> <span class="o">-</span><span class="mf">0.19433572</span><span class="p">,</span>  <span class="mf">0.40185179</span><span class="p">],</span>
+       <span class="p">[</span><span class="o">-</span><span class="mf">0.19433572</span><span class="p">,</span>  <span class="mf">0.38341184</span><span class="p">,</span>  <span class="mf">0.16081412</span><span class="p">],</span>
+       <span class="p">[</span> <span class="mf">0.40185179</span><span class="p">,</span>  <span class="mf">0.16081412</span><span class="p">,</span>  <span class="mf">0.22721918</span><span class="p">]])</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">q</span><span class="o">=</span><span class="n">np</span><span class="p">.</span><span class="n">mat</span><span class="p">(</span><span class="n">q</span><span class="p">)</span> <span class="c1">#将q转换为矩阵，这也是我们前面一再强调的，一定要用矩阵类型做矩阵运算
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">q</span><span class="p">.</span><span class="n">T</span> <span class="o">*</span> <span class="n">q</span>     <span class="c1">#验证转置*自身=I
+</span><span class="n">matrix</span><span class="p">([[</span> <span class="mf">1.00000000e+00</span><span class="p">,</span>  <span class="mf">2.37714715e-17</span><span class="p">,</span> <span class="o">-</span><span class="mf">1.52168377e-16</span><span class="p">],</span>
+        <span class="p">[</span> <span class="mf">2.37714715e-17</span><span class="p">,</span>  <span class="mf">1.00000000e+00</span><span class="p">,</span>  <span class="mf">1.37111751e-16</span><span class="p">],</span>
+        <span class="p">[</span><span class="o">-</span><span class="mf">1.52168377e-16</span><span class="p">,</span>  <span class="mf">1.37111751e-16</span><span class="p">,</span>  <span class="mf">1.00000000e+00</span><span class="p">]])</span>
+</code></pre></div></div>
+:ET
