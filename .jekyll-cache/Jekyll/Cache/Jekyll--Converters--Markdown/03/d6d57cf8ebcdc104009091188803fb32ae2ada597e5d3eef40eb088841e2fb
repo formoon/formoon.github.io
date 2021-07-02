@@ -1,4 +1,5 @@
-I"#<p><img src="http://115.182.41.123/files/201712/unixwin.jpeg" alt="" /></p>
+I"https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments
+#<p><img src="http://115.182.41.123/files/201712/unixwin.jpeg" alt="" /></p>
 
 <p>macOS延续自BSD Unix, Linux则是从内核开始重新编写但延续Unix使用方式的Unix。所以mac还有linux程序员，一般都算是*nix程序员，尽管其中还有不少的区别。<br />
 Windows从版本10开始做出的最大改变，可能就是内置的linux子系统，原本的安装方式很简单，网上很多介绍，一般就是三步：1.设置中打开开发人员模式；2.windows组件中安装linux子系统；3.在DOS窗口中执行bash,随后经历一场漫长而令人期待的安装。<br />

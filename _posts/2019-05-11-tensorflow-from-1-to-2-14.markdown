@@ -2,12 +2,12 @@
 layout:         page
 title:          TensorFlow从1到2（十四）
 subtitle:       评估器的使用和泰坦尼克号乘客分析
-card-image:		http://115.182.41.123/files/201904/tensorFlow2/tf-logo-card-2.png
+card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-05-11
 tags:           tensorflow
 post-card-type: image
 ---
-![](http://115.182.41.123/files/201904/tensorFlow2/tf-logo-card-2.png)  
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png)  
 #### 三种开发模式
 使用TensorFlow 2.0完成机器学习一般有三种方式：  
 * 使用底层逻辑  
@@ -17,7 +17,7 @@ post-card-type: image
 * 今天要介绍的评估器tf.estimator  
   评估器是TensorFlow官方推荐的内置高级API，层次上看跟Keras实际处于同样位置，只是似乎大家都视而不见了，以至于现在从用户的实际情况看用的人要远远少于Keras。  
 
-![](http://115.182.41.123/files/201904/tensorFlow2/est-struct-1.png)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/est-struct-1.png)
 通常认为评估器因为内置的紧密结合，运行速度要高于Keras。Keras一直是一个通用的高层框架，除了支持TensorFlow作为后端，还同时支持Theano和CNTK。高度的抽象肯定会影响Keras的速度，不过本人并未实际对比测试。我觉的，对于大量数据导致的长时间训练来说，这点效率上的差异不应当成为大问题，否则Python这种解释型的语言就不会成为优选的机器学习基础平台了。  
 在TensorFlow 1.x中可以使用tf.estimator.model_to_estimator方法将Keras模型转换为TensorFlow评估器。TensorFlow 2.0中，统一到了tf.keras.estimator.model_to_estimator方法。所以如果偏爱评估器的话，使用Keras也不会成为障碍。  
 
@@ -117,35 +117,35 @@ Type "help", "copyright", "credits" or "license" for more information.
 dftrain.age.hist(bins=20)
 plt.show()
 ```
-![](http://115.182.41.123/files/201904/tensorFlow2/est-age-0.png)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/est-age-0.png)
 直方图中显示，乘客年龄主要分布在20岁至30岁之间。  
 再来看看性别分布：  
 ```python
 dftrain.sex.value_counts().plot(kind='barh')
 plt.show()
 ```
-![](http://115.182.41.123/files/201904/tensorFlow2/est-sex-0.png)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/est-sex-0.png)
 男性乘客的数量，几乎是女性乘客的两倍。  
 接着是船舱等级的分布，这个参数能间接体现乘客的经济实力：  
 ```python
 dftrain['class'].value_counts().plot(kind='barh')
 plt.show()
 ```
-![](http://115.182.41.123/files/201904/tensorFlow2/est-class-0.png)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/est-class-0.png)
 图中显示，大多数乘客还是在三等舱。  
 继续看乘客上船的地点：  
 ```python
 dftrain['embark_town'].value_counts().plot(kind='barh')
 plt.show()
 ```
-![](http://115.182.41.123/files/201904/tensorFlow2/est-town-0.png)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/est-town-0.png)
 大多数乘客来自南安普顿。  
 继续，把性别跟最后生存标注关联起来：  
 ```python
 pd.concat([dftrain, y_train], axis=1).groupby('sex').survived.mean().plot(kind='barh').set_xlabel('% survive')
 plt.show()
 ```
-![](http://115.182.41.123/files/201904/tensorFlow2/est-sex-1.png)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/est-sex-1.png)
 女性的存活率几乎超过男性的5倍。  
 再来一个更复杂的统计，我们首先把年龄分段，然后看看不同年龄段的乘客最终存活率：  
 ```python
@@ -158,7 +158,7 @@ pd.concat([dftrain, y_train], axis=1).groupby('ages').survived.mean().plot(kind=
 plt.show()
 
 ```
-![](http://115.182.41.123/files/201904/tensorFlow2/est-survive-ages-0.png)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/est-survive-ages-0.png)
 10岁以下儿童和80岁以上的老人得到了最多的生存机会。  
 在那个寒冷、慌乱的沉船夜晚，弱者反而更多的活了下来。  
 
@@ -370,7 +370,7 @@ plt.subplot(1, 2, 2)
 probs2.plot(kind='hist', bins=20, title='bt-est predicted probabilities');
 plt.show()
 ```
-![](http://115.182.41.123/files/201904/tensorFlow2/est-predicted-probabilities-0.png)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/est-predicted-probabilities-0.png)
 大量集中在图形左侧的数据簇，显示了乘客九死一生的悲惨命运。  
 因为我们的预测结果只有两种可能：0表示未能生存；1表示生存下来。所以预测的结果，应当明显的尽量靠近0和1两端。中间悬而未决的部分应当尽可能少。从图形的情况看，如果不考虑分类准确率问题，提升树分类器效果要更好一些。  
 当然作为成熟的预定义模型，模型都是很优秀的，只是提升树可能更适合本应用的场景。  
@@ -404,7 +404,7 @@ plt.subplot(1, 2, 2)
 plot_roc(probs2, "bt-est ROC")
 plt.show()
 ```
-![](http://115.182.41.123/files/201904/tensorFlow2/est-predicted-ROC-1.png)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/est-predicted-ROC-1.png)
 从ROC曲线看，在本例中使用提升树模型的优势更为明显。  
 
 

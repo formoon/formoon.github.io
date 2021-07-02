@@ -1,4 +1,4 @@
-I"m<p><img src="http://115.182.41.123/files/201712/25/DSCO07091900586s-full.jpg" alt="" />
+I"m<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/25/DSCO07091900586s-full.jpg" alt="" />
 又是一篇老文，我屈指算了算，大概是14年前，也就是2003年写的:D。<br />
 这么多年过去，文章本身其实已经没有了什么参考价值，在这个纯技术的博客中，这算另类。只是偶尔重读起来，感觉，自己当年居然还曾经那么逗比。生活是一把杀猪刀……<br />
 啊还有，你是否注意到了照片上的水印，都已经不记得什么时候变成了现在的样子。</p>
@@ -7,27 +7,27 @@
 
 <p>最近IT不景气（注1）， 想看液晶电视买不起，自己来做一个吧。。。<br />
 首先是准备材料啦，这是液晶屏，从偶（注2）的老NoteBook上拆下来的，中国人就擅长这个，听说China这个词就是这么来的，逮啥都“拆那”。<br />
-<img src="http://115.182.41.123/files/201712/25/DSCO07032022521s-full.jpg" alt="" />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/25/DSCO07032022521s-full.jpg" alt="" />
 再来张背面的照片，然后我来解释一下液晶屏。
-<img src="http://115.182.41.123/files/201712/25/DSCO07032023202s-full.jpg" alt="" />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/25/DSCO07032023202s-full.jpg" alt="" />
 液晶屏有N多种型号，甚至同一家公司不同批次生产的液晶屏都不尽相同，这些不同就需要不同的驱动电路板和电路板上单片机不同的软件支持，因此你需要在这幅图上确定几个信息：<br />
 1,左上角有两条线的那个小辫子插头，这是背光灯管电源输入，背光灯你可以理解成比较高级的日光灯（虽然它很小），只有一条小辫子说明这个屏是单灯的，一般小屏单灯就够了，大一点的屏幕或者比较高亮度的屏幕，灯管数量就会多，就会有很多条小辫子，这个数量你需要数清楚，什么？不会数？那回家可得让咱妈妈好好教教，好在你计数有困难不影响你装液晶电视，这活儿基本上幼儿园文化就够用了。灯管的驱动同日光灯也一样，是需要高压的，灯管的数量不同，需要的高压板就不同，这种高压板有一块板子驱动一盏灯的，也有一块板子驱动2、4、6盏灯的，你购买的时候根据你灯管的数量来定。<br />
 2.随后是后面左侧上部的那个标签，上面一个条码，下面是个型号，HLD1104-020160,是hosiden和philips合资公司生产的11.04英寸SVGA液晶屏，一般这些信息有了型号就可以查到，在哪查我也告诉你，谁让你万一是幼儿园毕业呢，有句俗话，内事不明问老婆，外事不明问GOOGLE（注3）,所以你把型号扔在GOOGLE里去搜索就成了。<br />
 3.这项很重要，图右下部分有个竖向放置的接口，这是液晶屏的数据输入接口，你需要数清楚里面的阵脚数，描述明白接口，比如我这块是41扣接口，实在说不清楚，用数码相机拍一张也成。</p>
 
 <p>有了上面的这些信息，就要配置相应的驱动板和高压板，我再说强调一下每种型号液晶屏所使用的驱动板和软件是不同的，自己根据自己的需要配置。来看看我的，图的左侧就是驱动板，内置了电源管理、遥控管理、OSD控制键盘、TV输入、S-VIDEO、VIDEO、TTL-VGA,右侧那块小的就是高压板，在此我提醒一下，整个液晶电视实际都是弱电，唯一有高压的地方就是这块小的高压板，调试的时候躲它远点，别的地方随便你碰也没关系，实在觉得不过瘾你可以学学韦小宝，唱着十八摸然后再下手……
-<img src="http://115.182.41.123/files/201712/25/DSCO07091819569s-full.jpg" alt="" />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/25/DSCO07091819569s-full.jpg" alt="" />
 有了这些东西剩下就是试装了，这没啥技巧，接口都是唯一性的，接反了、插错了都进不去，你别死乞白咧在那搞拉郎配就成，瞅瞅偶拼好的：<br />
-<img src="http://115.182.41.123/files/201712/25/DSCO07091814324s-full.jpg" alt="" />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/25/DSCO07091814324s-full.jpg" alt="" />
 一般说业余制作，最难解决的就是外壳，这是你玩智慧的时候了，我见过老外很多搞笑的，有把液晶屏镶嵌在冰箱外壳上的，有放在微波炉前面板上的，有放在鱼缸壳上的，最强一个直接是连电脑一起散开了钉在墙上，旁边一大号标语：intel outside.<br />
 偶这人懒，就直接随俗了，上街40块钱买了一好油画框额外饶了一把木螺丝：<br />
-<img src="http://115.182.41.123/files/201712/25/DSCO07091818125s-full.jpg" alt="" />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/25/DSCO07091818125s-full.jpg" alt="" />
 装的过程就不说了，来看看我装好的图，先看背面，应当说不算好看，不过只要你都固定结实，别有短路、断路的地方，难看点也无所谓，反正能玩透视眼的在咱们这地头上尚属凤毛麟角。<br />
-<img src="http://115.182.41.123/files/201712/25/DSCO07091843360s-full.jpg" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/25/DSCO07091843360s-full.jpg" alt="" /><br />
 再瞅瞅正面，像样多了吧：
-<img src="http://115.182.41.123/files/201712/25/DSCO07091844582s-full.jpg" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/25/DSCO07091844582s-full.jpg" alt="" /><br />
 最后一镜头是挂在墙上的，偶家墙上乱点，到处是线，咱妈当年就说我，啥房子到我手里基本也就是一蜘蛛窝。其实这电视只要两条线就成，一个电源一个有线电视RF线，我没有用内置加扬声器，所以额外增加了一音箱线：<br />
-<img src="http://115.182.41.123/files/201712/25/DSCO07091900586s-full.jpg" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/25/DSCO07091900586s-full.jpg" alt="" /><br />
 就写这么多了，顺便刚还有人问我照片背景那是啥，这我也不瞒你，那是俺家竹凉席…..</p>
 <div align="right" style="font-size:12px">
 我有一辆吱吱嘎嘎响的破车，我骑着带你一起去看夕阳(注4)

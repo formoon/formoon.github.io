@@ -2,7 +2,7 @@
 layout:         page
 title:          那些令人惊艳的TensorFlow扩展包和社区贡献模型 
 subtitle:       Tensorflow models
-card-image:		http://115.182.41.123/files/201801/ml/tensorflowlogo.jpg
+card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/ml/tensorflowlogo.jpg
 date:           2018-03-03
 tags:           ml toSeven
 post-card-type: image

@@ -1,4 +1,4 @@
-I",<p><img src="http://115.182.41.123/files/201910/titlepic/appstore.jpeg" alt="" />
+I",<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201910/titlepic/appstore.jpeg" alt="" />
 在mac版本AppStore下载软件的时候，有时会出现“This item is temporarily unavailable, Try again later”错误提示，当然等一会儿或者不断重新尝试都是无法下载的。<br />
 <a href="http://stackoverflow.com/questions/27073615/trouble-downloading-xcode-6-1-on-mac-os-x-yosemite">StackOverFlow</a>上找到一个解法：<br />
 Mac App Store –&gt; Store –&gt; Check for Unfinished Downloads…<br />

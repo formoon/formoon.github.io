@@ -2,12 +2,12 @@
 layout:         page
 title:          python scrapy 入门
 subtitle:       10分钟完成一个爬虫
-card-image:		http://115.182.41.123/files/201804/scrapy.jpeg
+card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201804/scrapy.jpeg
 date:           2018-04-16
 tags:           python
 post-card-type: image
 ---
-![](http://115.182.41.123/files/201804/scrapy.jpeg)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201804/scrapy.jpeg)
 在TensorFlow热起来之前，很多人学习python的原因是因为想写爬虫。的确，有着丰富第三方库的python很适合干这种工作。  
 Scrapy是一个易学易用的爬虫框架，尽管因为互联网多变的复杂性仍然有很多爬虫需要自己编写大量的代码，但能够有一个相对全面均衡的基础框架，工作还是会少许多。  
 

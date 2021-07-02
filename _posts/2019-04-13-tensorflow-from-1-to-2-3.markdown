@@ -2,12 +2,12 @@
 layout:         page
 title:          TensorFlow从1到2（三）
 subtitle:       数据预处理和卷积神经网络
-card-image:		http://115.182.41.123/files/201904/tensorFlow2/tf-logo-card-2.png
+card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-04-13
 tags:           tensorflow
 post-card-type: image
 ---
-![](http://115.182.41.123/files/201904/tensorFlow2/tf-logo-card-2.png)  
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png)  
 #### 数据集及预处理
 从这个例子开始，相当比例的代码都来自于[官方新版文档](https://www.tensorflow.org/alpha/tutorials/quickstart/beginner)的示例。开始的几个还好，但随后的程序都将需要大量的算力支持。Google Colab是一个非常棒的云端实验室，提供含有TPU/GPU支持的Python执行环境(需要在Edit→Notebook Settings设置中打开)。速度比不上配置优良的本地电脑，但至少超过平均的开发环境。  
 所以如果你的电脑运行速度不理想，建议你尝试去官方文档中，使用相应代码的对应链接进入Colab执行试一试。  

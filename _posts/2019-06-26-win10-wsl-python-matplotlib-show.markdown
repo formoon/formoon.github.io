@@ -2,19 +2,19 @@
 layout:         page
 title:          win10配置linux子系统使用python绘图并显示
 subtitle:       WSL使用GUI输出
-card-image:		http://115.182.41.123/files/201906/wsl-python-gui/python-sin.png
+card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/wsl-python-gui/python-sin.png
 date:           2019-06-26
 tags:           html
 post-card-type: image
 ---
-![](http://115.182.41.123/files/201906/wsl-python-gui/python-sin.png)  
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/wsl-python-gui/python-sin.png)  
 默认情况下，Win10的linux子系统(WSL)是只能使用命令行程序的。所有图形界面的程序都无法执行。  
 
 通过为Win10安装XWindows协议的终端应用，可以让Win10成为一台XWindow终端，从而接受Linux的XWindow显示输出。  
 这样的终端应用有挺多，[Xming](https://sourceforge.net/projects/xming/)和[VcXsrv](https://sourceforge.net/projects/vcxsrv/)是其中著名的两个。下载安装就可以，我因为一些习惯上的原因使用了后者。  
 
 安装设置都使用默认即可，其中在显示端口设置的位置，默认是-1，表示自动选择，大多数情况是可以工作的。也碰到过不能连通的情况，这时候可以尝试设置成跟你Linux设置相同的端口，比如0。  
-![](http://115.182.41.123/files/201906/wsl-python-gui/VcXrvSetting.png)  
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/wsl-python-gui/VcXrvSetting.png)  
 
 Linux的环境参数设置可以放在~/.bashrc文件中，只要两行：  
 ```bash
@@ -27,7 +27,7 @@ $ sudo apt install x11-apps
     ...
 $ xeyes
 ```
-![](http://115.182.41.123/files/201906/wsl-python-gui/xeyes.png)  
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/wsl-python-gui/xeyes.png)  
 这表示整个GUI系统已经正常工作了。  
 
 并不建议在Linux安装桌面系统，我觉得既然已经选择了Windows作为前端，就踏踏实实的用Windows，后端Linux使用命令行才是正路子。安装XWindow只是为了使用Linux的GUI应用输出。桌面系统做文件管理、系统设置之类的操作，长久来看一定是得不偿失的，特别是在技能习惯上。  

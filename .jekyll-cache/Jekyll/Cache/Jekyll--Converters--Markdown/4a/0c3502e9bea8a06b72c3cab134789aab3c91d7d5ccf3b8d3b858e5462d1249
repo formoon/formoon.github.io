@@ -1,4 +1,4 @@
-I"H<p><img src="http://115.182.41.123/files/201912/wood-crate.jpg" alt="" /><br />
+I"H<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201912/wood-crate.jpg" alt="" /><br />
 不知道你的体会是什么，我从C切换到Rust以来，最大的感受并不是语法方面的—那些方面已经有足够多人抱怨而又享受着了。我最大的感受是终于把Web编程工具，同系统编程工具统一了起来。<br />
 C/C++其实也有很多不错的Web编程框架，只是依然总感觉味道不对。所以平常Node.Js / Golang /Python都会穿插在工作中。无论是开发效率，还是维护的方便程度，C/C++在Web开发方面还是弱项。</p>
 :ET

@@ -1,4 +1,4 @@
-I"�<p><img src="http://115.182.41.123/files/201801/ruby1.jpg" alt="" /></p>
+I"�<p><img srchttps://raw.githubusercontent.com/formoon/formoon.github.io/master/attachmentses/201801/ruby1.jpg" alt="" /></p>
 
 <p>挺少用gem update，因为我基本不怎么用ruby，本博的维护使用jekyll，似乎就躲不开了。<br />
 今天运行<code class="language-plaintext highlighter-rouge">sudo gem update --system</code>得到报错信息：</p>

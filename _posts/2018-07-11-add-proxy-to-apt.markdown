@@ -2,12 +2,12 @@
 layout:         page
 title:          给apt设置代理的正确姿势
 subtitle:      	三种方式给apt设置代理
-card-image:		http://115.182.41.123/files/201807/crosswall.jpg
+card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201807/crosswall.jpg
 date:           2018-07-11
 tags:           linux
 post-card-type: image
 ---
-![](http://115.182.41.123/files/201807/crosswall.jpg)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201807/crosswall.jpg)
 为什么设置代理，你懂得。  
 
 有很多第三方工具可以用，比如proxychains，非常好用，不过今天这不是正题。因为有可能没有代理，上网你都做不到，更别提下载软件了。想一想方法还是告诉你，免得你万一必须用：`sudo apt install proxychains`  

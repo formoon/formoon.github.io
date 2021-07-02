@@ -1,4 +1,4 @@
-I"�<p><img src="http://115.182.41.123/files/201910/titlepic/NMF.jpg" alt="" />
+I"�<p><img srchttps://raw.githubusercontent.com/formoon/formoon.github.io/master/attachmentses/201910/titlepic/NMF.jpg" alt="" />
 NMF是很久以前学的，基本快忘没了，昨天YX提出来一个关于NMF(同音同字不同义)的问题，才又想起来。<br />
 自己的学习笔记写的比较乱，好在网上资料多，摘了一篇，补充上自己笔记的内容，留此助记。</p>
 
@@ -123,9 +123,9 @@ NMF是很久以前学的，基本快忘没了，昨天YX提出来一个关于NMF
 <span class="n">plt2</span><span class="p">.</span><span class="n">show</span><span class="p">()</span><span class="c1">#直接画出矩阵，只打了点，下面对图plt1进行一些设置
 </span></code></pre></div></div>
 <p>以上代码会得到两张图，电影主题分布：<br />
-<img src="http://115.182.41.123/files/201804/25/files-distribution.png" alt="" />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201804/25/files-distribution.png" alt="" />
 用户倾向主题分布：<br />
-<img src="http://115.182.41.123/files/201804/25/user_distribution.png" alt="" />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201804/25/user_distribution.png" alt="" />
 从图中可以看到，我们分类比较少，数据也不是很准确，导致分布偏差比较大，但基本上是分成两类的。</p>
 
 <h4 id="电影推荐">电影推荐</h4>

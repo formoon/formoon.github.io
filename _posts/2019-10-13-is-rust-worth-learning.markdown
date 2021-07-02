@@ -2,12 +2,12 @@
 layout:         page
 title:          Rust到底值不值得学
 subtitle:       Rust对比、特色和理念
-card-image:		http://115.182.41.123/files/201910/rust.jpeg
+card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201910/rust.jpeg
 date:           2019-10-11
 tags:           html
 post-card-type: image
 ---
-![](http://115.182.41.123/files/201910/rust.jpeg)  
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201910/rust.jpeg)  
 #### 前言
 其实我一直弄不明白一点，那就是计算机技术的发展，是让这个世界变得简单了，还是变得更复杂了。   
 当然这只是一个玩笑，可别把这个问题当真。  

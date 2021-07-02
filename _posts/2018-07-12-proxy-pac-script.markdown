@@ -2,12 +2,12 @@
 layout:         page
 title:          代理自动配置文件PAC的使用方法
 subtitle:      	编写PAC脚本
-card-image:		http://115.182.41.123/files/201807/proxy.jpg
+card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201807/proxy.jpg
 date:           2018-07-12
 tags:           javascript
 post-card-type: image
 ---
-![](http://115.182.41.123/files/201807/proxy.jpg)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201807/proxy.jpg)
 我通常上网使用两个浏览器，safari用于一般上网；Chrome安装SwitchyOmega插件，在不同的代理中切换，来保证某些网站的上网速度。  
 但是这种方式到了手机上就有点懵，几乎所有的iPhone浏览器都不支持代理的自动切换和设置，所以只能选一个相对兼容性比较好的网络方式一直用下去。很不爽利。。。  
 后来发现代理自动配置文件PAC是个好东西，跟SwitchyOmega类似，能够比较智能的切换所需，所以给大家推荐一下。  

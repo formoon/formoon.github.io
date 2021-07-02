@@ -2,7 +2,7 @@
 layout:         page
 title:          resource fork, Finder information, or similar detritus not allowed
 subtitle:       错误处理
-card-image:     http://115.182.41.123/files/201801/swift.jpg
+card-image:     https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/swift.jpg
 date:           2018-01-29
 tags:           mac
 post-card-type: image

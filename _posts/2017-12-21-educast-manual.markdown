@@ -2,12 +2,12 @@
 layout:         post
 title:          Educast视频直播控制台使用说明
 subtitle:       Educast manual
-card-image:     http://115.182.41.123/files/201712/21/16_9.png
+card-image:     https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/21/16_9.png
 date:           2017-12-21
 tags:           videoaudio manual
 post-card-type: image
 ---
-![](http://115.182.41.123/files/201712/21/educast_main.png)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/21/educast_main.png)
 
 ### 简介
 Educast是一个以教育行业为主要应用方向，兼顾其他业务的专业视频直播、控制系统。  
@@ -16,7 +16,7 @@ Educast是一个以教育行业为主要应用方向，兼顾其他业务的专�
 * 专业视频系统虽然也允许手机等业余设备进行直播，但主要面向专业硬件设备，特别是可以兼容影棚、大规模专业会议系统的接入直播。
 * 专业视频系统一般至少允许2路视频同时直播甚至混屏直播，内容流直接广播，不会出现通常普及型系统直播时候用摄像机拍屏幕PPT画面等二次转录造成清晰度损失的情况。
 * 专业视频系统在长时间大规模的压力下通常表现更加稳定，并且可以使用遥控器、远程等方式更细节更方便的方式在直播中控制整体系统的操作。
-![](http://115.182.41.123/files/201712/21/remoteControl.jpg)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/21/remoteControl.jpg)
 
 educast系统内核使用c/c++和部分汇编完成。中间层使用golang开发。前端采用AngularJS4。架构设计综合考虑了跨平台的可移植性，但根据大量用户的实际使用情况，建议用户优先考虑部署在linux/mac操作系统。
 直播发出端控制台仅可使用支持HTML5以上的浏览器，不兼容老版本IE系列。推荐使用Safari/Chrome浏览器完成控制。  
@@ -59,9 +59,9 @@ educast系统内核使用c/c++和部分汇编完成。中间层使用golang开�
 * 在上面界面，左右两部分从功能上看是相同的，只是对应主视频及内容视频。每个视频均可有录制、直接直播两种不同操作。  
 * 界面上下两部分中间，是“直播混屏”的控制，指的是原始视频，通过何种处理之后直播出去。这部分功能，一般至少包含”画中画”模式，此外根据用户需求可能有不同的定制效果。  
 * “画中画混屏”指的是以内容视频为全屏画面，人物视频为画中画，放置于主画面右上角的模式，便于收看者主要看内容演示或者PPT、板书，然后辅以老师的讲解视频和老师声音的模式。在画中画方式下，两个视频可以在直播中根据控制分别全屏以便应对特写情况。  
-![](http://115.182.41.123/files/201712/21/16_9.png)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/21/16_9.png)
 * "并列混屏"指的是输出画面为32:9的视频效果，可用于双屏幕大教室、特型电视墙、大型会议的主席台展示等多种特殊应用，在这种模式下，两个画面可以在直播中根据控制互相切换位置。
-![](http://115.182.41.123/files/201712/21/32_9.png)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/21/32_9.png)
 * 界面下部的视频画面，在有任意一个直播发出的时候，可以点击播放实时收看同直播用户端看到的完全相同的画面。
 * 直播输出的视频，也可以录制下面供以后回放。
 * 整个控制界面的三个录制点均可随时并行录制多个视频，请使用不同的文件名称，文件名无需输入MP4后缀名。

@@ -2,12 +2,12 @@
 layout:         page
 title:          简单上手nodejs调用c++
 subtitle:       c++和js的混合编程
-card-image:		http://115.182.41.123/files/201802/nodejs.jpeg
+card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201802/nodejs.jpeg
 date:           2018-08-02
 tags:           javascript
 post-card-type: image
 ---
-![](http://115.182.41.123/files/201802/nodejs.jpeg)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201802/nodejs.jpeg)
 因为项目的原因，最近经常使用node.js搭RESTful接口。  
 性能还是很不错啦，感觉比Spring Boot之类的要快。而且在不错的性能之外，只要程序结构组织好，别让太多的回调把程序结构搞乱，整体开发效率比Java快的就太多了。  
 

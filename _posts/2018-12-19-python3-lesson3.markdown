@@ -2,12 +2,12 @@
 layout:         page
 title:          从零开始学习PYTHON3讲义（三）
 subtitle:       写第一个程序
-card-image:		http://115.182.41.123/files/201901/python3.jpeg
+card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201901/python3.jpeg
 date:           2018-12-19
 tags:           python
 post-card-type: image
 ---
-![](http://115.182.41.123/files/201901/python3.jpeg)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201901/python3.jpeg)
 <script src='https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML'></script>
 ### 《从零开始PYTHON3》第三讲
 >本页面使用了公式插件，因博客主机过滤无法显示的表示抱歉，并建议至个人主页查看原文。  

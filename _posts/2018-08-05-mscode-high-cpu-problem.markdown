@@ -2,12 +2,12 @@
 layout:         page
 title:          解决vs-code高cpu占用率问题
 subtitle:       microsoft.vscode.cpp.extension.darwin进程高cpu占用问题
-card-image:	http://115.182.41.123/files/201808/vscode.jpg
+card-image:	https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201808/vscode.jpg
 date:           2018-08-05
 tags:           mac linux
 post-card-type: image
 ---
-![](http://115.182.41.123/files/201808/vscode.jpg)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201808/vscode.jpg)
 免费的vs-code现在已经成为mac/linux平台的码农新宠，毕竟从windows平台开发virsul studio多年的经验积累不是白给的。  
 我也从诸多的代码编辑器环境，逐渐迁移、统一到了vs-code。最近发现一启动vs-code，风扇就呼呼转，才开始还没注意，以为微软的Windows中二病做派再次发作了。后来逐渐感觉系统响应速度严重下降，仔细检查发现是一个进程CPU占用高企不坠：microsoft.vscode.cpp.extension.darwin，如果是在linux平台则是：microsoft.vscode.cpp.extension.linux。  
 在网上搜索，发现这个问题早已有之，社区中投诉帖汗牛充栋，大致可以把问题界定向vs-code的插件机制和扩展插件的问题，但实际解决问题的方法一直没有，大家都寄期望于软件的升级。  

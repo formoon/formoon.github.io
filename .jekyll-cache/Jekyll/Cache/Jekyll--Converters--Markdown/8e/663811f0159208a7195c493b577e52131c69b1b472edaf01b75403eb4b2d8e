@@ -1,4 +1,4 @@
-I"H6<p><img src="http://115.182.41.123/files/201712/25/ar6.png" alt="" /></p>
+I"H6<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/25/ar6.png" alt="" /></p>
 
 <p>这是几年前写的一个笔记，估计Seven会用得到，所以翻出来重新贴上。<br />
 很多人学习电脑其实都是从单片机开始的，单片机结构简单，又五脏俱全，所以学习单片机入门，应当能够更容易的让初学者具备电脑的整体观。相信Z80/C51时候训练的习惯，很可能会伴随某些人整个技术生涯吧。 而随着IOT再次活跃起来的单片机，跟C51这些传统上的单片机相比变化不小。集成度更高、速度更快、外围接口和外围传感器更完善，编程也更加方便容易了。这些IOT常见的单片机中，Arduino无论如何算是比较火的一个系列，这个系列包括很多款，最便宜的差不多只要10多块钱（人民币）就可以买到，而且内置了连接电脑的USB转串口芯片，拿到手插上电脑就可以开发。<br />
@@ -12,15 +12,15 @@
 </ul>
 
 <p>作为一篇给新手的笔记，首先把器件介绍一下：<br />
-<img src="http://115.182.41.123/files/201712/25/ar0.jpg" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/25/ar0.jpg" alt="" /><br />
 这个是温度、湿度传感器，是一款很常见的A/D转换器件，共有3个针脚，分别是V(CC)电源端、G(ND)接地、S(ignal)信号端。大多数的传感器其实都是这样的形式，通过给出工作电压维持器件工作，在信号端得到数据。此类器件因为输出是数字化的模拟量，并非只有开、关两个状态，所以必须接在GPIO的模拟端。<br />
-<img src="http://115.182.41.123/files/201712/25/ar1.jpg" alt="" /><br />
-<img src="http://115.182.41.123/files/201712/25/ar2.jpg" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/25/ar1.jpg" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/25/ar2.jpg" alt="" /><br />
 这个是LCD1602的液晶显示屏，型号数字指的是每行16个字符，共2行，这里的字符特指是英文字符，这款LCD没有中文显示功能。器件接口使用I2C(读做:I方C),指的是I的平方，所以经常也写作IIC应当更加准确。I2C是一种接口标准，共4根管脚，分别是GND接地、VCC电源、SDA数据、SCL时钟，跟上一个器件的3根管脚主要区别是SDA是数字量，就是只有1、0两个状态，通过时钟信号的配合来区分位与位之间的间隔。IIC接口算是相对比较新的一种接口协议，详细资料可以在网上搜索，目前这种接口在手机、机顶盒、移动设备中有大量的应用。
-<img src="http://115.182.41.123/files/201712/25/ar3.jpg" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/25/ar3.jpg" alt="" /><br />
 这个就是马甲板，从功能上说，虽然外观区别很大，但其实就类似平常实验常用的面包板。只是这个马甲板专门为了Arduino设计，在管脚和功能方面，更适合Arduino的实验接线。比如请看图中，A/D接口、I2C接口（已经接线的两组）都单独的引了出来，其中很多管脚实际是跟其它管脚复用的，在马甲板上专门跟同协议管脚布线在一起，显然用起来更方便、灵活，对新手来说也更清楚。但是在正常实验结束后，如果会投入生产的话，一般会重新布线重新制作电路板，即便利用标准Arduino板投产也会直接接线到主板上，不会再用马甲板。所以马甲板的目的就是为了实验的方便。<br />
 本实验其实一共就只需要3组接线：温度湿度传感器3根线、LCD显示屏4根线还有Arduino主板到电脑的Usb线，这里的Usb线有供电、数据传输两个功能。下图是连接在一起的全家福：<br />
-<img src="http://115.182.41.123/files/201712/25/ar4.jpg" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/25/ar4.jpg" alt="" /><br />
 硬件部分连接好，仔细检查不要有短路、断路的点，可以进入软件部分。</p>
 
 <p>在电脑上打开Arduino IDE软件，这里用的是1.8.4，因为是几年前的笔记，相信当前肯定有更新的版本了。不过对于嵌入式开发，真的往往并不是新版本就好，具体情况要具体看，稳定性通常都是第一需要关注的。<br />
@@ -105,5 +105,5 @@
 
 </code></pre></div></div>
 <p>好了，在ArduinoIDE中，点击Tools菜单，选择正确的Arduino板型号和端口，把程序upload到单片机运行看一看吧。<br />
-<img src="http://115.182.41.123/files/201712/25/ar5.jpg" alt="" /></p>
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/25/ar5.jpg" alt="" /></p>
 :ET

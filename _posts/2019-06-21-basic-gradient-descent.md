@@ -2,13 +2,13 @@
 layout:         page
 title:          梯度下降法基本推导
 subtitle:       机器学习最基本的起点
-card-image:		http://115.182.41.123/files/201906/gradient/gradient-descent.jpeg
+card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/gradient/gradient-descent.jpeg
 date:           2019-06-21
 tags:           html
 post-card-type: image
 ---
 <script src='https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML'></script>
-![](http://115.182.41.123/files/201906/gradient/gradient-descent.jpeg)  
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/gradient/gradient-descent.jpeg)  
 仍然是一篇入门文，用以补充以前文章中都有意略过的部分。  
 之前的系列中，我们期望对数学并没有特别喜好的程序员，也可以从事人工智能应用的开发。但走到比较深入之后，基本的数学知识，还是没办法躲过的。  
 
@@ -124,7 +124,7 @@ $$</p>
 
 ### 梯度下降求解  
 对每一个要求解的量θ，同损失函数值之间，都有一个函数关系图示如下：  
-![](http://115.182.41.123/files/201906/gradient/theta.png)  
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/gradient/theta.png)  
 当然这是一个极度理想化的图，只有一个全局的最低点。实际上大多复杂的机器学习问题，其图示关系都如同重峦叠嶂，有很多个低谷,不理解的可以参考一下题头图。那会导致我们很容易到达了一个局部最优解之后陷入在那里，而不是全局最优，这种情况不在本文讨论。  
 梯度下降是微分中的一个概念，在这里应用的大意是，我们把每一个θ的取值范围，都划分为很多份，每一份的宽度我们称为动态∂，其实际宽度是由微分步长α决定的，我们一步步尝试改变θ的值，直至求得的损失值J(θ)最小，无限接近于0。  
 根据微分公式变形得到的θ迭代公式为：

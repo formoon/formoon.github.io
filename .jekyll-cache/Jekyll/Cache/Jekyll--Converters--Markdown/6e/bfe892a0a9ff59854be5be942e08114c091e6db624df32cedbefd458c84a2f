@@ -6,7 +6,7 @@
   <li>演示视频所用素材为网上资源，仅供演示，请勿传播使用</li>
 </ul>
 
-<video width="100%" src="http://115.182.41.123/files/201712/21/demoMix.mp4" controls="controls">
+<video width="100%" src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/21/demoMix.mp4" controls="controls">
 	需要支持HTML5的浏览器观看视频。</video>
 
 :ET

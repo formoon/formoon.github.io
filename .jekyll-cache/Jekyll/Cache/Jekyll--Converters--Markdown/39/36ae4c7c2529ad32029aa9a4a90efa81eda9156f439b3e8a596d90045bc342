@@ -1,4 +1,4 @@
-I"�/<p><img src="http://115.182.41.123/files/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
+I"�/<p><img srchttps://raw.githubusercontent.com/formoon/formoon.github.io/master/attachmentses/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
 <h4 id="基本概念">基本概念</h4>
 <p>机器翻译和语音识别是最早开展的两项人工智能研究。今天也取得了最显著的商业成果。<br />
 早先的机器翻译实际脱胎于电子词典，能力更擅长于词或者短语的翻译。那时候的翻译通常会将一句话打断为一系列的片段，随后通过复杂的程序逻辑对每一个片段进行翻译，最终组合在一起。所得到的翻译结果应当说似是而非，最大的问题是可读性和连贯性非常差。<br />
@@ -6,11 +6,11 @@
 一名职业翻译通常是这样做：首先完整听懂要翻译的语句，将语义充分理解，随后把理解到的内容，用目标语言复述出来。<br />
 而现在的机器翻译，也正是这样做的，谷歌的<a href="https://github.com/tensorflow/nmt">seq2seq</a>是这一模式的开创者。<br />
 如果用计算机科学的语言来说，这一过程很像一个编解码过程。原始的语句进入编码器，得到一组用于代表原始语句“内涵”的数组。这些数组中的数字就是原始语句所代表的含义，只是这个含义人类无法读懂，是需要由神经网络模型去理解的。随后解码过程，将“有含义的数字”解码为对应的目标语言。从而完成整个翻译过程。这样的得到的翻译结果，非常流畅，具有更好的可读性。<br />
-<img src="http://115.182.41.123/files/201904/tensorFlow2/nmt-encdec.jpg" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/nmt-encdec.jpg" alt="" /><br />
 （图片来自谷歌NMT文档）</p>
 
 <p>注意力机制是人类特有的大脑思维方式，比如看到下面这幅照片：
-<img src="http://115.182.41.123/files/201904/tensorFlow2/nmt-attention.png" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/nmt-attention.png" alt="" /><br />
 （图片来自互联网）<br />
 照片的内容实际很多，甚至如果从数学上说，背景树林的复杂度要高于前景。但看到照片的人，都会先注意到迎面而来的飞盘，随后是投掷者，接着是图像右侧的小孩子。其它的信息都被忽略了。<br />
 这是人类在上万年的进化中所形成的本能。对于快速向自己移动的物体首先会看到、识别危险、并且快速应对。接着是可能对自己造成威胁的同类或者生物。为了做到集注，不得不忽略看起来无关紧要的东西。<br />
@@ -41,15 +41,15 @@
 
 <h4 id="翻译模型">翻译模型</h4>
 <p>回到上面的编解码模型示意图。编码器、解码器在我们的机器学习中，实际都是神经网络模型。那么把上面的示意图展开，一个没有注意力机制的编码、解码翻译模型是这个样子：<br />
-<img src="http://115.182.41.123/files/201904/tensorFlow2/nmt-seq2seq.jpg" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/nmt-seq2seq.jpg" alt="" /><br />
 （图片来自谷歌NMT文档）</p>
 
 <p>随后，我们为这个模型增加解码时候的权重机制。模型在处理每个单词输出的时候，会在权重的帮助下，把重点放在对应的输入单词上。示意图如下：<br />
-<img src="http://115.182.41.123/files/201904/tensorFlow2/nmt-greedy_dec.jpg" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/nmt-greedy_dec.jpg" alt="" /><br />
 （图片来自谷歌NMT文档）</p>
 
 <p>最终，结合权重生成的过程，成为完整的注意力机制。注意力机制主要作用于解码，在每一个输出步骤中都要重新计算注意力权重，并更新到解码模型从而对输出产生影响。模型的示意图如下：<br />
-<img src="http://115.182.41.123/files/201904/tensorFlow2/nmt-attention_mechanism.jpg" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/nmt-attention_mechanism.jpg" alt="" /><br />
 （图片来自谷歌NMT文档）<br />
 图片中注意力权重的来源和去向箭头，要注意看清楚，这对你下面阅读实现的代码会很有帮助。</p>
 
@@ -533,7 +533,7 @@ Predicted translation: try to figure it out <span class="nb">.</span> &lt;end&gt
 </code></pre></div></div>
 <p>以后如果只是想测试翻译效果，可以不带train参数执行，直接看翻译结果。<br />
 对于每一个翻译句子，程序都会绘制注意力矩阵图：<br />
-<img src="http://115.182.41.123/files/201904/tensorFlow2/nmt-attention1.png" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/nmt-attention1.png" alt="" /><br />
 通常语法不是很复杂的句子，基本是顺序对应关系，所以注意力亮点基本落在对角线上。<br />
 图中X坐标是西班牙文单词，Y坐标是英文单词。每个英文单词，沿X轴看，亮点对应的X轴单词，表示对于翻译出这个英文单词，是哪一个西班牙文单词权重最大。</p>
 

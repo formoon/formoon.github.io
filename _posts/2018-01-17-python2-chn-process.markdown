@@ -2,7 +2,7 @@
 layout:         page
 title:          Python2中文处理纪要
 subtitle:       遇见乱码不用慌，我来跟你说端详
-card-image:     http://115.182.41.123/files/201801/python.jpg
+card-image:     https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/python.jpg
 date:           2018-01-17
 tags:           ml
 post-card-type: image

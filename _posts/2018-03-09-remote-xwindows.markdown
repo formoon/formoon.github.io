@@ -28,7 +28,7 @@ X11DisplayOffset 10
 最后还有一项，在mac使用ssh连接远端的服务器的时候，首先要确保ssh命令中需要增加`-X`或者`-Y`参数，表示接受远端的XWindows转发数据。示例：`ssh -Y john@123.123.123.123`。  
 连通之后，可以在远端运行一下xeyes、xclock、xlogo这样的基本应用来测试一下，看能否在本地桌面上显示出来。题头图的右上角两个应用分别是xlogo和xclock的样子。  
 最后给一个在我的电脑跑起来的样子：  
-![](http://115.182.41.123/files/201803/09/dnn_face_reg.png)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201803/09/dnn_face_reg.png)
 看起来跟在本地运行没有什么两样 :)  
 
 补充：  

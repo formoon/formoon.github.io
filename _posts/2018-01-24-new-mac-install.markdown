@@ -2,12 +2,12 @@
 layout:         page
 title:          新麦装机问题汇
 subtitle:       特别是研发人员的MAC装机注意问题
-card-image:     http://115.182.41.123/files/201801/mac.jpeg
+card-image:     https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/mac.jpeg
 date:           2018-01-24
 tags:           toSeven
 post-card-type: image
 ---
-![](http://115.182.41.123/files/201801/mac.jpeg)  
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/mac.jpeg)  
 虽然是mac老司机，但每次装机总会碰到一些小问题需要临时上网搜索一下解决方案，所以留下些文字备忘一下：  
 1. 研发用的新机最好选择语言用英文版，中文版通常的使用没问题，但很多的地方的翻译都不准确，而且有一些测试不充分的BUG。比如我曾经碰到过配置IP地址，多个IP地址之间应当是用英文分号分割，结果也变成了中文分号，新版本虽然修改了这个BUG，但类似小问题经常还是会有。  
 2. Xcode优先安装，后面其它许多的开源软件都依赖Xcode的命令行。  

@@ -1,9 +1,9 @@
-I"�	<p><img src="http://115.182.41.123/files/201906/ios-utf8/iphone.png" alt="" /><br />
+I"�	<p><img srchttps://raw.githubusercontent.com/formoon/formoon.github.io/master/attachmentses/201906/ios-utf8/iphone.png" alt="" /><br />
 本文是针对越狱版iPhone手机的，手机没有越狱就别看了，看了也没办法用。</p>
 
 <p>越狱版的iPhone当然是为了跟电脑一样做各种有趣的事情的。<br />
 但通常越狱的iPhone在命令行都无法处理中文，比如你的播放器里面的中文歌曲名，列出来全部是乱码的样子。类似下面的图：<br />
-<img src="http://115.182.41.123/files/201906/ios-utf8/distort.png" alt="" /></p>
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/ios-utf8/distort.png" alt="" /></p>
 
 <p>输入中文也做不到，在终端窗口输入中文，只会收到一串的警告音，什么也输入不上去或者同样是一串乱码显示。<br />
 这样很多强大的命令行工具也不能用了，比如find/grep。</p>
@@ -23,6 +23,6 @@ scp <span class="nt">-r</span> username@xx.xx.xx.xx:/usr/share/locale/en_US.UTF-
 <span class="c"># 下面退出ssh, 重新连接iPhone就成功了，这是为了让修改之后的.profile设置生效</span>
 </code></pre></div></div>
 <p>此时终端已经能够友好的处理中文了：<br />
-<img src="http://115.182.41.123/files/201906/ios-utf8/chs.png" alt="" /></p>
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/ios-utf8/chs.png" alt="" /></p>
 
 :ET

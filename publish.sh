@@ -1,5 +1,7 @@
 #!/bin/bash
 
+echo "pic demo url: "
+echo " https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201903/vm-docker/VM-LXC.png"
 #if [ "$1" = "pic" ]; then
 case "$1" in
   pic)

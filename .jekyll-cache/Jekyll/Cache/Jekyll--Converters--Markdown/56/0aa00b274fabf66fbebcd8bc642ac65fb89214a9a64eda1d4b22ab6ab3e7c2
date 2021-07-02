@@ -1,4 +1,4 @@
-I"�<p><img src="http://115.182.41.123/files/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
+I"�<p><img srchttps://raw.githubusercontent.com/formoon/formoon.github.io/master/attachmentses/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
 <h4 id="线性回归模型">线性回归模型</h4>
 <p>“回归”这个词，既是Regression算法的名称，也代表了不同的计算结果。当然结果也是由算法决定的。<br />
 不同于前面讲过的多个分类算法或者逻辑回归，线性回归模型的结果是一个连续的值。<br />
@@ -110,7 +110,7 @@
 <span class="o">&lt;</span><span class="n">seaborn</span><span class="p">.</span><span class="n">axisgrid</span><span class="p">.</span><span class="n">PairGrid</span> <span class="nb">object</span> <span class="n">at</span> <span class="mh">0x139405358</span><span class="o">&gt;</span>
 <span class="o">&gt;&gt;&gt;</span> <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="http://115.182.41.123/files/201904/tensorFlow2/regression_pairplot.png" alt="" /><br />
+<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/regression_pairplot.png" alt="" /><br />
 上图选取了MPG(油耗)、Cylinders(气缸数量)、Displacement(排气量)、Weight(车重)四项数据，做两两对比形成的散点图。<br />
 散点矩阵图（SPLOM:Scatterplot Matrix）可以用于粗略揭示数据中，不同列之间的相关性。可以粗略估计哪些变量是正相关的，哪些是负相关的，进而为下一步数据分析提供决策。当然这些图需要行业专家的理解和分析。然后为程序人员提供间接帮助。</p>
 
@@ -410,7 +410,7 @@ Testing <span class="nb">set </span>Mean Abs Error:  1.98 MPG
 <span class="n">plot_history</span><span class="p">(</span><span class="n">history</span><span class="p">)</span>
 </code></pre></div></div>
 <p>执行程序，可以得到下图的结果：<br />
-<img src="http://115.182.41.123/files/201904/tensorFlow2/regression_mae_mse.png" alt="" />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/regression_mae_mse.png" alt="" />
 从图中可以看出，虽然随着迭代次数的增加，训练错误率在降低，但大致从100次迭代之后，验证的错误率就基本稳定不变了。限于样本集数量及维度选取、模型设计等方面的原因，对这个结果的满意度先放在一边。这个模型在100次迭代之后就长时间无效的训练显然是一个可优化的点。<br />
 TensorFlow/Keras提供了EarlyStopping机制来应对这种问题，EarlyStopping也是一个回调函数，请看我们实现的代码：</p>
 
@@ -425,7 +425,7 @@ TensorFlow/Keras提供了EarlyStopping机制来应对这种问题，EarlyStoppin
 </span><span class="n">plot_history</span><span class="p">(</span><span class="n">history</span><span class="p">)</span>
 </code></pre></div></div>
 <p>执行后，这次得到的结果令人满意了，大致在60次迭代之后，就得到了同前面1000次迭代基本相似的结果：<br />
-<img src="http://115.182.41.123/files/201904/tensorFlow2/regression_mae_mse2.png" alt="" />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/regression_mae_mse2.png" alt="" />
 既然训练完成，虽然我们使用模型预测的结果无法跟原标注一对一比较，我们可以用图形的方式来比较一下两组值，并做一下预测错误统计：</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 继续在最后增加如下代码
 # 使用测试集数据用模型进行预测
@@ -451,7 +451,7 @@ TensorFlow/Keras提供了EarlyStopping机制来应对这种问题，EarlyStoppin
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
 <p>程序得到结果图如下：<br />
-<img src="http://115.182.41.123/files/201904/tensorFlow2/regression_predict_and_error.png" alt="" />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/regression_predict_and_error.png" alt="" />
 左边的图中，如果预测结果同标注结果完全一致，蓝色的点将落在主对角线上，偏离对角线则代表预测误差。从图中可以看出，所有的点大致是落在主对角线周边的。这表示预测结果同标注值基本吻合。<br />
 右边的图是两者之差的范围统计结果，可以理解为左图逆时针逆时针旋转45度后所有点统计的直方图，对角线就是误差为0的位置。图中能看出误差基本符合正态分布，代表预测数值偏大、偏小的数量和比例基本相似，模型是可信的。<br />
 当然限于样本数量过少的问题，模型的优化余地还是很大的。</p>

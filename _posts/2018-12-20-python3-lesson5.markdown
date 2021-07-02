@@ -2,12 +2,12 @@
 layout:         page
 title:          从零开始学习PYTHON3讲义（五）
 subtitle:       while循环和棋盘麦粒问题
-card-image:		http://115.182.41.123/files/201901/python3.jpeg
+card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201901/python3.jpeg
 date:           2018-12-20
 tags:           python
 post-card-type: image
 ---
-![](http://115.182.41.123/files/201901/python3.jpeg)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201901/python3.jpeg)
 <script src='https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML'></script>
 ### 《从零开始PYTHON3》第五讲
 

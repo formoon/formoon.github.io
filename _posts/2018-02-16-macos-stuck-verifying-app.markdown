@@ -2,7 +2,7 @@
 layout:         page
 title:          mac应用启动时卡死在“验证...”
 subtitle:       Stuck on verifying app
-card-image:     http://115.182.41.123/files/201802/macbook1.jpg
+card-image:     https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201802/macbook1.jpg
 date:           2018-02-16
 tags:           mac
 post-card-type: image

@@ -2,12 +2,12 @@
 layout:         page
 title:          mac电脑进行可见光通信实验要点
 subtitle:      	lifi on mac
-card-image:		http://115.182.41.123/files/201804/19/lifi.jpg
+card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201804/19/lifi.jpg
 date:           2018-04-19
 tags:           mac seven
 post-card-type: image
 ---
-![](http://115.182.41.123/files/201804/19/lifi.jpg)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201804/19/lifi.jpg)
 lifi作为一个入门门槛低、涉及范围广的实验，在理工高校中还是比较流行的。  
 通常实验分成3个部分，字符数据传输实验、音频传输实验、视频传输实验。在官方的实验指南中指定使用win7x64或者win xp来进行。老话题，这里说在mac怎么进行实验。  
 

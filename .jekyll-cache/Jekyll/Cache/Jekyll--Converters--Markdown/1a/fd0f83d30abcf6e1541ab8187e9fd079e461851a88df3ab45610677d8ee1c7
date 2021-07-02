@@ -1,4 +1,4 @@
-I"J�<p><img src="http://115.182.41.123/files/201906/waterMark/IMG_20190521_125150_logoed.jpg" alt="" /></p>
+I"J�<p><img srchttps://raw.githubusercontent.com/formoon/formoon.github.io/master/attachmentses/201906/waterMark/IMG_20190521_125150_logoed.jpg" alt="" /></p>
 <h3 id="前言">前言</h3>
 <p>加水印是为图片声明版权出处的一种常用方法。<br />
 平常都是写技术文章，文章的重点在技术本身，照片往往不需要加水印，或者需要加也不多，祭出神器PhotoShop很快就能完成。<br />
@@ -32,8 +32,8 @@
 </blockquote>
 
 <p>制作一个水印文件最容易的方法是在PhotoShop中，把主体内容独立一层，随后把背景部分全部涂黑。这个黑一定要是真正的黑，也即RGB三个值全部为0。实际上任何不会引起冲突的颜色都是可以的，比如我们常见到特技拍摄中用到的蓝箱、绿箱。但使用全黑的背景处理起来还是最容易的。<br />
-<img src="http://115.182.41.123/files/201906/waterMark/ps-layers.png" alt="" /><br />
-<img src="http://115.182.41.123/files/201906/waterMark/logo.png" alt="" /></p>
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/ps-layers.png" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/logo.png" alt="" /></p>
 
 <p>在程序中操作图片，最强大的当然是opencv库。给工程师用，拿Python写个脚本就够了。如果是给普通用户，可以编译为可执行文件的c/c++肯定是更优选。</p>
 
@@ -76,7 +76,7 @@ g++ <span class="nt">-std</span><span class="o">=</span>c++11 <span class="nt">-
 <span class="nv">$ </span>./wmv1
 </code></pre></div></div>
 <p>在一张样本的图片上运行这个程序，得到的结果效果如下：<br />
-<img src="http://115.182.41.123/files/201906/waterMark/wmv1.jpg" alt="" /></p>
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/wmv1.jpg" alt="" /></p>
 
 <p>看起来，完美的解决了用户的需求，完活收工……</p>
 
@@ -176,7 +176,7 @@ opencv中调整图片的尺寸很容易，我们可以要求用户输入一个�
 <span class="err">$</span> <span class="p">.</span><span class="o">/</span><span class="n">wmv2</span> <span class="n">IMG_20190521_125150</span><span class="p">.</span><span class="n">jpg</span> <span class="n">IMG_20190521_125150</span><span class="o">-</span><span class="n">logoed</span><span class="p">.</span><span class="n">jpg</span> <span class="n">logo</span><span class="p">.</span><span class="n">png</span> <span class="mi">150</span> <span class="mi">100</span> <span class="mi">100</span>
 </code></pre></div></div>
 <p>得到的图片如下：<br />
-<img src="http://115.182.41.123/files/201906/waterMark/wmv2.jpg" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/wmv2.jpg" alt="" /><br />
 看起来顺眼多了，刚才的问题，也都得到了解决。</p>
 
 <p>我们就不再“装作”有用户的样子，相信刚才描述的用户反馈，大多人都有过这种经历，谁也不开心别人在自己的心血上指手画脚。但在真实的工作中，往往如此。<br />
@@ -421,9 +421,9 @@ opencv中调整图片的尺寸很容易，我们可以要求用户输入一个�
 </blockquote>
 
 <p>假设我们当前目录准备了一张图片叫DSCF2183.jpg：
-<img src="http://115.182.41.123/files/201906/waterMark/DSCF2183.jpg" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/DSCF2183.jpg" alt="" /><br />
 并且准备两个logo水印文件，一张logo.png是刚才的黑白图片，另外一张logo1.png是红字黑底的图片：<br />
-<img src="http://115.182.41.123/files/201906/waterMark/logo1.png" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/logo1.png" alt="" /><br />
 我们把第三版的程序编译一下，然后做几个测试，</p>
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ./mkcv4.sh wmv3
 $ ./wmv3 -i DSCF2183.jpg
@@ -436,7 +436,7 @@ copy:0
 $
 </code></pre></div></div>
 <p>这是最简的运行模式，只需要一个输入文件。水印文件自动缩放到目标图片宽度的30%，然后透明叠加在右下角：<br />
-<img src="http://115.182.41.123/files/201906/waterMark/DSCF2183_wite.jpg" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/DSCF2183_wite.jpg" alt="" /><br />
 简单使用-c参数，可以用覆盖的方式叠加水印：</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./wmv3 <span class="nt">-i</span> DSCF2183.jpg <span class="nt">-c</span>
 input:DSCF2183.jpg
@@ -446,7 +446,7 @@ scale:0.300000
 postion:0
 copy:1
 </code></pre></div></div>
-<p><img src="http://115.182.41.123/files/201906/waterMark/DSCF2183_wite_copy.jpg" alt="" /><br />
+<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/DSCF2183_wite_copy.jpg" alt="" /><br />
 更换第二幅水印logo来试试：</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./wmv3 <span class="nt">-i</span> DSCF2183.jpg <span class="nt">--logo</span> logo1.png <span class="nt">-o</span> DSCF2183_red.jpg
 input:DSCF2183.jpg
@@ -463,8 +463,8 @@ scale:0.300000
 postion:0
 copy:1
 </code></pre></div></div>
-<p><img src="http://115.182.41.123/files/201906/waterMark/DSCF2183_red.jpg" alt="" /><br />
-<img src="http://115.182.41.123/files/201906/waterMark/DSCF2183_red_copy.jpg" alt="" /></p>
+<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/DSCF2183_red.jpg" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/DSCF2183_red_copy.jpg" alt="" /></p>
 
 <h3 id="补充">补充</h3>
 <p>作为一个命令行程序，第三版已经基本可以满足应用见用户了。忘了提醒你注意附加在程序内部的程序使用文档，千万注意保证文档的完善、准确。很多优秀的产品，用户能不能用的好，往往是由文档的水平决定的。<br />
@@ -486,7 +486,7 @@ copy:1
 <span class="nv">$ </span><span class="nb">sudo cp </span>wmv3 /usr/bin
 </code></pre></div></div>
 <p>这次为再多的图片加水印也不怕了，比如我们有一个测试文件夹，是这样的结构：<br />
-<img src="http://115.182.41.123/files/201906/waterMark/folderStructure.png" alt="" /><br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/folderStructure.png" alt="" /><br />
 只要如此执行就可以为文件夹下面，及其子文件夹中所有的jpg/jpeg/png文件添加水印：</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>markall.sh <span class="nb">test</span>
 </code></pre></div></div>

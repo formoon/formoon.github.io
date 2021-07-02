@@ -1,4 +1,4 @@
-I"�<p><img src="http://115.182.41.123/files/201712/angular.jpeg" alt="" />
+I"�<p><img srchttps://raw.githubusercontent.com/formoon/formoon.github.io/master/attachmentses/201712/angular.jpeg" alt="" />
 Angular2以后已经非常充分的面向对象化，所以很多原来在javascript中积累的技巧，都需要做出相应的调整。<br />
 检测当前浏览器类型、版本及设备类型，推荐使用：<a href="https://github.com/KoderLabs/ng2-device-detector">https://github.com/KoderLabs/ng2-device-detector</a>。github页面的介绍已经写的很详细，请直接阅读原文文档。这里只讲几个重点：</p>
 :ET

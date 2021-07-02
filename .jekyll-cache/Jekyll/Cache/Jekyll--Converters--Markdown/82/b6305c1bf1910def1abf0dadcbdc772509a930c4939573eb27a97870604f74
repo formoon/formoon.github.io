@@ -1,4 +1,4 @@
-I"�2<p><img src="http://115.182.41.123/files/202008/linearAlgerbra1.jpeg" alt="" /><br />
+I"�2<p><img srchttps://raw.githubusercontent.com/formoon/formoon.github.io/master/attachmentses/202008/linearAlgerbra1.jpeg" alt="" /><br />
 <script src="https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script></p>
 <h4 id="前言">前言</h4>
 <p>MATLAB一向是理工科学生的必备神器，但随着中美贸易冲突的一再升级，禁售与禁用的阴云也持续笼罩在高等学院的头顶。也许我们都应当考虑更多的途径，来辅助我们的学习和研究工作。<br />
@@ -980,7 +980,7 @@ SymPy和NumPy中都内置了QR分解算法，请看示例：</p>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
 <p>程序执行前首先要安装绘图软件包<code class="language-plaintext highlighter-rouge">pip3 install matplotlib</code>。安装完成后再次执行程序，除了得到上面相同的4行输出外，还会绘出如下的曲线，表现了斐波那契数列序号同数值之间的关系：
-<img src="http://115.182.41.123/files/202008/fibonacci.png" alt="" />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/202008/fibonacci.png" alt="" />
 在Win10的Linux子系统使用绘图功能的话，还需要配置X11协议的远程显示，请参考这篇文章：<a href="http://blog.17study.com.cn/2019/06/26/win10-wsl-python-matplotlib-show/">win10配置linux子系统使用python绘图并显示</a></p>
 
 <h4 id="马尔科夫矩阵">马尔科夫矩阵</h4>
@@ -1007,7 +1007,7 @@ SymPy和NumPy中都内置了QR分解算法，请看示例：</p>
 </span><span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
 <p>程序执行绘制的曲线如下：<br />
-<img src="http://115.182.41.123/files/202008/markov1.png" alt="" />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/202008/markov1.png" alt="" />
 程序在绘图中，使用了中文的图例注释。如果不做任何处理，出现的会是乱码。<code class="language-plaintext highlighter-rouge">plt.rcParams['font.sans-serif']=['Songti SC']</code>这一行代码，就是将默认绘图字体名sans-serif指定到使用系统宋体，从而正常显示中文。在不同的电脑上，要根据自己的电脑字体名称设置，选择一个替换。</p>
 
 <h4 id="对称矩阵复矩阵">对称矩阵、复矩阵</h4>
@@ -1192,8 +1192,8 @@ SymPy和NumPy中都内置了QR分解算法，请看示例：</p>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
 <p>绘制结果请看图：<br />
-<img src="http://115.182.41.123/files/202008/positive_definite1.png" alt="" />
-<img src="http://115.182.41.123/files/202008/positive_definite2.png" alt="" />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/202008/positive_definite1.png" alt="" />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/202008/positive_definite2.png" alt="" />
 在第一张图片中，可以看到当c取值7时，有相当一部分图都位于0（Z轴)之下。<br />
 而第二张图片中，c取值20，所有曲线都会在0之上了，代表xᵀAx&gt;0，矩阵是正定矩阵。<br />
 绘制的三维图片，可以使用鼠标拖动，从各个角度观察。还可以旋转、缩放、保存为图片文件。Python实在是数学学习和研究的利器。</p>

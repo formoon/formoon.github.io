@@ -2,12 +2,12 @@
 layout:         page
 title:          Angular7那些不得不说的事故
 subtitle:       说说那些坑
-card-image:		  http://115.182.41.123/files/201812/angular.jpg
+card-image:		  https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201812/angular.jpg
 date:           2018-12-14
 tags:           angular
 post-card-type: image
 ---
-![](http://115.182.41.123/files/201812/angular.jpg)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201812/angular.jpg)
 #### 题外话
 &emsp;&emsp;最近简直要忙死，所以停更了很久，你们会不会以为我人间蒸发了？  
 &emsp;&emsp;正文之前，请允许我先跑个题，就是关于忙的问题。  

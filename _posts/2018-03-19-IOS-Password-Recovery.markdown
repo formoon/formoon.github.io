@@ -2,12 +2,12 @@
 layout:         page
 title:          iPhone多次输入错误密码锁机后恢复
 subtitle:       刷机恢复（原内容丢失）
-card-image:     http://115.182.41.123/files/201803/iphoneitunes.jpg
+card-image:     https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201803/iphoneitunes.jpg
 date:           2018-03-18
 tags:           ios
 post-card-type: image
 ---
-![](http://115.182.41.123/files/201803/iphoneitunes.jpg)
+![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201803/iphoneitunes.jpg)
 1. 这个操作会完全丢失手机当前存储的资料，已经备份到iTunes的内容，将来可以通过iTunes恢复。已经被自动备份到iCloud的内容，比如通讯录，将来可以自动从iCloud恢复。以前没有备份过的资料，现在已经无法再备份。  
 2. 如果有发票，只是丢失了包装，还是可以尝试网上预约苹果店天才吧尝试官方恢复。主要是尽力证明手机确实是自己的，不是捡的、不是偷的。  
 3. 再次说明，手机刷机后原内容会丢失，确定可以接受继续看。
