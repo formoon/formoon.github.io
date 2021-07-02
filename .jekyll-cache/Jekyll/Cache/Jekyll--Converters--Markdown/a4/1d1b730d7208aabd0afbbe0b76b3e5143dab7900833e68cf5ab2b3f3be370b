@@ -1,0 +1,59 @@
+I"�<script language="JavaScript" type="text/javascript" src="https://kjur.github.io/jsrsasign/jsrsasign-all-min.js"></script>
+
+<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/bc1.jpg" alt="" /><br />
+上一篇中说过，ECDSA是BITCOIN的安全性核心，保证了任何人发布的信息不可篡改。而区块链，只是保证了每个人发布合法信息的权利。<br />
+电子签名说了这么久，很多人也在无意识间使用过，但仍然不知道电子签名到底是怎么回事，这个页面就做一个真正、实际上的ECDSA签名算法的演示。<br />
+电子签名算法有很多种，ECDSA并不是最先进的，只是随着比特币和区块链一起沾光走红而已。<br />
+=====================分割线========================
+<script language="JavaScript" type="text/javascript">
+function doGenerate() {
+  var f1 = document.form1;
+  var curve = f1.curve1.value;
+  var ec = new KJUR.crypto.ECDSA({"curve": curve});
+  var keypair = ec.generateKeyPairHex();
+  f1.prvkey1.value = keypair.ecprvhex;
+  f1.pubkey1.value = keypair.ecpubhex;
+}
+function doSign() {
+  var f1 = document.form1;
+  var prvkey = f1.prvkey1.value;
+  var curve = f1.curve1.value;
+  var sigalg = f1.sigalg1.value;
+  var msg1 = f1.msg1.value;
+  var sig = new KJUR.crypto.Signature({"alg": sigalg});
+  sig.init({d: prvkey, curve: curve});
+  sig.updateString(msg1);
+  var sigValueHex = sig.sign();
+  f1.sigval1.value = sigValueHex;
+}
+function doVerify() {
+  var f1 = document.form1;
+  var pubkey = f1.pubkey1.value;
+  var curve = f1.curve1.value;
+  var sigalg = f1.sigalg1.value;
+  var msg1 = f1.msg1.value;
+  var sigval = f1.sigval1.value;
+  var sig = new KJUR.crypto.Signature({"alg": sigalg, "prov": "cryptojs/jsrsa"});
+  sig.init({xy: pubkey, curve: curve});
+  sig.updateString(msg1);
+  var result = sig.verify(sigval);
+  if (result) {
+    alert("有效的ECDSA签名，信息确认为正确发布人签署！");
+  } else {
+    alert("无效的ECDSA签名，原始信息或者签名信息被修改过！");
+  }
+}
+</script></p>
+<h3 id="edcsa签名演示">EDCSA签名演示</h3>
+<h4 id="第一步生成签名用的秘钥打开网页会自动生成">(第一步)生成签名用的秘钥（打开网页会自动生成）：</h4>
+<form name="form1">
+<select name="curve1" style="display:none;">
+<option value="secp256r1">secp256r1 (= NIST P-256, P-256, prime256v1)
+<option value="secp256k1">secp256k1
+<option value="secp384r1" selected="">secp384r1 (= NIST P-384, P-384)
+&lt;/select&gt;
+<input type="button" value="generate EC key pair" onclick="doGenerate();" style="display:none;" />
+私钥（信息发出人保密保存，用于发布信息时候的签名）: <input type="text" name="prvkey1" value="" size="50" /><br />
+公钥（公开于网上，供他人验证信息时候使用）: <input type="text" name="pubkey1" value="" size="50" /><br />
+</option></option></option></select></form>
+:ET

@@ -1,0 +1,129 @@
+I"�;<p><img src="http://www.elecfans.com/uploads/allimg/151126/1965345-1511261149440-L.jpg" alt="" />
+图像识别、人脸识别可行的算法有很多。但是作为学习，如果能理清这个问题研究的历程及其主线，会对你深入理解当前研究最新的发展有很多帮助。本文是自己在学习过程中的笔记，大多内容来自于网络，出处请参考最后的引文部分。</p>
+
+<h4 id="sift算法">Sift算法</h4>
+<p>Sift算法是David Lowe于1999年提出的局部特征描述子，并于2004年进行了更深入的发展和完善。Sift特征匹配算法可以处理两幅图像之间发生平移、旋转、仿射变换情况下的匹配问题，具有很强的匹配能力。总体来说，Sift算子具有以下特性：</p>
+<ol>
+  <li>Sift特征是图像的局部特征，对平移、旋转、尺度缩放、亮度变化、遮挡和噪声等具有良好的不变性，对视觉变化、仿射变换也保持一定程度的稳定性。</li>
+  <li>独特性好，信息量丰富，适用于在海量特征数据库中进行快速、准确的匹配。</li>
+  <li>多量性，即使少数的几个物体也可以产生大量Sift特征向量。</li>
+  <li>速度相对较快，经优化的Sift匹配算法甚至可以达到实时的要求。</li>
+  <li>可扩展性强，可以很方便的与其他形式的特征向量进行联合。</li>
+</ol>
+
+<p>其Sift算法的三大工序为：</p>
+<ol>
+  <li>提取关键点；</li>
+  <li>对关键点附加详细的信息（局部特征）也就是所谓的描述器；</li>
+  <li>通过两方特征点（附带上特征向量的关键点）的两两比较找出相互匹配的若干对特征点，也就建立了景物间的对应关系。</li>
+</ol>
+
+<p>提取关键点和对关键点附加详细的信息（局部特征）也就是所谓的描述器可以称做是Sift特征的生成，即从多幅图像中提取对尺度缩放、旋转、亮度变化无关的特征向量，Sift特征的生成一般包括以下几个步骤：</p>
+<ol>
+  <li>构建尺度空间，检测极值点，获得尺度不变性；</li>
+  <li>特征点过滤并进行精确定位；</li>
+  <li>为特征点分配方向值；</li>
+  <li>生成特征描述子；</li>
+</ol>
+
+<h4 id="surf算法">Surf算法</h4>
+<p>SURF是speed up robust feature的缩写，可以视为加速版的Sift算法。<br />
+SURF的特点：</p>
+<ol>
+  <li>使用积分图像完成图像卷积（相关）操作;</li>
+  <li>使用Hessian矩阵检测特征值；</li>
+  <li>使用基于分布的描述符（局部信息）。</li>
+</ol>
+
+<p>SURF算法的一般步骤为：</p>
+<ol>
+  <li>构建Hessian矩阵；</li>
+  <li>构建尺度空间；</li>
+  <li>精确定位特征点；</li>
+  <li>主方向确定；</li>
+</ol>
+
+<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201803/30/building1.png" alt="" />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201803/30/building2.png" alt="" /></p>
+
+<p>跟TensorFlow中碰到的情况一样，目前这些常用的算法，在大多的机器学习框架中都已经封装完成了。使用者已经不需要详细的了解内在算法就可以直接使用。</p>
+
+<p>下面是网上转来的使用OPENCV进行SURF特征点检测示例源码：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include "highgui/highgui.hpp"    
+#include "opencv2/nonfree/nonfree.hpp"    
+#include "opencv2/legacy/legacy.hpp"   
+#include &lt;iostream&gt;  
+</span>  
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">cv</span><span class="p">;</span>  
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>  
+  
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span><span class="kt">char</span> <span class="o">*</span><span class="n">argv</span><span class="p">[])</span>    
+<span class="p">{</span>    
+    <span class="n">Mat</span> <span class="n">image01</span><span class="o">=</span><span class="n">imread</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]);</span>    
+    <span class="n">Mat</span> <span class="n">image02</span><span class="o">=</span><span class="n">imread</span><span class="p">(</span><span class="n">argv</span><span class="p">[</span><span class="mi">2</span><span class="p">]);</span>    
+    <span class="n">Mat</span> <span class="n">image1</span><span class="p">,</span><span class="n">image2</span><span class="p">;</span>    
+    <span class="n">image1</span><span class="o">=</span><span class="n">image01</span><span class="p">.</span><span class="n">clone</span><span class="p">();</span>  
+    <span class="n">image2</span><span class="o">=</span><span class="n">image02</span><span class="p">.</span><span class="n">clone</span><span class="p">();</span>  
+  
+    <span class="c1">//提取特征点    </span>
+    <span class="n">SurfFeatureDetector</span> <span class="n">surfDetector</span><span class="p">(</span><span class="mi">4000</span><span class="p">);</span>  <span class="c1">//hessianThreshold,海塞矩阵阈值，并不是限定特征点的个数   </span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="n">KeyPoint</span><span class="o">&gt;</span> <span class="n">keyPoint1</span><span class="p">,</span><span class="n">keyPoint2</span><span class="p">;</span>    
+    <span class="n">surfDetector</span><span class="p">.</span><span class="n">detect</span><span class="p">(</span><span class="n">image1</span><span class="p">,</span><span class="n">keyPoint1</span><span class="p">);</span>    
+    <span class="n">surfDetector</span><span class="p">.</span><span class="n">detect</span><span class="p">(</span><span class="n">image2</span><span class="p">,</span><span class="n">keyPoint2</span><span class="p">);</span>    
+  
+    <span class="c1">//绘制特征点    </span>
+    <span class="n">drawKeypoints</span><span class="p">(</span><span class="n">image1</span><span class="p">,</span><span class="n">keyPoint1</span><span class="p">,</span><span class="n">image1</span><span class="p">,</span><span class="n">Scalar</span><span class="o">::</span><span class="n">all</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="n">DrawMatchesFlags</span><span class="o">::</span><span class="n">DEFAULT</span><span class="p">);</span>      
+    <span class="n">drawKeypoints</span><span class="p">(</span><span class="n">image2</span><span class="p">,</span><span class="n">keyPoint2</span><span class="p">,</span><span class="n">image2</span><span class="p">,</span><span class="n">Scalar</span><span class="o">::</span><span class="n">all</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="n">DrawMatchesFlags</span><span class="o">::</span><span class="n">DRAW_RICH_KEYPOINTS</span><span class="p">);</span>       
+    <span class="n">imshow</span><span class="p">(</span><span class="s">"KeyPoints of image1"</span><span class="p">,</span><span class="n">image1</span><span class="p">);</span>    
+    <span class="n">imshow</span><span class="p">(</span><span class="s">"KeyPoints of image2"</span><span class="p">,</span><span class="n">image2</span><span class="p">);</span>    
+  
+    <span class="c1">//特征点描述，为下边的特征点匹配做准备    </span>
+    <span class="n">SurfDescriptorExtractor</span> <span class="n">SurfDescriptor</span><span class="p">;</span>    
+    <span class="n">Mat</span> <span class="n">imageDesc1</span><span class="p">,</span><span class="n">imageDesc2</span><span class="p">;</span>    
+    <span class="n">SurfDescriptor</span><span class="p">.</span><span class="n">compute</span><span class="p">(</span><span class="n">image1</span><span class="p">,</span><span class="n">keyPoint1</span><span class="p">,</span><span class="n">imageDesc1</span><span class="p">);</span>    
+    <span class="n">SurfDescriptor</span><span class="p">.</span><span class="n">compute</span><span class="p">(</span><span class="n">image2</span><span class="p">,</span><span class="n">keyPoint2</span><span class="p">,</span><span class="n">imageDesc2</span><span class="p">);</span>    
+  
+    <span class="c1">//特征点匹配并显示匹配结果    </span>
+    <span class="c1">//BruteForceMatcher&lt;L2&lt;float&gt;&gt; matcher;    </span>
+    <span class="n">FlannBasedMatcher</span> <span class="n">matcher</span><span class="p">;</span>  
+    <span class="n">vector</span><span class="o">&lt;</span><span class="n">DMatch</span><span class="o">&gt;</span> <span class="n">matchePoints</span><span class="p">;</span>    
+    <span class="n">matcher</span><span class="p">.</span><span class="n">match</span><span class="p">(</span><span class="n">imageDesc1</span><span class="p">,</span><span class="n">imageDesc2</span><span class="p">,</span><span class="n">matchePoints</span><span class="p">,</span><span class="n">Mat</span><span class="p">());</span>  
+  
+    <span class="c1">//提取强特征点  </span>
+    <span class="kt">double</span> <span class="n">minMatch</span><span class="o">=</span><span class="mi">1</span><span class="p">;</span>  
+    <span class="kt">double</span> <span class="n">maxMatch</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>  
+    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">matchePoints</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="n">i</span><span class="o">++</span><span class="p">)</span>  
+    <span class="p">{</span>  
+        <span class="c1">//匹配值最大最小值获取  </span>
+        <span class="n">minMatch</span><span class="o">=</span><span class="n">minMatch</span><span class="o">&gt;</span><span class="n">matchePoints</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">distance</span><span class="o">?</span><span class="n">matchePoints</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">distance</span><span class="o">:</span><span class="n">minMatch</span><span class="p">;</span>  
+        <span class="n">maxMatch</span><span class="o">=</span><span class="n">maxMatch</span><span class="o">&lt;</span><span class="n">matchePoints</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">distance</span><span class="o">?</span><span class="n">matchePoints</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">distance</span><span class="o">:</span><span class="n">maxMatch</span><span class="p">;</span>  
+    <span class="p">}</span>  
+    <span class="c1">//最大最小值输出  </span>
+    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">"最佳匹配值是： "</span><span class="o">&lt;&lt;</span><span class="n">minMatch</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>  
+    <span class="n">cout</span><span class="o">&lt;&lt;</span><span class="s">"最差匹配值是： "</span><span class="o">&lt;&lt;</span><span class="n">maxMatch</span><span class="o">&lt;&lt;</span><span class="n">endl</span><span class="p">;</span>  
+  
+    <span class="c1">//获取排在前边的几个最优匹配结果  </span>
+    <span class="n">vector</span><span class="o">&lt;</span><span class="n">DMatch</span><span class="o">&gt;</span> <span class="n">goodMatchePoints</span><span class="p">;</span>  
+    <span class="k">for</span><span class="p">(</span><span class="kt">int</span> <span class="n">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span><span class="n">i</span><span class="o">&lt;</span><span class="n">matchePoints</span><span class="p">.</span><span class="n">size</span><span class="p">();</span><span class="n">i</span><span class="o">++</span><span class="p">)</span>  
+    <span class="p">{</span>  
+        <span class="k">if</span><span class="p">(</span><span class="n">matchePoints</span><span class="p">[</span><span class="n">i</span><span class="p">].</span><span class="n">distance</span><span class="o">&lt;</span><span class="n">minMatch</span><span class="o">+</span><span class="p">(</span><span class="n">maxMatch</span><span class="o">-</span><span class="n">minMatch</span><span class="p">)</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>  
+        <span class="p">{</span>  
+            <span class="n">goodMatchePoints</span><span class="p">.</span><span class="n">push_back</span><span class="p">(</span><span class="n">matchePoints</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>  
+        <span class="p">}</span>  
+    <span class="p">}</span>  
+  
+    <span class="c1">//绘制最优匹配点  </span>
+    <span class="n">Mat</span> <span class="n">imageOutput</span><span class="p">;</span>  
+    <span class="n">drawMatches</span><span class="p">(</span><span class="n">image01</span><span class="p">,</span><span class="n">keyPoint1</span><span class="p">,</span><span class="n">image02</span><span class="p">,</span><span class="n">keyPoint2</span><span class="p">,</span><span class="n">goodMatchePoints</span><span class="p">,</span><span class="n">imageOutput</span><span class="p">,</span><span class="n">Scalar</span><span class="o">::</span><span class="n">all</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span>  
+        <span class="n">Scalar</span><span class="o">::</span><span class="n">all</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">),</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">char</span><span class="o">&gt;</span><span class="p">(),</span><span class="n">DrawMatchesFlags</span><span class="o">::</span><span class="n">NOT_DRAW_SINGLE_POINTS</span><span class="p">);</span>       
+    <span class="n">imshow</span><span class="p">(</span><span class="s">"Mathch Points"</span><span class="p">,</span><span class="n">imageOutput</span><span class="p">);</span>    
+    <span class="n">waitKey</span><span class="p">();</span>    
+    <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>    
+<span class="p">}</span>  
+</code></pre></div></div>
+
+<h4 id="引文及参考">引文及参考</h4>
+<p><a href="http://wuzizhang.blog.163.com/blog/static/78001208201138102648854/">SURF算法原理</a><br />
+<a href="https://blog.csdn.net/dcrmg/article/details/52602277">Opencv Surf算子特征提取与最优匹配</a><br />
+<a href="https://www.cnblogs.com/tornadomeet/archive/2012/08/17/2644903.html">特征点检测学习_2(surf算法)</a></p>
+:ET

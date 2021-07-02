@@ -1,0 +1,34 @@
+I"�<script src="https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/gradient/gradient-descent.jpeg" alt="" /><br />
+前面一篇就是基础性的推导过程。从反馈的情况看，总体还是讲明白了。但是在导数的部分，仍有不少的存疑。<br />
+其实在数学方面，我也是学渣。所以尽我所能，希望再次的补充能讲的明白。若有谬误，期盼指正。</p>
+<h3 id="基础公式">基础公式</h3>
+<p>所需基础公式抄录于下，不明白的请至<a href="http://blog.17study.com.cn/2019/06/21/basic-gradient-descent/">上篇</a>查看详解。</p>
+<h4 id="假设函数">假设函数</h4>
+<p>
+$$
+y' = h_θ(x) = \sum_{i=0}^nθ_ix_i
+$$
+</p>
+<h4 id="均方差损失函数">均方差损失函数</h4>
+<p>
+$$
+J(θ) = \frac1{2m}\sum_{i=1}^m(h_θ(x^{(i)}) - y^{(i)})^2
+$$
+</p>
+<h4 id="梯度下降求解θ">梯度下降求解θ</h4>
+<p>
+$$
+θ_j := θ_j - α\frac∂{∂θ_j}J(θ)
+$$
+摘出来上面公式步长α之后的部分：  
+$$
+\begin{align}
+\frac∂{∂θ_j}J(θ) &amp; = \frac∂{∂θ_j}\frac1{2m}\sum_{i=1}^m(h_θ(x^{(i)}) - y^{(i)})^2 \\
+                &amp; = \frac1m\sum_{i=1}^m(h_θ(x^{(i)}) - y^{(i)})x_j^i
+\end{align}
+$$
+</p>
+<p>嗯，问题一般就是出在这里了，很多人尝试了化简，得不到上面的化简结果。</p>
+:ET

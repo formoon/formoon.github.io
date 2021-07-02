@@ -1,0 +1,185 @@
+I"KO<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201804/camerai.jpg" alt="" />
+工作环境比较恶劣并且有较多干扰源的环境做视觉识别一般都使用工业相机，大恒水晶相机是比较常用的一种。比起来进口相机，虽然用起来会更麻烦，但好在价格便宜，各项指标也不低。<br />
+大恒水晶相机是提供SDK的方式跟OPENCV类的系统做集成，还做不到像很多进口相机一样直接就有了系统级的驱动，这方面的资料还是不少的，下面是在网上摘的一个例子：（<a href="https://blog.csdn.net/nameix/article/details/78308778">来源</a>）</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// test.cpp : 定义控制台应用程序的入口点。</span>
+<span class="c1">//</span>
+
+<span class="cp">#include "stdafx.h"
+#include "GxIAPI.h"
+#include "DxImageProc.h"
+#include &lt;opencv2/core/core.hpp&gt;
+#include &lt;opencv2/imgproc/imgproc.hpp&gt;
+#include &lt;opencv2/highgui/highgui.hpp&gt;
+#include &lt;iostream&gt;
+</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">cv</span><span class="p">;</span>
+
+<span class="n">GX_DEV_HANDLE</span>       <span class="n">m_hDevice</span><span class="p">;</span>              <span class="c1">///&lt; 设备句柄</span>
+<span class="n">BYTE</span>                <span class="o">*</span><span class="n">m_pBufferRaw</span><span class="p">;</span>          <span class="c1">///&lt; 原始图像数据</span>
+<span class="n">BYTE</span>                <span class="o">*</span><span class="n">m_pBufferRGB</span><span class="p">;</span>	        <span class="c1">///&lt; RGB图像数据，用于显示和保存bmp图像</span>
+<span class="kt">int64_t</span>             <span class="n">m_nImageHeight</span><span class="p">;</span>         <span class="c1">///&lt; 原始图像高</span>
+<span class="kt">int64_t</span>             <span class="n">m_nImageWidth</span><span class="p">;</span>          <span class="c1">///&lt; 原始图像宽</span>
+<span class="kt">int64_t</span>             <span class="n">m_nPayLoadSize</span><span class="p">;</span>
+<span class="kt">int64_t</span>             <span class="n">m_nPixelColorFilter</span><span class="p">;</span>    <span class="c1">///&lt; Bayer格式</span>
+<span class="n">Mat</span> <span class="n">test</span><span class="p">;</span>
+
+<span class="c1">//图像回调处理函数</span>
+<span class="k">static</span> <span class="kt">void</span> <span class="n">GX_STDC</span> <span class="nf">OnFrameCallbackFun</span><span class="p">(</span><span class="n">GX_FRAME_CALLBACK_PARAM</span><span class="o">*</span> <span class="n">pFrame</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="c1">//PrepareForShowImg();</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">pFrame</span><span class="o">-&gt;</span><span class="n">status</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="c1">//对图像进行某些操作</span>
+		<span class="cm">/*memcpy(m_pBufferRaw, pFrame-&gt;pImgBuf, pFrame-&gt;nImgSize);
+		// 黑白相机需要翻转数据后显示
+		for (int i = 0; i &lt;m_nImageHeight; i++)		{
+			memcpy(m_pImageBuffer + i*m_nImageWidth, m_pBufferRaw + (m_nImageHeight - i - 1)*m_nImageWidth, (size_t)m_nImageWidth);
+		}
+		IplImage* src;
+		src = cvCreateImage(cvSize(m_nImageWidth, m_nImageHeight), 8, 1);
+		src-&gt;imageData = (char*)m_pImageBuffer;
+		cvSaveImage("src.jpg", src);*/</span>
+		<span class="n">memcpy</span><span class="p">(</span><span class="n">m_pBufferRaw</span><span class="p">,</span> <span class="n">pFrame</span><span class="o">-&gt;</span><span class="n">pImgBuf</span><span class="p">,</span> <span class="n">pFrame</span><span class="o">-&gt;</span><span class="n">nImgSize</span><span class="p">);</span>
+
+		<span class="c1">// RGB转换</span>
+		<span class="n">DxRaw8toRGB24</span><span class="p">(</span><span class="n">m_pBufferRaw</span>
+			<span class="p">,</span> <span class="n">m_pBufferRGB</span>
+			<span class="p">,</span> <span class="p">(</span><span class="n">VxUint32</span><span class="p">)(</span><span class="n">m_nImageWidth</span><span class="p">)</span>
+			<span class="p">,</span> <span class="p">(</span><span class="n">VxUint32</span><span class="p">)(</span><span class="n">m_nImageHeight</span><span class="p">)</span>
+			<span class="p">,</span> <span class="n">RAW2RGB_NEIGHBOUR</span>
+			<span class="p">,</span> <span class="n">DX_PIXEL_COLOR_FILTER</span><span class="p">(</span><span class="n">m_nPixelColorFilter</span><span class="p">)</span>
+			<span class="p">,</span> <span class="nb">false</span><span class="p">);</span>
+	<span class="c1">//	cv_Image-&gt;imageData = (char*)m_pBufferRGB;</span>
+
+	<span class="c1">//	cvSaveImage("./test.bmp", cv_Image);</span>
+		
+		<span class="c1">//test.data = m_pBufferRaw;</span>
+		<span class="n">memcpy</span><span class="p">(</span><span class="n">test</span><span class="p">.</span><span class="n">data</span><span class="p">,</span> <span class="n">m_pBufferRGB</span><span class="p">,</span> <span class="n">m_nImageWidth</span><span class="o">*</span><span class="n">m_nImageHeight</span> <span class="o">*</span> <span class="mi">3</span><span class="p">);</span>
+		<span class="n">imwrite</span><span class="p">(</span><span class="s">"./test1.bmp"</span><span class="p">,</span> <span class="n">test</span><span class="p">);</span>
+		<span class="n">namedWindow</span><span class="p">(</span><span class="s">"test"</span><span class="p">);</span>
+		<span class="n">imshow</span><span class="p">(</span><span class="s">"test"</span><span class="p">,</span> <span class="n">test</span><span class="p">);</span>
+		<span class="n">waitKey</span><span class="p">(</span><span class="mi">15</span><span class="p">);</span>
+		
+	<span class="p">}</span>
+	<span class="k">return</span><span class="p">;</span>
+<span class="p">}</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+	<span class="n">GX_STATUS</span> <span class="n">emStatus</span> <span class="o">=</span> <span class="n">GX_STATUS_SUCCESS</span><span class="p">;</span>
+	<span class="n">GX_OPEN_PARAM</span> <span class="n">openParam</span><span class="p">;</span>
+	<span class="kt">uint32_t</span>      <span class="n">nDeviceNum</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="n">openParam</span><span class="p">.</span><span class="n">accessMode</span> <span class="o">=</span> <span class="n">GX_ACCESS_EXCLUSIVE</span><span class="p">;</span>
+	<span class="n">openParam</span><span class="p">.</span><span class="n">openMode</span> <span class="o">=</span> <span class="n">GX_OPEN_INDEX</span><span class="p">;</span>
+	<span class="n">openParam</span><span class="p">.</span><span class="n">pszContent</span> <span class="o">=</span> <span class="s">"1"</span><span class="p">;</span>
+	<span class="c1">// 初始化库 </span>
+	<span class="n">emStatus</span> <span class="o">=</span> <span class="n">GXInitLib</span><span class="p">();</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">emStatus</span> <span class="o">!=</span> <span class="n">GX_STATUS_SUCCESS</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="p">}</span>
+	<span class="c1">// 枚举设备列表</span>
+	<span class="n">emStatus</span> <span class="o">=</span> <span class="n">GXUpdateDeviceList</span><span class="p">(</span><span class="o">&amp;</span><span class="n">nDeviceNum</span><span class="p">,</span> <span class="mi">1000</span><span class="p">);</span>
+	<span class="k">if</span> <span class="p">((</span><span class="n">emStatus</span> <span class="o">!=</span> <span class="n">GX_STATUS_SUCCESS</span><span class="p">)</span> <span class="o">||</span> <span class="p">(</span><span class="n">nDeviceNum</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">))</span>
+	<span class="p">{</span>
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="p">}</span>
+	<span class="c1">//打开设备</span>
+	<span class="n">emStatus</span> <span class="o">=</span> <span class="n">GXOpenDevice</span><span class="p">(</span><span class="o">&amp;</span><span class="n">openParam</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">m_hDevice</span><span class="p">);</span>
+	
+
+	<span class="c1">//设置采集模式连续采集</span>
+	<span class="n">emStatus</span> <span class="o">=</span> <span class="n">GXSetEnum</span><span class="p">(</span><span class="n">m_hDevice</span><span class="p">,</span> <span class="n">GX_ENUM_ACQUISITION_MODE</span><span class="p">,</span> <span class="n">GX_ACQ_MODE_CONTINUOUS</span><span class="p">);</span>
+	<span class="n">emStatus</span> <span class="o">=</span> <span class="n">GXSetInt</span><span class="p">(</span><span class="n">m_hDevice</span><span class="p">,</span> <span class="n">GX_INT_ACQUISITION_SPEED_LEVEL</span><span class="p">,</span> <span class="mi">1</span><span class="p">);</span>
+	<span class="n">emStatus</span> <span class="o">=</span> <span class="n">GXSetEnum</span><span class="p">(</span><span class="n">m_hDevice</span><span class="p">,</span> <span class="n">GX_ENUM_BALANCE_WHITE_AUTO</span><span class="p">,</span> <span class="n">GX_BALANCE_WHITE_AUTO_CONTINUOUS</span><span class="p">);</span>
+
+	<span class="kt">bool</span>      <span class="n">bColorFliter</span> <span class="o">=</span> <span class="nb">false</span><span class="p">;</span>
+	<span class="c1">// 获取图像大小</span>
+	<span class="n">emStatus</span> <span class="o">=</span> <span class="n">GXGetInt</span><span class="p">(</span><span class="n">m_hDevice</span><span class="p">,</span> <span class="n">GX_INT_PAYLOAD_SIZE</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">m_nPayLoadSize</span><span class="p">);</span>
+	<span class="c1">// 获取宽度</span>
+	<span class="n">emStatus</span> <span class="o">=</span> <span class="n">GXGetInt</span><span class="p">(</span><span class="n">m_hDevice</span><span class="p">,</span> <span class="n">GX_INT_WIDTH</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">m_nImageWidth</span><span class="p">);</span>
+	<span class="c1">// 获取高度</span>
+	<span class="n">emStatus</span> <span class="o">=</span> <span class="n">GXGetInt</span><span class="p">(</span><span class="n">m_hDevice</span><span class="p">,</span> <span class="n">GX_INT_HEIGHT</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">m_nImageHeight</span><span class="p">);</span>
+	<span class="n">test</span><span class="p">.</span><span class="n">create</span><span class="p">(</span><span class="n">m_nImageHeight</span><span class="p">,</span> <span class="n">m_nImageWidth</span><span class="p">,</span> <span class="n">CV_8UC3</span><span class="p">);</span>
+	<span class="c1">//判断相机是否支持bayer格式</span>
+	<span class="kt">bool</span> <span class="n">m_bColorFilter</span><span class="p">;</span>
+	<span class="n">emStatus</span> <span class="o">=</span> <span class="n">GXIsImplemented</span><span class="p">(</span><span class="n">m_hDevice</span><span class="p">,</span> <span class="n">GX_ENUM_PIXEL_COLOR_FILTER</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">m_bColorFilter</span><span class="p">);</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">m_bColorFilter</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="n">emStatus</span> <span class="o">=</span> <span class="n">GXGetEnum</span><span class="p">(</span><span class="n">m_hDevice</span><span class="p">,</span> <span class="n">GX_ENUM_PIXEL_COLOR_FILTER</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">m_nPixelColorFilter</span><span class="p">);</span>
+	<span class="p">}</span>
+
+	<span class="n">m_pBufferRGB</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BYTE</span><span class="p">[(</span><span class="kt">size_t</span><span class="p">)(</span><span class="n">m_nImageWidth</span> <span class="o">*</span> <span class="n">m_nImageHeight</span> <span class="o">*</span> <span class="mi">3</span><span class="p">)];</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">m_pBufferRGB</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="c1">//为存储原始图像数据申请空间</span>
+	<span class="n">m_pBufferRaw</span> <span class="o">=</span> <span class="k">new</span> <span class="n">BYTE</span><span class="p">[(</span><span class="kt">size_t</span><span class="p">)</span><span class="n">m_nPayLoadSize</span><span class="p">];</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">m_pBufferRaw</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="k">delete</span><span class="p">[]</span><span class="n">m_pBufferRGB</span><span class="p">;</span>
+		<span class="n">m_pBufferRGB</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+
+		<span class="k">return</span> <span class="nb">false</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="c1">//注册图像处理回调函数</span>
+	<span class="n">emStatus</span> <span class="o">=</span> <span class="n">GXRegisterCaptureCallback</span><span class="p">(</span><span class="n">m_hDevice</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">,</span> <span class="n">OnFrameCallbackFun</span><span class="p">);</span>
+	<span class="c1">//发送开采命令</span>
+	<span class="n">emStatus</span> <span class="o">=</span> <span class="n">GXSendCommand</span><span class="p">(</span><span class="n">m_hDevice</span><span class="p">,</span> <span class="n">GX_COMMAND_ACQUISITION_START</span><span class="p">);</span>
+	<span class="c1">//---------------------</span>
+	<span class="c1">//</span>
+	<span class="c1">//在这个区间图像会通过OnFrameCallbackFun接口返给用户</span>
+	<span class="n">Sleep</span><span class="p">(</span><span class="mi">100000</span><span class="p">);</span>
+	<span class="c1">//</span>
+	<span class="c1">//---------------------</span>
+	<span class="c1">//发送停采命令</span>
+	<span class="n">emStatus</span> <span class="o">=</span> <span class="n">GXSendCommand</span><span class="p">(</span><span class="n">m_hDevice</span><span class="p">,</span> <span class="n">GX_COMMAND_ACQUISITION_STOP</span><span class="p">);</span>
+	<span class="c1">//注销采集回调</span>
+	<span class="n">emStatus</span> <span class="o">=</span> <span class="n">GXUnregisterCaptureCallback</span><span class="p">(</span><span class="n">m_hDevice</span><span class="p">);</span>
+
+	<span class="k">if</span> <span class="p">(</span><span class="n">m_pBufferRGB</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="k">delete</span><span class="p">[]</span><span class="n">m_pBufferRGB</span><span class="p">;</span>
+		<span class="n">m_pBufferRGB</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+	<span class="p">}</span>
+	<span class="k">if</span> <span class="p">(</span><span class="n">m_pBufferRaw</span> <span class="o">!=</span> <span class="nb">NULL</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="k">delete</span><span class="p">[]</span><span class="n">m_pBufferRaw</span><span class="p">;</span>
+		<span class="n">m_pBufferRaw</span> <span class="o">=</span> <span class="nb">NULL</span><span class="p">;</span>
+	<span class="p">}</span>
+	<span class="n">emStatus</span> <span class="o">=</span> <span class="n">GXCloseDevice</span><span class="p">(</span><span class="n">m_hDevice</span><span class="p">);</span>
+	<span class="n">emStatus</span> <span class="o">=</span> <span class="n">GXCloseLib</span><span class="p">();</span>
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>一般在工业设备上使用，需要进行监控及智能图像识别的点往往会多于一个，这时候这种使用网络进行数据传输的相机就显示出来优势了。<br />
+从大恒相机的开发手册上可以查到,函数调用：<code class="language-plaintext highlighter-rouge"> status = GXUpdateDeviceList(&amp;nDeviceNum, 1000);</code>返回的nDeviceNum就是当前网络上存在的相机数量。<br />
+随后可以使用相机的索引、序列号或者MAC地址方式来打开指定的相机。在网络环境简单的情况下，也可以使用IP地址打开指定相机，但通常这样会增加额外的设备安装时配置工作，所以并不建议。</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//打开枚举列表中的第一台设备。</span>
+<span class="c1">//假设枚举到了3台可用设备，那么用户可设置stOpenParam参数的pszContent字段为1、2、3</span>
+       <span class="n">stOpenParam</span><span class="p">.</span><span class="n">accessMode</span> <span class="o">=</span> <span class="n">GX_ACCESS_EXCLUSIVE</span><span class="p">;</span>
+       <span class="n">stOpenParam</span><span class="p">.</span><span class="n">openMode</span>   <span class="o">=</span> <span class="n">GX_OPEN_INDEX</span><span class="p">;</span>
+       <span class="n">stOpenParam</span><span class="p">.</span><span class="n">pszContent</span> <span class="o">=</span> <span class="s">"1"</span><span class="p">;</span>
+	   
+<span class="c1">//通过序列号打开设备</span>
+       <span class="n">stOpenParam</span><span class="p">.</span><span class="n">openMode</span> <span class="o">=</span> <span class="n">GX_OPEN_SN</span><span class="p">;</span>
+       <span class="n">stOpenParam</span><span class="p">.</span><span class="n">pszContent</span> <span class="o">=</span> <span class="s">"EA00010002"</span><span class="p">;</span>
+
+<span class="c1">//通过IP地址打开设备</span>
+      <span class="c1">//stOpenParam.openMode = GX_OPEN_IP;</span>
+      <span class="c1">//stOpenParam.pszContent = "192.168.40.35";</span>
+
+<span class="c1">//通过MAC地址打开设备</span>
+      <span class="c1">//stOpenParam.openMode = GX_OPEN_MAC;</span>
+      <span class="c1">//stOpenParam.pszContent = "54-04-A6-C2-7C-2F";</span>
+
+<span class="c1">//根据打开方式选择上面一种方式设置好参数后，可以使用下面函数打开相机</span>
+      <span class="n">status</span> <span class="o">=</span> <span class="n">GXOpenDevice</span><span class="p">(</span><span class="o">&amp;</span><span class="n">stOpenParam</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">hDevice</span><span class="p">);</span>
+</code></pre></div></div>
+<p>此外一个特别注意的小坑，SDK中提供了函数<code class="language-plaintext highlighter-rouge">GXGetAllDeviceBaseInfo</code>来遍历网络所有设备的信息，可以从其中查询相机的MAC地址、SN等各项信息。在实际工作中，可以使用这个函数获取相机信息后保存起来供以后打开相机使用，千万不能每次打开均使用此函数进行遍历查询，在一个网络设备较多的环境中，这个调用速度会非常慢，从而导致程序挂起。</p>
+
+:ET

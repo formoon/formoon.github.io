@@ -1,5 +1,0 @@
-I"v<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
-<h4 id="风格迁移">风格迁移</h4>
-<p><a href="http://blog.17study.com.cn/2018/01/15/tensorFlow-series-8/">《从锅炉工到AI专家(8)》</a>中我们介绍了一个“图片风格迁移”的例子。因为所引用的作品中使用了TensorFlow 1.x的代码，算法也相对复杂，所以文中没有仔细介绍风格迁移的原理。<br />
-今天在TensorFlow 2.0的帮助，和新算法思想的优化下，实现同样功能的代码量大幅减少，结构也越发清晰。所以今天就来讲讲这个话题。</p>
-:ET

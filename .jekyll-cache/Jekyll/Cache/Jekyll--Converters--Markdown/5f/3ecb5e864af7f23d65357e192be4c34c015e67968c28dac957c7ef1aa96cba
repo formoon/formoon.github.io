@@ -1,0 +1,4 @@
+I"}<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
+<h4 id="迁移学习基本概念">迁移学习基本概念</h4>
+<p>迁移学习是这两年比较火的一个话题，主要原因是在当前的机器学习中，样本数据的获取是成本最高的一块。而迁移学习可以有效的把原有的学习经验（对于模型就是模型本身及其训练好的权重值）带入到新的领域，从而不需要过多的样本数据，也能达到大批量数据所达成的效果，进一步节省了学习的计算量和时间。</p>
+:ET

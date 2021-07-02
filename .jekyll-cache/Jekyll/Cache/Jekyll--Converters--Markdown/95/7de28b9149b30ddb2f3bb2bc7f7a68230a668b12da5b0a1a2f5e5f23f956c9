@@ -1,0 +1,90 @@
+I",#<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201805/longxinbook.jpg" alt="" /><br />
+(图片是LEMOTE8089D笔记本，来自互联网)<br />
+YX原来送了一个LEMOTE笔记本给我。CPU是首款真正的国产，龙芯2F,兼容mips的指令集。<br />
+笔记本原来的操作系统是Debian6,后来升级到了7，随后一直是当做玩具放着。最近因为中兴受制裁的事件又想了起来，拿出来尝试看能做点什么。<br />
+首先做了常规升级，结果完成后重启动，笔记本直接挂了。<br />
+随后只好重新安装，因为笔记本出品时间比较长了，厂家似乎也业务转型，很多支持都无法获得了。所以这个安装过程，也不能说顺利，于是成文记录一下。</p>
+
+<h4 id="准备事项">准备事项</h4>
+<p>LEMOTE 8089D使用了PMON作为BootLoad和基本的系统调试、维护，这种模式很类似以前的APPLEII，应当说对于专业用户讲，比传统PC的BIOS更强大。<br />
+在PMON的支持下，可以使用U盘、网络两种方式安装系统。因为手头没有富裕的U盘，所以采用了网络安装的方式。<br />
+这种方式下，需要有另外一台电脑当做TFTP服务器，在线提供内核、基础根文件系统等启动文件。<br />
+启动文件可以直接到Debian的官网文件服务器中下载，也可以访问众多的镜像网站，我使用的是中科大的开源镜像，网址为:<a href="http://mirrors.ustc.edu.cn/debian/dists/Debian8.10/main/installer-mipsel/current/images/loongson-2f/netboot/">http://mirrors.ustc.edu.cn/debian/dists/Debian8.10/main/installer-mipsel/current/images/loongson-2f/netboot/</a><br />
+Debian8.10已经是当前Debian8中最高的版本，很可惜LEMOTE8089D不支持最新的Debian9系统，Debian9必须在龙芯3以上CPU运行。</p>
+<h4 id="基本安装">基本安装</h4>
+<p>下载完上述链接中的initrd.gz/vmlinux-3.16.0-4-loongson-2f两个文件放入到当做服务器的电脑TFTP根目录。注意因为Debian也在不断的更新中，路径、精确的版本号可能都在变化，所以不用太纠结细微的差别，通常只要对应版本的Debian提供了loongson-2f芯片的netboot文件，就应当可以顺利安装。<br />
+下载目录中另外一个文件boot.cfg是制作U盘启动盘使用的，单纯网络启动并不需要。
+在macOS上开启内置的tftp服务器的方法是，在命令行执行如下两条指令：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>launchctl load <span class="nt">-F</span> /System/Library/LaunchDaemons/tftp.plist
+<span class="nb">sudo </span>launchctl start com.apple.tftpd
+</code></pre></div></div>
+<p>当龙芯笔记本安装完成后，关闭tftp服务器使用：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>launchctl unload <span class="nt">-F</span> /System/Library/LaunchDaemons/tftp.plist
+<span class="nb">sudo </span>launchctl stop com.apple.tftpd
+</code></pre></div></div>
+<p>tftp服务的根目录路径为：/private/tftpboot/，上述下载的两个文件就放入此处。</p>
+
+<p>龙芯笔记本开机，出来提示画面的时候按住DEL键不松手，可以进入PMON状态。<br />
+假设你当前的网段是192.168.1.*，tftp服务器的IP地址是192.168.1.100。在PMON&gt;提示符之后键入如下4条指令：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#设定龙芯笔记本本机IP地址，注意网卡名是rtl0不是rt10</span>
+ifaddr rtl0 192.168.1.22
+<span class="c">#载入linux内核</span>
+load tftp://192.168.1.100/vmlinux-3.16.0-4-loongson-2f
+<span class="c">#载入根文件系统</span>
+initrd tftp://192.168.1.100/initrd.gz
+<span class="c">#使用载入的内核及根文件系统引导龙芯笔记本</span>
+g
+</code></pre></div></div>
+<p>顺利的话，龙芯笔记本会启动Debian安装界面，安装过程同平常的安装没有什么不同，此处省略。</p>
+
+<h4 id="基本安装的注意事项">基本安装的注意事项</h4>
+<ol>
+  <li>因为是网络安装，所以在提示选择网络源的时候，可以在另外一台电脑上用ping测试一下网址，选择一个快一点的。很可惜诸如中科大之类的镜像并不在官方的推荐中。一般来说在北京地区，直接选择第一个官方源速度就还不错。</li>
+  <li>选择桌面组件的时候，通常选择xface4,因为速度比较快。我选择了KDE,因为习惯了，这里应当是可以根据自己的喜好选择。不过我是建议使用官方推荐的xface4，因为在龙芯上跑KDE的确是太慢了。</li>
+</ol>
+
+<h4 id="配置调优">配置调优</h4>
+<p>根据网络的速度，安装需要一段时间，不过一般30分钟-1小时应当能顺利安装成功。<br />
+很可惜重启后就卡在了启动界面。这是因为龙芯的显卡兼容性造成的，通常的方式应当是安装龙芯自己的显卡驱动：xserver-xorg-video-siliconmotion-2.2.19.tar.gz，很可惜当前在网上几经寻找，已经找不到了这个驱动，所以只好采取了另外一种网友推荐的方式：删除现有显示驱动使用通用的显卡驱动。<br />
+刚才说卡在了启动界面，实际上并没有死机，仍然可以使用ALT-CTRL-F1等快捷键切换到另外的文字字符终端。然后使用安装时设置的用户名、密码登录系统。<br />
+在命令行键入：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt-get purge xserver-xorg-video-siliconmotion
+</code></pre></div></div>
+<p>随后使用sudo reboot命令重新启动，就可以正常的进入GUI用户界面了。这时特别注意一个事情：可能是依赖库设置的Bug，使用apt删除了上述显卡驱动包之后，会有大批的包被标注为不再需要，建议用户删除。而这个时候千万不要使用apt autoremove来删除这些包，否则龙芯笔记本将真的无法启动只能重新安装。</p>
+
+<p>如果使用xface4桌面系统，在显示方面不需要再做什么调优，如果使用KDE系统，还可以做以下几步：</p>
+
+<ol>
+  <li>关闭显卡AIGLX和Composite功能，降低CPU占用率。方法，新建一个文件/usr/share/X11/xorg.conf.d/99-disable-aiglx-composite.conf，在其中贴入如下内容：
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="c">############# 99-disable-aiglx-composite.conf ###########</span>
+ Section <span class="s2">"ServerFlags"</span>
+ Option <span class="s2">"AIGLX"</span>          <span class="s2">"off"</span>
+ EndSection
+
+ Section <span class="s2">"Extensions"</span>
+ Option <span class="s2">"Composite"</span>      <span class="s2">"Disable"</span>
+ EndSection
+ <span class="c">##################################################</span>
+</code></pre></div>    </div>
+  </li>
+  <li>登录进入GUI界面，打开系统设置-&gt;应用程序外观-&gt;风格-&gt;部件样式，点配置。在常规配置页关闭启动动画；在微调中显示效果设置为：低显示分辨率，低CPU使用率。</li>
+  <li>同样系统设置-&gt;桌面效果中，通用设置页关闭打开时启用桌面效果；在高级设置页设置Compositing类型为XRender，设置Qt图形系统为Rasters。</li>
+  <li>重启系统。</li>
+</ol>
+
+<h4 id="其它">其它</h4>
+<ol>
+  <li>内置的火狐浏览器不能启动，网上有提示使用firefox –safe-mode启动。另外可以尝试安装新的浏览器<code class="language-plaintext highlighter-rouge">sudo apt-get install netsurf-gtk </code>，命令行使用netsurf启动，也是一个简单易用的浏览器。</li>
+  <li>汉字输入法，通常都安装谷歌拼音，但没有发现谷歌拼音的双拼如何设置，所以安装了传统的孙拼音，方法如下：
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>apt-get <span class="nb">install </span>fcitx fcitx-sunpinyin
+</code></pre></div>    </div>
+    <p>安装完成需要重启后才生效。</p>
+  </li>
+  <li>到这个时候，如果实在不喜欢apt那么多未使用包的警告，可以执行:<code class="language-plaintext highlighter-rouge">apt autoremove -y</code>删除，但看那些包的名字也会发现，虽然这次删除不影响重启了，但诸如liboffice之类的软件也被自动卸载了。所以还是建议，就忽略那些apt的提示，不删除的好。</li>
+</ol>
+
+<h4 id="参考资料">参考资料</h4>
+<p><a href="https://blog.csdn.net/lophyxp/article/details/51764748">龙芯逸珑8089B安装debian8.5和KDE桌面</a><br />
+<a href="https://wiki.debian.org/DebianYeeloong/HowTo/Install">DebianYeeloongHowToInstall</a></p>
+
+:ET

@@ -1,0 +1,18 @@
+I"�<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
+<h4 id="keras内置的预定义模型">Keras内置的预定义模型</h4>
+<p>上一节我们讲过了完整的保存模型及其训练完成的参数。<br />
+Keras中使用这种方式，预置了多个著名的成熟神经网络模型。当然，这实际是Keras的功劳，并不适合算在TensorFlow 2.0头上。<br />
+当前TensorFlow 2.0-alpha版本捆绑的Keras中包含：</p>
+<ul>
+  <li>densenet</li>
+  <li>inception_resnet_v2</li>
+  <li>inception_v3</li>
+  <li>mobilenet</li>
+  <li>mobilenet_v2</li>
+  <li>nasnet</li>
+  <li>resnet50</li>
+  <li>vgg16</li>
+  <li>vgg19</li>
+  <li>xception</li>
+</ul>
+:ET

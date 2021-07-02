@@ -1,0 +1,13 @@
+I"6	<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
+<h4 id="图片样本可视化">图片样本可视化</h4>
+<p><a href="http://blog.17study.com.cn/2018/01/10/tensorFlow-series-4/">原文第四篇</a>中，我们介绍了官方的入门案例MNIST，功能是识别手写的数字0-9。这是一个非常基础的TensorFlow应用，地位相当于通常语言学习的”Hello World!”。<br />
+我们先不进入TensorFlow 2.0中的MNIST代码讲解，因为TensorFlow 2.0在Keras的帮助下抽象度比较高，代码非常简单。但这也使得大量的工作被隐藏掉，反而让人难以真正理解来龙去脉。特别是其中所使用的样本数据也已经不同，而这对于学习者，是非常重要的部分。模型可以看论文、在网上找成熟的成果，数据的收集和处理，可不会有人帮忙。<br />
+在原文中，我们首先介绍了MNIST的数据结构，并且用一个小程序，把样本中的数组数据转换为JPG图片，来帮助读者理解原始数据的组织方式。<br />
+这里我们把小程序也升级一下，直接把图片显示在屏幕上，不再另外保存JPG文件。这样图片看起来更快更直观。<br />
+在TensorFlow 1.x中，是使用程序input_data.py来下载和管理MNIST的样本数据集。当前官方仓库的master分支中已经取消了这个代码，为了不去翻仓库，你可以在<a href="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/input_data.py">这里</a>下载，放置到你的工作目录。<br />
+在TensorFlow 2.0中，会有keras.datasets类来管理大部分的演示和模型中需要使用的数据集，这个我们后面再讲。<br />
+MNIST的样本数据来自<a href="http://yann.lecun.com/exdb/mnist/">Yann LeCun</a>的项目网站。如果网速比较慢的话，可以先用下载工具下载，然后放置到自己设置的数据目录，比如工作目录下的data文件夹，input_data检测到已有数据的话，不会重复下载。<br />
+下面是我们升级后显示训练样本集的源码，代码的讲解保留在注释中。如果阅读有疑问的，建议先去原文中看一下样本集数据结构的图示部分：<br />
+```python
+#!/usr/bin/env python3</p>
+:ET

@@ -1,0 +1,542 @@
+I"�1<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
+<h4 id="基本概念">基本概念</h4>
+<p>机器翻译和语音识别是最早开展的两项人工智能研究。今天也取得了最显著的商业成果。<br />
+早先的机器翻译实际脱胎于电子词典，能力更擅长于词或者短语的翻译。那时候的翻译通常会将一句话打断为一系列的片段，随后通过复杂的程序逻辑对每一个片段进行翻译，最终组合在一起。所得到的翻译结果应当说似是而非，最大的问题是可读性和连贯性非常差。<br />
+实际从机器学习的观点来讲，这种翻译方式，也不符合人类在做语言翻译时所做的动作。其实以神经网络为代表的机器学习，更多的都是在“模仿”人类的行为习惯。<br />
+一名职业翻译通常是这样做：首先完整听懂要翻译的语句，将语义充分理解，随后把理解到的内容，用目标语言复述出来。<br />
+而现在的机器翻译，也正是这样做的，谷歌的<a href="https://github.com/tensorflow/nmt">seq2seq</a>是这一模式的开创者。<br />
+如果用计算机科学的语言来说，这一过程很像一个编解码过程。原始的语句进入编码器，得到一组用于代表原始语句“内涵”的数组。这些数组中的数字就是原始语句所代表的含义，只是这个含义人类无法读懂，是需要由神经网络模型去理解的。随后解码过程，将“有含义的数字”解码为对应的目标语言。从而完成整个翻译过程。这样的得到的翻译结果，非常流畅，具有更好的可读性。<br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/nmt-encdec.jpg" alt="" /><br />
+（图片来自谷歌NMT文档）</p>
+
+<p>注意力机制是人类特有的大脑思维方式，比如看到下面这幅照片：
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/nmt-attention.png" alt="" /><br />
+（图片来自互联网）<br />
+照片的内容实际很多，甚至如果从数学上说，背景树林的复杂度要高于前景。但看到照片的人，都会先注意到迎面而来的飞盘，随后是投掷者，接着是图像右侧的小孩子。其它的信息都被忽略了。<br />
+这是人类在上万年的进化中所形成的本能。对于快速向自己移动的物体首先会看到、识别危险、并且快速应对。接着是可能对自己造成威胁的同类或者生物。为了做到集注，不得不忽略看起来无关紧要的东西。<br />
+在机器学习中引入注意力模型，在图像处理、机器翻译、策略博弈等各个领域中都有应用。这里的注意力机制有两个作用：一是降低模型的复杂度或者计算量，把主要资源分配给更重要的内容。二是对应把最相关的输入导出到相关的输出，更有针对性的得到结果。</p>
+
+<p>在机器翻译领域，前面我们已经确定和解释了编码、解码模型。那么第二点的输入输出相关性就显得更重要。<br />
+我们举例来说明：比如英文“I love you”，翻译为中文是“我爱你”。在一个编码解码模型中，首先由编码器处理“I love you”，从而得到中间语义，比如我们称为C：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="n">C</span> <span class="o">=</span> <span class="n">Encoder</span><span class="p">(</span><span class="s">"I love you"</span><span class="p">)</span>  
+</code></pre></div></div>
+<p>解码的时候，如果没有注意力机制，那序列输出则是：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="s">"我"</span> <span class="o">=</span> <span class="n">Decoder</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>  
+	<span class="s">"爱"</span> <span class="o">=</span> <span class="n">Decoder</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>  
+	<span class="s">"你"</span> <span class="o">=</span> <span class="n">Decoder</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>  
+</code></pre></div></div>
+<p>因为C相当于“I love you”三个单词共同的作用。那么解码的时候，每一个字的输出，都相当于3个单词共同作用的结果。这显然是不合理的，而且也不大可能得到一个理想、顺畅的结果。<br />
+一个理想的解码模型应当类似这样的方式：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="s">"我"</span> <span class="o">=</span> <span class="n">Decoder</span><span class="p">(</span><span class="n">C</span><span class="o">+</span><span class="s">"I"</span><span class="p">)</span>  
+	<span class="s">"爱"</span> <span class="o">=</span> <span class="n">Decoder</span><span class="p">(</span><span class="n">C</span><span class="o">+</span><span class="s">"love"</span><span class="p">)</span>  
+	<span class="s">"你"</span> <span class="o">=</span> <span class="n">Decoder</span><span class="p">(</span><span class="n">C</span><span class="o">+</span><span class="s">"you"</span><span class="p">)</span>  
+</code></pre></div></div>
+<p>当然，机器学习不是人。人通过大量的学习、经验的积累，一眼就能看出来“I”对应翻译成“我”，“love”翻译成“爱”。机器不可能提前知道这一切，所以我们比较切实的方法，只能是增加一套权重逻辑，在不同的翻译处理中，对应不同的权重属性。这就好像下面这样的方式：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="s">"我"</span> <span class="o">=</span> <span class="n">Decoder</span><span class="p">(</span><span class="n">C</span><span class="o">+</span><span class="mf">0.8</span><span class="n">x</span><span class="s">"I"</span><span class="o">+</span><span class="mf">0.1</span><span class="n">x</span><span class="s">"love"</span><span class="o">+</span><span class="mf">0.2</span><span class="n">x</span><span class="s">"you"</span><span class="p">)</span>  
+	<span class="s">"爱"</span> <span class="o">=</span> <span class="n">Decoder</span><span class="p">(</span><span class="n">C</span><span class="o">+</span><span class="mf">0.1</span><span class="n">x</span><span class="s">"I"</span><span class="o">+</span><span class="mf">0.7</span><span class="n">x</span><span class="s">"love"</span><span class="o">+</span><span class="mf">0.1</span><span class="n">x</span><span class="s">"you"</span><span class="p">)</span>  
+	<span class="s">"你"</span> <span class="o">=</span> <span class="n">Decoder</span><span class="p">(</span><span class="n">C</span><span class="o">+</span><span class="mf">0.2</span><span class="n">x</span><span class="s">"I"</span><span class="o">+</span><span class="mf">0.1</span><span class="n">x</span><span class="s">"love"</span><span class="o">+</span><span class="mf">0.8</span><span class="n">x</span><span class="s">"you"</span><span class="p">)</span>  
+</code></pre></div></div>
+<p>没错了，这个权重值，比如翻译“我”的时候的权重序列：(0.8,0.1,0.2)，就是注意力机制。在翻译某个目标单词输出的时候，通过注意力机制，模型集注在对应的某个输入单词。<br />
+当然，注意力机制还包含上面示意性的表达式没有显示出来的一个重要操作：结合解码器的当前状态、和编码器输入内容之后的状态，在每一次翻译解码操作中更新注意力的权重值。</p>
+
+<h4 id="翻译模型">翻译模型</h4>
+<p>回到上面的编解码模型示意图。编码器、解码器在我们的机器学习中，实际都是神经网络模型。那么把上面的示意图展开，一个没有注意力机制的编码、解码翻译模型是这个样子：<br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/nmt-seq2seq.jpg" alt="" /><br />
+（图片来自谷歌NMT文档）</p>
+
+<p>随后，我们为这个模型增加解码时候的权重机制。模型在处理每个单词输出的时候，会在权重的帮助下，把重点放在对应的输入单词上。示意图如下：<br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/nmt-greedy_dec.jpg" alt="" /><br />
+（图片来自谷歌NMT文档）</p>
+
+<p>最终，结合权重生成的过程，成为完整的注意力机制。注意力机制主要作用于解码，在每一个输出步骤中都要重新计算注意力权重，并更新到解码模型从而对输出产生影响。模型的示意图如下：<br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/nmt-attention_mechanism.jpg" alt="" /><br />
+（图片来自谷歌NMT文档）<br />
+图片中注意力权重的来源和去向箭头，要注意看清楚，这对你下面阅读实现的代码会很有帮助。</p>
+
+<h4 id="样本及样本预处理">样本及样本预处理</h4>
+<p>前面的编解码模型示意图，还有模拟的表达式，当然都做了很多简化。实际上中间还有很多工作要做，首先是翻译样本库。</p>
+
+<p>本例中使用<a href="http://www.manythings.org/anki/">http://www.manythings.org/anki/</a>提供的英文对比西班牙文样本库，网站上还有很多其它语言的对比样本可以下载，有兴趣的读者不妨在做完这个练习后尝试一下其它语言的机器翻译。<br />
+这个样本是文本格式，包含很多行，每一行都是一个完整的句子，包含英文和西班牙文两部分，两种文字之间使用制表符隔开，比如：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>May I borrow this book? ¿Puedo tomar prestado este libro?
+</code></pre></div></div>
+<p>对于样本库，我们要进行以下几项预处理：</p>
+<ul>
+  <li>读取样本库，建立数据集。每一行的样本按语言分为两个部分。</li>
+  <li>为每一句样本，增加开始标志<code class="language-plaintext highlighter-rouge">&lt;start&gt;</code>和结束标志<code class="language-plaintext highlighter-rouge">&lt;end&gt;</code>。看过<a href="http://blog.17study.com.cn/2018/01/17/tensorFlow-series-10/">《从锅炉工到AI专家(10)》</a>的话，你应当理解这种做法。经过训练后，模型会根据这两个标志作为翻译的开始和结束。</li>
+</ul>
+
+<p>做完上面的处理后，刚才的那行样本看起来会是这个样子：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>&lt;start&gt; may i borrow this book ? &lt;end&gt;
+&lt;start&gt; ¿ puedo tomar prestado este libro ? &lt;end&gt;
+</code></pre></div></div>
+<p>注意标点符号也是语言的组成部分，每个部分用空格隔开，都需要单独数字化。所以你能看到，上面的两行例句，标点符号之前也添加了空格。</p>
+<ul>
+  <li>进行数据清洗，去掉不支持的字符。</li>
+  <li>把单词数字化，建立从单词到数字和从数字到单词的对照表。</li>
+  <li>设置一个句子的最大长度，把每个句子按照最大长度在句子的后端补齐。</li>
+</ul>
+
+<p>一行句子数字化之后，编码同单词之间的对照关系可能类似下面的样子：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Input Language<span class="p">;</span> index to word mapping
+1 <span class="nt">----</span><span class="o">&gt;</span> &lt;start&gt;
+8 <span class="nt">----</span><span class="o">&gt;</span> no
+38 <span class="nt">----</span><span class="o">&gt;</span> puedo
+804 <span class="nt">----</span><span class="o">&gt;</span> confiar
+20 <span class="nt">----</span><span class="o">&gt;</span> en
+1000 <span class="nt">----</span><span class="o">&gt;</span> vosotras
+3 <span class="nt">----</span><span class="o">&gt;</span> <span class="nb">.</span>
+2 <span class="nt">----</span><span class="o">&gt;</span> &lt;end&gt;
+
+Target Language<span class="p">;</span> index to word mapping
+1 <span class="nt">----</span><span class="o">&gt;</span> &lt;start&gt;
+4 <span class="nt">----</span><span class="o">&gt;</span> i
+25 <span class="nt">----</span><span class="o">&gt;</span> can
+12 <span class="nt">----</span><span class="o">&gt;</span> t
+345 <span class="nt">----</span><span class="o">&gt;</span> trust
+6 <span class="nt">----</span><span class="o">&gt;</span> you
+3 <span class="nt">----</span><span class="o">&gt;</span> <span class="nb">.</span>
+2 <span class="nt">----</span><span class="o">&gt;</span> &lt;end&gt;
+</code></pre></div></div>
+<p>你可能注意到了，“can’t”中的单引号作为不支持的字符被过滤掉了，不过你放心，这并不会影响模型的训练。当然在一个完善的翻译系统中，这样的字符都应当单独处理，本例中就忽略了。</p>
+
+<h4 id="模型构建">模型构建</h4>
+<p>本例中使用了编码器、解码器、注意力机制三个网络模型，都继承自keras.Model，属于三个自定义的Keras模型。<br />
+三个模型共同组成了完整的翻译模型。完整模型的组装，是在训练过程和翻译（预测）过程中，通过相应子程序把他们组装在一起的。这是因为它们三者之间的逻辑机制相对比较复杂。无法用前面常用的keras.models.Sequential方法直接耦合在一起。<br />
+自定义Keras模型在本系列中是第一次遇到，所以着重讲一下。实现自定义模型有三个基本要求：</p>
+<ul>
+  <li>继承自keras.Model类。</li>
+  <li>实现<code class="language-plaintext highlighter-rouge">__init__</code>方法，用于实现类的初始化，同所有面向对象的语言一样，这里主要完成基类和类成员的初始化工作。</li>
+  <li>实现call方法，这是主要的计算逻辑。模型接入到神经网络之后，训练逻辑和预测逻辑，都通过逐层调用call方法来完成计算。方法中可以使用keras中原有的网络模型和自己的计算通过组合来完成工作。</li>
+</ul>
+
+<p>自定义模型之所以有这些要求，主要是为了自定义的模型，可以跟Keras原生层一样，互相兼容，支持多种模型的组合、互联，从而共同形成更复杂的模型。</p>
+
+<p>Encoder/Decoder主体都使用GRU网络，读起来应当比较容易理解。有需要的话，复习一下<a href="http://blog.17study.com.cn/2018/01/17/tensorFlow-series-10/">《从锅炉工到AI专家(10)》</a>。<br />
+注意力机制的BahdanauAttention模型就很令人费解了，困惑的关键在于其中的算法。算法的计算部分只有两行代码，代码本身都知道是在做什么，但完全不明白组合在一起是什么功能以及为什么这样做。其实阅读由数学公式推导、转换而来的程序代码都有这种感觉。所以现在很多的知识保护，根本不在于源代码，而在于公式本身。没有公式，很多源代码非常难以读懂。<br />
+这部分推荐阅读Dzmitry Bahdanau的论文<a href="https://arxiv.org/abs/1409.0473">《Neural Machine Translation by Jointly Learning to Align and Translate》</a>和之后Minh-Thang Luong改进的算法<a href="https://arxiv.org/abs/1508.04025">《Effective Approaches to Attention-based Neural Machine Translation》</a>。论文中对于理论做了详尽解释，也有公式的推导过程。<br />
+这里的BahdanauAttention模型实际就是公式的程序实现。如果精力不够的话，死记公式也算一种学习方法。</p>
+
+<h5 id="训练和预测">训练和预测</h5>
+<p>我们以往碰到的模型，训练和预测基本都是一行代码，几乎没有什么需要解释的。<br />
+今天的模型涉及了带有注意力机制的自定义模型，主要的逻辑，是通过程序代码，在训练和评估子程序中把模型组合起来完成的。<br />
+程序如果只是编码器和解码器串联的逻辑，完全可以同以前一样，一条keras.Sequential函数完成组装，那就一点难度没有了。而加上注意力机制，复杂度高了很多，也是最难理解的地方。做一个简单的分析：</p>
+<ul>
+  <li>编码器Encoder是一次整句编码，得到一个enc_output。enc_output相当于模型对整句语义的理解。</li>
+  <li>解码器Decoder是逐个单词输入，逐个单词输出的。训练时，输入序列由<code class="language-plaintext highlighter-rouge">&lt;start&gt;</code>起始标志开始，到<code class="language-plaintext highlighter-rouge">&lt;end&gt;</code>标志结束。预测时，没有人知道这一句翻译的结果是多少个单词，就是逐个获取Decoder的输出，直到得到一个<code class="language-plaintext highlighter-rouge">&lt;end&gt;</code>标志。</li>
+  <li>Encoder和Decoder都引出了隐藏层，用于计算注意力权重。keras.layers.GRU的state输出其实就是隐藏层，平时这个参数我们是用不到的。</li>
+  <li>对于每一个翻译的输出词，注意力对其影响就是通过<code class="language-plaintext highlighter-rouge">attention_weights * values</code>，然后将结果跟前一个输出词一起作为Decoder的GRU输入，values实际就是编码器输出enc_output。</li>
+  <li>Decoder输出上一个词时候的隐藏层，跟enc_output一起通过公式计算，得到下一个词的注意力权重attention_weights。在第一次循环的时候Decoder还没有输出过隐藏层，这时候使用的是Encoder的隐藏层。</li>
+  <li>注意力权重attention_weights从程序逻辑上并不需要引出，程序中在Decoder中输出这个值是为了绘制注意力映射图，帮助你更好的理解注意力机制。所以如果是在这个基础上做翻译系统，输出权重值到模型外部是不需要的。</li>
+  <li>为了匹配各个网络的不同维度和不同形状，注意力机制的计算逻辑和注意力权重经过了各种维度变形。Decoder的输入虽然是一个词，但也需要扩展成一批词的第一个元素（也是唯一一个元素），这个跟我们以前的模型在预测时所做的是完全一样的。</li>
+</ul>
+
+<h4 id="完整源码">完整源码</h4>
+<p>下面是完整的可执行源代码，请参考注释阅读：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
+</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="kn">import</span> <span class="nn">unicodedata</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="c1"># 如果命令行增加了参数'train'则进入训练模式，否则按照翻译模式执行
+</span><span class="n">TRAIN</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s">'train'</span><span class="p">:</span>
+    <span class="n">TRAIN</span> <span class="o">=</span> <span class="bp">True</span>
+
+<span class="c1"># 下载样本集，下载后自动解压。数据保存在路径：~/.keras/datasets/
+</span><span class="n">path_to_zip</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">utils</span><span class="p">.</span><span class="n">get_file</span><span class="p">(</span>
+    <span class="s">'spa-eng.zip'</span><span class="p">,</span>
+    <span class="n">origin</span><span class="o">=</span><span class="s">'http://storage.googleapis.com/download.tensorflow.org/data/spa-eng.zip'</span><span class="p">,</span>
+    <span class="n">extract</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="c1"># 指向解压后的样本文件
+</span><span class="n">path_to_file</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">path_to_zip</span><span class="p">)</span><span class="o">+</span><span class="s">"/spa-eng/spa.txt"</span>
+
+<span class="c1"># 将文本从unicode编码转换为ascii编码
+</span><span class="k">def</span> <span class="nf">unicode_to_ascii</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="k">return</span> <span class="s">''</span><span class="p">.</span><span class="n">join</span><span class="p">(</span>
+        <span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">unicodedata</span><span class="p">.</span><span class="n">normalize</span><span class="p">(</span><span class="s">'NFD'</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">unicodedata</span><span class="p">.</span><span class="n">category</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">!=</span> <span class="s">'Mn'</span><span class="p">)</span>
+
+<span class="c1"># 对所有的句子做预处理
+</span><span class="k">def</span> <span class="nf">preprocess_sentence</span><span class="p">(</span><span class="n">w</span><span class="p">):</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">unicode_to_ascii</span><span class="p">(</span><span class="n">w</span><span class="p">.</span><span class="n">lower</span><span class="p">().</span><span class="n">strip</span><span class="p">())</span>
+
+    <span class="c1"># 在单词和标点之间增加空格
+</span>    <span class="c1"># 比如: "he is a boy." =&gt; "he is a boy ."
+</span>    <span class="c1"># 参考: https://stackoverflow.com/questions/3645931/python-padding-punctuation-with-white-spaces-keeping-punctuation
+</span>    <span class="n">w</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s">"([?.!,¿])"</span><span class="p">,</span> <span class="sa">r</span><span class="s">" \1 "</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s">'[" "]+'</span><span class="p">,</span> <span class="s">" "</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+
+    <span class="c1"># 用空格替换掉除了大小写字母和"."/ "?"/ "!"/ ","之外的字符
+</span>    <span class="n">w</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">sub</span><span class="p">(</span><span class="sa">r</span><span class="s">"[^a-zA-Z?.!,¿]+"</span><span class="p">,</span> <span class="s">" "</span><span class="p">,</span> <span class="n">w</span><span class="p">)</span>
+    <span class="c1"># 截断两端的空白
+</span>    <span class="n">w</span> <span class="o">=</span> <span class="n">w</span><span class="p">.</span><span class="n">rstrip</span><span class="p">().</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="c1"># 在句子两端增加开始和结束标志
+</span>    <span class="c1"># 这样经过训练后，模型知道什么时候开始和什么时候结束
+</span>    <span class="n">w</span> <span class="o">=</span> <span class="s">'&lt;start&gt; '</span> <span class="o">+</span> <span class="n">w</span> <span class="o">+</span> <span class="s">' &lt;end&gt;'</span>
+    <span class="k">return</span> <span class="n">w</span>
+
+<span class="c1"># 载入样本集，对句子进行预处理
+# 最终返回(英文,西班牙文)这样的配对元组
+</span><span class="k">def</span> <span class="nf">create_dataset</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">num_examples</span><span class="p">):</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">io</span><span class="p">.</span><span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">'UTF-8'</span><span class="p">).</span><span class="n">read</span><span class="p">().</span><span class="n">strip</span><span class="p">().</span><span class="n">split</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">'</span><span class="p">)</span>
+
+    <span class="n">word_pairs</span> <span class="o">=</span> <span class="p">[[</span><span class="n">preprocess_sentence</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">l</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="p">)]</span>  <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">[:</span><span class="n">num_examples</span><span class="p">]]</span>
+
+    <span class="k">return</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">word_pairs</span><span class="p">)</span>
+<span class="c1"># 至此的输出为：
+# &lt;start&gt; go away ! &lt;end&gt;
+# &lt;start&gt; salga de aqui ! &lt;end&gt;
+# 这样的形式。
+</span>
+<span class="c1"># 获取最长的句子长度
+</span><span class="k">def</span> <span class="nf">max_length</span><span class="p">(</span><span class="n">tensor</span><span class="p">):</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">t</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tensor</span><span class="p">)</span>
+
+<span class="c1"># 将单词数字化之后的数字&lt;-&gt;单词双向对照表
+</span><span class="k">def</span> <span class="nf">tokenize</span><span class="p">(</span><span class="n">lang</span><span class="p">):</span>
+    <span class="n">lang_tokenizer</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">preprocessing</span><span class="p">.</span><span class="n">text</span><span class="p">.</span><span class="n">Tokenizer</span><span class="p">(</span>
+        <span class="n">filters</span><span class="o">=</span><span class="s">''</span><span class="p">)</span>
+    <span class="n">lang_tokenizer</span><span class="p">.</span><span class="n">fit_on_texts</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span>
+
+    <span class="n">tensor</span> <span class="o">=</span> <span class="n">lang_tokenizer</span><span class="p">.</span><span class="n">texts_to_sequences</span><span class="p">(</span><span class="n">lang</span><span class="p">)</span>
+
+    <span class="n">tensor</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">preprocessing</span><span class="p">.</span><span class="n">sequence</span><span class="p">.</span><span class="n">pad_sequences</span><span class="p">(</span>
+        <span class="n">tensor</span><span class="p">,</span>
+        <span class="n">padding</span><span class="o">=</span><span class="s">'post'</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">tensor</span><span class="p">,</span> <span class="n">lang_tokenizer</span>
+
+<span class="k">def</span> <span class="nf">load_dataset</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">num_examples</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="c1"># 载入样本，两种语言分别保存到两个数组
+</span>    <span class="n">targ_lang</span><span class="p">,</span> <span class="n">inp_lang</span> <span class="o">=</span> <span class="n">create_dataset</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">num_examples</span><span class="p">)</span>
+    <span class="c1"># 把句子数字化，两种语言是两套对照编码
+</span>    <span class="n">input_tensor</span><span class="p">,</span> <span class="n">inp_lang_tokenizer</span> <span class="o">=</span> <span class="n">tokenize</span><span class="p">(</span><span class="n">inp_lang</span><span class="p">)</span>
+    <span class="n">target_tensor</span><span class="p">,</span> <span class="n">targ_lang_tokenizer</span> <span class="o">=</span> <span class="n">tokenize</span><span class="p">(</span><span class="n">targ_lang</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">input_tensor</span><span class="p">,</span> <span class="n">target_tensor</span><span class="p">,</span> <span class="n">inp_lang_tokenizer</span><span class="p">,</span> <span class="n">targ_lang_tokenizer</span>
+
+<span class="c1"># 训练的样本集数量，越大翻译效果越好，但训练耗时越长
+</span><span class="n">num_examples</span> <span class="o">=</span> <span class="mi">80000</span>
+<span class="n">input_tensor</span><span class="p">,</span> <span class="n">target_tensor</span><span class="p">,</span> <span class="n">inp_lang</span><span class="p">,</span> <span class="n">targ_lang</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">path_to_file</span><span class="p">,</span> <span class="n">num_examples</span><span class="p">)</span>
+<span class="c1"># 至此，input_tensor/target_tensor 是数字化之后的样本（数字数组）
+# inp_lang/targ_lang 是数字&lt;-&gt;单词编码对照表
+# 计算两种语言中最长句子的长度
+</span><span class="n">max_length_targ</span><span class="p">,</span> <span class="n">max_length_inp</span> <span class="o">=</span> <span class="n">max_length</span><span class="p">(</span><span class="n">target_tensor</span><span class="p">),</span> <span class="n">max_length</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span>
+
+<span class="c1"># 将样本按照8:2分为训练集和验证集
+</span><span class="n">input_tensor_train</span><span class="p">,</span> <span class="n">input_tensor_val</span><span class="p">,</span> <span class="n">target_tensor_train</span><span class="p">,</span> <span class="n">target_tensor_val</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">,</span> <span class="n">target_tensor</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+
+<span class="c1">##############################################
+</span>
+<span class="n">BUFFER_SIZE</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_tensor_train</span><span class="p">)</span>
+<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="n">steps_per_epoch</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_tensor_train</span><span class="p">)</span><span class="o">//</span><span class="n">BATCH_SIZE</span>
+<span class="n">embedding_dim</span> <span class="o">=</span> <span class="mi">256</span>
+<span class="n">units</span> <span class="o">=</span> <span class="mi">1024</span>
+<span class="n">vocab_inp_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">inp_lang</span><span class="p">.</span><span class="n">word_index</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+<span class="n">vocab_tar_size</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">targ_lang</span><span class="p">.</span><span class="n">word_index</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span>
+
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">Dataset</span><span class="p">.</span><span class="n">from_tensor_slices</span><span class="p">((</span><span class="n">input_tensor_train</span><span class="p">,</span> <span class="n">target_tensor_train</span><span class="p">)).</span><span class="n">shuffle</span><span class="p">(</span><span class="n">BUFFER_SIZE</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">.</span><span class="n">batch</span><span class="p">(</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">drop_remainder</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># 编码器模型
+</span><span class="k">class</span> <span class="nc">Encoder</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="p">,</span> <span class="n">enc_units</span><span class="p">,</span> <span class="n">batch_sz</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Encoder</span><span class="p">,</span> <span class="bp">self</span><span class="p">).</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">batch_sz</span> <span class="o">=</span> <span class="n">batch_sz</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">enc_units</span> <span class="o">=</span> <span class="n">enc_units</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">embedding</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">gru</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">GRU</span><span class="p">(</span>
+                                    <span class="bp">self</span><span class="p">.</span><span class="n">enc_units</span><span class="p">,</span> 
+                                    <span class="n">return_sequences</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> 
+                                    <span class="n">return_state</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> 
+                                    <span class="n">recurrent_initializer</span><span class="o">=</span><span class="s">'glorot_uniform'</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">hidden</span><span class="p">):</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="n">output</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">gru</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">initial_state</span><span class="o">=</span><span class="n">hidden</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">output</span><span class="p">,</span> <span class="n">state</span>
+
+    <span class="k">def</span> <span class="nf">initialize_hidden_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">zeros</span><span class="p">((</span><span class="bp">self</span><span class="p">.</span><span class="n">batch_sz</span><span class="p">,</span> <span class="bp">self</span><span class="p">.</span><span class="n">enc_units</span><span class="p">))</span>
+
+<span class="n">encoder</span> <span class="o">=</span> <span class="n">Encoder</span><span class="p">(</span><span class="n">vocab_inp_size</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">BATCH_SIZE</span><span class="p">)</span>
+
+<span class="c1"># 注意力模型
+</span><span class="k">class</span> <span class="nc">BahdanauAttention</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">units</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">BahdanauAttention</span><span class="p">,</span> <span class="bp">self</span><span class="p">).</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">W1</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">units</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">W2</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">units</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">V</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">query</span><span class="p">,</span> <span class="n">values</span><span class="p">):</span>
+        <span class="c1"># query为上次的GRU隐藏层
+</span>        <span class="c1"># values为编码器的编码结果enc_output
+</span>        <span class="n">hidden_with_time_axis</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># 计算注意力权重值
+</span>        <span class="n">score</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">V</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">tanh</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">W1</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">+</span> <span class="bp">self</span><span class="p">.</span><span class="n">W2</span><span class="p">(</span><span class="n">hidden_with_time_axis</span><span class="p">)))</span>
+
+        <span class="n">attention_weights</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># 使用注意力权重*编码器输出作为返回值，将来会作为解码器的输入
+</span>        <span class="n">context_vector</span> <span class="o">=</span> <span class="n">attention_weights</span> <span class="o">*</span> <span class="n">values</span>
+        <span class="n">context_vector</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">context_vector</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">context_vector</span><span class="p">,</span> <span class="n">attention_weights</span>
+
+<span class="c1"># 解码器模型
+</span><span class="k">class</span> <span class="nc">Decoder</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">vocab_size</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="p">,</span> <span class="n">dec_units</span><span class="p">,</span> <span class="n">batch_sz</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Decoder</span><span class="p">,</span> <span class="bp">self</span><span class="p">).</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">batch_sz</span> <span class="o">=</span> <span class="n">batch_sz</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">dec_units</span> <span class="o">=</span> <span class="n">dec_units</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">embedding</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">gru</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">GRU</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">.</span><span class="n">dec_units</span><span class="p">,</span> 
+            <span class="n">return_sequences</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+            <span class="n">return_state</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> 
+            <span class="n">recurrent_initializer</span><span class="o">=</span><span class="s">'glorot_uniform'</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">fc</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">vocab_size</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="p">.</span><span class="n">attention</span> <span class="o">=</span> <span class="n">BahdanauAttention</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">dec_units</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">hidden</span><span class="p">,</span> <span class="n">enc_output</span><span class="p">):</span>
+        <span class="c1"># 使用上次的隐藏层（第一次使用编码器隐藏层）、编码器输出计算注意力权重
+</span>        <span class="n">context_vector</span><span class="p">,</span> <span class="n">attention_weights</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">attention</span><span class="p">(</span><span class="n">hidden</span><span class="p">,</span> <span class="n">enc_output</span><span class="p">)</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">embedding</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="c1"># 将上一循环的预测结果跟注意力权重值结合在一起作为本次的GRU网络输入
+</span>        <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">concat</span><span class="p">([</span><span class="n">tf</span><span class="p">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">context_vector</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">x</span><span class="p">],</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="c1"># state实际是GRU的隐藏层
+</span>        <span class="n">output</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">gru</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">output</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">2</span><span class="p">]))</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">fc</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">attention_weights</span>
+
+<span class="n">decoder</span> <span class="o">=</span> <span class="n">Decoder</span><span class="p">(</span><span class="n">vocab_tar_size</span><span class="p">,</span> <span class="n">embedding_dim</span><span class="p">,</span> <span class="n">units</span><span class="p">,</span> <span class="n">BATCH_SIZE</span><span class="p">)</span>
+
+
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">optimizers</span><span class="p">.</span><span class="n">Adam</span><span class="p">()</span>
+<span class="n">loss_object</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">losses</span><span class="p">.</span><span class="n">SparseCategoricalCrossentropy</span><span class="p">(</span><span class="n">from_logits</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># 损失函数
+</span><span class="k">def</span> <span class="nf">loss_function</span><span class="p">(</span><span class="n">real</span><span class="p">,</span> <span class="n">pred</span><span class="p">):</span>
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">math</span><span class="p">.</span><span class="n">logical_not</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">math</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="n">real</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="n">loss_</span> <span class="o">=</span> <span class="n">loss_object</span><span class="p">(</span><span class="n">real</span><span class="p">,</span> <span class="n">pred</span><span class="p">)</span>
+
+    <span class="n">mask</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">cast</span><span class="p">(</span><span class="n">mask</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">loss_</span><span class="p">.</span><span class="n">dtype</span><span class="p">)</span>
+    <span class="n">loss_</span> <span class="o">*=</span> <span class="n">mask</span>
+
+    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">loss_</span><span class="p">)</span>
+
+<span class="c1"># 保存中间训练结果
+</span><span class="n">checkpoint_dir</span> <span class="o">=</span> <span class="s">'./training_checkpoints'</span>
+<span class="n">checkpoint_prefix</span> <span class="o">=</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">join</span><span class="p">(</span><span class="n">checkpoint_dir</span><span class="p">,</span> <span class="s">"ckpt"</span><span class="p">)</span>
+<span class="n">checkpoint</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">Checkpoint</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
+                                 <span class="n">encoder</span><span class="o">=</span><span class="n">encoder</span><span class="p">,</span>
+                                 <span class="n">decoder</span><span class="o">=</span><span class="n">decoder</span><span class="p">)</span>
+
+<span class="c1"># 一次训练
+</span><span class="o">@</span><span class="n">tf</span><span class="p">.</span><span class="n">function</span>
+<span class="k">def</span> <span class="nf">train_step</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">targ</span><span class="p">,</span> <span class="n">enc_hidden</span><span class="p">):</span>
+    <span class="n">loss</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">GradientTape</span><span class="p">()</span> <span class="k">as</span> <span class="n">tape</span><span class="p">:</span>
+        <span class="c1"># 输入源语言句子进行编码
+</span>        <span class="n">enc_output</span><span class="p">,</span> <span class="n">enc_hidden</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">enc_hidden</span><span class="p">)</span>
+        <span class="c1"># 保留编码器隐藏层用于第一次的注意力权重计算
+</span>        <span class="n">dec_hidden</span> <span class="o">=</span> <span class="n">enc_hidden</span>
+
+        <span class="c1"># 解码器第一次的输入必定是&lt;start&gt;，targ_lang.word_index['&lt;start&gt;']是转换为对应的数字编码
+</span>        <span class="n">dec_input</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">expand_dims</span><span class="p">([</span><span class="n">targ_lang</span><span class="p">.</span><span class="n">word_index</span><span class="p">[</span><span class="s">'&lt;start&gt;'</span><span class="p">]]</span> <span class="o">*</span> <span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>       
+
+        <span class="c1"># 循环整个目标句子（用于对比每一次解码器输出同样本的对比）
+</span>        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">targ</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]):</span>
+            <span class="c1"># 使用本单词、隐藏层、编码器输出共同预测下一个单词，同事保留本次的隐藏层作为下一次输入
+</span>            <span class="n">predictions</span><span class="p">,</span> <span class="n">dec_hidden</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">decoder</span><span class="p">(</span><span class="n">dec_input</span><span class="p">,</span> <span class="n">dec_hidden</span><span class="p">,</span> <span class="n">enc_output</span><span class="p">)</span>
+            <span class="c1"># 计算损失值，最终的损失值是整个句子所有单词损失值的合计
+</span>            <span class="n">loss</span> <span class="o">+=</span> <span class="n">loss_function</span><span class="p">(</span><span class="n">targ</span><span class="p">[:,</span> <span class="n">t</span><span class="p">],</span> <span class="n">predictions</span><span class="p">)</span>
+
+            <span class="c1"># 在训练时，每次解码器的输入并不是上次解码器的输出，而是样本目标语言对应单词
+</span>            <span class="c1"># 这称为teach forcing
+</span>            <span class="n">dec_input</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">targ</span><span class="p">[:,</span> <span class="n">t</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># 所有单词的平均损失值
+</span>    <span class="n">batch_loss</span> <span class="o">=</span> <span class="p">(</span><span class="n">loss</span> <span class="o">/</span> <span class="nb">int</span><span class="p">(</span><span class="n">targ</span><span class="p">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="c1"># 最终的训练参量是编码器和解码的集合
+</span>    <span class="n">variables</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">.</span><span class="n">trainable_variables</span> <span class="o">+</span> <span class="n">decoder</span><span class="p">.</span><span class="n">trainable_variables</span>
+    <span class="c1"># 根据代价值计算下一次的参量值
+</span>    <span class="n">gradients</span> <span class="o">=</span> <span class="n">tape</span><span class="p">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">variables</span><span class="p">)</span>
+    <span class="c1"># 将新的参量应用到模型
+</span>    <span class="n">optimizer</span><span class="p">.</span><span class="n">apply_gradients</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">gradients</span><span class="p">,</span> <span class="n">variables</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">batch_loss</span>
+
+<span class="k">def</span> <span class="nf">training</span><span class="p">():</span>
+    <span class="n">EPOCHS</span> <span class="o">=</span> <span class="mi">10</span>
+
+    <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">EPOCHS</span><span class="p">):</span>
+        <span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="c1"># 初始化隐藏层和损失值
+</span>        <span class="n">enc_hidden</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">.</span><span class="n">initialize_hidden_state</span><span class="p">()</span>
+        <span class="n">total_loss</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1"># 一个批次的训练
+</span>        <span class="k">for</span> <span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">targ</span><span class="p">))</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="p">.</span><span class="n">take</span><span class="p">(</span><span class="n">steps_per_epoch</span><span class="p">)):</span>
+            <span class="n">batch_loss</span> <span class="o">=</span> <span class="n">train_step</span><span class="p">(</span><span class="n">inp</span><span class="p">,</span> <span class="n">targ</span><span class="p">,</span> <span class="n">enc_hidden</span><span class="p">)</span>
+            <span class="n">total_loss</span> <span class="o">+=</span> <span class="n">batch_loss</span>
+
+        <span class="c1"># 每100次显示一下模型损失值
+</span>        <span class="k">if</span> <span class="n">batch</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">'Epoch {} Batch {} Loss {:.4f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span>
+                                                        <span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                                                        <span class="n">batch</span><span class="p">,</span>
+                                                        <span class="n">batch_loss</span><span class="p">.</span><span class="n">numpy</span><span class="p">()))</span>
+        <span class="c1"># 每两次迭代保存一次数据
+</span>        <span class="k">if</span> <span class="p">(</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">checkpoint</span><span class="p">.</span><span class="n">save</span><span class="p">(</span><span class="n">file_prefix</span><span class="o">=</span><span class="n">checkpoint_prefix</span><span class="p">)</span>
+        <span class="c1"># 显示每次迭代的损失值和消耗时间
+</span>        <span class="k">print</span><span class="p">(</span><span class="s">'Epoch {} Loss {:.4f}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">epoch</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                                            <span class="n">total_loss</span> <span class="o">/</span> <span class="n">steps_per_epoch</span><span class="p">))</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'Time taken for 1 epoch {} sec</span><span class="se">\n</span><span class="s">'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start</span><span class="p">))</span>
+
+<span class="c1"># 根据命令行参数选择本次是否进行训练
+</span><span class="k">if</span> <span class="n">TRAIN</span><span class="p">:</span>
+    <span class="n">training</span><span class="p">()</span>
+<span class="c1">################################################
+</span>
+<span class="c1"># 评估（翻译）一行句子
+</span><span class="k">def</span> <span class="nf">evaluate</span><span class="p">(</span><span class="n">sentence</span><span class="p">):</span>
+    <span class="c1"># 清空注意力图
+</span>    <span class="n">attention_plot</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">max_length_targ</span><span class="p">,</span> <span class="n">max_length_inp</span><span class="p">))</span>
+    <span class="c1"># 句子预处理
+</span>    <span class="n">sentence</span> <span class="o">=</span> <span class="n">preprocess_sentence</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span>
+    <span class="c1"># 句子数字化
+</span>    <span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">inp_lang</span><span class="p">.</span><span class="n">word_index</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">sentence</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">' '</span><span class="p">)]</span>
+    <span class="c1"># 按照最长句子长度补齐
+</span>    <span class="n">inputs</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">preprocessing</span><span class="p">.</span><span class="n">sequence</span><span class="p">.</span><span class="n">pad_sequences</span><span class="p">([</span><span class="n">inputs</span><span class="p">],</span> 
+                                                           <span class="n">maxlen</span><span class="o">=</span><span class="n">max_length_inp</span><span class="p">,</span> 
+                                                           <span class="n">padding</span><span class="o">=</span><span class="s">'post'</span><span class="p">)</span>
+    <span class="n">inputs</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">convert_to_tensor</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="s">''</span>
+
+    <span class="c1"># 句子做编码
+</span>    <span class="n">hidden</span> <span class="o">=</span> <span class="p">[</span><span class="n">tf</span><span class="p">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span> <span class="n">units</span><span class="p">))]</span>
+    <span class="n">enc_out</span><span class="p">,</span> <span class="n">enc_hidden</span> <span class="o">=</span> <span class="n">encoder</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">hidden</span><span class="p">)</span>
+
+    <span class="c1"># 编码器隐藏层作为第一次解码器的隐藏层值
+</span>    <span class="n">dec_hidden</span> <span class="o">=</span> <span class="n">enc_hidden</span>
+    <span class="c1"># 解码第一个单词必然是&lt;start&gt;,表示启动解码
+</span>    <span class="n">dec_input</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">expand_dims</span><span class="p">([</span><span class="n">targ_lang</span><span class="p">.</span><span class="n">word_index</span><span class="p">[</span><span class="s">'&lt;start&gt;'</span><span class="p">]],</span> <span class="mi">0</span><span class="p">)</span>
+
+    <span class="c1"># 假设翻译结果不超过最长的样本句子
+</span>    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_length_targ</span><span class="p">):</span>
+        <span class="c1"># 逐个单词翻译
+</span>        <span class="n">predictions</span><span class="p">,</span> <span class="n">dec_hidden</span><span class="p">,</span> <span class="n">attention_weights</span> <span class="o">=</span> <span class="n">decoder</span><span class="p">(</span><span class="n">dec_input</span><span class="p">,</span>
+                                                             <span class="n">dec_hidden</span><span class="p">,</span>
+                                                             <span class="n">enc_out</span><span class="p">)</span>
+
+        <span class="c1"># 保留注意力权重用于绘制注意力图
+</span>        <span class="c1"># 注意每次循环的每个单词注意力权重是不同的
+</span>        <span class="n">attention_weights</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">attention_weights</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">))</span>
+        <span class="n">attention_plot</span><span class="p">[</span><span class="n">t</span><span class="p">]</span> <span class="o">=</span> <span class="n">attention_weights</span><span class="p">.</span><span class="n">numpy</span><span class="p">()</span>
+
+        <span class="c1"># 得到预测值
+</span>        <span class="n">predicted_id</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">predictions</span><span class="p">[</span><span class="mi">0</span><span class="p">]).</span><span class="n">numpy</span><span class="p">()</span>
+
+        <span class="c1"># 从数字查表转换为对应单词，累加到上一次结果，最终组成句子
+</span>        <span class="n">result</span> <span class="o">+=</span> <span class="n">targ_lang</span><span class="p">.</span><span class="n">index_word</span><span class="p">[</span><span class="n">predicted_id</span><span class="p">]</span> <span class="o">+</span> <span class="s">' '</span>
+
+        <span class="c1"># 如果是&lt;end&gt;表示翻译结束
+</span>        <span class="k">if</span> <span class="n">targ_lang</span><span class="p">.</span><span class="n">index_word</span><span class="p">[</span><span class="n">predicted_id</span><span class="p">]</span> <span class="o">==</span> <span class="s">'&lt;end&gt;'</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">sentence</span><span class="p">,</span> <span class="n">attention_plot</span>
+
+        <span class="c1"># 上次的预测值，将作为下次解码器的输入
+</span>        <span class="n">dec_input</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">expand_dims</span><span class="p">([</span><span class="n">predicted_id</span><span class="p">],</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="c1"># 如果超过样本中最长的句子仍然没有翻译结束标志，则返回当前所有翻译结果
+</span>    <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">sentence</span><span class="p">,</span> <span class="n">attention_plot</span>
+
+<span class="c1"># 绘制注意力图
+</span><span class="k">def</span> <span class="nf">plot_attention</span><span class="p">(</span><span class="n">attention</span><span class="p">,</span> <span class="n">sentence</span><span class="p">,</span> <span class="n">predicted_sentence</span><span class="p">):</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="p">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">.</span><span class="n">matshow</span><span class="p">(</span><span class="n">attention</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s">'viridis'</span><span class="p">)</span>
+
+    <span class="n">fontdict</span> <span class="o">=</span> <span class="p">{</span><span class="s">'fontsize'</span><span class="p">:</span> <span class="mi">14</span><span class="p">}</span>
+
+    <span class="n">ax</span><span class="p">.</span><span class="n">set_xticklabels</span><span class="p">([</span><span class="s">''</span><span class="p">]</span> <span class="o">+</span> <span class="n">sentence</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="n">fontdict</span><span class="p">,</span> <span class="n">rotation</span><span class="o">=</span><span class="mi">90</span><span class="p">)</span>
+    <span class="n">ax</span><span class="p">.</span><span class="n">set_yticklabels</span><span class="p">([</span><span class="s">''</span><span class="p">]</span> <span class="o">+</span> <span class="n">predicted_sentence</span><span class="p">,</span> <span class="n">fontdict</span><span class="o">=</span><span class="n">fontdict</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># 翻译一句文本
+</span><span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="n">sentence</span><span class="p">):</span>
+    <span class="n">result</span><span class="p">,</span> <span class="n">sentence</span><span class="p">,</span> <span class="n">attention_plot</span> <span class="o">=</span> <span class="n">evaluate</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s">'Input: %s'</span> <span class="o">%</span> <span class="p">(</span><span class="n">sentence</span><span class="p">))</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">'Predicted translation: {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">result</span><span class="p">))</span>
+
+    <span class="n">attention_plot</span> <span class="o">=</span> <span class="n">attention_plot</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">result</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">' '</span><span class="p">)),</span> <span class="p">:</span><span class="nb">len</span><span class="p">(</span><span class="n">sentence</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">' '</span><span class="p">))]</span>
+    <span class="n">plot_attention</span><span class="p">(</span><span class="n">attention_plot</span><span class="p">,</span> <span class="n">sentence</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">' '</span><span class="p">),</span> <span class="n">result</span><span class="p">.</span><span class="n">split</span><span class="p">(</span><span class="s">' '</span><span class="p">))</span>
+
+<span class="c1"># 恢复保存的训练结果
+</span><span class="n">checkpoint</span><span class="p">.</span><span class="n">restore</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">latest_checkpoint</span><span class="p">(</span><span class="n">checkpoint_dir</span><span class="p">))</span>
+
+<span class="c1"># 测试以下翻译
+</span><span class="n">translate</span><span class="p">(</span><span class="sa">u</span><span class="s">'hace mucho frio aqui.'</span><span class="p">)</span>
+<span class="n">translate</span><span class="p">(</span><span class="sa">u</span><span class="s">'esta es mi vida.'</span><span class="p">)</span>
+<span class="n">translate</span><span class="p">(</span><span class="sa">u</span><span class="s">'¿todavia estan en casa?'</span><span class="p">)</span>
+<span class="c1"># 据说这句话的翻译结果不对，不懂西班牙文，不做评论
+</span><span class="n">translate</span><span class="p">(</span><span class="sa">u</span><span class="s">'trata de averiguarlo.'</span><span class="p">)</span>
+</code></pre></div></div>
+<p>第一次执行的时候要加参数tain:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./translate_spa2en.py train
+Epoch 1 Batch 0 Loss 4.5296
+Epoch 1 Batch 100 Loss 2.2811
+Epoch 1 Batch 200 Loss 1.7985
+Epoch 1 Batch 300 Loss 1.6724
+Epoch 1 Loss 2.0235
+Time taken <span class="k">for </span>1 epoch 149.3063322815 sec
+	...训练过程略...
+	
+Input: &lt;start&gt; hace mucho frio aqui <span class="nb">.</span> &lt;end&gt;
+Predicted translation: it s very cold here <span class="nb">.</span> &lt;end&gt; 
+Input: &lt;start&gt; esta es mi vida <span class="nb">.</span> &lt;end&gt;
+Predicted translation: this is my life <span class="nb">.</span> &lt;end&gt; 
+Input: &lt;start&gt; ¿ todavia estan en casa ? &lt;end&gt;
+Predicted translation: are you still at home ? &lt;end&gt; 
+Input: &lt;start&gt; trata de averiguarlo <span class="nb">.</span> &lt;end&gt;
+Predicted translation: try to figure it out <span class="nb">.</span> &lt;end&gt; 
+</code></pre></div></div>
+<p>以后如果只是想测试翻译效果，可以不带train参数执行，直接看翻译结果。<br />
+对于每一个翻译句子，程序都会绘制注意力矩阵图：<br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/nmt-attention1.png" alt="" /><br />
+通常语法不是很复杂的句子，基本是顺序对应关系，所以注意力亮点基本落在对角线上。<br />
+图中X坐标是西班牙文单词，Y坐标是英文单词。每个英文单词，沿X轴看，亮点对应的X轴单词，表示对于翻译出这个英文单词，是哪一个西班牙文单词权重最大。</p>
+
+<p>（待续…）</p>
+
+:ET

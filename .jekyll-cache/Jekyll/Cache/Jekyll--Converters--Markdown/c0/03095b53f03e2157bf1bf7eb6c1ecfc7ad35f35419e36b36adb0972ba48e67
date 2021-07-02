@@ -1,0 +1,11 @@
+I"<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/SDL.png" alt="" />
+SDL全名Simple DirectMedia Layer，是一个跨平台的底层音频、视频、键盘、鼠标操作库，操作实际通过更底层的OpenGL/Direct3D完成，在保留跨平台的兼容性之外提供了非常高的效率，所以广泛的应用在多种游戏和对速度敏感的应用中，比如鼎鼎大名的steam平台/ffmpeg/qemu/模拟器等，当前的版本是2.0。更详细的资料可以访问官网：<a href="https://www.libsdl.org/">https://www.libsdl.org/</a>。<br />
+SDL2的编程理念清晰易用，代码简洁高效，这里用显式一副图片的最简代码来作为入门的示例，正式的教学可以搜索很多国内的教学网站。<br />
+老办法，让代码自己来说话：<br />
+```c
+#include <stdio.h>
+//引入SDL头文件
+#include <SDL.h>        
+//显式bmp之外的图片需要用到sdl_image库，需要单独引入头文件
+#include <SDL_image.h></SDL_image.h></SDL.h></stdio.h></p>
+:ET

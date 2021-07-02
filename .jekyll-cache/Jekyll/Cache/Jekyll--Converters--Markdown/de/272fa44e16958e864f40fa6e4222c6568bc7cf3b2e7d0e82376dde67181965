@@ -1,0 +1,467 @@
+I"��<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
+
+<h4 id="结构化数据的预处理">结构化数据的预处理</h4>
+<p>前面所展示的一些示例已经很让人兴奋。但从总体看，数据类型还是比较单一的，比如图片，比如文本。<br />
+这个单一并非指数据的类型单一，而是指数据组成的每一部分，在模型中对于结果预测的影响基本是一致的。<br />
+更通俗一点说，比如在手写数字识别的案例中，图片坐标(10,10)的点、(14,14)的点、(20,20)的点，对于最终的识别结果的影响，基本是同一个维度。
+再比如在影评中，第10个单词、第20个单词、第30个单词，对于最终结果的影响，也在同一个维度。<br />
+是的，这里指的是数据在维度上的不同。在某些问题中，数据集中的不同数据，对于结果的影响维度完全不同。这是数据所代表的属性意义不同所决定的。这种情况在<a href="http://blog.17study.com.cn/2018/01/08/tensorFlow-series-2/">《从锅炉工到AI专家(2)》</a>一文中我们做了简单描述，并讲述了使用规范化数据的方式在保持数据内涵的同时降低数据取值范围差异对于最终结果的负面影响。<br />
+随着机器学习应用范围的拓展，不同行业的不同问题，让此类情况出现的越加频繁。特别是在与大数据相连接的商业智能范畴，数据的来源、类型、维度，区别都很大。<br />
+在此我们使用心脏病预测的案例，对结构化数据的预处理做一个分享。</p>
+
+<h4 id="心脏病预测">心脏病预测</h4>
+<p>我们能从TensorFlow 2.0的变化中看出来，TensorFlow越来越集注，只做好自己擅长的事情。很多必要的工作，TensorFlow会借助第三方的工具来完成。本例中的数据处理，将使用Python的Pandas和sklearn库。这两个库在第一篇的开始部分我们已经安装了。<br />
+样本数据来自于克利夫兰临床基金会，是美国最大的心脏外科中心。样本是一个包含几百行数据的csv文件。每一行属于一个病患，而每一列，则描述病人的某一项指征。我们试图使用这些数据来预测一个病人是否患有心脏病。<br />
+延续我们的习惯，首先关注原始数据。这里只是一个示例，有很多样本的选取只是为了说明问题，并不符合心脏外科的理论。在任何一个机器学习的实际应用中，都应当是专业人员，配合机器学习工程师一起分析、筛选、设计出这样的表格，进而由全部团队配合，得到尽可能多的原始数据。<br />
+样本数据各列的名称和所代表的含义成表如下：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">特征名称</th>
+      <th style="text-align: left">描述</th>
+      <th style="text-align: left">特征类型</th>
+      <th style="text-align: left">数据类型</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left">Age</td>
+      <td style="text-align: left">年龄</td>
+      <td style="text-align: left">数值</td>
+      <td style="text-align: left">integer</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Sex</td>
+      <td style="text-align: left">(1 = 男; 0 = 女)</td>
+      <td style="text-align: left">分类</td>
+      <td style="text-align: left">integer</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">CP</td>
+      <td style="text-align: left">胸腔疼痛类型(0, 1, 2, 3, 4)</td>
+      <td style="text-align: left">分类</td>
+      <td style="text-align: left">integer</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Trestbpd</td>
+      <td style="text-align: left">静态血压 (in mm Hg on admission to the hospital)</td>
+      <td style="text-align: left">数值</td>
+      <td style="text-align: left">integer</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Chol</td>
+      <td style="text-align: left">胆固醇 in mg/dl</td>
+      <td style="text-align: left">数值</td>
+      <td style="text-align: left">integer</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">FBS</td>
+      <td style="text-align: left">(空腹血糖含量达到120 mg/dl) (1 = 是; 0 = 否)</td>
+      <td style="text-align: left">分类</td>
+      <td style="text-align: left">integer</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">RestECG</td>
+      <td style="text-align: left">静态心电图 (0, 1, 2)</td>
+      <td style="text-align: left">分类</td>
+      <td style="text-align: left">integer</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Thalach</td>
+      <td style="text-align: left">最大心率</td>
+      <td style="text-align: left">数值</td>
+      <td style="text-align: left">integer</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Exang</td>
+      <td style="text-align: left">运动是否引发心绞痛 (1 = 是; 0 = 否)</td>
+      <td style="text-align: left">分类</td>
+      <td style="text-align: left">integer</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Oldpeak</td>
+      <td style="text-align: left">运动相对休息诱发ST段压低</td>
+      <td style="text-align: left">数值</td>
+      <td style="text-align: left">integer</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Slope</td>
+      <td style="text-align: left">运动峰ST段坡度</td>
+      <td style="text-align: left">数值</td>
+      <td style="text-align: left">float</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">CA</td>
+      <td style="text-align: left">用荧光染色的主要血管数量(0-3)</td>
+      <td style="text-align: left">数值</td>
+      <td style="text-align: left">integer</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Thal</td>
+      <td style="text-align: left">地中海贫血：3 = 正常; 6 = 固定缺陷; 7 = 可逆转缺陷</td>
+      <td style="text-align: left">分类</td>
+      <td style="text-align: left">string</td>
+    </tr>
+    <tr>
+      <td style="text-align: left">Target</td>
+      <td style="text-align: left">诊出心脏疾病 (1 = 是; 0 = 否)</td>
+      <td style="text-align: left">分类标注结果</td>
+      <td style="text-align: left">integer</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>表格出来，我们的问题也能看的很清楚了，这是一个典型的监督学习。使用表格中所有特征的值，进行模型训练，最后一行的人工确诊结果，相当于标定的目标值。<br />
+正式应用的时候，通过填表、体检获取模型所需各项数据，数据经过模型的预测，就能得到一个可以提供给医生参考的心脏病初步诊断结果。</p>
+
+<p>Pandas库支持直接使用网址打开数据文件。但考虑到网络访问的问题，建议先手工自<a href="https://storage.googleapis.com/applied-dl/heart.csv">https://storage.googleapis.com/applied-dl/heart.csv</a>下载数据文件。下载后保存到工作目录，不要修改文件名称。<br />
+接着我们先在Python3交互模式中，直观的看一下数据内容。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">$</span> <span class="n">python3</span>
+<span class="n">Python</span> <span class="mf">3.7</span><span class="p">.</span><span class="mi">3</span> <span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="n">Mar</span> <span class="mi">27</span> <span class="mi">2019</span><span class="p">,</span> <span class="mi">09</span><span class="p">:</span><span class="mi">23</span><span class="p">:</span><span class="mi">39</span><span class="p">)</span> 
+<span class="p">[</span><span class="n">Clang</span> <span class="mf">10.0</span><span class="p">.</span><span class="mi">0</span> <span class="p">(</span><span class="n">clang</span><span class="o">-</span><span class="mf">1000.11</span><span class="p">.</span><span class="mf">45.5</span><span class="p">)]</span> <span class="n">on</span> <span class="n">darwin</span>
+<span class="n">Type</span> <span class="s">"help"</span><span class="p">,</span> <span class="s">"copyright"</span><span class="p">,</span> <span class="s">"credits"</span> <span class="ow">or</span> <span class="s">"license"</span> <span class="k">for</span> <span class="n">more</span> <span class="n">information</span><span class="p">.</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s">'heart.csv'</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">dataframe</span><span class="p">.</span><span class="n">head</span><span class="p">()</span>
+   <span class="n">age</span>  <span class="n">sex</span>  <span class="n">cp</span>  <span class="n">trestbps</span>  <span class="n">chol</span>  <span class="n">fbs</span>  <span class="n">restecg</span>  <span class="n">thalach</span>  <span class="n">exang</span>  <span class="n">oldpeak</span>  <span class="n">slope</span>  <span class="n">ca</span>        <span class="n">thal</span>  <span class="n">target</span>
+<span class="mi">0</span>   <span class="mi">63</span>    <span class="mi">1</span>   <span class="mi">1</span>       <span class="mi">145</span>   <span class="mi">233</span>    <span class="mi">1</span>        <span class="mi">2</span>      <span class="mi">150</span>      <span class="mi">0</span>      <span class="mf">2.3</span>      <span class="mi">3</span>   <span class="mi">0</span>       <span class="n">fixed</span>       <span class="mi">0</span>
+<span class="mi">1</span>   <span class="mi">67</span>    <span class="mi">1</span>   <span class="mi">4</span>       <span class="mi">160</span>   <span class="mi">286</span>    <span class="mi">0</span>        <span class="mi">2</span>      <span class="mi">108</span>      <span class="mi">1</span>      <span class="mf">1.5</span>      <span class="mi">2</span>   <span class="mi">3</span>      <span class="n">normal</span>       <span class="mi">1</span>
+<span class="mi">2</span>   <span class="mi">67</span>    <span class="mi">1</span>   <span class="mi">4</span>       <span class="mi">120</span>   <span class="mi">229</span>    <span class="mi">0</span>        <span class="mi">2</span>      <span class="mi">129</span>      <span class="mi">1</span>      <span class="mf">2.6</span>      <span class="mi">2</span>   <span class="mi">2</span>  <span class="n">reversible</span>       <span class="mi">0</span>
+<span class="mi">3</span>   <span class="mi">37</span>    <span class="mi">1</span>   <span class="mi">3</span>       <span class="mi">130</span>   <span class="mi">250</span>    <span class="mi">0</span>        <span class="mi">0</span>      <span class="mi">187</span>      <span class="mi">0</span>      <span class="mf">3.5</span>      <span class="mi">3</span>   <span class="mi">0</span>      <span class="n">normal</span>       <span class="mi">0</span>
+<span class="mi">4</span>   <span class="mi">41</span>    <span class="mi">0</span>   <span class="mi">2</span>       <span class="mi">130</span>   <span class="mi">204</span>    <span class="mi">0</span>        <span class="mi">2</span>      <span class="mi">172</span>      <span class="mi">0</span>      <span class="mf">1.4</span>      <span class="mi">1</span>   <span class="mi">0</span>      <span class="n">normal</span>       <span class="mi">0</span>
+<span class="o">&gt;&gt;&gt;</span> 
+</code></pre></div></div>
+<p>这些数据中，我们会根据不同数据的特征，采用不同的方式进行预处理。</p>
+
+<p>以年龄数据为例，年龄是一个数值特征。同专业人员沟通之后就知道，一个人的年龄是31岁还是32岁，对于确诊是否有心脏病帮助并不大。反而年龄段，一个人是30多岁（30-39岁）还是40多岁（40-49岁），对于判断心脏病的可能性帮助更大。所以我们更希望的数据是年龄段数据。<br />
+接着问题来了，即便我们计算得到了年龄段数据，仍然存在数据数字化和规范化的问题。我们怎么表达60-69岁、70-79岁这样的年龄段呢？用了这么久的机器学习，你肯定不会天真的认为计算机就应当知道“年龄段”是啥意思吧。</p>
+
+<h4 id="常用编码方式">常用编码方式</h4>
+<p>这里打断一下，我们先梳理一下数据数字化的常用编码方式。<br />
+数据的数字化，最常见有三种编码方式，也就是所谓数字化方式。<br />
+第一种是 <em>One-hot</em> 。这种编码方式，把每一项数据当成一个N项的数组，数据有多少种，数组就有多少项。数组中每一个元组取值只有0、1两种形式。并且每一个数组中，只有一项是1。你想到了，前面手写数字识别，有一种样本的标签就是这种形式。手写数字的识别结果，实际也是这种形式。我们用一张表格来描述一下，假设我们对猫、狗、猴、鸡四种动物做编码：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th>猫</th>
+      <th>狗</th>
+      <th>猴</th>
+      <th>鸡</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>猫</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>狗</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>猴</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>鸡</td>
+      <td>0</td>
+      <td>0</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>这种方式编码效率最低，直观度也不够。但是通常实现比较容易，速度快，并且适合表达某一特征“是”或者“否”的强烈因素。再者每一分类之间，并没有强烈的连接性关系。</p>
+
+<p>第二种编码方式最常见，就是 <em>序列化的唯一值</em> 。比如1代表猫；2代表狗；3代表猴；4代表鸡。<br />
+这种方式是我们平常用的最多的，至少下意识的，数据库中每行记录都是一个序列递增值。<br />
+但这种编码方式用在机器学习中通常有比较大的副作用，就是值的大小，往往会在神经网络的数学运算中被赋予我们并不期望的含义。而且这些值，也不适合规范化到0到1、-1到+1这样的浮点数字空间。所以在机器学习领域，除非这种值的递增本身就有特殊的意义，否则并不建议使用。</p>
+
+<p>第三种编码方式就是我们在NLP中使用的 <em>向量化</em> 。向量化同样首先确定一个N项的数组，每个数组元素值的取值范围会非常广，通常都是用浮点数据。这使得向量化的结果密度很高，能代表更多的分类。<br />
+ 不仅如此，对于NLP类的项目，向量化提供了对编码结果进一步调整的机会。两个我们期望更紧密的分类，比如意义相近的词，可以在向量空间中更接近。这个“更接近”如果太抽象，你想象一下二维、或者三维空间中的两个点之间的距离就理解了。<br />
+我们用表格做一个示例(仅为示例，表中数字并无特殊含义)：</p>
+
+<table>
+  <thead>
+    <tr>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+      <th> </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>猫</td>
+      <td>1.3</td>
+      <td>0.7</td>
+      <td>0.1</td>
+      <td>2.1</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>狗</td>
+      <td>0.9</td>
+      <td>1.1</td>
+      <td>0.9</td>
+      <td>1.0</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>猴</td>
+      <td>1.8</td>
+      <td>0.4</td>
+      <td>1.3</td>
+      <td>0.8</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>鸡</td>
+      <td>0.6</td>
+      <td>0.5</td>
+      <td>0.5</td>
+      <td>1.3</td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>…</td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<p>其它的编码方案多为这些方案的变种，我们后面在示例讲解的部分会说到。</p>
+
+<h4 id="结构化数据的预处理-1">结构化数据的预处理</h4>
+<p>回到我们的心脏病预测实例。<br />
+年龄段的数据，实际就非常适合One-Hot编码方式。因为我们关注的是某个年龄段的人，属于心脏病的高发人群。特别是在经验数据足够之前，也不能简单的就认为年龄大于多少就高发心脏病。因此年龄的线性特征，在我们的例子中也没有必要过分强调。<br />
+我们把年龄段划分为18岁以下、18-25岁、25-30岁、30-35岁、35-40岁、40-45岁、45-50岁、50-55岁、55-60岁、60-65岁、65岁以上共11个年龄段。<br />
+那如下的年龄数据：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[[</span><span class="mf">60.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">41.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">61.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">59.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">52.</span><span class="p">]]</span>
+</code></pre></div></div>
+<p>经过处理之后，就是这样的形式：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span> <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">0.</span><span class="p">]]</span>
+</code></pre></div></div>
+<p>TensorFlow中对于这种情况的数据已经有了专门的处理方式，以下一行语句就是完成这个工作：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 代码请在完整程序中执行
+</span><span class="n">age_buckets</span> <span class="o">=</span> <span class="n">feature_column</span><span class="p">.</span><span class="n">bucketized_column</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">boundaries</span><span class="o">=</span><span class="p">[</span><span class="mi">18</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">65</span><span class="p">])</span>
+</code></pre></div></div>
+<p>这等于是将线性的年龄数据，变成了年龄段的分类数据。</p>
+
+<p>我们继续看Thal字段，这代表患者地中海贫血症的表现情况。原始数据包括normal(正常)、fixed(固定)、reversible(可逆转)三种情况。并且在原始数据中，是直接以字符串的形式来表达的。<br />
+我们可以使用下面语句，将Thal字段也转换为one-hot编码方式：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 请在完整代码中执行
+# 获取thal字段原始数据
+</span><span class="n">thal</span> <span class="o">=</span> <span class="n">feature_column</span><span class="p">.</span><span class="n">categorical_column_with_vocabulary_list</span><span class="p">(</span>
+      <span class="s">'thal'</span><span class="p">,</span> <span class="p">[</span><span class="s">'fixed'</span><span class="p">,</span> <span class="s">'normal'</span><span class="p">,</span> <span class="s">'reversible'</span><span class="p">])</span>
+<span class="c1"># 转换为one-hot编码
+</span><span class="n">thal_one_hot</span> <span class="o">=</span> <span class="n">feature_column</span><span class="p">.</span><span class="n">indicator_column</span><span class="p">(</span><span class="n">thal</span><span class="p">)</span>
+</code></pre></div></div>
+<p>新的thal字段会是这个样子：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">0.</span> <span class="mf">1.</span><span class="p">]</span>
+ <span class="p">[</span><span class="mf">0.</span> <span class="mf">1.</span> <span class="mf">0.</span><span class="p">]]</span>
+</code></pre></div></div>
+<p>那么如果实例中不仅这三种可能，而是成千上万中可能呢？你想到了，这种情况就需要选用向量化的编码方式(还记得我们在前面自然语言语义识别中先将单词数字化，然后再嵌入向量中的例子吗？)，比如：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 此代码不要执行，仅为示例
+# 将thal字段嵌入到8维空间
+</span><span class="n">thal_embedding</span> <span class="o">=</span> <span class="n">feature_column</span><span class="p">.</span><span class="n">embedding_column</span><span class="p">(</span><span class="n">thal</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+</code></pre></div></div>
+<p>编码的结果会类似这样：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[[</span> <span class="mf">0.15909313</span> <span class="o">-</span><span class="mf">0.17830053</span> <span class="o">-</span><span class="mf">0.01482905</span>  <span class="mf">0.26818395</span> <span class="o">-</span><span class="mf">0.7063258</span>   <span class="mf">0.17809148</span>
+  <span class="o">-</span><span class="mf">0.33043832</span>  <span class="mf">0.34121528</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.2877485</span>   <span class="mf">0.20686264</span>  <span class="mf">0.2649153</span>  <span class="o">-</span><span class="mf">0.2827308</span>   <span class="mf">0.10686944</span> <span class="o">-</span><span class="mf">0.12080232</span>
+  <span class="o">-</span><span class="mf">0.28829345</span>  <span class="mf">0.43876123</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.2877485</span>   <span class="mf">0.20686264</span>  <span class="mf">0.2649153</span>  <span class="o">-</span><span class="mf">0.2827308</span>   <span class="mf">0.10686944</span> <span class="o">-</span><span class="mf">0.12080232</span>
+  <span class="o">-</span><span class="mf">0.28829345</span>  <span class="mf">0.43876123</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.15909313</span> <span class="o">-</span><span class="mf">0.17830053</span> <span class="o">-</span><span class="mf">0.01482905</span>  <span class="mf">0.26818395</span> <span class="o">-</span><span class="mf">0.7063258</span>   <span class="mf">0.17809148</span>
+  <span class="o">-</span><span class="mf">0.33043832</span>  <span class="mf">0.34121528</span><span class="p">]</span>
+ <span class="p">[</span> <span class="mf">0.2877485</span>   <span class="mf">0.20686264</span>  <span class="mf">0.2649153</span>  <span class="o">-</span><span class="mf">0.2827308</span>   <span class="mf">0.10686944</span> <span class="o">-</span><span class="mf">0.12080232</span>
+  <span class="o">-</span><span class="mf">0.28829345</span>  <span class="mf">0.43876123</span><span class="p">]]</span>
+</code></pre></div></div>
+<p>在分类可能性非常多的时候，还有一种可选的编码方案是使用哈希表：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 本代码仅为示例，不要执行
+</span><span class="n">thal_hashed</span> <span class="o">=</span> <span class="n">feature_column</span><span class="p">.</span><span class="n">categorical_column_with_hash_bucket</span><span class="p">(</span>
+      <span class="s">'thal'</span><span class="p">,</span> <span class="n">hash_bucket_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</code></pre></div></div>
+<p>某两项或者某多项字段互相关联作用，需要整体表达的情况也很常见。这时候可以使用feature crosses编码方式：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 本代码仅为示例，不要执行
+</span><span class="n">crossed_feature</span> <span class="o">=</span> <span class="n">feature_column</span><span class="p">.</span><span class="n">crossed_column</span><span class="p">([</span><span class="n">age_buckets</span><span class="p">,</span> <span class="n">thal</span><span class="p">],</span> <span class="n">hash_bucket_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+</code></pre></div></div>
+<p>上面三个编码都是为了说明编码方式本身，医学方面的工作者千万不要用来参考。</p>
+
+<h4 id="建模">建模</h4>
+<p>建模本身跟前几篇讲过的基本相同。网络的第一层也就是数据的输入层需要单独说明一下，那就是Keras已经为这种复杂的自定义结构化数据提供了输入层的支持：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 定义输入层
+</span><span class="n">feature_layer</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">DenseFeatures</span><span class="p">(</span><span class="n">feature_columns</span><span class="p">)</span>
+
+<span class="c1"># 将输入层一定要放在模型的第一层
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">Sequential</span><span class="p">([</span>
+  <span class="n">feature_layer</span><span class="p">,</span>
+  <span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">),</span>
+  <span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">),</span>
+  <span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'sigmoid'</span><span class="p">)</span>
+<span class="p">])</span>
+</code></pre></div></div>
+<p>有了自定义结构化数据的自动处理，节省了我们在TensorFlow1.0中需要自己操作的大量预处理过程，工作量减少，出错的几率也少了。<br />
+模型的训练和评估就都是一条语句，略去不讲。</p>
+
+<h4 id="完整代码">完整代码</h4>
+<p>好了，贴出完整的可执行代码：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
+</span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+
+<span class="c1"># 引入所需头文件
+</span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+<span class="kn">from</span> <span class="nn">tensorflow</span> <span class="kn">import</span> <span class="n">feature_column</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras</span> <span class="kn">import</span> <span class="n">layers</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">train_test_split</span>
+
+<span class="c1"># 打开样本数据文件
+# URL = 'https://storage.googleapis.com/applied-dl/heart.csv'   #直接从网上打开可以使用这一行
+</span><span class="n">URL</span> <span class="o">=</span> <span class="s">'heart.csv'</span>
+<span class="n">dataframe</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">URL</span><span class="p">)</span>
+<span class="c1"># 显示数据的头几行
+# dataframe.head()
+</span>
+<span class="c1"># 将数据中20%分做测试数据
+</span><span class="n">train</span><span class="p">,</span> <span class="n">test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="c1"># 将数据的64%作为训练数据，16%作为验证数据
+</span><span class="n">train</span><span class="p">,</span> <span class="n">val</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">train</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="c1"># 显示训练、验证、测试三个数据集的记录数量
+</span><span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">train</span><span class="p">),</span> <span class="s">'train examples'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">val</span><span class="p">),</span> <span class="s">'validation examples'</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">test</span><span class="p">),</span> <span class="s">'test examples'</span><span class="p">)</span>
+
+<span class="c1"># 定义一个函数，将Pandas Dataframe对象转换为TensorFlow的Dataset对象
+</span><span class="k">def</span> <span class="nf">df_to_dataset</span><span class="p">(</span><span class="n">dataframe</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">):</span>
+    <span class="n">dataframe</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="c1"># target字段是确诊是否罹患心脏病的数据，取出来作为标注数据
+</span>    <span class="n">labels</span> <span class="o">=</span> <span class="n">dataframe</span><span class="p">.</span><span class="n">pop</span><span class="p">(</span><span class="s">'target'</span><span class="p">)</span>
+    <span class="c1"># 生成Dataset
+</span>    <span class="n">ds</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">data</span><span class="p">.</span><span class="n">Dataset</span><span class="p">.</span><span class="n">from_tensor_slices</span><span class="p">((</span><span class="nb">dict</span><span class="p">(</span><span class="n">dataframe</span><span class="p">),</span> <span class="n">labels</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">shuffle</span><span class="p">:</span>
+        <span class="c1"># 是否需要乱序
+</span>        <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="p">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">buffer_size</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">dataframe</span><span class="p">))</span>
+    <span class="c1"># 设置每批次的记录数量
+</span>    <span class="n">ds</span> <span class="o">=</span> <span class="n">ds</span><span class="p">.</span><span class="n">batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">ds</span>
+
+<span class="c1"># 训练、验证、测试三个数据集都转换成Dataset类型，其中训练集需要重新排序
+</span><span class="n">train_ds</span> <span class="o">=</span> <span class="n">df_to_dataset</span><span class="p">(</span><span class="n">train</span><span class="p">)</span>
+<span class="n">val_ds</span> <span class="o">=</span> <span class="n">df_to_dataset</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">test_ds</span> <span class="o">=</span> <span class="n">df_to_dataset</span><span class="p">(</span><span class="n">test</span><span class="p">,</span> <span class="n">shuffle</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+<span class="c1"># 用于保存所需的数据列
+</span><span class="n">feature_columns</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># 根据字段名，添加所需的数据列
+</span><span class="k">for</span> <span class="n">header</span> <span class="ow">in</span> <span class="p">[</span><span class="s">'age'</span><span class="p">,</span> <span class="s">'trestbps'</span><span class="p">,</span> <span class="s">'chol'</span><span class="p">,</span> <span class="s">'thalach'</span><span class="p">,</span> <span class="s">'oldpeak'</span><span class="p">,</span> <span class="s">'slope'</span><span class="p">,</span> <span class="s">'ca'</span><span class="p">]:</span>
+    <span class="n">feature_columns</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">feature_column</span><span class="p">.</span><span class="n">numeric_column</span><span class="p">(</span><span class="n">header</span><span class="p">))</span>
+
+<span class="c1"># 取出年龄数据
+</span><span class="n">age</span> <span class="o">=</span> <span class="n">feature_column</span><span class="p">.</span><span class="n">numeric_column</span><span class="p">(</span><span class="s">"age"</span><span class="p">)</span>
+<span class="c1"># 按照18-25/25-30/30-35/.../60-65为年龄分段，最后形成one-hot编码
+</span><span class="n">age_buckets</span> <span class="o">=</span> <span class="n">feature_column</span><span class="p">.</span><span class="n">bucketized_column</span><span class="p">(</span><span class="n">age</span><span class="p">,</span> <span class="n">boundaries</span><span class="o">=</span><span class="p">[</span><span class="mi">18</span><span class="p">,</span> <span class="mi">25</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">35</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">45</span><span class="p">,</span> <span class="mi">50</span><span class="p">,</span> <span class="mi">55</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">65</span><span class="p">])</span>
+<span class="c1"># 数据段作为一个新参量添加到数据集
+</span><span class="n">feature_columns</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">age_buckets</span><span class="p">)</span>
+
+<span class="c1"># 获取thal字段原始数据
+</span><span class="n">thal</span> <span class="o">=</span> <span class="n">feature_column</span><span class="p">.</span><span class="n">categorical_column_with_vocabulary_list</span><span class="p">(</span>
+      <span class="s">'thal'</span><span class="p">,</span> <span class="p">[</span><span class="s">'fixed'</span><span class="p">,</span> <span class="s">'normal'</span><span class="p">,</span> <span class="s">'reversible'</span><span class="p">])</span>
+<span class="c1"># 做one-hot编码
+</span><span class="n">thal_one_hot</span> <span class="o">=</span> <span class="n">feature_column</span><span class="p">.</span><span class="n">indicator_column</span><span class="p">(</span><span class="n">thal</span><span class="p">)</span>
+<span class="c1"># 作为新的数据列添加
+</span><span class="n">feature_columns</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">thal_one_hot</span><span class="p">)</span>
+
+<span class="c1"># 将thal嵌入8维空间做向量化
+</span><span class="n">thal_embedding</span> <span class="o">=</span> <span class="n">feature_column</span><span class="p">.</span><span class="n">embedding_column</span><span class="p">(</span><span class="n">thal</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+<span class="n">feature_columns</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">thal_embedding</span><span class="p">)</span>
+
+<span class="c1"># 把年龄段和thal字段作为关联属性加入新列
+</span><span class="n">crossed_feature</span> <span class="o">=</span> <span class="n">feature_column</span><span class="p">.</span><span class="n">crossed_column</span><span class="p">([</span><span class="n">age_buckets</span><span class="p">,</span> <span class="n">thal</span><span class="p">],</span> <span class="n">hash_bucket_size</span><span class="o">=</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">crossed_feature</span> <span class="o">=</span> <span class="n">feature_column</span><span class="p">.</span><span class="n">indicator_column</span><span class="p">(</span><span class="n">crossed_feature</span><span class="p">)</span>
+<span class="n">feature_columns</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">crossed_feature</span><span class="p">)</span>
+
+<span class="c1"># 定义输入层
+</span><span class="n">feature_layer</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">DenseFeatures</span><span class="p">(</span><span class="n">feature_columns</span><span class="p">)</span>
+
+<span class="c1"># 定义完整模型
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">Sequential</span><span class="p">([</span>
+  <span class="n">feature_layer</span><span class="p">,</span>
+  <span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">),</span>
+  <span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">128</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">),</span>
+  <span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'sigmoid'</span><span class="p">)</span>
+<span class="p">])</span>
+
+<span class="c1"># 模型编译
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'adam'</span><span class="p">,</span>
+              <span class="n">loss</span><span class="o">=</span><span class="s">'binary_crossentropy'</span><span class="p">,</span>
+              <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+
+<span class="c1"># 训练
+</span><span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_ds</span><span class="p">,</span> 
+          <span class="n">validation_data</span><span class="o">=</span><span class="n">val_ds</span><span class="p">,</span> 
+          <span class="n">epochs</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="c1"># 评估
+</span><span class="n">test_loss</span><span class="p">,</span> <span class="n">test_acc</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">test_ds</span><span class="p">)</span>
+<span class="c1"># 显示评估的正确率
+</span><span class="k">print</span><span class="p">(</span><span class="s">'===================</span><span class="se">\n</span><span class="s">Test accuracy:'</span><span class="p">,</span> <span class="n">test_acc</span><span class="p">)</span>
+</code></pre></div></div>
+<p>这样的内容，的确是使用IPython笔记本的互动方式边讲边试效果最好。不过可惜国内访问Colab这样的工具网站还是不方便。<br />
+上面程序执行的输出如下：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">Epoch</span> <span class="mi">1</span><span class="o">/</span><span class="mi">5</span>
+<span class="mi">7</span><span class="o">/</span><span class="mi">7</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span><span class="n">s</span> <span class="mi">110</span><span class="n">ms</span><span class="o">/</span><span class="n">step</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">1.2045</span> <span class="o">-</span> <span class="n">accuracy</span><span class="p">:</span> <span class="mf">0.5884</span> <span class="o">-</span> <span class="n">val_loss</span><span class="p">:</span> <span class="mf">1.1234</span> <span class="o">-</span> <span class="n">val_accuracy</span><span class="p">:</span> <span class="mf">0.7755</span>
+<span class="n">Epoch</span> <span class="mi">2</span><span class="o">/</span><span class="mi">5</span>
+<span class="mi">7</span><span class="o">/</span><span class="mi">7</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="mi">46</span><span class="n">ms</span><span class="o">/</span><span class="n">step</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">1.0691</span> <span class="o">-</span> <span class="n">accuracy</span><span class="p">:</span> <span class="mf">0.6383</span> <span class="o">-</span> <span class="n">val_loss</span><span class="p">:</span> <span class="mf">0.5731</span> <span class="o">-</span> <span class="n">val_accuracy</span><span class="p">:</span> <span class="mf">0.7959</span>
+<span class="n">Epoch</span> <span class="mi">3</span><span class="o">/</span><span class="mi">5</span>
+<span class="mi">7</span><span class="o">/</span><span class="mi">7</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="mi">43</span><span class="n">ms</span><span class="o">/</span><span class="n">step</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.9016</span> <span class="o">-</span> <span class="n">accuracy</span><span class="p">:</span> <span class="mf">0.7100</span> <span class="o">-</span> <span class="n">val_loss</span><span class="p">:</span> <span class="mf">0.5924</span> <span class="o">-</span> <span class="n">val_accuracy</span><span class="p">:</span> <span class="mf">0.7551</span>
+<span class="n">Epoch</span> <span class="mi">4</span><span class="o">/</span><span class="mi">5</span>
+<span class="mi">7</span><span class="o">/</span><span class="mi">7</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="mi">44</span><span class="n">ms</span><span class="o">/</span><span class="n">step</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.5362</span> <span class="o">-</span> <span class="n">accuracy</span><span class="p">:</span> <span class="mf">0.7055</span> <span class="o">-</span> <span class="n">val_loss</span><span class="p">:</span> <span class="mf">0.6440</span> <span class="o">-</span> <span class="n">val_accuracy</span><span class="p">:</span> <span class="mf">0.7755</span>
+<span class="n">Epoch</span> <span class="mi">5</span><span class="o">/</span><span class="mi">5</span>
+<span class="mi">7</span><span class="o">/</span><span class="mi">7</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="mi">43</span><span class="n">ms</span><span class="o">/</span><span class="n">step</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.7290</span> <span class="o">-</span> <span class="n">accuracy</span><span class="p">:</span> <span class="mf">0.6940</span> <span class="o">-</span> <span class="n">val_loss</span><span class="p">:</span> <span class="mf">0.5966</span> <span class="o">-</span> <span class="n">val_accuracy</span><span class="p">:</span> <span class="mf">0.7347</span>
+<span class="mi">2</span><span class="o">/</span><span class="mi">2</span> <span class="p">[</span><span class="o">==============================</span><span class="p">]</span> <span class="o">-</span> <span class="mi">0</span><span class="n">s</span> <span class="mi">24</span><span class="n">ms</span><span class="o">/</span><span class="n">step</span> <span class="o">-</span> <span class="n">loss</span><span class="p">:</span> <span class="mf">0.4600</span> <span class="o">-</span> <span class="n">accuracy</span><span class="p">:</span> <span class="mf">0.7705</span>
+<span class="o">===================</span>
+<span class="n">Test</span> <span class="n">accuracy</span><span class="p">:</span> <span class="mf">0.7704918</span>
+</code></pre></div></div>
+<p>为了说明数据的预处理，我们选用了一些并不合理的特征项用于演示。再加上较少的训练数据和训练过程，预测准确率很低也就没有什么好奇怪了。</p>
+
+<p>最后还有一个问题要补充。就是比如年龄字段，我们已经预处理并且增加了一个年龄段字段，那原来的年龄字段还需要保留吗？<br />
+我们上面的代码仅为示例，保留了年龄字段，但这并不能说明什么问题。类似这样的字段是否保留，关键还是看专业方面的需求。如果觉得年龄的线性特征本身对于预测结果还是有意义的，那就保留。额外增加的年龄段等于是一个强调的作用。<br />
+如果觉得年龄原始数据本身并没有什么意义，用年龄段表达足以说明问题，那年龄字段就应当去掉。通常说，在机器学习中，如果特征项非常多的话，单独一个年龄字段保留或者不保留，对最终结果的影响都不大，不用太过认真。<br />
+与此对应的，thal字段，原本就是字符串类型。这种字段一定需要预处理之后再进入数据集，而原始的字段是不能保留在数据集中的。字符串在神经网络中不能直接处理是一方面。即便能处理，这种无数学意义的高维数据对最终结果一定有很大的负面影响。</p>
+
+<p>（待续…）</p>
+
+:ET

@@ -1,7 +1,0 @@
-I"-<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201910/titlepic/appstore.jpeg" alt="" />
-在mac版本AppStore下载软件的时候，有时会出现“This item is temporarily unavailable, Try again later”错误提示，当然等一会儿或者不断重新尝试都是无法下载的。<br />
-<a href="http://stackoverflow.com/questions/27073615/trouble-downloading-xcode-6-1-on-mac-os-x-yosemite">StackOverFlow</a>上找到一个解法：<br />
-Mac App Store –&gt; Store –&gt; Check for Unfinished Downloads…<br />
-通常是因为软件原来下载的时候，跟现在登录的账号不是同一个并且不再同一个国家，所以当前国家的AppStore中很可能没有对应版本的相关软件，上面操作后，一般会弹出对应的登录窗口，重新登录后就可以正常下载了。</p>
-
-:ET

@@ -1,0 +1,455 @@
+I"��<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201805/232cable1.jpg" alt="" /><br />
+再次是一篇入门文，各路神仙退散。<br />
+直接进入主题，又不是历史课，关于RS232那些前世今生的故事就不摆了。</p>
+
+<h4 id="硬件链接">硬件链接</h4>
+<p>首先以9针小口为例（大口应当只能去博物馆看了吧）看一下管脚排布，其实RS232本身没进博物馆都已经够让我惊讶了。<br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201805/232pic1.jpg" alt="" />
+(图片来自互联网)</p>
+
+<p>通常使用的接线图：<br />
+<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201805/232pic2.jpg" alt="" />
+(图片来自互联网)</p>
+
+<p>硬件接口部分的重点：</p>
+<ul>
+  <li>绝大多数情况下，我们只需要接2号、3号、5号，RXD/TXD/SG三根线就能正常工作。（顺便多说一句，古老的大串口是2、3、7号）</li>
+  <li>直连模式一般用于延长线或者大小口的转换线。</li>
+  <li>交叉线是用于连接电脑之间、电脑与设备之间，是最主要的应用方式。</li>
+  <li>通常三根线就能工作，但并不表示其它信号就没用，甚至像某些书上说的都没有定义。</li>
+</ul>
+
+<h4 id="硬件支持">硬件支持</h4>
+<p>当前我们常用的电脑，在台式机上一般都会有串口，可以直接使用。<br />
+绝大多数的笔记本电脑都已经没有了串口，想使用串口通常都是使用USB接口的适配器。顺便说一句，USB实际也是另外一种串口，SATA也是，只是未成文的约定俗称上，串口特指了RS232接口或者485接口。<br />
+USB适配器通常也分两种，一种是内置于外置设备中的适配器，比如外置GPS模块、烧录机。另外一种则是仅有串口功能的独立适配器，今天的实验中我们会使用后者。</p>
+
+<h4 id="驱动程序">驱动程序</h4>
+<p>本身主板已经具有的串口都已经有了良好的设备驱动，鲜见不可用者。<br />
+USB外置的串口则绝大多数都需要另外安装驱动，Windows/Linux/macOS都是如此，依据适配器的芯片不同，所使用的驱动也不一样。这个在采购的时候就需要了解好。比如我测试的这款是PL2302芯片，使用win10内置的微软2017版驱动（不不不，不是你想的那样免驱动，继续看）。<br />
+因为串口无论如何算是一个比较有历史的技术，所以在x64的系统中大多支持不好，PL2302为例，在win10x64系统中会自动识别并安装驱动，但驱动安装完成仍然会有一个叹号表示设备不能正常工作，错误代码10。<br />
+搜索互联网能找到第三方提供的补丁，原厂商已经发布通知说PL2302已经停止支持了。补丁程序安装后运行还会先下载.net的运行时间库，随后才能完成驱动的补丁工作。<br />
+此仅为举例，不同的适配器，需要的驱动、安装方式都不会一样。</p>
+
+<h4 id="实验环境准备">实验环境准备</h4>
+<p>串口作为通讯设备，实验需要发送、接受两个端。所以最好的实验方法是一台电脑上，用两个串口，一个模拟接收，一个模拟发送。当然如果你不缺电脑、不缺空间、不缺时间，使用两台电脑看上去肯定会更高大上。<br />
+各类操作系统都支持多个USB串口适配器同时工作，并识别为不同的串口设备和串口编号。<br />
+所以你要做的是：</p>
+<ol>
+  <li>在不连接USB串口适配器的情况下（通常要求如此）安装正确的设备驱动。</li>
+  <li>根据驱动安装的要求，看是否需要重启系统。</li>
+  <li>在没有安装适配器的情况下，Windows到设备管理工具中，macOS则记录/dev路径下tty开头的设备。</li>
+  <li>连接USB串口适配器，再次到上述相应位置，查看是否增加了串口设备，如果没有增加，返回检查驱动程序甚至适配器硬件。如果有增加，记录下来端口号，以供后续编程使用。</li>
+  <li>使用带接线端子的杜邦线，用上图中交叉连接的方式，连接两个适配器的GND-GND/RX-TX/TX-RX。如果感觉插在电脑上不好接线，也可以先将两个适配器接好线再插入电脑USB。</li>
+  <li>要么你的两个USB口离的足够近，要么你的杜邦线足够长，总之要保证连接稳定可靠。顺便，如果USB不够多，使用USB集线器也可以正常工作。</li>
+</ol>
+
+<p>开发工具部分，因为学校的教学限定，使用VC6。作为一个追求时尚的unix fans，被逼回到这个太祖级的编程环境我也是有够纠结:(</p>
+
+<h4 id="rs232编程之旅">RS232编程之旅</h4>
+<p>通常的教程都会从底层写起，细致的构建起整个的系统。而我比较相反，首先从c语言的main主函数的代码讲起：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">// 为了清晰结构，代码有删减，但能正常运行</span>
+<span class="c1">//</span>
+<span class="cp">#include "serialport.h"
+#include&lt;string.h&gt;
+</span>
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span> <span class="kt">char</span><span class="o">*</span> <span class="n">argv</span><span class="p">[])</span>
+<span class="p">{</span>
+	<span class="c1">//定义两个句柄，用来报错打开后的两个串口相关资源信息</span>
+	<span class="c1">//句柄是编程中常用的说法，通常都表示指向一堆数据的标志</span>
+	<span class="n">HANDLE</span> <span class="n">h1</span><span class="p">,</span><span class="n">h2</span><span class="p">;</span>
+	<span class="c1">//定义一个字符串，字符串的内容其实无所谓，用于演示串口通讯的内容</span>
+	<span class="kt">char</span> <span class="o">*</span><span class="n">msg</span><span class="o">=</span><span class="s">"Hello, human!</span><span class="se">\n</span><span class="s">"</span><span class="p">;</span>
+	<span class="c1">//要传输的数据的长度</span>
+	<span class="kt">int</span> <span class="n">n</span><span class="o">=</span><span class="n">strlen</span><span class="p">(</span><span class="n">msg</span><span class="p">);</span>
+	<span class="c1">//一个串口接受用的缓冲区，100是随意给出的，只要大于通讯对端一次传输的数据量即可</span>
+	<span class="kt">char</span> <span class="n">buf</span><span class="p">[</span><span class="mi">100</span><span class="p">];</span>
+
+	<span class="c1">//首先将接受缓冲区清空，在正常、确定长度的数据传输中，这一步并不必要</span>
+	<span class="c1">//但在字符串传输的演示中，还是需要清空的，以保证在串味没有乱字符出现</span>
+	<span class="n">memset</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">100</span><span class="p">);</span>
+	<span class="c1">//给用户一个提示，表示传输测试开始了，因为至少以今天的眼光看，串口速度还是很慢的</span>
+	<span class="n">printf</span><span class="p">(</span><span class="s">"Serial port test begin ...!</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+	<span class="c1">//打开并设置发送端串口，后面的串口编号是在设备管理器中查询到的</span>
+	<span class="c1">//在正式的系统中，这个串口通常会由用户在参数设置中修改</span>
+	<span class="c1">//Uart是英文中对串口的另外一个称呼，serial port/com也是同义</span>
+	<span class="n">SetupUart</span><span class="p">(</span><span class="o">&amp;</span><span class="n">h1</span><span class="p">,</span><span class="s">"com7"</span><span class="p">);</span>
+	<span class="c1">//打开并设置接收端串口</span>
+	<span class="n">SetupUart2</span><span class="p">(</span><span class="o">&amp;</span><span class="n">h2</span><span class="p">,</span><span class="s">"com8"</span><span class="p">);</span>
+	<span class="c1">//在发送端口写出数据，也就是我们准备的字符串</span>
+	<span class="c1">//串口通讯可以容纳的内容范围很广，不仅是字符串，所以使用unsigned char类型</span>
+	<span class="n">WriteUart</span><span class="p">((</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">msg</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">h1</span><span class="p">);</span>
+	<span class="c1">//在接受端口读取数据，注意因为接收是阻塞式的，所以读取的长度要&lt;=发送的数据包长度，</span>
+	<span class="c1">//否则会让程序阻塞在这里一直等待读取</span>
+	<span class="n">ReadUart</span><span class="p">((</span><span class="kt">unsigned</span> <span class="kt">char</span><span class="o">*</span><span class="p">)</span><span class="n">buf</span><span class="p">,</span><span class="n">n</span><span class="p">,</span><span class="n">h2</span><span class="p">);</span>
+	<span class="c1">//显示接收到的数据内容</span>
+	<span class="n">printf</span><span class="p">(</span><span class="s">"Loop received:%s"</span><span class="p">,</span><span class="n">buf</span><span class="p">);</span>
+	<span class="c1">//关闭两个打开的串口</span>
+	<span class="n">CloseUart2</span><span class="p">();</span>
+	<span class="n">CloseUart</span><span class="p">();</span>
+
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>上面代码的注释非常详细，归纳串口操作的步骤为：</p>
+<ol>
+  <li>打开并设置串口。</li>
+  <li>写入或者读取数据。</li>
+  <li>关闭串口。</li>
+</ol>
+
+<p>接下来看细节，也就是串口操作的部分：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//以下代码原型来自MSDN官方示例，为了保持原始代码的风格，尽量不做改动</span>
+<span class="c1">//代码中有很多东西超出一般学习的范围，比如多线程的事件同步等，可以先大概了解即可</span>
+<span class="c1">//对于不熟悉的代码，初期可以抄过来用，了解对外的API即可，有时间再去下功夫了解细节</span>
+<span class="cp">#include "serialPort.h"
+</span>
+<span class="n">DCB</span>            <span class="n">PortDCB</span><span class="p">;</span> 
+<span class="n">COMMTIMEOUTS</span>   <span class="n">CommTimeouts</span><span class="p">;</span> 
+<span class="n">HANDLE</span>         <span class="n">hPort1</span><span class="p">,</span><span class="n">hPort2</span><span class="p">;</span>
+<span class="kt">char</span>           <span class="n">lastError</span><span class="p">[</span><span class="mi">1024</span><span class="p">];</span>
+
+<span class="c1">//以下是一些端口设置使用的常量，在正常项目中应当也是归集于配置系统中的</span>
+<span class="c1">//串口顾名思义是将数据串流化通讯，因此需要定义发送、接收方都完全相同的速度、位长、校验模式等</span>
+<span class="c1">//另外因为我们只用了三根数据线，其它控制位的设置我们就省略掉了</span>
+<span class="c1">//这些常量参数使用index*这样的方式是为了同传统界面上的各项设置做的对应，变量命名嘛，不用过于纠结。</span>
+<span class="kt">int</span>	<span class="n">index1</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span><span class="c1">//9600</span>
+	<span class="n">index2</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span><span class="c1">//8</span>
+	<span class="n">index3</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span><span class="c1">//NOPARITY</span>
+	<span class="n">index4</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span><span class="c1">//ONSTOPBIT</span>
+	<span class="n">index5</span><span class="o">=-</span><span class="mi">1</span><span class="p">;</span>
+<span class="c1">//打开并且设置串口</span>
+<span class="kt">int</span> <span class="nf">SetupUart</span><span class="p">(</span><span class="n">HANDLE</span> <span class="o">*</span><span class="n">hPort</span><span class="p">,</span><span class="kt">char</span> <span class="o">*</span><span class="n">port1</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="c1">//打开串行端口，也是把端口当做一个文件来对待</span>
+	<span class="c1">//对于新手，为什么用这个函数之类的问题，只能先死记了</span>
+	<span class="n">hPort1</span> <span class="o">=</span> <span class="n">CreateFile</span> <span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="n">port1</span><span class="p">),</span>			            <span class="c1">// Name of the port </span>
+						<span class="n">GENERIC_READ</span> <span class="o">|</span> <span class="n">GENERIC_WRITE</span><span class="p">,</span>     <span class="c1">// Access (read-write) mode </span>
+						<span class="mi">0</span><span class="p">,</span>                                  
+						<span class="nb">NULL</span><span class="p">,</span>                             
+						<span class="n">OPEN_EXISTING</span><span class="p">,</span>
+						<span class="n">FILE_ATTRIBUTE_NORMAL</span><span class="p">,</span>                     
+			            <span class="nb">NULL</span><span class="p">);</span>                             
+             
+	<span class="c1">//打开失败就报个警并退出后续操作</span>
+	<span class="k">if</span> <span class="p">(</span> <span class="n">hPort1</span> <span class="o">==</span> <span class="n">INVALID_HANDLE_VALUE</span> <span class="p">)</span>
+	<span class="p">{</span> 
+		<span class="n">MessageBox</span> <span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="s">"Port Open Failed"</span> <span class="p">,</span><span class="s">"Error"</span><span class="p">,</span> <span class="n">MB_OK</span><span class="p">);</span>
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="p">}</span>   
+	<span class="o">*</span><span class="n">hPort</span> <span class="o">=</span> <span class="n">hPort1</span><span class="p">;</span>
+	  <span class="c1">//读取当前串口的状态</span>
+      <span class="n">PortDCB</span><span class="p">.</span><span class="n">DCBlength</span> <span class="o">=</span> <span class="k">sizeof</span> <span class="p">(</span><span class="n">DCB</span><span class="p">);</span> 
+      <span class="n">GetCommState</span> <span class="p">(</span><span class="n">hPort1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">PortDCB</span><span class="p">);</span>
+	  <span class="c1">//在当前串口状态的基础上设置串口速率等参数</span>
+	  <span class="n">configure</span><span class="p">();</span>
+
+	  <span class="c1">//读取当前超时设置</span>
+	  <span class="n">GetCommTimeouts</span> <span class="p">(</span><span class="n">hPort1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">CommTimeouts</span><span class="p">);</span> 
+	  <span class="c1">//根据当前超时设置，设置自己期望的值</span>
+	  <span class="n">configuretimeout</span><span class="p">();</span>
+	
+   
+
+	<span class="c1">//Re-configure the port with the new DCB structure. </span>
+	<span class="c1">//上面的configure只是设置了参数结构，下面函数才是真正将之设置到串口</span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">SetCommState</span> <span class="p">(</span><span class="n">hPort1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">PortDCB</span><span class="p">))</span> 
+	<span class="p">{</span> 
+        <span class="n">MessageBox</span> <span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="s">"1.Could not create the read thread.(SetCommState Failed)"</span> <span class="p">,</span><span class="s">"Error"</span><span class="p">,</span> <span class="n">MB_OK</span><span class="p">);</span>
+		<span class="n">CloseHandle</span><span class="p">(</span><span class="n">hPort1</span><span class="p">);</span>   
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span> 
+	 <span class="p">}</span> 
+
+	<span class="c1">// Set the time-out parameters for all read and write operations on the port. </span>
+	<span class="c1">//同样设置configuretimeout输出的结果</span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">SetCommTimeouts</span> <span class="p">(</span><span class="n">hPort1</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">CommTimeouts</span><span class="p">))</span> 
+	<span class="p">{</span> 
+        <span class="n">MessageBox</span> <span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="s">"Could not create the read thread.(SetCommTimeouts Failed)"</span> <span class="p">,</span><span class="s">"Error"</span><span class="p">,</span> <span class="n">MB_OK</span><span class="p">);</span>
+		<span class="n">CloseHandle</span><span class="p">(</span><span class="n">hPort1</span><span class="p">);</span>  
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span> 
+	<span class="p">}</span> 
+
+	<span class="c1">// Clear the port of any existing data. </span>
+	<span class="c1">//如果串口还有以前通讯积累的未完结数据，清理掉</span>
+	<span class="k">if</span><span class="p">(</span><span class="n">PurgeComm</span><span class="p">(</span><span class="n">hPort1</span><span class="p">,</span> <span class="n">PURGE_TXCLEAR</span> <span class="o">|</span> <span class="n">PURGE_RXCLEAR</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> 
+	<span class="p">{</span>   <span class="n">MessageBox</span> <span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="s">"Clearing The Port Failed"</span> <span class="p">,</span><span class="s">"Message"</span><span class="p">,</span> <span class="n">MB_OK</span><span class="p">);</span>
+		<span class="n">CloseHandle</span><span class="p">(</span><span class="n">hPort1</span><span class="p">);</span> 
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span> 
+	<span class="p">}</span> 
+    
+	<span class="c1">//MessageBox (NULL, "Port1 SETUP OK." ,"Message", MB_OK);</span>
+	<span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="c1">//下面函数功能同上面的完全一样，其实设置一个函数就好，这里保持原状</span>
+<span class="kt">int</span> <span class="nf">SetupUart2</span><span class="p">(</span><span class="n">HANDLE</span> <span class="o">*</span><span class="n">hPort</span><span class="p">,</span><span class="kt">char</span> <span class="o">*</span><span class="n">port2</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="c1">//int STOPBITS;</span>
+
+	<span class="n">hPort2</span> <span class="o">=</span> <span class="n">CreateFile</span> <span class="p">(</span><span class="n">TEXT</span><span class="p">(</span><span class="n">port2</span><span class="p">),</span>				       <span class="c1">// Name of the port </span>
+						<span class="n">GENERIC_READ</span> <span class="o">|</span> <span class="n">GENERIC_WRITE</span><span class="p">,</span>     <span class="c1">// Access (read-write) mode </span>
+						<span class="mi">0</span><span class="p">,</span>                                  
+						<span class="nb">NULL</span><span class="p">,</span>                             
+						<span class="n">OPEN_EXISTING</span><span class="p">,</span>
+						<span class="n">FILE_ATTRIBUTE_NORMAL</span><span class="p">,</span>                     
+			            <span class="nb">NULL</span><span class="p">);</span>                             
+             
+	<span class="k">if</span> <span class="p">(</span> <span class="n">hPort2</span> <span class="o">==</span> <span class="n">INVALID_HANDLE_VALUE</span> <span class="p">)</span> 
+	<span class="p">{</span> 
+		
+		<span class="n">MessageBox</span> <span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="s">"Port Open Failed"</span> <span class="p">,</span><span class="s">"Error"</span><span class="p">,</span> <span class="n">MB_OK</span><span class="p">);</span>
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+	<span class="p">}</span>
+	<span class="o">*</span><span class="n">hPort</span> <span class="o">=</span> <span class="n">hPort2</span><span class="p">;</span>
+	
+	 <span class="c1">// Initialize the DCBlength member. </span>
+     <span class="n">PortDCB</span><span class="p">.</span><span class="n">DCBlength</span> <span class="o">=</span> <span class="k">sizeof</span> <span class="p">(</span><span class="n">DCB</span><span class="p">);</span> 
+      
+      <span class="c1">// Get the default port setting information.</span>
+      <span class="n">GetCommState</span> <span class="p">(</span><span class="n">hPort2</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">PortDCB</span><span class="p">);</span>
+	  <span class="n">configure</span><span class="p">();</span>
+
+	  <span class="c1">// Retrieve the time-out parameters for all read and write operations  </span>
+	<span class="n">GetCommTimeouts</span> <span class="p">(</span><span class="n">hPort2</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">CommTimeouts</span><span class="p">);</span>
+	<span class="n">configuretimeout</span><span class="p">();</span>
+
+	<span class="c1">//Re-configure the port with the new DCB structure. </span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">SetCommState</span> <span class="p">(</span><span class="n">hPort2</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">PortDCB</span><span class="p">))</span> 
+	<span class="p">{</span> 
+        <span class="n">MessageBox</span> <span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="s">"1.Could not create the read thread.(SetCommState Failed)"</span> <span class="p">,</span><span class="s">"Error"</span><span class="p">,</span> <span class="n">MB_OK</span><span class="p">);</span>
+		<span class="n">CloseHandle</span><span class="p">(</span><span class="n">hPort2</span><span class="p">);</span>   
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span> 
+	 <span class="p">}</span> 
+	
+	<span class="c1">// Set the time-out parameters for all read and write operations on the port. </span>
+	<span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">SetCommTimeouts</span> <span class="p">(</span><span class="n">hPort2</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">CommTimeouts</span><span class="p">))</span> 
+	<span class="p">{</span> 
+        <span class="n">MessageBox</span> <span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="s">"Could not create the read thread.(SetCommTimeouts Failed)"</span> <span class="p">,</span><span class="s">"Error"</span><span class="p">,</span> <span class="n">MB_OK</span><span class="p">);</span>
+		<span class="n">CloseHandle</span><span class="p">(</span><span class="n">hPort2</span><span class="p">);</span>  
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span> 
+	<span class="p">}</span> 
+
+	<span class="c1">// Clear the port of any existing data. </span>
+	<span class="k">if</span><span class="p">(</span><span class="n">PurgeComm</span><span class="p">(</span><span class="n">hPort2</span><span class="p">,</span> <span class="n">PURGE_TXCLEAR</span> <span class="o">|</span> <span class="n">PURGE_RXCLEAR</span><span class="p">)</span><span class="o">==</span><span class="mi">0</span><span class="p">)</span> 
+	<span class="p">{</span>   <span class="n">MessageBox</span> <span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="s">"Clearing The Port Failed"</span> <span class="p">,</span><span class="s">"Message"</span><span class="p">,</span> <span class="n">MB_OK</span><span class="p">);</span>
+		<span class="n">CloseHandle</span><span class="p">(</span><span class="n">hPort2</span><span class="p">);</span> 
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span> 
+	<span class="p">}</span> 
+    
+	<span class="c1">//MessageBox (NULL, "Port2 SETUP OK." ,"Message", MB_OK);</span>
+	<span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+
+
+<span class="c1">//PortDCB是全局变量，这里根据读取到的端口状态，设置自己希望的通讯参数</span>
+<span class="kt">int</span> <span class="nf">configure</span><span class="p">()</span>
+<span class="p">{</span>
+	<span class="c1">// Change the DCB structure settings</span>
+	<span class="n">PortDCB</span><span class="p">.</span><span class="n">fBinary</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">;</span>                         <span class="c1">// Binary mode; no EOF check</span>
+	<span class="n">PortDCB</span><span class="p">.</span><span class="n">fParity</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">;</span>                         <span class="c1">// Enable parity checking </span>
+	<span class="n">PortDCB</span><span class="p">.</span><span class="n">fDsrSensitivity</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>                <span class="c1">// DSR sensitivity </span>
+	<span class="n">PortDCB</span><span class="p">.</span><span class="n">fErrorChar</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>                     <span class="c1">// Disable error replacement </span>
+	<span class="n">PortDCB</span><span class="p">.</span><span class="n">fOutxDsrFlow</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>                   <span class="c1">// No DSR output flow control </span>
+	<span class="n">PortDCB</span><span class="p">.</span><span class="n">fAbortOnError</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>                  <span class="c1">// Do not abort reads/writes on error</span>
+	<span class="n">PortDCB</span><span class="p">.</span><span class="n">fNull</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>                          <span class="c1">// Disable null stripping </span>
+	<span class="n">PortDCB</span><span class="p">.</span><span class="n">fTXContinueOnXoff</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">;</span>                <span class="c1">// XOFF continues Tx </span>
+	<span class="c1">//设置波特率</span>
+	<span class="k">switch</span><span class="p">(</span><span class="n">index1</span><span class="p">)</span>                                  <span class="c1">// BAUD Rate</span>
+		<span class="p">{</span>
+		<span class="k">case</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">BaudRate</span><span class="o">=</span> <span class="mi">115200</span><span class="p">;</span>            
+		<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="mi">1</span><span class="p">:</span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">BaudRate</span> <span class="o">=</span> <span class="mi">19200</span><span class="p">;</span>            
+		<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="mi">2</span><span class="p">:</span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">BaudRate</span><span class="o">=</span> <span class="mi">38400</span><span class="p">;</span>            
+		<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="mi">3</span><span class="p">:</span>
+			 <span class="n">PortDCB</span><span class="p">.</span><span class="n">BaudRate</span> <span class="o">=</span> <span class="mi">57600</span><span class="p">;</span>            
+		<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="mi">4</span><span class="p">:</span>
+			 <span class="n">PortDCB</span><span class="p">.</span><span class="n">BaudRate</span> <span class="o">=</span> <span class="mi">9600</span><span class="p">;</span>            
+		<span class="k">break</span><span class="p">;</span>
+		<span class="nl">default:</span>
+			<span class="k">break</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="c1">//设置通讯字节位长</span>
+		<span class="k">switch</span><span class="p">(</span><span class="n">index2</span><span class="p">)</span>                                     <span class="c1">// Number of bits/byte, 5-8 </span>
+		<span class="p">{</span>
+		<span class="k">case</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">ByteSize</span> <span class="o">=</span> <span class="mi">5</span><span class="p">;</span>            
+		<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="mi">1</span><span class="p">:</span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">ByteSize</span> <span class="o">=</span> <span class="mi">6</span><span class="p">;</span>            
+		<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="mi">2</span><span class="p">:</span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">ByteSize</span><span class="o">=</span> <span class="mi">7</span><span class="p">;</span>            
+		<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="mi">3</span><span class="p">:</span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">ByteSize</span><span class="o">=</span><span class="mi">8</span><span class="p">;</span>            
+		<span class="k">break</span><span class="p">;</span>
+		<span class="nl">default:</span>
+			<span class="k">break</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="c1">//校验方式</span>
+		<span class="k">switch</span><span class="p">(</span><span class="n">index3</span><span class="p">)</span>                                     <span class="c1">// 0-4=no,odd,even,mark,space </span>
+		<span class="p">{</span>
+		<span class="k">case</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">Parity</span><span class="o">=</span> <span class="n">EVENPARITY</span><span class="p">;</span>                
+		<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="mi">1</span><span class="p">:</span>
+			 <span class="n">PortDCB</span><span class="p">.</span><span class="n">Parity</span> <span class="o">=</span> <span class="n">MARKPARITY</span><span class="p">;</span>               
+		<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="mi">2</span><span class="p">:</span>
+			  <span class="n">PortDCB</span><span class="p">.</span><span class="n">Parity</span> <span class="o">=</span> <span class="n">NOPARITY</span><span class="p">;</span>                   
+		<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="mi">3</span><span class="p">:</span>
+			 <span class="n">PortDCB</span><span class="p">.</span><span class="n">Parity</span> <span class="o">=</span> <span class="n">ODDPARITY</span><span class="p">;</span>           
+		<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="mi">4</span><span class="p">:</span>
+			 <span class="n">PortDCB</span><span class="p">.</span><span class="n">Parity</span> <span class="o">=</span> <span class="n">SPACEPARITY</span><span class="p">;</span>           
+		<span class="k">break</span><span class="p">;</span>
+		<span class="nl">default:</span>
+			<span class="k">break</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="c1">//停止位</span>
+		<span class="k">switch</span><span class="p">(</span><span class="n">index4</span><span class="p">)</span>                       
+		<span class="p">{</span>
+		<span class="k">case</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">StopBits</span> <span class="o">=</span>  <span class="n">ONESTOPBIT</span><span class="p">;</span>          
+		<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="mi">1</span><span class="p">:</span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">StopBits</span> <span class="o">=</span>  <span class="n">TWOSTOPBITS</span><span class="p">;</span>        
+		<span class="k">break</span><span class="p">;</span>
+		
+		<span class="nl">default:</span>
+			<span class="k">break</span><span class="p">;</span>
+		<span class="p">}</span>
+		<span class="c1">//是否使用硬件流控制等</span>
+		<span class="k">switch</span><span class="p">(</span><span class="n">index5</span><span class="p">)</span>                       
+		<span class="p">{</span>
+		<span class="k">case</span> <span class="mi">0</span><span class="p">:</span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">fOutxCtsFlow</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">;</span>                        <span class="c1">// CTS output flow control </span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">fDtrControl</span> <span class="o">=</span> <span class="n">DTR_CONTROL_ENABLE</span><span class="p">;</span>           <span class="c1">// DTR flow control type </span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">fOutX</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>                              <span class="c1">// No XON/XOFF out flow control </span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">fInX</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>                               <span class="c1">// No XON/XOFF in flow control </span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">fRtsControl</span> <span class="o">=</span> <span class="n">RTS_CONTROL_ENABLE</span><span class="p">;</span>           <span class="c1">// RTS flow control </span>
+			 
+			
+		<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="mi">1</span><span class="p">:</span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">fOutxCtsFlow</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>                      <span class="c1">// No CTS output flow control </span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">fDtrControl</span> <span class="o">=</span> <span class="n">DTR_CONTROL_ENABLE</span><span class="p">;</span>          <span class="c1">// DTR flow control type </span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">fOutX</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>                             <span class="c1">// No XON/XOFF out flow control </span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">fInX</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>                              <span class="c1">// No XON/XOFF in flow control </span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">fRtsControl</span> <span class="o">=</span> <span class="n">RTS_CONTROL_ENABLE</span><span class="p">;</span>          <span class="c1">// RTS flow control </span>
+		<span class="k">break</span><span class="p">;</span>
+		<span class="k">case</span> <span class="mi">2</span><span class="p">:</span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">fOutxCtsFlow</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>                      <span class="c1">// No CTS output flow control </span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">fDtrControl</span> <span class="o">=</span> <span class="n">DTR_CONTROL_ENABLE</span><span class="p">;</span>          <span class="c1">// DTR flow control type </span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">fOutX</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">;</span>                              <span class="c1">// Enable XON/XOFF out flow control </span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">fInX</span> <span class="o">=</span> <span class="n">TRUE</span><span class="p">;</span>                               <span class="c1">// Enable XON/XOFF in flow control </span>
+			<span class="n">PortDCB</span><span class="p">.</span><span class="n">fRtsControl</span> <span class="o">=</span> <span class="n">RTS_CONTROL_ENABLE</span><span class="p">;</span>          <span class="c1">// RTS flow control </span>
+		<span class="k">break</span><span class="p">;</span>
+		
+		<span class="nl">default:</span>
+			<span class="k">break</span><span class="p">;</span>
+		<span class="p">}</span>
+
+	<span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="kt">int</span> <span class="nf">configuretimeout</span><span class="p">()</span>
+<span class="p">{</span>	<span class="c1">//超时设置，放置读写端口时时间过长程序挂起</span>
+	<span class="c1">//memset(&amp;CommTimeouts, 0x00, sizeof(CommTimeouts)); </span>
+	<span class="n">CommTimeouts</span><span class="p">.</span><span class="n">ReadIntervalTimeout</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span> 
+	<span class="n">CommTimeouts</span><span class="p">.</span><span class="n">ReadTotalTimeoutConstant</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span> 
+	<span class="n">CommTimeouts</span><span class="p">.</span><span class="n">ReadTotalTimeoutMultiplier</span><span class="o">=</span><span class="mi">10</span><span class="p">;</span>
+	<span class="n">CommTimeouts</span><span class="p">.</span><span class="n">WriteTotalTimeoutMultiplier</span><span class="o">=</span><span class="mi">10</span><span class="p">;</span>
+	<span class="n">CommTimeouts</span><span class="p">.</span><span class="n">WriteTotalTimeoutConstant</span> <span class="o">=</span> <span class="mi">50</span><span class="p">;</span> 
+   <span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="kt">int</span> <span class="nf">WriteUart</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">buf1</span><span class="p">,</span> <span class="kt">int</span> <span class="n">len</span><span class="p">,</span><span class="n">HANDLE</span> <span class="n">hPort</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="n">DWORD</span> <span class="n">dwNumBytesWritten</span><span class="p">;</span>
+	<span class="c1">//使用写文件的方式向串口输出数据</span>
+	<span class="c1">//因为串口芯片及驱动程序都有缓存，所以一般小数据量的写出都不会阻塞</span>
+	<span class="n">WriteFile</span> <span class="p">(</span><span class="n">hPort</span><span class="p">,</span><span class="n">buf1</span><span class="p">,</span> <span class="n">len</span><span class="p">,</span><span class="o">&amp;</span><span class="n">dwNumBytesWritten</span><span class="p">,</span><span class="nb">NULL</span><span class="p">);</span>			
+
+	<span class="k">if</span><span class="p">(</span><span class="n">dwNumBytesWritten</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>
+	<span class="p">{</span>
+		<span class="c1">//MessageBox (NULL, "Transmission Success" ,"Success", MB_OK);</span>
+		<span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+	<span class="p">}</span>
+	
+	<span class="k">else</span> 
+	   <span class="p">{</span>
+		<span class="n">MessageBox</span> <span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="s">"Transmission Failed"</span> <span class="p">,</span><span class="s">"Error"</span><span class="p">,</span> <span class="n">MB_OK</span><span class="p">);</span>
+		<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>	
+	   <span class="p">}</span>
+<span class="p">}</span>
+
+
+<span class="kt">int</span> <span class="nf">ReadUart</span><span class="p">(</span><span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">buf2</span><span class="p">,</span><span class="kt">int</span> <span class="n">len</span><span class="p">,</span><span class="n">HANDLE</span> <span class="n">hPort</span><span class="p">)</span>
+<span class="p">{</span>
+	<span class="c1">//BOOL ret;</span>
+	<span class="n">DWORD</span> <span class="n">dwRead</span><span class="p">;</span>
+    <span class="n">BOOL</span> <span class="n">fWaitingOnRead</span> <span class="o">=</span> <span class="n">FALSE</span><span class="p">;</span>
+    <span class="n">OVERLAPPED</span> <span class="n">osReader</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">};</span>
+    <span class="kt">unsigned</span> <span class="kt">long</span> <span class="n">retlen</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+
+   <span class="c1">// Create the overlapped event. Must be closed before exiting to avoid a handle leak.</span>
+	<span class="c1">//读取串口的时候，如果对方尚未发送指定长度的数据，会导致读取串口阻塞</span>
+	<span class="c1">//这里使用线程同步的事件响应方式，防止读取数据阻塞</span>
+	<span class="c1">//所以读取串口可能返回0表示没有读取到数据</span>
+	<span class="c1">//或者小于期望读取的字节表示数据尚未完全到来</span>
+   <span class="n">osReader</span><span class="p">.</span><span class="n">hEvent</span> <span class="o">=</span> <span class="n">CreateEvent</span><span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">TRUE</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">,</span> <span class="nb">NULL</span><span class="p">);</span>
+   <span class="k">if</span> <span class="p">(</span><span class="n">osReader</span><span class="p">.</span><span class="n">hEvent</span> <span class="o">==</span> <span class="nb">NULL</span><span class="p">)</span>
+       <span class="n">MessageBox</span> <span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="s">"Error in creating Overlapped event"</span> <span class="p">,</span><span class="s">"Error"</span><span class="p">,</span> <span class="n">MB_OK</span><span class="p">);</span>
+   <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">fWaitingOnRead</span><span class="p">)</span>
+   <span class="p">{</span>
+	   	<span class="c1">//具体的读取数据</span>
+          <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">ReadFile</span><span class="p">(</span><span class="n">hPort</span><span class="p">,</span> <span class="n">buf2</span><span class="p">,</span> <span class="n">len</span><span class="p">,</span> <span class="o">&amp;</span><span class="n">dwRead</span><span class="p">,</span>  <span class="o">&amp;</span><span class="n">osReader</span><span class="p">))</span> 
+          <span class="p">{</span>
+          <span class="n">FormatMessage</span><span class="p">(</span><span class="n">FORMAT_MESSAGE_FROM_SYSTEM</span> <span class="o">|</span> <span class="n">FORMAT_MESSAGE_IGNORE_INSERTS</span><span class="p">,</span>
+                        <span class="nb">NULL</span><span class="p">,</span>
+                        <span class="n">GetLastError</span><span class="p">(),</span>
+                        <span class="n">MAKELANGID</span><span class="p">(</span><span class="n">LANG_NEUTRAL</span><span class="p">,</span> <span class="n">SUBLANG_DEFAULT</span><span class="p">),</span>
+                        <span class="n">lastError</span><span class="p">,</span>
+                        <span class="mi">1024</span><span class="p">,</span>
+                        <span class="nb">NULL</span><span class="p">);</span>
+		   <span class="n">MessageBox</span> <span class="p">(</span><span class="nb">NULL</span><span class="p">,</span> <span class="n">lastError</span> <span class="p">,</span><span class="s">"MESSAGE"</span><span class="p">,</span> <span class="n">MB_OK</span><span class="p">);</span>
+           <span class="p">}</span>
+           <span class="k">else</span>
+		   <span class="p">{</span>
+	         <span class="c1">// MessageBox (NULL, "ReadFile Suceess" ,"Success", MB_OK);</span>
+           <span class="p">}</span>
+    <span class="p">}</span>
+	
+	<span class="k">if</span><span class="p">(</span><span class="n">dwRead</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>	
+	<span class="p">{</span>
+		<span class="c1">//MessageBox (NULL, "Read DATA Success" ,"Success", MB_OK);//If we have data</span>
+		<span class="k">return</span> <span class="p">(</span><span class="kt">int</span><span class="p">)</span> <span class="n">retlen</span><span class="p">;</span>
+	<span class="p">}</span>
+	     <span class="c1">//return the length</span>
+    
+	<span class="k">else</span> <span class="k">return</span> <span class="mi">0</span><span class="p">;</span>     <span class="c1">//else no data has been read</span>
+ <span class="p">}</span>
+
+<span class="c1">//关闭端口，同样有一个就够了</span>
+<span class="kt">int</span> <span class="nf">CloseUart</span><span class="p">()</span>
+<span class="p">{</span>
+	<span class="n">CloseHandle</span><span class="p">(</span><span class="n">hPort1</span><span class="p">);</span> 
+	<span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="kt">int</span> <span class="nf">CloseUart2</span><span class="p">()</span>
+<span class="p">{</span>
+	<span class="n">CloseHandle</span><span class="p">(</span><span class="n">hPort2</span><span class="p">);</span>
+	<span class="k">return</span> <span class="mi">1</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>在串口的编程中，打开串口、读写串口、关闭串口都是通常的文件操作，也就是把串口当做一个文件的方式进行处理。<br />
+只有串口的设置部分（本程序中是跟打开串口放在一起）是同传统文件操作不相同的。<br />
+第二个不同则是，通常的硬盘文件读写，速度都很快，不需要考虑阻塞问题。而串口是非常慢的设备，需要考虑阻塞问题的额外处理。<br />
+一般的初学者在这部分不需要太过纠结具体的过程，做到一般了解后。把良好运行的样本程序按照自己习惯封装、保存起来，用到的时候抄过来用即可。</p>
+
+:ET

@@ -1,0 +1,381 @@
+I"x<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201901/python3.jpeg" alt="" />
+<script src="https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script></p>
+<h3 id="从零开始python3第三讲">《从零开始PYTHON3》第三讲</h3>
+<blockquote>
+  <p>本页面使用了公式插件，因博客主机过滤无法显示的表示抱歉，并建议至个人主页查看原文。</p>
+</blockquote>
+
+<p>​	我见过很多初学者，提到编程都有一种恐惧感，起源是感觉编程太难了。其实，难的也不过是开头第一步，所以中国有古话说，万事开头难。</p>
+
+<p>​	一个人想得到别人的帮助，通常是同别人沟通，请求对方伸出援手。沟通的工具当然是语言，甚至可能还要加上晓之以理、动之以情的表情、手势。比较而言，请计算机帮忙就简单多了，只需要语言就够了。</p>
+
+<p>​	人类沟通的语言，需要两个人都能听懂，比如碰到一个不会中文的美国人，你只能用英语跟他交流。计算机语言也是这样，需要人和计算机都能看懂，Python就属于人跟计算机都能懂的语言，当然这样的语言还有很多种，几乎已经超过了人类之间沟通的语言总和。</p>
+
+<p>​	能来学Python，你对语言肯定不陌生。甭管是英文还是中文，还是计算机语言，单词、语法都是基本的组成部分。比较大的差异在于人与人的沟通主要靠说和听，email、发短信只是辅助手段。而即便有了人工智能的帮助，计算机仍然还是以“阅读”你写给它的“email”为主，来完成对你要求的理解。这里的“email”，其实就是我们前面看到过的“程序”，没错，一样是全篇的文字，而在我们的课程这里，就是Python语言。当然啦，“email”只是形象化的比喻，你可别真的给电脑发封email。</p>
+
+<p>​	此外，人工智能是我们重要的工具，但抱着“人工智能取代程序”的观点是不对的，以目前的发展速度来看，人工智能在很多方面，包括编程方面，都可以成为我们的好助手，但远远还无法取代人的编程能力，这一点，你自己学过编程了就理解了。</p>
+
+<p>​	为了加深印象，让我们来看一个摘要的《XX航空公司起飞准备程序》:</p>
+
+<blockquote>
+  <ul>
+    <li>提前起飞时间2小时飞行机组在公司开准备会
+      <ul>
+        <li>拿飞行资料、飞行计划、天气、通告</li>
+        <li>阅读核对以上资料，讨论一下最近行业内出的事故</li>
+        <li>半个小时后坐车去机场。</li>
+      </ul>
+    </li>
+    <li>飞机检查
+      <ul>
+        <li>机长穿着反光背心下飞机做机外检查（看飞机的外表有无异常）</li>
+        <li>副驾驶检查驾驶舱基本设备（氧气、逃生斧、逃生绳等）</li>
+        <li>飞行管理计算机内输入飞行计划</li>
+        <li>机长做完机外检查后核对副驾驶输入的飞行计划</li>
+        <li>副驾驶再次进行机外检查</li>
+      </ul>
+    </li>
+    <li>旅客登机中及之后
+      <ul>
+        <li>机长和副驾口头叙述飞行计划以及起飞滑跑和起飞后的紧急情况处置预案</li>
+        <li>副驾向塔台申请放行许可，依据放行许可修改一下飞行计划</li>
+        <li>飞机推出，机长起动发动机，启动完申请滑行</li>
+        <li>按照塔台给的滑行路线滑行到跑道外等待进跑到许可</li>
+        <li>进跑到后等待起飞许可</li>
+      </ul>
+    </li>
+  </ul>
+</blockquote>
+
+<p>​	请看，这就是写给“人”来执行的一个程序。从本质上讲，这同让“计算机”来执行的程序，并没有什么不同。</p>
+
+<p>​	但是因为计算机尚不具备与人类相当的智能，为了避免出现歧义，方便计算机理解和处理，类似Python这样的计算机语言额外的附加了一些特征：</p>
+
+<ul>
+  <li>严格的语法</li>
+  <li>特定的书写格式（其实是语法的一部分）</li>
+  <li>特定的单词（或者说不允许随意换成别的同义词）</li>
+</ul>
+
+<p>​	同样是文字，写给计算机看的文字（程序）还有这样一些特点：</p>
+
+<ul>
+  <li>必须使用半角英文字符</li>
+  <li>包括：保留字（也称关键字），比如运算符就是保留字的一种，保留字指的是你不能再把这样的字符、单词用于自定义的其它用途，比如变量名，比如函数名。Python包含大概不超过50个保留字</li>
+  <li>包括：函数，有预定义标准函数、官方函数库、第三方函数库，这三者的区别以后我们会讲</li>
+  <li>包括：变量，Python有一些预定义的变量</li>
+</ul>
+
+<p>​	Python语言学习的主要内容是语法和保留字，这部分的数量非常有限。函数的数量特别是第三方提供的函数非常多，可以在使用中逐渐记忆。不常用的还可以一边查看文档一边使用。</p>
+
+<p>​	此外一个重点是算法的学习，学习算法能够强化逻辑思维和抽象思维，从而促进数学和其它学科的学习。</p>
+
+<hr />
+
+<h4 id="第一个程序">第一个程序</h4>
+
+<p>​	我们已经知道了，程序就是文本，就像我们平常写的email。所以理论上编写Python程序，我们用任何一个文本编辑的工具都是可以的。但实际上不同的语言，都有不同的流行工具更适合使用。你可以相像一下，同样是文字为主，Word / PowerPoint / Excel都针对了不同的应用场景。也可能有人经历过，某款软件用起来很方便，但适合处理英文，在中文环境使用就“水土不服”。</p>
+
+<p>​	Python语言也有很多流行的编程工具，我们这里使用随着语言本身附带的IDLE工具。IDLE是英文Integrated Development and Learning Environment的缩写，中文意思是：集成开发和学习环境。</p>
+
+<p>​	上节课我们已经用IDLE尝试过了Python的交互模式。在交互模式的时候，从File菜单选择New File，会新打开一个窗口。前面说过了，这就是编程模式。
+<img src="/assets/cimages/201812/python33/newfile1.png" alt="newfile1" />	
+	在这个新打开的窗口中，输入下面这一行命令，如果你看的是电子版文档，直接拷贝、黏贴也是可以的：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">print</span><span class="p">(</span><span class="mi">12345678</span><span class="o">+</span><span class="mi">87654321</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>​	之后看起来，应当是类似于下图的样子:
+<img src="/assets/cimages/201812/python33/prgmode1.png" alt="prgmode1" />
+	接下来从File菜单选择Save，把这个程序存盘。需要为程序起一个在当前目录唯一的名字，比如叫hello，或者叫first，随你高兴。存盘文件自动会有.py后缀，表示这个文件是Python的程序文件，请不要修改这个后缀，这时候完整的名字会叫hello.py。保存到什么目录无所谓，但是请你记住程序的位置，当然还要记住文件名。Python是允许程序文件使用中文名的，但考虑到扩展名必须使用英文，并且还有很多交流上的不方便和兼容问题，这里建议你坚持使用有意义的英文或者拼音文件名。</p>
+
+<p>​	套用董卿一句话说：见证奇迹的时刻到了！请按下F5，执行这个程序。（忘记执行程序的，出门左拐，去看看第一课讲义最后部分。）
+	按下F5之后，当前程序的编辑窗口会退到后面，交互模式的窗口会出现在前面，并显示运行的结果：
+<img src="/assets/cimages/201812/python33/f5run1.png" alt="f5run1" />
+	99999999就是12345678+87654321的计算结果，并通过print()函数打印出来。</p>
+
+<blockquote>
+  <p>print这个词在英文中是“打印”的意思，我在课程的讲解中也习惯上说“打印出来”，但实际上结果不明明白白的显示在屏幕上吗？<br />
+原因其实很简单，最早的计算机其实是没有显示器的，输出的结果，就是在打印机上。为了兼容原有的经验、程序和习惯，print命令在很多语言中都延用至今，而且看起来，还会延用下去。</p>
+</blockquote>
+
+<hr />
+
+<h4 id="第二个程序">第二个程序</h4>
+
+<p>​	你可能注意到了，在这个课程中，很多内容都一再的重复。其实这就是Python的学习模式，不断的重复，不断的动手练习，书上的知识，才能变成你自己的知识。否则以Python语言30多个单词+10多个符号的保留字，你们用两天时间全部背过应当无论如何不成问题，但依然不会编程。
+	这里我们再次引用上一节的应用题：</p>
+
+<blockquote>
+  <p>甲、乙两人相距36千米，相向而行，如果甲比乙先走2小时，那么他们在乙出发2.5小时后相遇；如果乙比甲先走2小时，那么他们在甲出发3小时后相遇，甲、乙两人每小时各走多少千米？（假设甲乙的速度均匀稳定）</p>
+</blockquote>
+
+<p>​	解题思路上一讲最后练习答案部分已经有了，这里就不再占篇幅。我们还是从File-&gt;New File新建一个程序文件开始，在打开的新编辑窗口中，把下面的代码拷贝进去：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">y</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="o">*</span><span class="mf">4.5</span><span class="o">-</span><span class="mi">36</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">4.5</span><span class="o">*</span><span class="mi">5</span><span class="o">/</span><span class="mi">3</span><span class="o">-</span><span class="mf">2.5</span><span class="p">)</span>
+<span class="n">x</span><span class="o">=</span><span class="p">(</span><span class="mi">36</span><span class="o">-</span><span class="mi">5</span><span class="o">*</span><span class="n">y</span><span class="p">)</span><span class="o">/</span><span class="mi">3</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>​	存盘后，再次按F5执行，如果程序输入没有出错的话，会得到这样的结果：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mf">6.0</span> <span class="mf">3.6</span>
+</code></pre></div></div>
+
+<p>​	这是我们的第二个程序，我们已经可以做一个小的总结：</p>
+
+<ul>
+  <li>对于简单的计算程序来讲，把在交互模式所使用的命令汇总在一起，写到一个文本文件中，就成形成一个简单的程序。</li>
+  <li>交互模式的过程，穿插着大量思考、试错的过程，很难有条理的保存、重用。用程序的方式，可以把交互模式实验过程中犯错的部分去除掉，只保留最有用的部分，而且还可以将来再次使用。</li>
+</ul>
+
+<p>​	到了这里，你应当再尝试一些其它的数学计算，首先在交互模式验证你的思想。最后把最优的方法保存到程序中，尝试编程模式的优点，也熟悉使用你手上的编程工具。</p>
+
+<hr />
+
+<h4 id="自定义函数">自定义函数</h4>
+
+<p>​	现在假设我们把前面应用题的内容小小的修改一点，从“甲乙两人相距36千米”改成“甲乙两人相距48千米”，这里只是为了举例，请忽略现实中些微的不合理因素。</p>
+<blockquote>
+  <p>甲、乙两人相距48千米，相向而行，如果甲比乙先走2小时，那么他们在乙出发2.5小时后相遇；如果乙比甲先走2小时，那么他们在甲出发3小时后相遇，甲、乙两人每小时各走多少千米？（假设甲乙的速度均匀稳定）</p>
+</blockquote>
+
+<p>​	既然上面我们已经试验并保存过了编写好的程序，打开重新编辑一下，就能用于这一道题的求解了。如果刚才的程序窗口已经关闭了，从File菜单点Open，选择自己保存的文件，这部分在第一讲介绍过了。
+	为了让你看的清楚，我完整的粘贴一遍修改后的程序：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">y</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="o">*</span><span class="mf">4.5</span><span class="o">-</span><span class="mi">48</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="mf">4.5</span><span class="o">*</span><span class="mi">5</span><span class="o">/</span><span class="mi">3</span><span class="o">-</span><span class="mf">2.5</span><span class="p">)</span>
+<span class="n">x</span><span class="o">=</span><span class="p">(</span><span class="mi">48</span><span class="o">-</span><span class="mi">5</span><span class="o">*</span><span class="n">y</span><span class="p">)</span><span class="o">/</span><span class="mi">3</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>​	存盘后，F5执行程序，结果是：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mf">14.0</span> <span class="mf">1.2</span>
+</code></pre></div></div>
+
+<p>​	甲肯定骑了小黄车，而乙需要拄拐杖是没跑了:)<br />
+	现在你应当再次感受到了使用程序方式的优势。其实这种方便还能更明显，下面我们来尝试用自定义函数的方式来解决。</p>
+
+<p>​	上一节我们已经了解，程序中函数的概念，同样来自数学：\(y = f(x)\)<br />
+​	在数学函数中，y表示函数计算的结果，f()代表一个函数，x则是函数的参数。上例中我们使用的Python内置的标准函数print()，x/y是print的参数，我们要的是显示结果，返回值我们不关心，丢弃了（是的，Python中的函数，是可以没有返回值或者忽略返回值的）。</p>
+
+<p>​	下面用一个简单的例子来展示自定义函数，这里我们定义一个数学中的线性函数：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">line</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="n">y</span><span class="o">=</span><span class="mi">3</span><span class="o">*</span><span class="n">x</span><span class="o">+</span><span class="mi">4</span>
+    <span class="k">return</span> <span class="n">y</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">line</span><span class="p">(</span><span class="mi">5</span><span class="p">))</span>
+</code></pre></div></div>
+
+<ul>
+  <li>
+    <p>def和return是Python的保留字，实际还有冒号“：”也算是保留字的一种</p>
+  </li>
+  <li>
+    <p>line是函数名，x是传递到这个函数的参数</p>
+  </li>
+  <li>
+    <p>def line(x):这样的形式，包括def和line之间的空格，就是自定义函数的语法</p>
+  </li>
+  <li>
+    <p>y=3*x+4是一条赋值语句，昨天的课程你肯定还记得，把算式3*x+4的结果赋值给变量y。在计算机中，这样的算式也称为“表达式”</p>
+  </li>
+  <li>
+    <p>return y是把y的值，当做函数的返回值返回给函数的调用者，同时这条语句结束函数的执行，返回函数被调用的位置</p>
+  </li>
+  <li>
+    <p>return是保留字，所以后面不用小括号“()”把y包裹起来；与此对应的，函数调用则必须有小括号把参数包裹起来。</p>
+  </li>
+  <li>
+    <p>print(line(5))这一行，是连续的两个函数调用。读的时候先从最内一层读起。首先是使用参数5调用我们自己定义的line函数。随后把line函数计算的结果返回给print函数显示出来。这一行类似这样的形式：</p>
+
+    <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">tmp</span><span class="o">=</span><span class="n">line</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">tmp</span><span class="p">)</span>
+</code></pre></div>    </div>
+  </li>
+  <li>
+    <p>函数定义跟下面函数调用之间的空行，也就是上面的第4行，并不是必须的，但这样写可以让你的程序看上去结构更清楚</p>
+  </li>
+  <li>
+    <p>函数定义def那一行之后的两句命令，前面的固定长度空格，叫做“缩格”，表示这两句从属于函数定义，是必须的。这部分也称为“函数体”</p>
+  </li>
+  <li>
+    <p>从语法规定上说，缩格使用任意多个空格或者TAB制表键，都是可以的。但整个程序文件，所有的缩格必须使用完全相同的格式。比如程序中出现的第一个缩格是是使用了1个TAB键，那整个文件所有的缩格必须都是使用1个TAB键。这是特别需要注意的，很多初学者都会在这里犯错</p>
+  </li>
+  <li>
+    <p>官方文档建议缩格统一使用4个空格键，因为这样最美观，并且比TAB键有更好的兼容性。</p>
+  </li>
+  <li>
+    <p>缩格可以嵌套，表示多重的层级关系。程序中最高层级的语句，必须顶格书写，前面不能有空格或者制表符</p>
+  </li>
+  <li>
+    <p>最后也是最重要的，执行顺序上，每个Python程序都是从第一行开始，顺序执行，直到程序的最后一句。其中碰到def关键字进行函数定义的时候，所做的工作是“定义一个函数”，而不是“执行一个函数”。所以函数真正的执行并不是在定义的时候，而是在函数被调用的时候</p>
+  </li>
+</ul>
+
+<blockquote>
+  <p>自己练习输入一下上面的程序，看看计算结果是什么？</p>
+</blockquote>
+
+<p>​	上面的自定义函数中，line是函数名。Python语言对自定义函数名的要求，跟变量名是相同的，也既：使用字母开始，后面可以有数字或者下划线，不能包含别的字符。事实上函数也是变量的一种，这个概念我们的课程暂不涉及，你知道有这回事就好了。</p>
+
+<p>​	学了今天的课程，实际上变量名、函数名的选取有了更多的要求：</p>
+
+<ul>
+  <li>不能使用Python的关键字（保留字）</li>
+  <li>不能使用同本程序引用的其它函数重复的名字</li>
+  <li>简单易懂，使用有意义的单词或者拼音名。并且在每个单词或者拼音开始的第一个字母之前使用下划线或者大写第一个字母</li>
+  <li>比如：ji_suan / countTotalData</li>
+</ul>
+
+<blockquote>
+  <p>学习了自定义函数，来做个练习吧。就是把上面的应用题，用函数的形式重写一遍。其中的计算部分，定义成1个或者2个函数来完成计算。</p>
+</blockquote>
+
+<p>​	最后关于函数还有几点要知道：</p>
+
+<ul>
+  <li>函数的参数，通常就是用作函数的传入参数，一般不用做返回值</li>
+  <li>函数的返回值通常都要使用return来返回</li>
+  <li>这是良好的编程习惯上需要的，并非语法上的规定。特别必要的情况下，也可以利用参数返回计算结果，我们将来会做介绍</li>
+</ul>
+
+<hr />
+
+<h4 id="变量的作用域">变量的作用域</h4>
+
+<p>​	变量的概念和使用很简单，函数的定义和使用也很简单，当两者出现在一起的时候，问题就复杂了。</p>
+
+<p>​	“全局变量”概念：在一个程序文件中，在最高层级的位置（就是语句前面没有任何空格或者TAB键的层级），定义的变量，在程序的任何位置都是有效的。看一个例子：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="k">def</span> <span class="nf">testVar</span><span class="p">():</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="n">testVar</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</code></pre></div></div>
+<p>​	程序执行的输出结果是：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">10</span>
+<span class="mi">10</span>
+</code></pre></div></div>
+
+<p>​	第一个是10是自定义函数testVar中的print(x)语句输出的。第二个10是程序结尾的print(x)输出的。这个变量x就是全局变量，可以看到x不管在函数的内部还是外部，都能被有效的访问到。再看一个例子：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span> <span class="o">=</span> <span class="mi">10</span>
+
+<span class="k">def</span> <span class="nf">testVar</span><span class="p">():</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="n">testVar</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>​	执行后程序的输出是：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">3</span>
+<span class="mi">10</span>
+</code></pre></div></div>
+
+<p>​	3是由自定义函数testVar输出的，其中对x使用立即数3进行了赋值。10则依然是由程序最后一句输出的。你可能感觉到奇怪，第一行输出3不奇怪，奇怪的是为什么函数调用完成后，x的值又变回了10呢？<br />
+	实际上，在testVar函数中，x=3并不是再次对x进行赋值，而是在函数内重新定义了一个变量x。虽然这个x跟一开始的x同名，但这里实际是个testVar函数的“局部变量”，在局部变量跟全局变量重名的情况下，全局变量会被隐藏，这说明局部变量的优先级要高于全局变量。同时，这个局部变量也只在testVar函数内部有效，不能在函数外使用。这也是“局部变量”这个名称的由来。我们可以进一步再试一下：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">testVar</span><span class="p">():</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="n">testVar</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>​	执行结果是：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">3</span>
+<span class="n">Traceback</span> <span class="p">(</span><span class="n">most</span> <span class="n">recent</span> <span class="n">call</span> <span class="n">last</span><span class="p">):</span>
+  <span class="n">File</span> <span class="s">"var3.py"</span><span class="p">,</span> <span class="n">line</span> <span class="mi">6</span><span class="p">,</span> <span class="ow">in</span> <span class="o">&lt;</span><span class="n">module</span><span class="o">&gt;</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="nb">NameError</span><span class="p">:</span> <span class="n">name</span> <span class="s">'x'</span> <span class="ow">is</span> <span class="ow">not</span> <span class="n">defined</span>
+</code></pre></div></div>
+
+<p>​	请看，在testVar函数执行中，局部变量x被正确显示了。而函数返回后，在全局并不存在一个名为x的变量，所以Python报错了。</p>
+
+<p>​	那么想在一个自定义函数内，直接修改全局变量的值怎么办？首先我们不建议这样做，因为这样会降低函数的“可重用性”，本来一个函数就可以看做一个积木的模块，一个大的程序由很多小的积木块拼装起来。<br />
+	这些“积木块”应当有足够的独立性，从而可以在不同的程序中随意拼装，但是在函数内对外部的全局变量进行修改，等于是给“积木块”在别的程序中使用预设了条件，这是很不好的编程习惯。<br />
+	如果一定要这样做呢？可以在自定义函数一开始就使用“global”关键字声明变量，Python就会把该变量当做全局变量来使用了：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">x</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="k">def</span> <span class="nf">testVar</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">x</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+<span class="n">testVar</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>​	程序的运行结果是：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">3</span>
+<span class="mi">3</span>
+</code></pre></div></div>
+
+<p>​	这表示因为使用global在testVar函数内声明了变量x,Python即便在testVar函数内，也把x当做全局变量来使用了，并没有新建一个局部的x函数，因此对x的修改是全局性的，所以在程序最后一行显示出来的，是testVar函数内对变量的修改内容。</p>
+
+<p>​	这就是变量的作用域概念，全局变量还有局部变量。关于局部变量还有一点要补充：我们前面在函数自定义的时候就认识到了，函数的参数，在函数内部就是当做变量来使用的，也属于局部变量，所以通常只用做输入值，不用做返回值。最后看一个综合的例子：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">a</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">b</span> <span class="o">=</span> <span class="mi">2</span>
+<span class="n">x</span> <span class="o">=</span> <span class="mi">3</span>
+
+<span class="k">def</span> <span class="nf">testVar</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">a</span>
+    <span class="n">c</span><span class="o">=</span><span class="mi">4</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">a</span> <span class="o">=</span> <span class="mi">15</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">,</span><span class="n">c</span><span class="p">,</span><span class="n">x</span><span class="p">)</span>
+
+<span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+<span class="n">testVar</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="n">b</span><span class="p">)</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>学习英语，分为听、说、读、写四大技能。掌握Python,重要的是读和写的练习。<br />
+仔细的思考10分钟，阅读程序，用自己的大脑模拟计算机的执行，写出执行结果，然后再跟实际的执行结果来对比，看看自己的思考都正确吗？</p>
+</blockquote>
+
+<hr />
+
+<h4 id="本讲小结">本讲小结</h4>
+
+<ul>
+  <li>程序就是人与计算机沟通的语言，同人与人之间沟通的语言并没有本质上的区别。</li>
+  <li>本讲介绍了使用IDLE编写Python程序，最简单的程序可以只有一行。</li>
+  <li>程序可以顺序编写，但为了更好管理，通常有很多个小的函数组成。这个过程就好像是准备一个个的积木块，然后把积木拼接起来。</li>
+  <li>因为这个原因，自定义函数就好像准备最基本的一个积木块，会经常用到，一定要弄明白。</li>
+  <li>全程序必须使用统一的缩格格式，是新手比较容易犯错的地方</li>
+  <li>变量的作用域是较难理解、容易出错而又很重要的概念，需要用心弄懂。</li>
+</ul>
+
+<p>​	从今天起的内容，感觉上突然量增大了。每节课都会出现很多新的、不容易理解的概念。不要紧张，刚刚接触编程的每个人都是这种感觉，随着课程深入，你会逐渐适应的。多练习，在练习中发现自己的学习漏洞，通过实验或者咨询老师找到答案会让你进步更快。</p>
+
+<hr />
+
+<h4 id="练习参考答案">练习参考答案</h4>
+
+<p>​	请参考资料包中的ex2.py及ex2a.py两种方案。</p>
+
+<p>​	变量作用域最后一个综合案例的执行结果，请一定要自己思考过后再看答案：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="mi">1</span> <span class="mi">2</span>
+<span class="mi">1</span> <span class="mi">5</span> <span class="mi">4</span> <span class="mi">3</span>
+<span class="mi">15</span> <span class="mi">5</span> <span class="mi">4</span> <span class="mi">3</span>
+<span class="mi">15</span> <span class="mi">2</span>
+</code></pre></div></div>
+
+:ET
