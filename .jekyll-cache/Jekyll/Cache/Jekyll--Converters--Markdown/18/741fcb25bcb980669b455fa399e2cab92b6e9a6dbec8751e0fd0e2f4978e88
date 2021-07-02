@@ -1,4 +1,4 @@
-I"MY<p><img src="http://blog.17study.com.cn/attachments/201712/markdown.jpg" alt="" />
+I"MY<p><img src="/attachments/201712/markdown.jpg" alt="" />
 估计很多人都是这样，平常工作在github，等到有成果要发布，又要写微信公众号。<br />
 github用Markdown,微信公众号，至少截止今天，还是沿用富文本的方式。不是说富文本不好，但每次精心撰写的内容，重新排一遍版，还真是怪烦的。<br />
 如果在github是使用jekyll相对会容易一点，在页面上拷贝、到微信粘贴一下，大多内容都会差不多。否则就只好转换成html显示在浏览器，然后再拷贝粘贴。<br />

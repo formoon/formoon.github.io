@@ -2,12 +2,12 @@
 layout:         page
 title:          比特币核心概念及算法
 subtitle:       区块链、挖矿还有其它
-card-image:     http://blog.17study.com.cn/attachments/201801/bc1.jpg
+card-image:     /attachments/201801/bc1.jpg
 date:           2018-01-18
 tags:           toSeven
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201801/bc1.jpg)  
+![](/attachments/201801/bc1.jpg)  
 
 bitcoin项目地址位于github[仓库](https://github.com/bitcoin/bitcoin)，当前各种“币”，基本都是从抄写bitcoin代码开始起步的。想要深度研究，从看源码开始不可避免。  
 * P2P：电骡、迅雷、BT，在中国网络影视的发展让大家对P2P很熟悉，可能已经没有人记得比特币实际上是第一批P2P的实践者。所有交易记录在全网通过P2P的方式广播，每个人都保存一份完整的交易记录。所以也叫去中心化。  

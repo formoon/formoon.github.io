@@ -2,12 +2,12 @@
 layout:         page
 title:          从零开始学习PYTHON3讲义（十六）（连载完）
 subtitle:       学习资源包下载
-card-image:		http://blog.17study.com.cn/attachments/201901/python3.jpeg
+card-image:		/attachments/201901/python3.jpeg
 date:           2019-01-04
 tags:           python
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201901/python3.jpeg)
+![](/attachments/201901/python3.jpeg)
 ### 《从零开始PYTHON3》学习资源包下载
 课程连载已经完全结束。  
 经过整理校对，这里把在课程中出现过的源码和练习答案示例源码全部打包提供下载：  

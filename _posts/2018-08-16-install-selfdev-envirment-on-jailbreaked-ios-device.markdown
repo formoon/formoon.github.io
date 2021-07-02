@@ -2,12 +2,12 @@
 layout:         page
 title:          在越狱的iPhone上安装自开发环境
 subtitle:       iOS版的xcode
-card-image:		http://blog.17study.com.cn/attachments/201808/jailbreak.jpg
+card-image:		/attachments/201808/jailbreak.jpg
 date:           2018-08-16
 tags:           linux
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201808/jailbreak.jpg)
+![](/attachments/201808/jailbreak.jpg)
 自开发跟自编译意思一样，后者表示一个开发语言的开发能力成熟度；前者则表示一个开发平台的开发能力成熟度。  
 iPhone跟iPad面世这么多年，一直无法摆脱“娱乐”工具的宿命。Apple曾经希望通过iPad Pro为平台增添“生产力工具”的特征，但看起来成效不大。  
 而竞争对手的Surface Pro，虽然娱乐性不足，但没有人否认Surface Pro是一个优良的生产力工具。  

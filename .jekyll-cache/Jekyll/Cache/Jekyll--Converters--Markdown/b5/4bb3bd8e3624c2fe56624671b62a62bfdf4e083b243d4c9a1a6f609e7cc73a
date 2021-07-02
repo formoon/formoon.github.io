@@ -79,7 +79,7 @@
 <span class="o">[(</span><span class="s1">'n02089078'</span>, <span class="s1">'black-and-tan_coonhound'</span>, 0.46141574<span class="o">)</span>, <span class="o">(</span><span class="s1">'n02105412'</span>, <span class="s1">'kelpie'</span>, 0.15314996<span class="o">)</span>, <span class="o">(</span><span class="s1">'n02106550'</span>, <span class="s1">'Rottweiler'</span>, 0.092713624<span class="o">)]</span>
 <span class="o">[(</span><span class="s1">'n02123045'</span>, <span class="s1">'tabby'</span>, 0.29928064<span class="o">)</span>, <span class="o">(</span><span class="s1">'n02123159'</span>, <span class="s1">'tiger_cat'</span>, 0.08147916<span class="o">)</span>, <span class="o">(</span><span class="s1">'n02096177'</span>, <span class="s1">'cairn'</span>, 0.047330838<span class="o">)]</span>
 </code></pre></div></div>
-<p><img src="http://blog.17study.com.cn/attachments/201904/tensorFlow2/tl-dog-vs-cat1.png" alt="" /><br />
+<p><img src="/attachments/201904/tensorFlow2/tl-dog-vs-cat1.png" alt="" /><br />
 程序准确的预测出了结果。</p>
 
 <h4 id="迁移学习改造">迁移学习改造</h4>
@@ -286,7 +286,7 @@ final accuracy: 0.97
 </code></pre></div></div>
 <p>我们为了讲解方便，把最终的程序分成了几个部分，实际上为了节省时间，是可以合并在一起执行的，这样不需要重复训练很多次。<br />
 从绘图结果看，优化的效果还是很明显的：<br />
-<img src="http://blog.17study.com.cn/attachments/201904/tensorFlow2/tl-dog-vs-cat2.png" alt="" /><br />
+<img src="/attachments/201904/tensorFlow2/tl-dog-vs-cat2.png" alt="" /><br />
 两张图，中间都有一条绿线分隔开优化前和优化后的训练数据。在前半段，正确率和损失值的优化过程是明显比较慢的，而且训练集和验证集两条线的分离也说明有过拟合的现象。在后半段，有一个明显的阶梯表现出来模型性能明显改善，训练集和验证集也更接近。说明各项指标都有效改善了。<br />
 （待续…）</p>
 

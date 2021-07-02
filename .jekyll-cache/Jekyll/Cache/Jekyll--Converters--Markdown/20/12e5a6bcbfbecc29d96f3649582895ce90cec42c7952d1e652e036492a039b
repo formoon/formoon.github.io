@@ -124,9 +124,9 @@ NMF是很久以前学的，基本快忘没了，昨天YX提出来一个关于NMF
 <span class="n">plt2</span><span class="p">.</span><span class="n">show</span><span class="p">()</span><span class="c1">#直接画出矩阵，只打了点，下面对图plt1进行一些设置
 </span></code></pre></div></div>
 <p>以上代码会得到两张图，电影主题分布：<br />
-<img src="http://blog.17study.com.cn/attachments/201804/25/files-distribution.png" alt="" />
+<img src="/attachments/201804/25/files-distribution.png" alt="" />
 用户倾向主题分布：<br />
-<img src="http://blog.17study.com.cn/attachments/201804/25/user_distribution.png" alt="" />
+<img src="/attachments/201804/25/user_distribution.png" alt="" />
 从图中可以看到，我们分类比较少，数据也不是很准确，导致分布偏差比较大，但基本上是分成两类的。</p>
 
 <h4 id="电影推荐">电影推荐</h4>

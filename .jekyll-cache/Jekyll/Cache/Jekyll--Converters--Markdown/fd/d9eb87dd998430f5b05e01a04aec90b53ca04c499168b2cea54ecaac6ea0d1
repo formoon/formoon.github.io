@@ -1,4 +1,4 @@
-I"<p><img src="http://blog.17study.com.cn/attachments/201805/19/heart1.png" alt="" /><br />
+I"<p><img src="/attachments/201805/19/heart1.png" alt="" /><br />
 <script src="https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 承自上一篇中的函数图形，有人问，能不能别把画个图搞那么复杂，我说当然，只要你有一台mac。<br />
 话说出来很潇洒的样子，充斥着一股迷之自信。</p>
@@ -9,7 +9,7 @@
 
 <p>跟Grapher比起来，Python的兼容性和普及度无疑会更好，所以上一篇中我给出了用Python绘制心形的方法。使用Python，不管是mac/Linux亦或Win,都能很顺畅的绘制出函数图形。<br />
 但是如果说操作简单、效果直观，Grapher出山，无人敢领其锋。至于我上篇中说到的mathmatica，那是很贵的好不好？<br />
-<img src="http://blog.17study.com.cn/attachments/201805/28/heartofgrapher.png" alt="" /></p>
+<img src="/attachments/201805/28/heartofgrapher.png" alt="" /></p>
 
 <p>Grapher打开，选择2D/Default模式，就可以在界面上输入公式了。公式的输入大致有以下几种情况：</p>
 <ul>

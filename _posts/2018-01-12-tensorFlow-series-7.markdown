@@ -2,7 +2,7 @@
 layout:         page
 title:          从锅炉工到AI专家(7)
 subtitle:       TensorFlow实务
-card-image:     http://blog.17study.com.cn/attachments/201801/ml/tensorflowlogo.jpg
+card-image:     /attachments/201801/ml/tensorflowlogo.jpg
 date:           2018-01-12
 tags:           ml toSeven
 post-card-type: image
@@ -318,7 +318,7 @@ TensorBoard 0.4.0rc3 at http://127.0.0.1:6006 (Press CTRL+C to quit)
 ```
 命令中指定数据文件路径只需要指定到上一级即可，因为tensorbaord支持多组数据文件对比显示，这个我们后面再介绍。  
 查看图形化的分析结果可以使用浏览器访问：http://127.0.0.1:6006。  
-![](http://blog.17study.com.cn/attachments/201801/ml/tensorboard3.png) 
+![](/attachments/201801/ml/tensorboard3.png) 
 能够显示出来完整的数学模型，只是图的可读性感觉还是比较差，大多节点要思考一下才能明白代表的是什么。而且除了图基本也没有提供其它参数，难以做更深入的分析。  
 我们还可以继续定义一些输出来改善数学模型的显示：  
 我们可以监控常量的状态：  
@@ -354,9 +354,9 @@ with tf.name_scope("weight"):
 ```
 因为定义了placeholder,所以每次sess.run()都是需要喂数据的。即便我们定义的merged这个操作并不需要数据。所以如果单独运行这个操作，附带喂入数据肯定是很不经济。因此通常的方法，都是跟主要的操作一起运行。同时运行多个操作，并且同时得到多个返回值的语法既是python的语言特色，也是TensorFlow支持的功能。  
 现在重复运行程序，得到新的事件文件，再次启动tensorboard然后用浏览器查看，我们可以看到更多的内容了：  
-![](http://blog.17study.com.cn/attachments/201801/ml/tensorboard5.png) 
+![](/attachments/201801/ml/tensorboard5.png) 
 请注意看两个命名的节点，都已经有更友好的节点名了。  
-![](http://blog.17study.com.cn/attachments/201801/ml/tensorboard6.png) 
+![](/attachments/201801/ml/tensorboard6.png) 
 我们监控的变量，能清晰的看到代价函数的值逐渐变小，表示逐渐趋于收敛。（请忽略这个粗糙示例中的抖动，这里仅是为了示例可视化的效果。）  
 其它监控的各种值基本类似，这里就不一一贴出图片了，建议你把源码执行一下然后看看效果。  
 

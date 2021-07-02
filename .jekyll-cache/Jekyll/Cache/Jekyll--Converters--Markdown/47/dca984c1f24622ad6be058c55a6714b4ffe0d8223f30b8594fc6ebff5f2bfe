@@ -1,4 +1,4 @@
-I"1<p><img src="http://blog.17study.com.cn/attachments/201808/vscode.jpg" alt="" />
+I"1<p><img src="/attachments/201808/vscode.jpg" alt="" />
 免费的vs-code现在已经成为mac/linux平台的码农新宠，毕竟从windows平台开发virsul studio多年的经验积累不是白给的。<br />
 我也从诸多的代码编辑器环境，逐渐迁移、统一到了vs-code。最近发现一启动vs-code，风扇就呼呼转，才开始还没注意，以为微软的Windows中二病做派再次发作了。后来逐渐感觉系统响应速度严重下降，仔细检查发现是一个进程CPU占用高企不坠：microsoft.vscode.cpp.extension.darwin，如果是在linux平台则是：microsoft.vscode.cpp.extension.linux。<br />
 在网上搜索，发现这个问题早已有之，社区中投诉帖汗牛充栋，大致可以把问题界定向vs-code的插件机制和扩展插件的问题，但实际解决问题的方法一直没有，大家都寄期望于软件的升级。<br />

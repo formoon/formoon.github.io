@@ -2,12 +2,12 @@
 layout:         page
 title:          AngularJS2+调用原有的js脚本
 subtitle:       AngularJS脚本跟本地原有脚本之间的关系
-card-image:     http://blog.17study.com.cn/attachments/201712/angular.jpeg
+card-image:     /attachments/201712/angular.jpeg
 date:           2017-12-14
 tags:           html
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201712/angular.jpeg)
+![](/attachments/201712/angular.jpeg)
 昨天一个话题说关于AngularJS2以后版本的两个小技巧，不料引出了另外一个话题，话题起始很简单：  
 “很多的前端框架并不复杂，比如JQuery,引入即用，实时看到效果，多好。到了Angular2一直到现在的版本5，一点改进没有，还要编译，还要部署，原有的JS脚本也不能用了。”  
 细想起来，这个话题的帽子并不小，至少牵扯出来一个关键，AngularJS2及以后的版本，其框架之下的JS代码，跟HTML中`<script>`块之中的JS代码，到底是什么关系？  

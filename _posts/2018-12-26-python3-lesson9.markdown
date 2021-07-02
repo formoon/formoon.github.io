@@ -2,12 +2,12 @@
 layout:         page
 title:          从零开始学习PYTHON3讲义（九）
 subtitle:       字典类型和插入排序
-card-image:		http://blog.17study.com.cn/attachments/201901/python3.jpeg
+card-image:		/attachments/201901/python3.jpeg
 date:           2018-12-26
 tags:           python
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201901/python3.jpeg)
+![](/attachments/201901/python3.jpeg)
 <script src='https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML'></script>
 ### 《从零开始PYTHON3》第九讲
 

@@ -2,13 +2,13 @@
 layout:         page
 title:          比特币核心算法ECDSA电子签名在线演示
 subtitle:       纯JS版本签名库
-card-image:     http://blog.17study.com.cn/attachments/201801/bc1.jpg
+card-image:     /attachments/201801/bc1.jpg
 date:           2018-01-22
 tags:           toSeven
 post-card-type: image
 ---
 <script language="JavaScript" type="text/javascript" src="https://kjur.github.io/jsrsasign/jsrsasign-all-min.js"></script>
-![](http://blog.17study.com.cn/attachments/201801/bc1.jpg)  
+![](/attachments/201801/bc1.jpg)  
 上一篇中说过，ECDSA是BITCOIN的安全性核心，保证了任何人发布的信息不可篡改。而区块链，只是保证了每个人发布合法信息的权利。  
 电子签名说了这么久，很多人也在无意识间使用过，但仍然不知道电子签名到底是怎么回事，这个页面就做一个真正、实际上的ECDSA签名算法的演示。  
 电子签名算法有很多种，ECDSA并不是最先进的，只是随着比特币和区块链一起沾光走红而已。  

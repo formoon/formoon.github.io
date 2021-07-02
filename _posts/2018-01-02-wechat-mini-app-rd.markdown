@@ -2,12 +2,12 @@
 layout:         page
 title:          如何看到微信小程序的源码
 subtitle:       wechat mini-app 探究
-card-image:     http://blog.17study.com.cn/attachments/201801/miniprog.jpg
+card-image:     /attachments/201801/miniprog.jpg
 date:           2018-01-02
 tags:           HTML
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201801/miniprog.jpg)
+![](/attachments/201801/miniprog.jpg)
 首先要说，按照中华人民共和国著作权法，逆向工程看别人源码是不合法的，所以请仅限于个人学习。  
 另外一个角度来说，HTML/JS本身的开源特质，也是在鼓励大家互相交流、沟通和共同的进步。从这个角度上说，非技术限制所导致的人为对源码进行封装、隐藏网页源码，似乎也不那么令人信服。  
 

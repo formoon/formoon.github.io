@@ -2,12 +2,12 @@
 layout:         page
 title:          TensorFlow从1到2（九）
 subtitle:       迁移学习
-card-image:		http://blog.17study.com.cn/attachments/201904/tensorFlow2/tf-logo-card-2.png
+card-image:		/attachments/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-04-28
 tags:           tensorflow
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/tf-logo-card-2.png)  
+![](/attachments/201904/tensorFlow2/tf-logo-card-2.png)  
 #### 迁移学习基本概念
 迁移学习是这两年比较火的一个话题，主要原因是在当前的机器学习中，样本数据的获取是成本最高的一块。而迁移学习可以有效的把原有的学习经验（对于模型就是模型本身及其训练好的权重值）带入到新的领域，从而不需要过多的样本数据，也能达到大批量数据所达成的效果，进一步节省了学习的计算量和时间。  
 
@@ -89,7 +89,7 @@ $ ./cats_dogs_1predict.py
 [('n02089078', 'black-and-tan_coonhound', 0.46141574), ('n02105412', 'kelpie', 0.15314996), ('n02106550', 'Rottweiler', 0.092713624)]
 [('n02123045', 'tabby', 0.29928064), ('n02123159', 'tiger_cat', 0.08147916), ('n02096177', 'cairn', 0.047330838)]
 ```
-![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/tl-dog-vs-cat1.png)  
+![](/attachments/201904/tensorFlow2/tl-dog-vs-cat1.png)  
 程序准确的预测出了结果。  
 
 #### 迁移学习改造
@@ -302,7 +302,7 @@ plt.show()
 ```
 我们为了讲解方便，把最终的程序分成了几个部分，实际上为了节省时间，是可以合并在一起执行的，这样不需要重复训练很多次。  
 从绘图结果看，优化的效果还是很明显的：  
-![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/tl-dog-vs-cat2.png)  
+![](/attachments/201904/tensorFlow2/tl-dog-vs-cat2.png)  
 两张图，中间都有一条绿线分隔开优化前和优化后的训练数据。在前半段，正确率和损失值的优化过程是明显比较慢的，而且训练集和验证集两条线的分离也说明有过拟合的现象。在后半段，有一个明显的阶梯表现出来模型性能明显改善，训练集和验证集也更接近。说明各项指标都有效改善了。  
 （待续...）  
 

@@ -2,12 +2,12 @@
 layout:         page
 title:          《连连看》算法c语言演示
 subtitle:      	自动连连看
-card-image:		http://blog.17study.com.cn/attachments/201806/llk1.jpg
+card-image:		/attachments/201806/llk1.jpg
 date:           2018-06-14
 tags:           seven c
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201806/llk1.jpg)
+![](/attachments/201806/llk1.jpg)
 （图片是游戏的示意图，来自互联网，与本文程序无关）  
 
 看题目就知道是写给初学者的，没需要的就别看了，自己都觉得怪无聊的。  

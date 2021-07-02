@@ -2,7 +2,7 @@
 layout:         page
 title:          那些令人惊艳的TensorFlow扩展包和社区贡献模型 
 subtitle:       Tensorflow models
-card-image:		http://blog.17study.com.cn/attachments/201801/ml/tensorflowlogo.jpg
+card-image:		/attachments/201801/ml/tensorflowlogo.jpg
 date:           2018-03-03
 tags:           ml toSeven
 post-card-type: image

@@ -2,12 +2,12 @@
 layout:         page
 title:          从零开始学习PYTHON3讲义（二）
 subtitle:       把Python当做计算器
-card-image:		http://blog.17study.com.cn/attachments/201901/python3.jpeg
+card-image:		/attachments/201901/python3.jpeg
 date:           2018-12-18
 tags:           python
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201901/python3.jpeg)
+![](/attachments/201901/python3.jpeg)
 ### 《从零开始PYTHON3》第二讲
 上一讲我们说过了如何启动Python IDLE集成开发学习环境，macOS/Linux都可以在命令行执行idle3。Windows则从开始菜单中去寻找IDLE程序的图标。
 ![](/assets/cimages/201812/python32/startPython1.png)

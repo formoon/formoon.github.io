@@ -2,12 +2,12 @@
 layout:         page
 title:          从零开始学习PYTHON3讲义（十五）
 subtitle:       让画面动起来
-card-image:		http://blog.17study.com.cn/attachments/201901/python3.jpeg
+card-image:		/attachments/201901/python3.jpeg
 date:           2019-01-03
 tags:           python
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201901/python3.jpeg)
+![](/attachments/201901/python3.jpeg)
 ### 《从零开始PYTHON3》第十五讲
 
 虽然看起来绘图和音乐并不相关，但是听过了上一讲的内容你一定知道，这是游戏编程中四个需要处理内容的两部分，这两部分必须同时、并行的处理，不能因为某一项计算的拖延，导致另外一方程序的停滞。要知道人对声音的断续和游戏的卡顿是很敏感的。

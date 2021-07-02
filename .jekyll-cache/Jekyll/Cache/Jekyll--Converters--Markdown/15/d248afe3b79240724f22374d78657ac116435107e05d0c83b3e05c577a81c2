@@ -43,8 +43,8 @@ SURF的特点：</p>
   <li>主方向确定；</li>
 </ol>
 
-<p><img src="http://blog.17study.com.cn/attachments/201803/30/building1.png" alt="" />
-<img src="http://blog.17study.com.cn/attachments/201803/30/building2.png" alt="" /></p>
+<p><img src="/attachments/201803/30/building1.png" alt="" />
+<img src="/attachments/201803/30/building2.png" alt="" /></p>
 
 <p>跟TensorFlow中碰到的情况一样，目前这些常用的算法，在大多的机器学习框架中都已经封装完成了。使用者已经不需要详细的了解内在算法就可以直接使用。</p>
 

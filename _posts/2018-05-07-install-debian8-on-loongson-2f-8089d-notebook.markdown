@@ -2,12 +2,12 @@
 layout:         page
 title:          在龙芯小本上安装Debain8.10
 subtitle:      	安装过程流水账
-card-image:		http://blog.17study.com.cn/attachments/201805/longxinbook.jpg
+card-image:		/attachments/201805/longxinbook.jpg
 date:           2018-05-07
 tags:           linux
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201805/longxinbook.jpg)  
+![](/attachments/201805/longxinbook.jpg)  
 (图片是LEMOTE8089D笔记本，来自互联网)  
 YX原来送了一个LEMOTE笔记本给我。CPU是首款真正的国产，龙芯2F,兼容mips的指令集。  
 笔记本原来的操作系统是Debian6,后来升级到了7，随后一直是当做玩具放着。最近因为中兴受制裁的事件又想了起来，拿出来尝试看能做点什么。  

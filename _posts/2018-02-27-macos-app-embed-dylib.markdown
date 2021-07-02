@@ -2,12 +2,12 @@
 layout:         page
 title:          将dylib库嵌入macOS应用的方法
 subtitle:       otool和install_name_tool
-card-image:     http://blog.17study.com.cn/attachments/201802/sun1.jpg
+card-image:     /attachments/201802/sun1.jpg
 date:           2018-02-27
 tags:           mac
 post-card-type: image
 ---
-![]http://blog.17study.com.cn/attachments/201802/sun1.jpg)  
+![]/attachments/201802/sun1.jpg)  
 写作是一种习惯，稍微松懈，也许失去的就很多。过了一个年，居然很多天都没有更新，幸福的代价吧:)  
 
 标题的问题其实以前碰到过，不过当时在iOS，所以随手处理了没有重视。  

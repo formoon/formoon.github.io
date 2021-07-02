@@ -2,12 +2,12 @@
 layout:         page
 title:          mac用户丢失管理员身份急救
 subtitle:      	macOS setting user administrator right
-card-image:		http://blog.17study.com.cn/attachments/201804/19/secure.jpeg
+card-image:		/attachments/201804/19/secure.jpeg
 date:           2018-04-19
 tags:           mac
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201804/19/secure.jpeg)
+![](/attachments/201804/19/secure.jpeg)
 用了这么久mac，发现居然还存在这么大一个bug。就是如果你曾经编辑mac电脑默认用户资料，比如试图改用户名、试图改HOME路径之类的，有很高比率可能导致该用户丧失管理员权限。  
 随后悲剧就开始了，所有需要管理员权限认证的地方，比如安装了一个新软件，在弹出的认证窗口中，无论如何输入用户名和密码，都无法授权通过。此时在系统设置->用户及用户组中，会发现该用户选项卡中“允许用户管理这台电脑”前面的勾选已经不见了。当然这时候因为无法授权修改用户权限，因此也无法重新勾选上这个选项。  
 

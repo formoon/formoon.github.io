@@ -1,4 +1,4 @@
-I"!<p><img src="http://blog.17study.com.cn/attachments/201810/opencv-freetype-demo.png" alt="" />
+I"!<p><img src="/attachments/201810/opencv-freetype-demo.png" alt="" />
 　　在mac电脑上管理这些gnu的库一般都使用Homebrew，但总有一些你个性化的需要是官方的Homebrew配方无法满足的。比如在屏幕的输出中使用中文字符。<br />
 　　在OPENCV中输出UTF8字符集早已经有人完成过类似的工作，方法是使用freetype的支持，程序中选择使用的字库，从而在屏幕上输出任意的字符。但官方的Homebrew OPENCV的配方中，并不包含freetype的支持。这时候，只好自己来编译OPENCV及contrib库，因为freetype的支持就在contrib库中。</p>
 <h4 id="编译安装">编译安装</h4>

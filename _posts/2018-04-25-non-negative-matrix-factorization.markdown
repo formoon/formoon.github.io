@@ -2,12 +2,12 @@
 layout:         page
 title:          NMF学习练习：做电影推荐
 subtitle:      	Non-negative Matrix Factorization
-card-image:		http://blog.17study.com.cn/attachments/201910/titlepic/NMF.jpg
+card-image:		/attachments/201910/titlepic/NMF.jpg
 date:           2018-04-25
 tags:           AI
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201910/titlepic/NMF.jpg)
+![](/attachments/201910/titlepic/NMF.jpg)
 NMF是很久以前学的，基本快忘没了，昨天YX提出来一个关于NMF(同音同字不同义)的问题，才又想起来。  
 自己的学习笔记写的比较乱，好在网上资料多，摘了一篇，补充上自己笔记的内容，留此助记。  
 
@@ -134,9 +134,9 @@ for user in zipuser:
 plt2.show()#直接画出矩阵，只打了点，下面对图plt1进行一些设置
 ```
 以上代码会得到两张图，电影主题分布：  
-![](http://blog.17study.com.cn/attachments/201804/25/files-distribution.png)
+![](/attachments/201804/25/files-distribution.png)
 用户倾向主题分布：  
-![](http://blog.17study.com.cn/attachments/201804/25/user_distribution.png)
+![](/attachments/201804/25/user_distribution.png)
 从图中可以看到，我们分类比较少，数据也不是很准确，导致分布偏差比较大，但基本上是分成两类的。  
 
 #### 电影推荐

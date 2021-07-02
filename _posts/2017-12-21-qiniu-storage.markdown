@@ -2,12 +2,12 @@
 layout:         page
 title:          七牛对象存储的使用
 subtitle:       兼说在jekyll页面中添加照片引用
-card-image:     http://blog.17study.com.cn/attachments/201712/7niu.jpg
+card-image:     /attachments/201712/7niu.jpg
 date:           2017-12-21
 tags:           mac jekyll
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201712/7niu.jpg)
+![](/attachments/201712/7niu.jpg)
 
 Jekyll个人网页是个好技术，github.com是个好网站，不过存储容量和流量的限制是个头痛的事情，当然，也在情理之中。  
 好在我们生于“云”的时代，有很多办法来扩展我们的世界。在引用图片方面，主要的要求就是服务商可以提供外链。由于在国内，我们的选择少了一些，不过还是有几个优选的：

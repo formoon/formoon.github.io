@@ -38,9 +38,9 @@ RGBA:同RGB相比，多了一个遮罩图层，在高清图中，A除了遮罩�
 <h4 id="什么样算好">什么样算好？</h4>
 <p>好了我们已经知道了亮度对比度调整的技术层面原理。那么一副照片，调整到什么时候算效果最好呢？其实这才是本文的主题。 <br />
 照片的调整，从来都是有主观性的，我们先来看两幅照片：<br />
-<img src="http://blog.17study.com.cn/attachments/201801/04/mcsjz.jpg" alt="" />（国产电视剧《琅琊榜》剧照）</p>
+<img src="/attachments/201801/04/mcsjz.jpg" alt="" />（国产电视剧《琅琊榜》剧照）</p>
 
-<p><img src="http://blog.17study.com.cn/attachments/201801/04/xqdzjz.jpg" alt="" />（《星球大战》某前传剧照）<br />
+<p><img src="/attachments/201801/04/xqdzjz.jpg" alt="" />（《星球大战》某前传剧照）<br />
 这两幅照片都是出品方原图，转帖未经任何处理，也就是说符合各自出品方对于照片处理的规范要求。<br />
 先说第一幅照片。应当说看上去很美，在同时代不管是国产电视剧、电影，又或影楼的婚纱照，基本都是这样一个感觉。干净、完美、阳光、靓丽或者很多这样可以罗列的形容词。<br />
 接着我们看第二幅照片，如果按照第一幅照片的标准来说，这实在是太糟糕了。衣服脏兮兮的，脸脏兮兮的，手套脏到可以感觉到那种油腻，机器人满身划痕……这样的形容词一样可以列出很多，但是且慢，这些感觉，为什么如此真实？好像照片中描述的未来世界，难道真实存在的吗？<br />
@@ -252,7 +252,7 @@ RGBA:同RGB相比，多了一个遮罩图层，在高清图中，A除了遮罩�
 
 </code></pre></div></div>
 <p>程序以一副照片为参数执行。先显示出来原图，窗口名称为“org”,随后以5%为抛弃比例做亮度、对比度自动均衡，结果图片显示于窗口”photo”，同时在窗口为用户提供了进一步调整亮度对比度的两个工具条。下图是运行的截图:<br />
-<img src="http://blog.17study.com.cn/attachments/201801/04/opencvp1.jpg" alt="" />
+<img src="/attachments/201801/04/opencvp1.jpg" alt="" />
 参考链接：<br />
 <a href="http://blog.csdn.net/c80486/article/details/52505061">http://blog.csdn.net/c80486/article/details/52505061</a><br />
 <a href="http://answers.opencv.org/question/75510/how-to-make-auto-adjustmentsbrightness-and-contrast-for-image-android-opencv-image-correction/">http://answers.opencv.org/question/75510/how-to-make-auto-adjustmentsbrightness-and-contrast-for-image-android-opencv-image-correction/</a><br />

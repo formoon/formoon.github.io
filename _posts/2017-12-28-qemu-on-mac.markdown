@@ -45,7 +45,7 @@ qemu-system-ppc -m 512 -redir tcp:2222::22 -boot d -cdrom ~/Downloads/debian-ser
 qemu-system-ppc -m 1G -device e1000,netdev=net0 -netdev user,hostfwd=tcp::2222-:22,id=net0 ~/qemuPowerPC/debian-ppc.qcow2 
 ```
 下图就是一个安装好的展示画面，其中的uname命令中可以看到CPU类型是PowerPC类型：
-![](http://blog.17study.com.cn/attachments/201712/28/debian.png)
+![](/attachments/201712/28/debian.png)
 在一个真实的CPU环境中工作，原来很多交叉编译繁复工作、本地依赖库及目标机依赖库的头痛问题都不用考虑了。这种顺畅，是除了golang这种天生自带交叉编译系统之外的开发人员梦寐以求的吧。  
 qemu支持很多种cpu类型，每种cpu都有一个对应的启动程序，可以通过ls /usr/local/qemu*查看一下，比如我电脑上的最新版包括这些启动程序：  
 ```bash

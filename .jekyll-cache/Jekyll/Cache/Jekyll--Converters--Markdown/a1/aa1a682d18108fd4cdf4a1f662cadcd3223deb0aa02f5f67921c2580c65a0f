@@ -1,6 +1,6 @@
 I"(<script src="https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML"></script>
 
-<p><img src="http://blog.17study.com.cn/attachments/201906/gradient/gradient-descent.jpeg" alt="" /><br />
+<p><img src="/attachments/201906/gradient/gradient-descent.jpeg" alt="" /><br />
 仍然是一篇入门文，用以补充以前文章中都有意略过的部分。<br />
 之前的系列中，我们期望对数学并没有特别喜好的程序员，也可以从事人工智能应用的开发。但走到比较深入之后，基本的数学知识，还是没办法躲过的。</p>
 :ET

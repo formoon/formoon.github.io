@@ -2,12 +2,12 @@
 layout:         page
 title:          TensorFlow从1到2（十一）
 subtitle:       变分自动编码器和图片自动生成
-card-image:		http://blog.17study.com.cn/attachments/201904/tensorFlow2/tf-logo-card-2.png
+card-image:		/attachments/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-05-05
 tags:           tensorflow
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/tf-logo-card-2.png)  
+![](/attachments/201904/tensorFlow2/tf-logo-card-2.png)  
 
 #### 基本概念
 “变分自动编码器”(Variational Autoencoders，缩写:VAE)的概念来自Diederik P Kingma和Max Welling的论文[《Auto-Encoding Variational Bayes》](https://arxiv.org/abs/1312.6114)。现在有了很广泛的应用，应用范围已经远远超出了当时论文的设想。不过看起来似乎，国内还没有见到什么相关产品出现。  
@@ -23,7 +23,7 @@ post-card-type: image
 
 上一节神经网络翻译，我们知道这个编码结果实际就是神经网络对于一句话的理解。对于自然语言如此，对于图同样如此。  
 深度学习技术的发展为自动编码器赋予了“灵魂”，自动编码器迅速的出现了很多。我们早就熟悉的分类算法就属于典型的自动编码器，即便他们一开始表现的并不像在干这个。按照某种规则，把具有相同性质的数据，分配到某一类，产生相同的编码------这就是分类算法干的。不像自动编码器的原因主要是在学习的过程中，我们实际都使用了标注之后的训练集，这个标注本身就是人为分类的过程，这个过程称不上自动。但也有很多分类算法是不需要标注数据的，比如K-means聚类算法。  
-![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/vae1.jpg)  
+![](/attachments/201904/tensorFlow2/vae1.jpg)  
 一个基于深度学习模型的编码器可以轻松的经过训练，把一幅图片转换为一组数据。再通过训练好的模型（你可以理解为存储有信息的模型），完整把编码数据还原到图片。NMT机器翻译，也算的上实现了这个过程。  
 所以在图片应用中的自动编码器，最终的效果更类似于压缩器或者存储器，把一幅图片的数据量降低。随后解码器把这个过程逆转，从一组小的数据量还原为完整的图片。  
 
@@ -36,17 +36,17 @@ post-card-type: image
 从资料介绍的情况看（[参考资料](https://www.youtube.com/watch?v=9zKuYvjFFS8)），比如对一组人脸照片进行编码，调整编码的某个数值项，结果的人脸肤色可能发生变化；调整另外一个数值，人脸的朝向可能发生了变化。  
 模型就此似乎获得了令人兴奋的创造能力，而原本这应当是艺术家、人类的领域范围。  
 另外一个例子中，通过对一组序列的视频图片的学习，随后删去其中的一部分，比如一辆驶过的汽车。然后使用VAE重新生成删除的画面，可以完美再现画面的背景，汽车似乎从未出现在那里。这样的功能，我们在某大公司的图像、视频处理软件中已经见到了商业化的实现（Neural Inpainting）。  
-![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/vae-neural-inpainting0.jpg)  
+![](/attachments/201904/tensorFlow2/vae-neural-inpainting0.jpg)  
 
 #### 程序要点
 本示例程序中使用的训练图片，就是手写数字的样本库，这是我们最容易获取到的样本集。  
 我们希望经过大量的训练之后，VAE模型能够自动的生成可以乱真的手写字符图片。  
-![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/vae-mnist0.jpeg)  
+![](/attachments/201904/tensorFlow2/vae-mnist0.jpeg)  
 (MNIST手写数字样本图片)  
 程序一开始，先载入MNIST样本库。根据模型卷积层的需要，将样本整形为样本数量x宽x高x色深的形式。最后把样本规范化为背景色为0、前景笔画为1的张量数据。  
 
 程序训练的结果，是使用随机生成的编码向量，还原为手写的数字图片。因为编码是随机生成的，所以不同的编码，生成的图片不可能完全吻合原有的样本集，而这种合理的差异，更类似人自己每次手写的字体------大体上是一致的，但有很多细微的区别。看起来就好像计算机有了人的智慧，在学习了很多手写数字的样本后，自己也能手写数字。  
-![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/vae-epoch99.png)  
+![](/attachments/201904/tensorFlow2/vae-epoch99.png)  
 (VAE经过100次训练迭代后，生成的手写数字样本图片)  
 下面就是随机生成4格x4格共16个样本编码向量，每个向量长度是50个浮点数：  
 ```python
@@ -119,7 +119,7 @@ def generate_and_save_images(model, epoch, test_input):
     plt.close()
 ```
 最后一共生成100张图片，如果生成一张gif动图，那看起来会对训练过程的认识格外深刻：  
-![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/vae-100all.gif)  
+![](/attachments/201904/tensorFlow2/vae-100all.gif)  
 生成动图的程序代码如下，可以单独形成一个程序执行：  
 ```python
 #!/usr/bin/env python3
@@ -373,10 +373,10 @@ for epoch in range(1, epochs + 1):
 ```
 最终训练迭代100次后生成的手写数字样本图，虽然已经很有辨识度。但同人写的数字仍然区别很大，原因是，人手写时候误差造成的变形，人类已经看习惯了，几乎不太影响辨别。而机器形成的误差，从人类的眼光中看起来，很怪异，甚至影响识别。这并不能说机器生成的手写字体就不对，至少在机器学习模型看起来，这样的字体已经可以识别了。  
 我们程序一直使用同一组随机数生成的向量来生成手写字符图片，所以生成的数字一直是同一组。如果程序中再次执行随机生成，得到另外一组随机数，那解码生成的手写图片，也同样会换为另外一组：  
-![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/vae-epoch101.png)  
+![](/attachments/201904/tensorFlow2/vae-epoch101.png)  
 当然作为随机数，本身的随意性，所解码还原的图片辨识度，也基本是同样的等级。按照100次的迭代训练来看，也就是比儿童涂鸦略好。  
 我们开始说过了，VAE的编码目标是平均分配在一个编码空间内的，符合高斯分布。那么我们生成的随机数编码符合这个要求吗？作为50个浮点数长度的向量，这种可能性几乎没有。如果希望得到一个符合正太分布的随机编码向量，需要使用函数reparameterize中提供的方法。比如我们使用这个方法，生成一组编码，再还原为图片看一看：  
-![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/vae-repara-0127.png)  
+![](/attachments/201904/tensorFlow2/vae-repara-0127.png)  
 是不是发现解码还原的图片辨识度高了很多？原因很简单，符合VAE编码规则的编码，所生成的图片，本身就是和训练样本图片最接近、代价值最低的图片。这在人的眼光中看起来好看，实际上，同普通的编码器也就没什么区别了。因为这算不上模型“创造”出来的图片，只是“存储”的图片而已。  
 所以，VAE之所以受欢迎，就是在于VAE具备了人类才有的创造力，虽然创造的结果不一定都令人满意，但毕竟可以“无中生有”啊。  
 

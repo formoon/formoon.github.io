@@ -2,12 +2,12 @@
 layout:         page
 title:          分享一个很通用的Makefile
 subtitle:       自动化程度比较高的c语言Makefile
-card-image:     http://blog.17study.com.cn/attachments/201712/makefile.png
+card-image:     /attachments/201712/makefile.png
 date:           2017-12-19
 tags:           mac
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201712/makefile.png)
+![](/attachments/201712/makefile.png)
 
 编写Makefile是一个苦乐交织的事情，快乐是因为从一堆需要手工逐个处理的编译过程，进步到一条命令完成，看着代码顺畅的在屏幕上滚动，编译为最终的产品，那个过程无比愉悦；而痛苦则是，写代码已经很累了，写完代码还要编写Makefile,这多出来的一点工作，很有点最后一根稻草的感觉。  
 最近整理手头的几个项目，把C语言类的Makefile抽象、合并了一下，形成了一个比较通用的编译脚本，这里分享一下：  

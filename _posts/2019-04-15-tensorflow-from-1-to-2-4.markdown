@@ -2,16 +2,16 @@
 layout:         page
 title:          TensorFlow从1到2（四）
 subtitle:       时尚单品识别和保存、恢复训练数据
-card-image:		http://blog.17study.com.cn/attachments/201904/tensorFlow2/tf-logo-card-2.png
+card-image:		/attachments/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-04-15
 tags:           tensorflow
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/tf-logo-card-2.png)  
+![](/attachments/201904/tensorFlow2/tf-logo-card-2.png)  
 #### Fashion Mnist --- 一个图片识别的延伸案例
 在TensorFlow官方新的教程中，第一个例子使用了由MNIST延伸而来的新程序。  
 这个程序使用一组时尚单品的图片对模型进行训练，比如T恤(T-shirt)、长裤(Trouser)，训练完成后，对于给定图片，可以识别出单品的名称。  
-![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/fashion-mnist-sprite.png)
+![](/attachments/201904/tensorFlow2/fashion-mnist-sprite.png)
 程序同样将所有图片规范为28x28点阵，使用灰度图，每个字节取值范围0-255。时尚单品的类型，同样也是分为10类，跟手写数字识别的分类维度相同。因此实际上，这个例子看起来美观也有趣很多，但是在技术层面上，跟传统的MNIST没有区别。  
 不同的地方也有，首先是识别之后需要显示的是单品名称，而不是0-9的数字，所以程序中需要定义一个标签数组，并在显示时做一个转换：  
 ```python
@@ -24,7 +24,7 @@ class_names = ['T-shirt/top', 'Trouser', 'Pullover', 'Dress', 'Coat',
 plt.xlabel(class_names[train_labels[i]])
 	......
 ```
-![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/fashion_mnist_train_samples.png)
+![](/attachments/201904/tensorFlow2/fashion_mnist_train_samples.png)
 其次，从样本图片中你应当能看出来，图片的复杂度，比手写数字还是高多了。从而造成的混淆和误判，显然也高的多。这种情况下，只使用tf.argmax()获取确定的一个标签就有点不足了。所以在这个例子中，增加了使用直方图，显示所有10个预测分类中，每个分类的相似度功能。同时，预测正确的，用蓝色字体表示。预测结果同样本标注不同的，使用红色字体表示。  
 ```python
 	......
@@ -228,7 +228,7 @@ test_images[0] prediction text: Ankle boot
 test_labels[0]: Ankle boot
 ```
 程序执行中，测试集前15幅图片的验证结果显示如下：  
-![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/fashion_mnist_predict.png)
+![](/attachments/201904/tensorFlow2/fashion_mnist_predict.png)
 左下角的图片出现了明显的识别错误。不过话说回来，以我这种时尚盲人来说，也完全区分不出来这种样子的凉鞋跟运动鞋有啥区别（手动捂脸），当然图片的分辨率也是问题之一啦。  
 
 #### 保存和恢复训练数据

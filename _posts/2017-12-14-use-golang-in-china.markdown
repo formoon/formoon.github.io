@@ -2,12 +2,12 @@
 layout:         page
 title:          在国内使用golang的小技巧
 subtitle:       下载资源包和查看文档
-card-image:     http://blog.17study.com.cn/attachments/201712/wall.jpeg
+card-image:     /attachments/201712/wall.jpeg
 date:           2017-12-14
 tags:           golang 
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201712/wall.jpeg)
+![](/attachments/201712/wall.jpeg)
 (图文无关)
 
 go是一种好语言，从业几十年，接触到go语言就有一种“众里寻他千百度，眸然回首，那人就在灯火阑珊处”的感觉。  

@@ -2,12 +2,12 @@
 layout:         page
 title:          Rocket框架多文件上传
 subtitle:       rocket_upload crate使用
-card-image:		http://blog.17study.com.cn/attachments/201912/wood-crate.jpg
+card-image:		/attachments/201912/wood-crate.jpg
 date:           2019-12-04
 tags:           html
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201912/wood-crate.jpg)  
+![](/attachments/201912/wood-crate.jpg)  
 不知道你的体会是什么，我从C切换到Rust以来，最大的感受并不是语法方面的---那些方面已经有足够多人抱怨而又享受着了。我最大的感受是终于把Web编程工具，同系统编程工具统一了起来。  
 C/C++其实也有很多不错的Web编程框架，只是依然总感觉味道不对。所以平常Node.Js / Golang /Python都会穿插在工作中。无论是开发效率，还是维护的方便程度，C/C++在Web开发方面还是弱项。  
 

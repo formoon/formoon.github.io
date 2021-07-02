@@ -2,12 +2,12 @@
 layout:         page
 title:          在Ubuntu上搭建kindle gtk开发环境
 subtitle:       以及kindle gtk样本程序
-card-image:     http://blog.17study.com.cn/attachments/201712/gtk.png
+card-image:     /attachments/201712/gtk.png
 date:           2017-12-13
 tags:           linux
 post-card-type: image
 ---
-![](http://blog.17study.com.cn/attachments/201712/gtk.png)
+![](/attachments/201712/gtk.png)
 
 某个角度上说，kindle很类似android,同样的Linux内核，同样的Java用户层。不过kindle更注重简单、节能、稳定。Amazon一向认为，功能过多会分散人们阅读时候的注意力。  
 Kindle底层的Linux比Android保持了更多的linux兼容性，可以使用GTK或者QT编写程序。QT适合编写大的、独占界面性的应用，比如多看就曾经发布过一个Kindle之上的版本，现在还有很多人用，可惜因为公司战略调整的原因，这个产品被废弃了。GTK及最基本的Linux应用更适合开发一些补丁性的小程序，来补充Kindle的基本功能。在Ubuntu上搭建kindle的gtk开发环境非常简单,只需要一条命令：

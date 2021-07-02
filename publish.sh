@@ -1,7 +1,7 @@
 #!/bin/bash
 
 echo "pic demo url: "
-echo " http://blog.17study.com.cn/attachments/201903/vm-docker/VM-LXC.png"
+echo " /attachments/201903/vm-docker/VM-LXC.png"
 #if [ "$1" = "pic" ]; then
 case "$1" in
   pic)

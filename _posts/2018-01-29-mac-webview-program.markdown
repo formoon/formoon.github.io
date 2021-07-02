@@ -2,7 +2,7 @@
 layout:         page
 title:          macOS webview编程
 subtitle:       老树依然有新发
-card-image:     http://blog.17study.com.cn/attachments/201801/swift.jpg
+card-image:     /attachments/201801/swift.jpg
 date:           2018-01-29
 tags:           mac
 post-card-type: image
