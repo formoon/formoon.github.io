@@ -2,12 +2,12 @@
 layout:         page
 title:          把Markdown文本发布到微信公众号文章
 subtitle:       开源工具转换Markdown到HTML
-card-image:     https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/markdown.jpg
+card-image:     http://blog.17study.com.cn/attachments/201712/markdown.jpg
 date:           2017-12-20
 tags:           jekyll
 post-card-type: image
 ---
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/markdown.jpg)
+![](http://blog.17study.com.cn/attachments/201712/markdown.jpg)
 估计很多人都是这样，平常工作在github，等到有成果要发布，又要写微信公众号。  
 github用Markdown,微信公众号，至少截止今天，还是沿用富文本的方式。不是说富文本不好，但每次精心撰写的内容，重新排一遍版，还真是怪烦的。  
 如果在github是使用jekyll相对会容易一点，在页面上拷贝、到微信粘贴一下，大多内容都会差不多。否则就只好转换成html显示在浏览器，然后再拷贝粘贴。  

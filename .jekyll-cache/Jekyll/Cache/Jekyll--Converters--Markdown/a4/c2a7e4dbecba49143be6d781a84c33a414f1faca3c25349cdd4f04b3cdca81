@@ -1,4 +1,4 @@
-I"<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
+I"<p><img src="http://blog.17study.com.cn/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
 <h4 id="线性回归模型">线性回归模型</h4>
 <p>“回归”这个词，既是Regression算法的名称，也代表了不同的计算结果。当然结果也是由算法决定的。<br />
 不同于前面讲过的多个分类算法或者逻辑回归，线性回归模型的结果是一个连续的值。<br />

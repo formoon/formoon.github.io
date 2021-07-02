@@ -2,12 +2,12 @@
 layout:         page
 title:          TensorFlow从1到2（七）
 subtitle:       线性回归模型预测汽车油耗以及训练过程优化
-card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png
+card-image:		http://blog.17study.com.cn/attachments/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-04-24
 tags:           tensorflow
 post-card-type: image
 ---
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png)  
+![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/tf-logo-card-2.png)  
 #### 线性回归模型
 “回归”这个词，既是Regression算法的名称，也代表了不同的计算结果。当然结果也是由算法决定的。  
 不同于前面讲过的多个分类算法或者逻辑回归，线性回归模型的结果是一个连续的值。  
@@ -123,7 +123,7 @@ dtype: int64
 <seaborn.axisgrid.PairGrid object at 0x139405358>
 >>> plt.show()
 ```
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/regression_pairplot.png)  
+![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/regression_pairplot.png)  
 上图选取了MPG(油耗)、Cylinders(气缸数量)、Displacement(排气量)、Weight(车重)四项数据，做两两对比形成的散点图。  
 散点矩阵图（SPLOM:Scatterplot Matrix）可以用于粗略揭示数据中，不同列之间的相关性。可以粗略估计哪些变量是正相关的，哪些是负相关的，进而为下一步数据分析提供决策。当然这些图需要行业专家的理解和分析。然后为程序人员提供间接帮助。  
 
@@ -428,7 +428,7 @@ def plot_history(history):
 plot_history(history)
 ```
 执行程序，可以得到下图的结果：  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/regression_mae_mse.png)
+![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/regression_mae_mse.png)
 从图中可以看出，虽然随着迭代次数的增加，训练错误率在降低，但大致从100次迭代之后，验证的错误率就基本稳定不变了。限于样本集数量及维度选取、模型设计等方面的原因，对这个结果的满意度先放在一边。这个模型在100次迭代之后就长时间无效的训练显然是一个可优化的点。  
 TensorFlow/Keras提供了EarlyStopping机制来应对这种问题，EarlyStopping也是一个回调函数，请看我们实现的代码：  
 
@@ -444,7 +444,7 @@ history = model.fit(normed_train_data, train_labels, epochs=EPOCHS,
 plot_history(history)
 ```
 执行后，这次得到的结果令人满意了，大致在60次迭代之后，就得到了同前面1000次迭代基本相似的结果：  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/regression_mae_mse2.png)
+![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/regression_mae_mse2.png)
 既然训练完成，虽然我们使用模型预测的结果无法跟原标注一对一比较，我们可以用图形的方式来比较一下两组值，并做一下预测错误统计：  
 ```python
 # 继续在最后增加如下代码
@@ -471,7 +471,7 @@ _ = plt.ylabel("Count")
 plt.show()
 ```
 程序得到结果图如下：  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/regression_predict_and_error.png)
+![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/regression_predict_and_error.png)
 左边的图中，如果预测结果同标注结果完全一致，蓝色的点将落在主对角线上，偏离对角线则代表预测误差。从图中可以看出，所有的点大致是落在主对角线周边的。这表示预测结果同标注值基本吻合。  
 右边的图是两者之差的范围统计结果，可以理解为左图逆时针逆时针旋转45度后所有点统计的直方图，对角线就是误差为0的位置。图中能看出误差基本符合正态分布，代表预测数值偏大、偏小的数量和比例基本相似，模型是可信的。  
 当然限于样本数量过少的问题，模型的优化余地还是很大的。  

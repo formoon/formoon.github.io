@@ -2,12 +2,12 @@
 layout:         page
 title:          PYTHON替代MATLAB在线性代数学习中的应用
 subtitle:       使用Python辅助MIT 18.06 Linear Algebra学习
-card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/202008/linearAlgerbra1.jpeg
+card-image:		http://blog.17study.com.cn/attachments/202008/linearAlgerbra1.jpeg
 date:           2020-08-09
 tags:           html
 post-card-type: image
 ---
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/202008/linearAlgerbra1.jpeg)  
+![](http://blog.17study.com.cn/attachments/202008/linearAlgerbra1.jpeg)  
 <script src="https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
 #### 前言
 MATLAB一向是理工科学生的必备神器，但随着中美贸易冲突的一再升级，禁售与禁用的阴云也持续笼罩在高等学院的头顶。也许我们都应当考虑更多的途径，来辅助我们的学习和研究工作。  
@@ -1038,7 +1038,7 @@ plt.plot(x,y)
 plt.show()
 ```
 程序执行前首先要安装绘图软件包`pip3 install matplotlib`。安装完成后再次执行程序，除了得到上面相同的4行输出外，还会绘出如下的曲线，表现了斐波那契数列序号同数值之间的关系：
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/202008/fibonacci.png)
+![](http://blog.17study.com.cn/attachments/202008/fibonacci.png)
 在Win10的Linux子系统使用绘图功能的话，还需要配置X11协议的远程显示，请参考这篇文章：[win10配置linux子系统使用python绘图并显示](http://blog.17study.com.cn/2019/06/26/win10-wsl-python-matplotlib-show/)  
 
 #### 马尔科夫矩阵
@@ -1066,7 +1066,7 @@ plt.legend()    #显示图例
 plt.show()
 ```
 程序执行绘制的曲线如下：  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/202008/markov1.png)
+![](http://blog.17study.com.cn/attachments/202008/markov1.png)
 程序在绘图中，使用了中文的图例注释。如果不做任何处理，出现的会是乱码。`plt.rcParams['font.sans-serif']=['Songti SC']`这一行代码，就是将默认绘图字体名sans-serif指定到使用系统宋体，从而正常显示中文。在不同的电脑上，要根据自己的电脑字体名称设置，选择一个替换。  
 
 #### 对称矩阵、复矩阵
@@ -1255,8 +1255,8 @@ ax.plot_surface(X, Y, Z2, rstride=1, cstride=1, cmap='rainbow')
 plt.show()
 ```
 绘制结果请看图：  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/202008/positive_definite1.png)
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/202008/positive_definite2.png)
+![](http://blog.17study.com.cn/attachments/202008/positive_definite1.png)
+![](http://blog.17study.com.cn/attachments/202008/positive_definite2.png)
 在第一张图片中，可以看到当c取值7时，有相当一部分图都位于0（Z轴)之下。  
 而第二张图片中，c取值20，所有曲线都会在0之上了，代表xᵀAx>0，矩阵是正定矩阵。  
 绘制的三维图片，可以使用鼠标拖动，从各个角度观察。还可以旋转、缩放、保存为图片文件。Python实在是数学学习和研究的利器。  

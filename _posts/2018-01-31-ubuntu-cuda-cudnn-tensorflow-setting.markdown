@@ -2,12 +2,12 @@
 layout:         page
 title:          Ubuntu 16.04.03 LTS 安装CUDA/CUDNN/TensorFlow+GPU流水账
 subtitle:       包括TensorFlow再编译
-card-image:     https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/nvidia.jpg
+card-image:     http://blog.17study.com.cn/attachments/201801/nvidia.jpg
 date:           2018-01-31
 tags:           linux
 post-card-type: image
 ---
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/nvidia.jpg)  
+![](http://blog.17study.com.cn/attachments/201801/nvidia.jpg)  
 #### 安装CUDA和CUDNN
 
 重要的事情先说：  

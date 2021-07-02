@@ -1,4 +1,4 @@
-I"�<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
+I"�<p><img srchttp://blog.17study.com.cn/r/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
 <h4 id="keras内置的预定义模型">Keras内置的预定义模型</h4>
 <p>上一节我们讲过了完整的保存模型及其训练完成的参数。<br />
 Keras中使用这种方式，预置了多个著名的成熟神经网络模型。当然，这实际是Keras的功劳，并不适合算在TensorFlow 2.0头上。<br />

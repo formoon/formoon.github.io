@@ -2,12 +2,12 @@
 layout:         page
 title:          gem update 升级错误解决
 subtitle:       SSL错误
-card-image:     https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/ruby1.jpg
+card-image:     http://blog.17study.com.cn/attachments/201801/ruby1.jpg
 date:           2018-01-18
 tags:           mac
 post-card-type: image
 ---
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/ruby1.jpg)  
+![](http://blog.17study.com.cn/attachments/201801/ruby1.jpg)  
 
 挺少用gem update，因为我基本不怎么用ruby，本博的维护使用jekyll，似乎就躲不开了。  
 今天运行`sudo gem update --system`得到报错信息：  

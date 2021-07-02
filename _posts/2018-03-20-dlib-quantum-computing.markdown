@@ -2,12 +2,12 @@
 layout:         page
 title:          量子计算及量子计算的模拟
 subtitle:       白话量子计算
-card-image:     https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201803/iclines.jpg
+card-image:     http://blog.17study.com.cn/attachments/201803/iclines.jpg
 date:           2018-03-20
 tags:           algorithm
 post-card-type: image
 ---
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201803/iclines.jpg)
+![](http://blog.17study.com.cn/attachments/201803/iclines.jpg)
 IT是一个繁荣的行业，寄托着无数人的梦想，充斥着无数的造梦神话。  
 IT是一个悲催的行业，层出不穷的新概念让人应接不暇，几乎只要有一天不学习，都可能让你寝食不安。  
 

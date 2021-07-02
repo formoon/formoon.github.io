@@ -2,12 +2,12 @@
 layout:         page
 title:          TensorFlow从1到2（十五）（完结）
 subtitle:       在浏览器做机器学习
-card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png
+card-image:		http://blog.17study.com.cn/attachments/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-05-14
 tags:           tensorflow
 post-card-type: image
 ---
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png)  
+![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/tf-logo-card-2.png)  
 #### TensorFlow的Javascript版
 TensorFlow一直努力扩展自己的基础平台环境，除了熟悉的Python，当前的TensorFlow还实现了支持Javascript/C++/Java/Go/Swift(预发布版)共6种语言。  
 越来越多的普通程序员，可以容易的在自己工作的环境加入机器学习特征，让产品更智能。  
@@ -124,7 +124,7 @@ document.addEventListener('DOMContentLoaded', run);
 ```
 在支持HTML5的浏览器中打开index.html文件就开始了程序执行，因为是本地文件，通常双击打开就可以。程序一开始首先下载样本数据，视网络环境不同，速度会有区别。执行结束后会自动在浏览器的右侧弹出图表窗口显示我们绘制的样本分布图。  
 除了可能的输入拼写错误，文件下载是最可能出现的问题，如果碰到这种情况，请根据数据文件的路径自行下载到本地来进行试验。  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/js-vis-0.png)  
+![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/js-vis-0.png)  
 这部分相当于一个Hello World吧。从示例中可以看出，js在数据处理中，虽然没有Python的优势，但对于确定的数据类型也有自己的优点。在图表的显示上更是方便，无需第三方模块的支持。何况大多数现代浏览器也都包括console工具，必要情况下通过输出console的调试信息也可以达到很多目的。  
 此外有一点需要说明的，是稍微可能耗时的函数，应当尽量使用异步方式，也就是function关键字之前的async。以避免阻塞整个程序的执行。  
 当然使用了异步方式，程序的整体逻辑一定要多思考，想清楚，避免执行过程中顺序混乱。  
@@ -155,7 +155,7 @@ function createModel() {
 // 在图表窗口显示模型摘要信息
 tfvis.show.modelSummary({name: 'Model Summary'}, model);
 ```
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/js-vis-1.png)  
+![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/js-vis-1.png)  
 #### 数据预处理
 在数据载入的时候我们已经进行了一些预处理的工作。这个数据预处理主要是指把js数据转换为TensorFlow处理起来更高效的张量类型。此外还需要做数据的规范化。  
 在这里有很重要的一点需要说明。js语言在大规模数据的处理上，不如Python的高效。当然这一定程度上是浏览器的限制。  
@@ -204,7 +204,7 @@ function convertToTensor(data) {
 #### 完整代码
 程序核心的训练和测试（预测）的代码在TensorFlow中非常简单，我们早就有经验了。唯一需要说明的是，除了跟Python中一样使用model.fit()做训练，以及model.predict()做预测，我们的过程和结果，也会使用TensorFLow-vis图表工具可视化出来，显示在浏览器中。  
 其中训练部分，是使用回调函数，这种机制我们在Python中也见过。目的是能够动态的显示训练的过程，而不是全部训练枯燥、漫长的等待完成才显示一次。  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/js-vis-2.png)  
+![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/js-vis-2.png)  
 预测部分的数据少，速度很快，就是执行完成后一次显示。  
 但预测部分的数据有大量的转换过程，这个过程消耗内存大，所以放在tf.tidy()中执行以防止内存泄露。  
 好了，代码秀出，请参考注释阅读：  
@@ -383,7 +383,7 @@ function testModel(model, inputData, normalizationData) {
 }
 ```
 程序执行，最终预测测试的输出结果如下：  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/js-vis-3.png)  
+![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/js-vis-3.png)  
 
 #### 结语
 本连载目标定位让已经有TensorFlow使用经验的技术人员，快速上手TensorFlow 2.0开发。  

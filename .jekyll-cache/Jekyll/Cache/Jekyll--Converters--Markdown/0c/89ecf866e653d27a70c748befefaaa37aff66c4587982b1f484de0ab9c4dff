@@ -1,4 +1,4 @@
-I"<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/mp3.jpeg" alt="" />
+I"<p><img src="http://blog.17study.com.cn/attachments/201712/mp3.jpeg" alt="" />
 有个不好意思的坏习惯，经常在网上下载一些MP3音乐，大家可别学我，请努力支持正版。<br />
 很多不同时间、不同来源的MP3，一般采用了不同的命名规则，或者干脆就是混乱的命名，比如一串谁也看不懂的数字，感觉这些起名字的人实在是不走心。<br />
 但管理起来或者欣赏起来，这些杂乱的名字就实在太令人恼火了。自己写了一个小程序，读取MP3音乐中的标签(Taginfo)信息，这些信息一般是压制MP3的时候直接从CD中得到并且保存到MP3文件的，然后用这些信息重新命名MP3文件，我当前采用的方式是“艺术家+曲名.mp3”,源码内很清楚，如果有不同的需求可以自己再修改。<br />

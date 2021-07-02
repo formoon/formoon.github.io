@@ -1,8 +1,8 @@
-I"`�<blockquote>
+I"`�<blockquote>
   <p>摘要：本文从单机真机运营的历史讲起，逐步介绍虚拟化、容器化、Docker、Kubernetes、ServiceMesh的发展历程。并重点介绍了容器化阶段之后，各项重点技术的安装、使用、运维知识。可以说一文讲清楚服务器端运维的热点技术。</p>
 </blockquote>
 
-<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201903/vm-docker/its.jpg" alt="" /></p>
+<p><img src="http://blog.17study.com.cn/attachments/201903/vm-docker/its.jpg" alt="" /></p>
 
 <h4 id="序">序</h4>
 <p>文章的名字起的有点纠结，实际上这是一篇真正从基础开始讲解，并试图串联起来现有一些流行技术的入门文章。<br />
@@ -22,7 +22,7 @@
 
 <h4 id="由cs至bs">由C/S至B/S</h4>
 <p>在客户端安装一个程序并且保证程序的长期正常运行是挺费劲一个事情。特别是随着Windows系统快速的升级，和客户端可能安装的软件数量增加带来的运行环境复杂性增加，兼容性问题成为另外一个麻烦。<br />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201903/vm-docker/csmode.jpg" alt="" />
+<img src="http://blog.17study.com.cn/attachments/201903/vm-docker/csmode.jpg" alt="" />
 所以从用户、开发人员到运维人员，都开始将程序从客户端（Client)的方式，转移到了浏览器（Browser)的方式。<br />
 这其实就是我们使用电脑浏览互联网的方式，习惯了手机上网的我们，可能已经忘记了一个域名就卖出天价的时代。<br />
 浏览器“开箱即用”的特性很快就风靡业界。Google公司甚至专门为此研发了只支持浏览器环境的Chromebook上网笔记本。在深圳的华强北，大量的轻薄短小的迷你上网本也快速出货。<br />
@@ -35,7 +35,7 @@
 在CPU厂商尚未给CPU内置虚拟化（比如VT）技术之前，这种模拟器就已经出现了。我所考证最早使用这种方式工作的软件是一款分析、破解应用软件的软件。是一个重要的黑客工具，因此软件的名字在这里不提。这款软件完整的模拟操作系统的执行，在其中运行的应用软件完全意识不到自己是在一个虚拟的环境中执行。在这种状态下，软件的一切动作都可以被跟踪、记录而无所遁形，甚至随时被中断运行切换到代码分析模式，从而快速的被破解。<br />
 这种工作方式完整的模拟一切，可以达成工作，但是因为使用了大量的CPU调试中断，软件模拟和监控，导致运行效率非常低。所以在生产环境中并不流行，通常主要用户是开发部门。时至今日，仍然有一些应用采用这种方式工作，比如Android的模拟器，就是基于QEMU的虚拟化技术。不仅可以模拟x86系列CPU,还可以模拟ARM/MIPS等。<br />
 直到从CPU硬件层级实现了对虚拟化的支持之后，配合上软件的进步，在虚拟计算机中的程序的运行效率才得到了大幅度提高。在不需要大量显示资源的后端应用中，运行速度已经无限接近实体真机运行同样应用的速度。而这恰恰是服务器端软件所需要的，至此，虚拟化的推广扫清了障碍。<br />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201903/vm-docker/vmware1.jpg" alt="" />
+<img src="http://blog.17study.com.cn/attachments/201903/vm-docker/vmware1.jpg" alt="" />
 虚拟化的出现大幅提高了运维效率，也大幅的提高了硬件服务器的利用率，带来了运维的革命性变化。其实就是从这个时期开始，运维部门才逐渐同研发部门互相比肩，脱离了长期从属的尴尬地位。<br />
 在这一时代，VMWare几乎一家独大。服务器端采用 VMware ESXi, 客户端使用VMware Workstation。盗版的数量恐怕更是正版采购量的十倍以上。<br />
 即便在微服务如此普及的今天，很多企业的基础硬件环境也会首先部署VMware ESXi，再由其中划分所需资源供微服务架构来使用。<br />
@@ -57,13 +57,13 @@
 <h4 id="容器containerlxcdocker">容器（Container）、LXC、Docker</h4>
 <p>虚拟化的市场巨大，虽然VMWare吃到了最大的一口。但业界的竞争从来没有停止。<br />
 很快容器技术就脱颖而出，成为业界新宠。成功的原因是多方面的，但最硬核的一条，是对系统运行效率的提升。<br />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201903/vm-docker/docker1.jpg" alt="" />
+<img src="http://blog.17study.com.cn/attachments/201903/vm-docker/docker1.jpg" alt="" />
 在上一章我们说过，虚拟化会在一台电脑上，虚拟出1台或多台电脑，运行另外的操作系统。比如执行了2台Windows，1台Ubuntu，1台Centos。随后在这些操作系统上，再执行具体的应用。<br />
 应用在执行的过程中，大量的硬件调用通过虚拟主机的操作系统，被虚拟化系统比如VMWare所截获，再转换到实体主机的硬件层执行。这个过程已经成为执行效率进一步提升的瓶颈。<br />
 而对于大多数应用来说，其规模远远小于操作系统本身，往往是为了执行一个只有几十M容量的应用，首先要部署一个上G容量的操作系统。系统启动过程所耗费的时间也是远超应用本身。这种情况下，虚拟化对于计算资源的消耗更是变得尤为突出。<br />
 容器则是使用了完全不同的思路，在容器中，每个应用都共享了实体主机的操作系统本身。只是利用内核提供的隔离技术，完全无法发现其它应用的存在，同样实现了“独占”的效果。<br />
 在容器中执行的应用，所有操作实际上并不是被虚拟化的，跟直接在实体机上的执行从效率上说没有区别。
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201903/vm-docker/VM-LXC.png" alt="" />
+<img src="http://blog.17study.com.cn/attachments/201903/vm-docker/VM-LXC.png" alt="" />
 容器技术的缺点也是明显的，就是容器无法支持实体主机上的多种操作系统，容器中的操作系统，跟宿主机上的操作系统必须是一致的。<br />
 比如在Ubuntu主机上的容器中，可能出现Centos/Ubuntu,但不可能出现Windows容器。<br />
 容器技术发展迅猛，即便系统软件巨头微软也无法忽略，传闻微软在Windows的容器化上投入了巨大的资源，但截至今日，尚未有说服力的产品出现。<br />
@@ -113,7 +113,7 @@ sudo apt install docker.io
 <em>Container</em>: 容器，相当于一台虚机，可能正在执行，也可能执行结束已经退出（关机）。<br />
 <em>Image</em>: 映像。这个是新手容易困惑的。因为在VMWare中没有这个概念，比较接近的，可以理解为已经安装好的操作系统模板，每次启动一个容器（虚机），实际是复制一份映像，然后在映像上执行。前面已经说过，容器本质上是跟宿主机共享内核，映像则相当于硬盘的文件系统，当然是建立在某目录下的根文件系统，只是文件本身，并不是磁盘的克隆。<br />
 <em>Docker</em>: Docker是这套容器系统的产品名称，也是命令行管理工具的名称（命令行工具要使用全小写字符）。所有对Docker系统的操作，都可以通过命令行完成。直接执行<code class="language-plaintext highlighter-rouge">docker</code>，可以得到概要帮助文档。<br />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201903/vm-docker/dockerhub.png" alt="" /><br />
+<img src="http://blog.17study.com.cn/attachments/201903/vm-docker/dockerhub.png" alt="" /><br />
 （本文的代码块中，命令前面的#符号是系统root状态的提示符，不需要用户输入）</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># docker</span>
 
@@ -490,7 +490,7 @@ Hello World&lt;br&gt;Here is NodeJs <span class="k">in </span>Docker&lt;br&gt;
 这些系统集中解决了多宿主机集群情况下的统一管理和容器动态编排方面的问题。因为Linux本身就是开源软件，这些系统大量的采用了开源软件资源，加上自主开发的部分代码。所以实际上看起来很多部分都是雷同或者类似的。<br />
 从软件工程的角度来看，VMWare模式是典型的“教堂模式”，容器当然就是“集市”模式。如果说Linux作为集市模式的代表，其领导地位还存在争议的话。在虚拟化平台的生产应用方面，“集市”模式已经显著领先了。<br />
 经过了2年左右的竞争、淘汰，已经有很多平台人气不在了，国内我也知道几家创业公司悄然倒闭。对用户来讲，最可惜的是付出的学习成本。<br />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201903/vm-docker/k8s1.gif" alt="" /><br />
+<img src="http://blog.17study.com.cn/attachments/201903/vm-docker/k8s1.gif" alt="" /><br />
 当前用户比较多的系统中，比较有名的是Rancher、Kubernetes、Swarm。<br />
 Swarm是Docker官方推出，可惜推出的比较晚，很多用户已经有了自己的选择，不愿意付出迁移的成本。否则本来Swarm是最有机会一统天下的。<br />
 Kubernetes今天看起来似乎已经成为了业界领袖，占有最多的用户群。毕竟Google这么多年最大规模的服务器集群运营经验不可小视。所以接下来我们就看看Kubernetes的解决方案。</p>
@@ -514,7 +514,7 @@ kubeadm帮助集群管理员简化集群的安装、维护工作。对于k8s容�
 你可以理解为，有了网络插件，容器虚机中才能有自己独立的ip地址，才能进行虚拟服务器之间的数据交换。k8s支持的网络插件列表可以在这里找到：<a href="https://kubernetes.io/docs/concepts/cluster-administration/addons/">https://kubernetes.io/docs/concepts/cluster-administration/addons/</a><br />
 以上是k8s的基本组成。<br />
 图形界面的粉丝们也可以欢呼了，k8s的Dashboard组件提供了WEB UI功能，容器用户也能像VMWare用户一样靠鼠标完成工作了。我见过好几个用户对于k8s的容器自动编排、负载均衡等并不是很需要，纯粹就为了使用Dashboard而配置k8s集群。Dashboard是单独的一个Pod，没有Dashboard并不影响k8s集群的运行，是在集群安装完成后单独部署执行的。<br />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201903/vm-docker/k8s2.jpg" alt="" /><br />
+<img src="http://blog.17study.com.cn/attachments/201903/vm-docker/k8s2.jpg" alt="" /><br />
 类似于使用Docker的核心就是操作容器。k8s操作的核心单元是Pod。一个Pod是k8s操作的最小单元，包括一个或者多个容器、存储、网络、服务。可能有多个容器的原因是，稍复杂的应用，可能都不是一个容器可以承载的。强制放在一个容器里，往往也增大了粒度，降低了资源使用效率。比如通常一个小网站，可能至少有一个WEB服务器，然后还有一个数据库服务器。这就是两个容器。如果是在Docker中，你可能需要分别启动两次，而在k8s之中，这两个容器可以属于一个Pod，统一进行管理。此外比较重要的一个概念，k8s可以根据要求，一次启动Pod的多个实例，相当于对于某个应用投入了更多的计算资源，从而应对高负荷应用。<br />
 Service是k8s管理的另外一个对象，容器的运行，归根结底是对外提供服务。网络服务实际上就是开放某个端口，通过端口对外提供服务。不同于Docker中简单的端口映射。k8s中可以启动某Pod的多个实例，这些Pod中的程序，肯定对外提供了同一个接口进行服务。Service可以提供基本的负载均衡功能，把外部连接进来的访问流量调度到不同的Pod上，让集群的规模化发生作用。而如果在Docker上，则只能自行配置外加的负载均衡方案来达成同样的功能，麻烦就不说了，Docker及负载均衡方案之间的衔接使得容器列表发生变动的时候很可能发生服务的阻塞。k8s的负载均衡是使用内部的DNS服务（用于动态解析Pod的IP地址，相当于服务发现）和Kube-Proxy（将流量动态分配到不同的Pod)共同来完成的。<br />
 Volume就是用于映射到容器内工作目录的存储目录或者设备。k8s在Docker的基础上根据需要更加细分了存储设备的类型，包括普通的目录映射、iSCSI之类的硬件存储设备、甚至商业云存储服务。这让容器技术更具有实用性。<br />
@@ -818,8 +818,8 @@ token:      eyJhbGciOiJSUzI1NiIsImtpZCI6IiJ9.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2V
 </code></pre></div></div>
 <p>现在使用https协议访问主控节点IP地址的32767端口就能看到控制台登录界面了：<a href="https://10.96.200.150:32767">https://10.96.200.150:32767</a>，因为使用了私有的证书，所以还要确认忽略掉浏览器的警告信息窗口。<br />
 登录Dashboard控制台使用Token模式，这个Token就是我们刚才建立用户的时候所获得的TOKEN，跟前面加入工作节点所使用token的不是同一个东西。<br />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201903/vm-docker/k8s-dashboard-login.png" alt="" />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201903/vm-docker/k8s-dashboard-namespaces.png" alt="" />
+<img src="http://blog.17study.com.cn/attachments/201903/vm-docker/k8s-dashboard-login.png" alt="" />
+<img src="http://blog.17study.com.cn/attachments/201903/vm-docker/k8s-dashboard-namespaces.png" alt="" />
 Dashboard还可以安装一些酷炫的插件，用于图形化的显示系统的负载、使用情况，有兴趣可以参考此文：<a href="https://iamchuka.com/install-kubernetes-dashboard-part-iii/">https://iamchuka.com/install-kubernetes-dashboard-part-iii/</a></p>
 
 <p>至此，集群的安装全部结束。</p>
@@ -1171,7 +1171,7 @@ service <span class="s2">"web-site-svc"</span> deleted
 但是即便在这种高可用的模式下，仍然需要配置负载均衡机制，比如HAProxy，放置在控制群组之前，这无可避免的成为了又一个单点瓶颈。<br />
 此外还有一些需求，比如对容器的监控功能不足，调试容器的配置问题需要研发团队配合输出大量的日志信息。再比如红黑发布的导流控制等。<br />
 在开源社区中，只要有需求，就有大量的团队为此努力，开发出同样大量的产品或者插件。在其中，这次是Istio脱颖而出。<br />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201903/vm-docker/istio.png" alt="" />
+<img src="http://blog.17study.com.cn/attachments/201903/vm-docker/istio.png" alt="" />
 简单来说，Istio采用了比较新的思路来解决问题。最主要的就是，原本每个容器，需要同管理节点之间建立通讯连接，沟通容器状态及接受控制信息。因为这种机制，管理节点的健康状况和负载能力，成为了整个系统的瓶颈。<br />
 Istio同样也是在容器上配置自己的组件（Sidecar），但这些控制数据流，不再沟通到某个具体的管理节点，而是所有节点直接互相沟通，组成了一个服务网格（ServiceMesh）。网格中任意一个容器出现问题，并不影响整个网格的信息传递和控制，故障的容器同样也会在服务支持下被删除，并被新生成的容器替代。系统不再存在单点瓶颈。<br />
 Sidecar的核心是代理机制，接管了所有进出容器的通讯流。在这种机制的帮助下，在流量管理、安全性、控制、和监控方面，显然有了更可靠的手段。因此在Istio首页（<a href="https://istio.io">https://istio.io</a>）上，这四个特征成为了主要的卖点：</p>
@@ -1184,7 +1184,7 @@ Sidecar的核心是代理机制，接管了所有进出容器的通讯流。在�
 
 <p>应当说单纯这些功能，在社区中都有不错的组件可以完成，为了少量的需求安装一个轻型的组件也很经济。实际上Istio也直接或者间接的使用了大量社区贡献的组件。但有一点一定要明白，虽然安装同样的组件能够完成同样的功能，但除非使用了Istio的Sidecar机制，否则需求是满足了，但并没有解决单点瓶颈问题，并不是ServiceMesh。<br />
 (Sidecar本意是指跨斗摩托车边上的跨斗，这里指正式任务容器旁边再附着一个管理的容器，组成服务网格。Sidecar用在这里是非常形象的说法。)<br />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201903/vm-docker/mesh1.jpg" alt="" /></p>
+<img src="http://blog.17study.com.cn/attachments/201903/vm-docker/mesh1.jpg" alt="" /></p>
 <h4 id="istio的安装">Istio的安装</h4>
 <p>Istio可以在k8s上直接安装，这个相爱相杀的世界啊:)<br />
 当然这个特征是k8s的市场占有率决定的,支持k8s能让Istio更易用也有更多用户。实际上Istio可以在纯Docker环境配合Docker Compose安装，并且在没有k8s存在的情况下独立运行。<br />
@@ -1858,14 +1858,14 @@ docker pull istio/examples-bookinfo-reviews-v3:1.8.0
 docker pull istio/examples-bookinfo-productpage-v1:1.8.0
 </code></pre></div></div>
 
-<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201903/vm-docker/prometheus_query_result.png" alt="" />
+<p><img src="http://blog.17study.com.cn/attachments/201903/vm-docker/prometheus_query_result.png" alt="" />
 在Istio安装的过程中，已经预置了Prometheus和Grafana指标可视化工具，使用Kubectl工具的端口转发功能把服务端口开放出来就可以使用，比如：</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl <span class="nt">-n</span> istio-system port-forward <span class="si">$(</span>kubectl <span class="nt">-n</span> istio-system get pod <span class="nt">-l</span> <span class="nv">app</span><span class="o">=</span>prometheus <span class="nt">-o</span> <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.items[0].metadata.name}'</span><span class="si">)</span> <span class="nt">--address</span> 0.0.0.0 9090:9090 &amp;
 <span class="nv">$ </span>kubectl <span class="nt">-n</span> istio-system port-forward <span class="si">$(</span>kubectl <span class="nt">-n</span> istio-system get pod <span class="nt">-l</span> <span class="nv">app</span><span class="o">=</span>grafana <span class="nt">-o</span> <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.items[0].metadata.name}'</span><span class="si">)</span> <span class="nt">--address</span> 0.0.0.0 3000:3000 &amp;
 </code></pre></div></div>
 <p>上面两条转发命令中的<code class="language-plaintext highlighter-rouge">--address 0.0.0.0</code>是为了把端口开放给节点主机之外的电脑来访问，因为通常节点服务器上不具备图形界面。但这也会带来安全性的问题，所以注意要使用完即时关闭。<br />
 这部分请参考官方文档：<a href="https://istio.io/zh/docs/tasks/telemetry/metrics/querying-metrics/">https://istio.io/zh/docs/tasks/telemetry/metrics/querying-metrics/</a><br />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201903/vm-docker/grafana-istio-dashboard.png" alt="" /><br />
+<img src="http://blog.17study.com.cn/attachments/201903/vm-docker/grafana-istio-dashboard.png" alt="" /><br />
 Istio在辅助调试方面，可以在流量中注入指定的错误信息、对数据包进行延迟、中断等，用于模拟实际故障发生的可能性，从而帮助研发人员、运维人员对系统进行优化。具体使用方法请参考官方文档。<br />
 监控功能和辅助调试同样也是借助了Sidecar对所有数据流的代理功能得以实现的。<br />
 在安全性方面，Istio主要是采用证书签名机制和TLS连接。支持TLS连接的版本，同本文中我们示例安装的版本不是同一个。如果有需求，请在Istio集群安装时就注意选择对应的配置文件来启动。详情请至官方文档学习。<br />

@@ -1,4 +1,4 @@
-I"�<h4 id="imagenet">ImageNet</h4>
+I"�<h4 id="imagenet">ImageNet</h4>
 <p>基础部分完成，从本篇开始，会略微的增加一些难度。<br />
 通常说，在解决问题的时候，大多程序员都会在网上搜索，寻找一些相似相近的案例作为参考。这个方式在机器学习领域同样有效。可惜早期的时候，各公司的保密还是做的比较严格，时至今日有了很大改善，但在整个IT行业中，机器学习领域，各公司的研发成果保密仍然是最严重的。<br />
 因此，<a href="http://www.image-net.org/">ImageNet</a>对机器学习的推动更是难能可贵和功不可没。在机器学习尚处于摸索阶段，大家在都没有大规模投资的情况下艰苦研究的时候，ImageNet提供了一个迄今也是最大的已标注视觉大数据集，让个人即便在家里也可能把精力集中在算法和理论的研究。<br />
@@ -15,7 +15,7 @@ ImageNet还连续举办了多届机器识别大赛，比赛结果一次次刷新
 
 <h4 id="vgg-19">vgg-19</h4>
 <p>VGG-19是2014年在ImageNet大赛中夺冠的算法，整体模型定义超过了19层的卷积及神经网络。下图是vgg系列网络的结构示意图：<br />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/ml-nn/vgg.png" alt="" />  <br />
+<img src="http://blog.17study.com.cn/attachments/201801/ml-nn/vgg.png" alt="" />  <br />
 这里选择这个案例有三个原因：一是可以从上图看到，虽然模型很复杂，但没有超过我们现在掌握的基础算法，所有用到的算法我们都已经学过；二是这个复杂的模型完成ImageNet学习用时很长，但网上已经有完整的训练数据可以直接下载使用，从而大大的降低使用门槛。也就是说，我们搭建好模型，就可以用来对图片进行识别预测；三则是这是真正广泛应用的模型，在吻合的领域完全可以直接用于商用化。  <br />
 训练数据下载：<a href="http://www.vlfeat.org/matconvnet/models/beta16/imagenet-vgg-verydeep-19.mat">点击下载</a><br />
 分类标签下载：<a href="https://github.com/sh1r0/caffe-android-demo/raw/master/app/src/main/assets/synset_words.txt">点击查看</a><br />
@@ -241,7 +241,7 @@ vgg.py:</p>
 接着程序列出文件夹中所有图片，逐个读入。读入的图片统一将尺寸变更为长宽均为224，颜色为RGB的图片（归一化）。
 随后使用vgg算法识别给定的图片矩阵。返回值已经从分类变成了索引，使用索引在标签库中查找就可以得到图片所属的分类。程序会列出最相似的前三个分类及其相似度。<br />
 本例中所使用的图片就是在百度图片上随意搜索的，显示如下：<br />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/leopard.jpg" alt="" /><br />
+<img src="http://blog.17study.com.cn/attachments/201801/leopard.jpg" alt="" /><br />
 最后的执行结果为：</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./picRegn.py
 <span class="c">#####images/leopard.jpeg#######</span>
@@ -260,7 +260,7 @@ vgg.py:</p>
 vgg.py最主要的函数是net,其它函数都是围绕这个函数而工作的。在这个函数中，首先完整定义一个vgg19的模型。这个定义跟我们以前用的方式非常不同。在我们以前学习的时候，因为结构比较简单，都是直接逐行的用命令进行模型的搭建。而在这个19层的网络中，用手工搭建已经太繁琐了，因此用了一个字符串数组<code class="language-plaintext highlighter-rouge">layers</code>，将模型以字符串的形式存入数组。然后循环遍历这个数组，根据该层名称调用相应的子程序定义相应层的算法。并将每一层的输入，定义为上一层的输出，从而将网络逐层关联在一起，最终完成完整的网络。<br />
 这种方法在复杂网络中会经常用到，目前我听说比较深的网络已经超过了1000层之多。这一篇里，这部分是学习的重点，学会了这个，你才能真正的在网上搜索成熟的算法、模型，并拿来应用。<br />
 vgg19的网络看上面展开的图反而不一定容易理解，我再转帖一张vgg-16网络的结构化示意图供参考（vgg-19网络除了层数其它基本类似）：<br />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/ml-nn/vgg16.png" alt="" /><br />
+<img src="http://blog.17study.com.cn/attachments/201801/ml-nn/vgg16.png" alt="" /><br />
 整个vgg包对外的接口实际上主要是使用函数：<code class="language-plaintext highlighter-rouge">predict</code>,这个函数接受一个参数，参数是一个224x224x3的图片矩阵。函数中会对图片统一减去均值，然后转换成张量（矩阵），并且全部变成浮点数据。随后送入刚才说过的net，用构建的网络对图片进行识别。<br />
 一个要注意的情况是，其实刚才说到的所有工作都只是对数据模型的描述、定义和组装。真正执行TensorFlow运算在下面<code class="language-plaintext highlighter-rouge">preds[0].eval()</code>这里，其实你看到evel()就应当明白了，我们前面的文章讲过，这里是使用当前默认的session来执行一个模型并返回结果。<br />
 同样是图像识别，用这个程序进行图像识别，跟使用百度之类的云API有什么区别吗？都学到第八篇了，这种区别无论如何你也应当能说得出来，不然我要伤心死了:)。云API是所有工作架构在云端，提供接口调用，按使用数量付费。使用这里的程序则是要自己搭建服务器，定义、实现接口，在自己的服务器上运行。如何取舍，其实不仅仅是技术问题，更重要是对于业务和企业战略的决策。<br />

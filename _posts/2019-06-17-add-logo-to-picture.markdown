@@ -2,12 +2,12 @@
 layout:         page
 title:          给图片加水印
 subtitle:       新码农如何把技术变成产品
-card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/IMG_20190521_125150_logoed.jpg
+card-image:		http://blog.17study.com.cn/attachments/201906/waterMark/IMG_20190521_125150_logoed.jpg
 date:           2019-06-17
 tags:           html
 post-card-type: image
 ---
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/IMG_20190521_125150_logoed.jpg)  
+![](http://blog.17study.com.cn/attachments/201906/waterMark/IMG_20190521_125150_logoed.jpg)  
 ### 前言
 加水印是为图片声明版权出处的一种常用方法。  
 平常都是写技术文章，文章的重点在技术本身，照片往往不需要加水印，或者需要加也不多，祭出神器PhotoShop很快就能完成。  
@@ -33,8 +33,8 @@ post-card-type: image
 > 除非“标准化”本身也是用户的需求之一，否则虽然标准化有很多好处，但快速完成项目才是第一追求的目标。  
 
 制作一个水印文件最容易的方法是在PhotoShop中，把主体内容独立一层，随后把背景部分全部涂黑。这个黑一定要是真正的黑，也即RGB三个值全部为0。实际上任何不会引起冲突的颜色都是可以的，比如我们常见到特技拍摄中用到的蓝箱、绿箱。但使用全黑的背景处理起来还是最容易的。  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/ps-layers.png)  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/logo.png)  
+![](http://blog.17study.com.cn/attachments/201906/waterMark/ps-layers.png)  
+![](http://blog.17study.com.cn/attachments/201906/waterMark/logo.png)  
 
 在程序中操作图片，最强大的当然是opencv库。给工程师用，拿Python写个脚本就够了。如果是给普通用户，可以编译为可执行文件的c/c++肯定是更优选。  
 
@@ -80,7 +80,7 @@ $ ./mkcv4.sh wmv1
 $ ./wmv1
 ```
 在一张样本的图片上运行这个程序，得到的结果效果如下：  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/wmv1.jpg)  
+![](http://blog.17study.com.cn/attachments/201906/waterMark/wmv1.jpg)  
 
 看起来，完美的解决了用户的需求，完活收工......  
 
@@ -178,7 +178,7 @@ $ ./mkcv4.sh wmv2
 $ ./wmv2 IMG_20190521_125150.jpg IMG_20190521_125150-logoed.jpg logo.png 150 100 100
 ```
 得到的图片如下：  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/wmv2.jpg)  
+![](http://blog.17study.com.cn/attachments/201906/waterMark/wmv2.jpg)  
 看起来顺眼多了，刚才的问题，也都得到了解决。  
 
 我们就不再“装作”有用户的样子，相信刚才描述的用户反馈，大多人都有过这种经历，谁也不开心别人在自己的心血上指手画脚。但在真实的工作中，往往如此。  
@@ -412,9 +412,9 @@ int main(int argc, char **argv){
 > 技术人员不能只沉迷于技术，技术人员的升职加薪，往往得益于其它经验的积累，比如行业经验，比如沟通协调经验。  
 
 假设我们当前目录准备了一张图片叫DSCF2183.jpg：
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/DSCF2183.jpg)  
+![](http://blog.17study.com.cn/attachments/201906/waterMark/DSCF2183.jpg)  
 并且准备两个logo水印文件，一张logo.png是刚才的黑白图片，另外一张logo1.png是红字黑底的图片：  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/logo1.png)  
+![](http://blog.17study.com.cn/attachments/201906/waterMark/logo1.png)  
 我们把第三版的程序编译一下，然后做几个测试，
 ```
 $ ./mkcv4.sh wmv3
@@ -428,7 +428,7 @@ copy:0
 $
 ```
 这是最简的运行模式，只需要一个输入文件。水印文件自动缩放到目标图片宽度的30%，然后透明叠加在右下角：  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/DSCF2183_wite.jpg)  
+![](http://blog.17study.com.cn/attachments/201906/waterMark/DSCF2183_wite.jpg)  
 简单使用-c参数，可以用覆盖的方式叠加水印：  
 ```bash
 $ ./wmv3 -i DSCF2183.jpg -c
@@ -439,7 +439,7 @@ scale:0.300000
 postion:0
 copy:1
 ```
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/DSCF2183_wite_copy.jpg)  
+![](http://blog.17study.com.cn/attachments/201906/waterMark/DSCF2183_wite_copy.jpg)  
 更换第二幅水印logo来试试：  
 ```bash 
 $ ./wmv3 -i DSCF2183.jpg --logo logo1.png -o DSCF2183_red.jpg
@@ -457,8 +457,8 @@ scale:0.300000
 postion:0
 copy:1
 ```
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/DSCF2183_red.jpg)  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/DSCF2183_red_copy.jpg)  
+![](http://blog.17study.com.cn/attachments/201906/waterMark/DSCF2183_red.jpg)  
+![](http://blog.17study.com.cn/attachments/201906/waterMark/DSCF2183_red_copy.jpg)  
 
 ### 补充
 作为一个命令行程序，第三版已经基本可以满足应用见用户了。忘了提醒你注意附加在程序内部的程序使用文档，千万注意保证文档的完善、准确。很多优秀的产品，用户能不能用的好，往往是由文档的水平决定的。  
@@ -482,7 +482,7 @@ $ sudo cp markall.sh /usr/bin
 $ sudo cp wmv3 /usr/bin
 ```
 这次为再多的图片加水印也不怕了，比如我们有一个测试文件夹，是这样的结构：  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/waterMark/folderStructure.png)  
+![](http://blog.17study.com.cn/attachments/201906/waterMark/folderStructure.png)  
 只要如此执行就可以为文件夹下面，及其子文件夹中所有的jpg/jpeg/png文件添加水印：  
 ```bash
 $ markall.sh test

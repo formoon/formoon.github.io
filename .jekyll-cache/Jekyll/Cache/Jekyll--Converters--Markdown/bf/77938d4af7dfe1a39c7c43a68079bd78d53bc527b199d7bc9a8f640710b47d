@@ -1,4 +1,4 @@
-I"�6<p><img src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=46233978,3905979695&amp;fm=27&amp;gp=0.jpg" alt="" />
+I"�6<p><img src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=46233978,3905979695&amp;fm=27&amp;gp=0.jpg" alt="" />
 这是一个云端的年代，这是一个虚拟化的年代。当我们幸福的置身其中的时候，也不得不痛苦的怀疑自己的感官和思想，真和假，虚和实，谁又能分得清。<br />
 时至今日，几乎没有一台服务器不是用虚拟化的方式管理和维护了。每个人的电脑上，VMware虚机或者Docker组成的诸多大大小小、错综复杂的微服务容器已经充斥生活。还有人记得QEMU吗？<br />
 QEMU是虚机鼻祖式的应用，正是从QEMU开始，虚拟化、云服务才一日紧似一日的迅猛发展，直至一统江湖。<br />
@@ -34,7 +34,7 @@ qemu-system-ppc <span class="nt">-m</span> 512 <span class="nt">-redir</span> tc
 qemu-system-ppc <span class="nt">-m</span> 1G <span class="nt">-device</span> e1000,netdev<span class="o">=</span>net0 <span class="nt">-netdev</span> user,hostfwd<span class="o">=</span>tcp::2222-:22,id<span class="o">=</span>net0 ~/qemuPowerPC/debian-ppc.qcow2 
 </code></pre></div></div>
 <p>下图就是一个安装好的展示画面，其中的uname命令中可以看到CPU类型是PowerPC类型：
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/28/debian.png" alt="" />
+<img src="http://blog.17study.com.cn/attachments/201712/28/debian.png" alt="" />
 在一个真实的CPU环境中工作，原来很多交叉编译繁复工作、本地依赖库及目标机依赖库的头痛问题都不用考虑了。这种顺畅，是除了golang这种天生自带交叉编译系统之外的开发人员梦寐以求的吧。<br />
 qemu支持很多种cpu类型，每种cpu都有一个对应的启动程序，可以通过ls /usr/local/qemu*查看一下，比如我电脑上的最新版包括这些启动程序：</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">ls</span> /usr/local/bin/qemu<span class="k">*</span>

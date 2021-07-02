@@ -1,4 +1,4 @@
-I"�;<p><img src="http://www.elecfans.com/uploads/allimg/151126/1965345-1511261149440-L.jpg" alt="" />
+I"�;<p><img src="http://www.elecfans.com/uploads/allimg/151126/1965345-1511261149440-L.jpg" alt="" />
 图像识别、人脸识别可行的算法有很多。但是作为学习，如果能理清这个问题研究的历程及其主线，会对你深入理解当前研究最新的发展有很多帮助。本文是自己在学习过程中的笔记，大多内容来自于网络，出处请参考最后的引文部分。</p>
 
 <h4 id="sift算法">Sift算法</h4>
@@ -43,8 +43,8 @@ SURF的特点：</p>
   <li>主方向确定；</li>
 </ol>
 
-<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201803/30/building1.png" alt="" />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201803/30/building2.png" alt="" /></p>
+<p><img src="http://blog.17study.com.cn/attachments/201803/30/building1.png" alt="" />
+<img src="http://blog.17study.com.cn/attachments/201803/30/building2.png" alt="" /></p>
 
 <p>跟TensorFlow中碰到的情况一样，目前这些常用的算法，在大多的机器学习框架中都已经封装完成了。使用者已经不需要详细的了解内在算法就可以直接使用。</p>
 

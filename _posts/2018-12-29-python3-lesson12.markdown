@@ -2,12 +2,12 @@
 layout:         page
 title:          从零开始学习PYTHON3讲义（十二）
 subtitle:       画一颗心送给你
-card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201901/python3.jpeg
+card-image:		http://blog.17study.com.cn/attachments/201901/python3.jpeg
 date:           2018-12-29
 tags:           python
 post-card-type: image
 ---
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201901/python3.jpeg)
+![](http://blog.17study.com.cn/attachments/201901/python3.jpeg)
 <script src='https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML'></script>
 （内容需要，本讲使用了大量在线公式，如果因为转帖网站不支持公式无法显示的情况，欢迎访问原始博客。）
 ### 《从零开始PYTHON3》第十二讲

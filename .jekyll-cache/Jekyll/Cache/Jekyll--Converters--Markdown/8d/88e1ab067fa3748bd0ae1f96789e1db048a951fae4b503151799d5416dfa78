@@ -1,4 +1,4 @@
-I"ϼ<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
+I"ϼ<p><img src="http://blog.17study.com.cn/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
 <h4 id="keras内置的预定义模型">Keras内置的预定义模型</h4>
 <p>上一节我们讲过了完整的保存模型及其训练完成的参数。<br />
 Keras中使用这种方式，预置了多个著名的成熟神经网络模型。当然，这实际是Keras的功劳，并不适合算在TensorFlow 2.0头上。<br />
@@ -66,7 +66,7 @@ Keras中使用这种方式，预置了多个著名的成熟神经网络模型。
 </code></pre></div></div>
 <p>Keras库载入图片文件的代码间接引用了pillow库，所以程序执行前请先安装：<code class="language-plaintext highlighter-rouge">pip3 install pillow</code>。<br />
 仍然使用原文中的图片尝试识别：<br />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/bigcat.jpeg" alt="" /></p>
+<img src="http://blog.17study.com.cn/attachments/201904/tensorFlow2/bigcat.jpeg" alt="" /></p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">$</span> <span class="p">.</span><span class="o">/</span><span class="n">pic</span><span class="o">-</span><span class="n">recognize</span><span class="p">.</span><span class="n">py</span> <span class="o">-</span><span class="n">i</span> <span class="n">pics</span><span class="o">/</span><span class="n">bigcat</span><span class="p">.</span><span class="n">jpeg</span> 
 <span class="p">[(</span><span class="s">'n02128385'</span><span class="p">,</span> <span class="s">'leopard'</span><span class="p">,</span> <span class="mf">0.9778516</span><span class="p">),</span> <span class="p">(</span><span class="s">'n02130308'</span><span class="p">,</span> <span class="s">'cheetah'</span><span class="p">,</span> <span class="mf">0.008372171</span><span class="p">),</span> <span class="p">(</span><span class="s">'n02128925'</span><span class="p">,</span> <span class="s">'jaguar'</span><span class="p">,</span> <span class="mf">0.007467962</span><span class="p">)]</span>
 </code></pre></div></div>

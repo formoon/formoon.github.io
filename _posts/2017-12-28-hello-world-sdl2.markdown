@@ -2,12 +2,12 @@
 layout:         page
 title:          使用SDL2显示一张图片
 subtitle:       SDL2上手贴
-card-image:     https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/SDL.png
+card-image:     http://blog.17study.com.cn/attachments/201712/SDL.png
 date:           2017-12-28
 tags:           videoaudio
 post-card-type: image
 ---
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/SDL.png)
+![](http://blog.17study.com.cn/attachments/201712/SDL.png)
 SDL全名Simple DirectMedia Layer，是一个跨平台的底层音频、视频、键盘、鼠标操作库，操作实际通过更底层的OpenGL/Direct3D完成，在保留跨平台的兼容性之外提供了非常高的效率，所以广泛的应用在多种游戏和对速度敏感的应用中，比如鼎鼎大名的steam平台/ffmpeg/qemu/模拟器等，当前的版本是2.0。更详细的资料可以访问官网：<https://www.libsdl.org/>。  
 SDL2的编程理念清晰易用，代码简洁高效，这里用显式一副图片的最简代码来作为入门的示例，正式的教学可以搜索很多国内的教学网站。  
 老办法，让代码自己来说话：  

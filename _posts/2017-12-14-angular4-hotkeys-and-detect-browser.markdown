@@ -2,12 +2,12 @@
 layout:         page
 title:          Angular2+的两个小技巧
 subtitle:       检测浏览器以及热键绑定
-card-image:     https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/angular.jpeg
+card-image:     http://blog.17study.com.cn/attachments/201712/angular.jpeg
 date:           2017-12-14
 tags:           html
 post-card-type: image
 ---
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/angular.jpeg)
+![](http://blog.17study.com.cn/attachments/201712/angular.jpeg)
 Angular2以后已经非常充分的面向对象化，所以很多原来在javascript中积累的技巧，都需要做出相应的调整。  
 检测当前浏览器类型、版本及设备类型，推荐使用：[https://github.com/KoderLabs/ng2-device-detector](https://github.com/KoderLabs/ng2-device-detector)。github页面的介绍已经写的很详细，请直接阅读原文文档。这里只讲几个重点：
 

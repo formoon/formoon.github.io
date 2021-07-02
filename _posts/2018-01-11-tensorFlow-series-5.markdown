@@ -2,7 +2,7 @@
 layout:         page
 title:          从锅炉工到AI专家(5)
 subtitle:       TensorFlow实务
-card-image:     https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/ml/tensorflowlogo.jpg
+card-image:     http://blog.17study.com.cn/attachments/201801/ml/tensorflowlogo.jpg
 date:           2018-01-11
 tags:           ml toSeven
 post-card-type: image
@@ -23,12 +23,12 @@ post-card-type: image
 “神经网络”的诞生是自然选择的结果，人脑就是由无数个神经元组成的，有资料说大概接近900亿个，是天文数字的级别。这些神经网络的传导和反射支撑着现代人类所有的智力和行为。  
 ![](http://img3.imgtn.bdimg.com/it/u=1200990360,2133960765&fm=27&gp=0.jpg)  
 在人工智能还没有足够现代理论支撑的年代，仿照人脑“神经网络”的工作模式，建立“人工神经网络”进行机器学习是很自然的事情。并且在实践中的结果也非常令人兴奋，所以从并不很长的AI历史上，“人工神经网络”算统治了相当不短的时间。以至于对于很多非专业人士来讲，“神经网络”已经成了AI标志性的概念。  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/ml-nn/NN-Brain.jpg)  
+![](http://blog.17study.com.cn/attachments/201801/ml-nn/NN-Brain.jpg)  
 模仿人脑神经元细胞的基本工作方式，下图示意了一个“人工神经网络”基本单元的工作方式：  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/ml-nn/NN-Cell.jpg)  
+![](http://blog.17study.com.cn/attachments/201801/ml-nn/NN-Cell.jpg)  
 每一个这样的计算节点，都有n维的输入，在其中完成一个类似上一个源码样例中的线性计算，然后汇总输出，这个输出会再连接到下一级的计算节点。很多个这样的计算节点汇总完成一组计算，这样成为一“层”。上一层的输出，成为下一层的输入，多个层次累计起来，完成最终的机器学习过程。
 在这些多层的计算中，第一层承担了所有原始数据的输入，因此叫做“输入层”；最后一层完成结果的输出，叫做“输出层”；中间的部分承担上一层的结果，经过计算完成下一层的输入，但对用户来讲实际是不可见的，叫做“隐藏层”。这几个概念以后你在看各种资料的时候会经常看到，你需要知道这些概念指的是什么。    
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/ml-nn/NN-pic1.jpg)  
+![](http://blog.17study.com.cn/attachments/201801/ml-nn/NN-pic1.jpg)  
 上图示意了神经网络的多种变形和组合后的网络模式。这种“仿生学”一般的组合模式取得了令人惊喜的效果。从数学的计算结构上非常的清晰，但内部多节点组合之后的数学机理实际上至今也没有哪篇论文描述的非常清楚。你可以理解为：通过增加计算节点、更多的体现和保持每个数据和其它数据之间的微小关系甚至多层互动之后的关系，从而更准确的完成对结果的计算。  
 
 #### 反向传播

@@ -1,4 +1,4 @@
-I"�<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201712/https.jpeg" alt="" /></p>
+I"�<p><img srchttp://blog.17study.com.cn/r/attachments/201712/https.jpeg" alt="" /></p>
 
 <p>从Safari11开始，无法访问自签名的HTTPS网站了。原来访问这样的网站，会弹出来一个警告页面，大意是这个网站签名证书无法验证，有安全风险，然后用户可以选择继续访问这个不安全的站点，从而访问自签名的HTTPS网站。但是自从Safari升级到11之后，访问此类https网站只会报错说无法建立可靠连接,网页内容已经无法访问。<br />
 尚不知道这是Safari的BUG还是苹果有意为之，从IOS的发展上看，强制要求访问从http升级到https似乎也是趋势。</p>

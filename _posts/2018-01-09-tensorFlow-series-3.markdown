@@ -2,7 +2,7 @@
 layout:         page
 title:          从锅炉工到AI专家(3)
 subtitle:       TensorFlow实务
-card-image:     https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/ml/tensorflowlogo.jpg
+card-image:     http://blog.17study.com.cn/attachments/201801/ml/tensorflowlogo.jpg
 date:           2018-01-09
 tags:           ml toSeven
 post-card-type: image

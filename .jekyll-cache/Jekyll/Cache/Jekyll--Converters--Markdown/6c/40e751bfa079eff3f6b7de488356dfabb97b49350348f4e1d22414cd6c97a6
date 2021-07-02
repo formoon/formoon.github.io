@@ -1,4 +1,4 @@
-I"�G<p><img src="https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2550540489,2603653507&amp;fm=27&amp;gp=0.jpg" alt="" />
+I"�G<p><img src="https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2550540489,2603653507&amp;fm=27&amp;gp=0.jpg" alt="" />
 本文是写给Mac电脑开发新手的入门帖，诸神请退散。</p>
 
 <h4 id="c语言">C语言</h4>
@@ -21,7 +21,7 @@ Mac的命令行C语言开发工具主要有两种，clang及gcc,前者是苹果�
 
 <h4 id="vim简要入门">vim简要入门</h4>
 <p>vim是命令行下重要的文本编辑工具。命令行也就是“终端”app,启动命令行的方式除了在Launchpad中翻找图标之外，也可以在电脑右上角选择放大镜“spotlight”,或者使用SpotLight的快捷键：COMMAND+空格，然后在其中搜索Terminal，搜索到了之后用鼠标点击运行就可以进入命令行。<br />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/03/terminalp1.jpg" alt="" />(终端.app,也叫Terminal.app、命令行，图标长这样子)<br />
+<img src="http://blog.17study.com.cn/attachments/201801/03/terminalp1.jpg" alt="" />(终端.app,也叫Terminal.app、命令行，图标长这样子)<br />
 至少在macOS10.10以后，系统中已经内置了vim工具。如果你的系统没有vim软件，可以使用命令<code class="language-plaintext highlighter-rouge">brew install vim</code>来安装，brew是包管理器，用于管理Mac电脑上的开源软件。brew的安装可以查看以前的文章。<br />
 运行vim的方法是在命令行状态键入命令<code class="language-plaintext highlighter-rouge">vim 要编辑的文本文件名</code>。
 这里插一条命令行操作的知识，当前正在输入的命令行，ctrl-a是将光标移动到当前行头一个字符；ctrl-e是将光标移动到当前行最后一个字符，移动光标是为了在输入命令的时候编辑输入错误的部分。补充在这里，是为了你可以跟下面vim的操作对应区别着记忆。<br />
@@ -87,11 +87,11 @@ vim是从80年代的vi编辑器基础和发展过来的，历史已经比很多�
   </li>
   <li>命令行敲入<code class="language-plaintext highlighter-rouge">vim helloworld.c</code>，这是使用vim编辑一个名为helloworld.c的文本文件，这个文件现在还不存在，所以我们是新建这样一个文件。</li>
   <li>在vim中，敲i键进入插入状态，随后COMMAND+V把剪贴板中的代码粘贴出去。刚才讲vim的时候说了，yy也是拷贝的意思，但是vim的剪贴板，跟Mac操作系统的剪贴板不是一个，所以vim的yy跟vim的p是对应的。Mac的COMMAND+C跟COMMAND+V是对应的，互相之间不能拷贝粘贴。<br />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/03/terminalp2.png" alt="" /></li>
+<img src="http://blog.17study.com.cn/attachments/201801/03/terminalp2.png" alt="" /></li>
   <li>按ESC键从“输入状态”返回到“光标状态”，然后按<code class="language-plaintext highlighter-rouge">:</code>再切换到“命令状态”，随后按<code class="language-plaintext highlighter-rouge">x</code>保存文件，并退出vim。helloworld.c会保存在当前文件夹，也就是~/cfiles文件夹，这就是当前文件夹的作用。</li>
   <li>在命令行输入<code class="language-plaintext highlighter-rouge">gcc -o helloworld helloworld.c</code>，这条命令就是编译helloworld.c程序，编译完成，输出为当前文件helloworld文件。正常情况下，编译会很快结束，并且没有错误信息。此外这里使用gcc进行了c语言程序的编译，但并不一定真的是gcc系统，在Mac电脑上默认是使用clang系统，只是为了兼容也伪装成了gcc的调用方式而已。这些知道就成，程序员没有必要过多了解，这些编译器互相都是兼容的。</li>
   <li>命令行输入<code class="language-plaintext highlighter-rouge">./helloworld</code>回车执行，屏幕上会出现一行“Hello World!”，这表示我们编辑一个C程序，然后编译、并且运行验证成功了。
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/03/terminalp3.png" alt="" />
+<img src="http://blog.17study.com.cn/attachments/201801/03/terminalp3.png" alt="" />
 以上就是在命令行编辑程序文件，编译并运行所需知道的所有知识。接下来就是你按照C语言课本的要求进行你的各项编程实验了。<br />
 PS:截止以上，利用命令行编辑、编译C语言的方法，在Linux电脑上，也几乎完全一样。可能就是拷贝、粘贴在Linux系统是Ctrl-C及Ctrl-V，如果是远程终端，则依赖终端所在客户端的操作系统操作方法。vim操作、gcc命令是完全相同的。</li>
 </ol>
@@ -102,17 +102,17 @@ Xcode除了刚才说过的第一次运行会自动提示你安装命令行工具
 在这个链接<a href="http://finance.591hx.com/article/2015-12-25/0000518556s.shtml">http://finance.591hx.com/article/2015-12-25/0000518556s.shtml</a>有个图文的说明讲解设置开发者账号，可以参考。下面继续我们的C语言之旅：</p>
 <ol>
   <li>刚进入Xcode就有一个启动界面，从左侧第二行选择“Create a new Xcode project”,在下一个出现的对话框中，选择程序类型。Xcode可以开发iOS/watchOS/tvOS/macOS/Cross-platform五种应用，这里选择macOS,表示是运行在桌面电脑上面的应用程序。第二行选择“Command Line Tool”表示是命令行工具程序，接着选Next。
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/03/xcodep1.png" alt="" /></li>
+<img src="http://blog.17study.com.cn/attachments/201801/03/xcodep1.png" alt="" /></li>
   <li>接着输入应用的名字，我们刚才在命令行状态起的名字是helloworld，这次可以叫firstc,随你喜好。第二行是你的开发组织，因为使用的AppleID没有开发者身份，所以就使用默认的Personal Team就可以了，如果使用了正式的开发者账号，要选择正确的组织信息。第三行是组织名称，第二行的组织信息实际是电脑签名用的证书名称，用于保证编译的程序正装原造，除了你没有被人篡改过。这一行则是用于软件给用户看的信息，就是一行可以辨识的字符，如果你有公司名可以输入进去，没有的话，随便看你高兴起一个吧。第四行是组织的标志名，用于确定全球本组织的唯一性，习惯上使用网址的逆向方式，没有网址的话，看你喜欢吧，起一个唯一性的标志就好了。最后一行是重点，既然学习的是C语言，就选C。
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/03/xcodep2.png" alt="" /></li>
+<img src="http://blog.17study.com.cn/attachments/201801/03/xcodep2.png" alt="" /></li>
   <li>接下来为这个项目选择一个保存在磁盘上的位置，项目本身会自动建立一个文件夹，全部文件保存在项目自己的文件夹之内，这里选择的实际上是项目文件夹上一层文件夹的位置。<br />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/03/xcodep3.png" alt="" /></li>
+<img src="http://blog.17study.com.cn/attachments/201801/03/xcodep3.png" alt="" /></li>
   <li>到了这一步，实际上项目已经建立成功了。这个界面就是对项目整体进行修改、调整的界面，一般情况下选择默认值就好。<br />
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/03/xcodep4.png" alt="" /></li>
+<img src="http://blog.17study.com.cn/attachments/201801/03/xcodep4.png" alt="" /></li>
   <li>我们可以在Finder中检视一下项目建立的情况，可以看到文件夹的层次结构，还有那个自动建立的程序主文件main.c。
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/03/xcodep5.png" alt="" /></li>
+<img src="http://blog.17study.com.cn/attachments/201801/03/xcodep5.png" alt="" /></li>
   <li>main.c的内容，实际上已经是一个hello World，直接用鼠标点击左上角的三角键，Xcode会自动对项目进行编译、查错、并运行。屏幕中部右下角的位置，就是程序运行输出的结果。除了我们刚才知道的“Hello,World!”这一行，还有一行“Program ended with exit code 0”,直译的意思是程序已经执行结束，退出代码是0。0是一个特殊的退出代码，表示程序正常退出。通常我们可以使用退出代码表示某种错误，或者给本程序的调用者传达某种约定的信息。
-<img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201801/03/xcodep6.png" alt="" />
+<img src="http://blog.17study.com.cn/attachments/201801/03/xcodep6.png" alt="" />
 至此，使用命令行界面，和使用Xcode图形化界面，我们都知道了如何开始我们的C程序。下面的岁月里，捧着教科书，努力吧！</li>
 </ol>
 

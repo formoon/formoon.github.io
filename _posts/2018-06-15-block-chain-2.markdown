@@ -2,13 +2,13 @@
 layout:         page
 title:          让我来为“区块链”添把火
 subtitle:      	再谈区块链：正在改变世界的区块链技术
-card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201806/blockchain.jpg
+card-image:		http://blog.17study.com.cn/attachments/201806/blockchain.jpg
 date:           2018-06-15
 tags:           life
 post-card-type: image
 ---
 <link rel="stylesheet" type="text/css" href="{{ "/assets/css/sectors.css" | prepend: site.baseurl }}">
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201806/blockchain.jpg)
+![](http://blog.17study.com.cn/attachments/201806/blockchain.jpg)
 <section style="text-align: center; height: 50px;"><section style="width:48px;height:48px;color:#fff;font-size:16px;line-height:48px;display:inline-block;text-align:center;background-image:url(http://image2.135editor.com/mmbiz_gif/yqVAqoZvDibElUrxgDE4QeKBff3ehKBcxKdGhmMbTCFtF1y4BYviab1IbDHuSvqYyrFUFdicSOrOMABzH2nfYVm0A/0?wx_fmt=gif);background-repeat:no-repeat;background-size:100%;background-position:0;margin:0 auto;background-color:rgb(255,255,255);"><p style="margin:10px;padding:0px;font-size:16px;text-align:center;font-weight:bold;color:#ffffff"><span>1</span></p></section><section style="height:2px;background-color:rgb(34,33,33);margin-top:-26px;"></section></section>
 这次我不是来灭火的，我觉得现在为炙手可热的区块链添一把柴正是时候。  
 在大多数人的概念中，区块链就是比特币。了解多一点的，可能还会说起来现在充斥于各交易所形形色色的虚拟货币。然后接下来一句可能就是：暴跌啊，惨不忍睹...   
@@ -16,7 +16,7 @@ post-card-type: image
 如果仍然只是把“区块链”跟“虚拟货币”联系在一起，我想你对区块链的认知，不过还停留在入门阶段。  
 >先说结论，区块链的技术，和技术即将带来对业界的冲击，将会是互联网出现以来最大的一次。称其为“第二代互联网”一点都不过分。不相信？且听我为你慢慢解说。  
 
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201806/bc1.jpg)
+![](http://blog.17study.com.cn/attachments/201806/bc1.jpg)
 <section style="text-align: center; height: 50px;"><section style="width:48px;height:48px;color:#fff;font-size:16px;line-height:48px;display:inline-block;text-align:center;background-image:url(http://image2.135editor.com/mmbiz_gif/yqVAqoZvDibElUrxgDE4QeKBff3ehKBcxKdGhmMbTCFtF1y4BYviab1IbDHuSvqYyrFUFdicSOrOMABzH2nfYVm0A/0?wx_fmt=gif);background-repeat:no-repeat;background-size:100%;background-position:0;margin:0 auto;background-color:rgb(255,255,255);"><p style="margin:10px;padding:0px;font-size:16px;text-align:center;font-weight:bold;color:#ffffff"><span>2</span></p></section><section style="height:2px;background-color:rgb(34,33,33);margin-top:-26px;"></section></section>
 区块链并不仅仅是比特币，但说起来区块链，的确绕不过去比特币这个先行者。  
 鉴于大多数人都已经对比特币耳熟能详，我们不浪费时间从头说起，这里只把比特币所带来的流行概念粗糙的罗列一下：  
@@ -25,7 +25,7 @@ __P2P:__ 端点到端点的计算机只需要一个客户端就可以连接在�
 __分布式数据库：__ 线上的每个挖矿者都有一套完整的数据库备份，如果出现黑客，他只修改一台甚至一批计算机的数据并不能影响数据库的安全。  
 __可衡量的算力，按劳取酬:__ 每台矿机采用公平的算法执行计算，通过成功的挖矿获得报酬。  
 __可信赖的安全策略和支付能力:__ 每个人的账户都是一个去中心化的加密钱包，业界公认安全的公钥、私钥加密策略对区块链中的各项通讯和交易进行保护。有传言说，对安全要求极高的贩毒、军火交易都通过比特币顺畅完成。  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201806/bitcoin.jpg)
+![](http://blog.17study.com.cn/attachments/201806/bitcoin.jpg)
 这些特征，相信大家都已经足够了解。但说到区块链如何跟自身业务结合、落地，从而搭上这班不敢掉队的高铁快车的时候。又都表现的无所适从，最终又是一大批“空气币”应运而生，币值一日三跌，连垃圾股都算不上。   
 
 <section style="text-align: center; height: 50px;"><section style="width:48px;height:48px;color:#fff;font-size:16px;line-height:48px;display:inline-block;text-align:center;background-image:url(http://image2.135editor.com/mmbiz_gif/yqVAqoZvDibElUrxgDE4QeKBff3ehKBcxKdGhmMbTCFtF1y4BYviab1IbDHuSvqYyrFUFdicSOrOMABzH2nfYVm0A/0?wx_fmt=gif);background-repeat:no-repeat;background-size:100%;background-position:0;margin:0 auto;background-color:rgb(255,255,255);"><p style="margin:10px;padding:0px;font-size:16px;text-align:center;font-weight:bold;color:#ffffff"><span>3</span></p></section><section style="height:2px;background-color:rgb(34,33,33);margin-top:-26px;"></section></section>
@@ -38,7 +38,7 @@ __可信赖的安全策略和支付能力:__ 每个人的账户都是一个去�
 * 购买人收到商品后验收无误，给淘宝确认收货。  
 * 支付宝得到收货确认后，把款转至销售商账户。  
 
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201806/taobao.jpeg)
+![](http://blog.17study.com.cn/attachments/201806/taobao.jpeg)
 很多人已经用惯了淘宝，觉得这个流程很自然，没有什么了不起。  
 但是在电子商务刚刚起步的时候，付款拿不到货、发货拿不到款的事情比比皆是。其实就在2年前左右的时间，微商刚刚出现的时候，因为没有中间担保商，收款不发货的事情也出现过很多。  
 而在区块链平台上，很短的代码就可以完成一个智能合约的部署，达到跟上面一样的流程，从而对交易双方的利益进行保证。如果出现了纠纷，区块链的追溯机制可以保留双方完整的交易过程，失信的账户，很快就没办法生存下去。  
@@ -47,7 +47,7 @@ __可信赖的安全策略和支付能力:__ 每个人的账户都是一个去�
 在比特币挖矿中，很遭人诟病的就是大量的算力浪费在毫无意义的hash计算中。这其实已经是老黄历了。  
 新的区块链系统，很多都已经实现了在完成简单的挖矿运算的同时，可以接受发布的计算任务。只要你的运算程序写的规范合理，并给出相应酬金。所有在线的计算机都可以把你的任务拆分，每台电脑仅仅完成其中一部分工作，最终高效的完成整个计算任务。随后根据工作量按劳取酬。   
 想一想，比特币矿池已经是世界上最大的算力集群，还没有哪个人、哪个公司有能力再现这样庞大的一笔算力。如果这种技术普及下去，我们曾经引以为傲，排名世界第一、世界前列的计算中心会否有危机感呢？  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201806/dist.jpg)
+![](http://blog.17study.com.cn/attachments/201806/dist.jpg)
 
 ##### 3.分布式存储
 如同计算一样，每个人的电脑可能都有很富裕的存储，并不一定用得完。  
@@ -62,7 +62,7 @@ __可信赖的安全策略和支付能力:__ 每个人的账户都是一个去�
 按照现在的发展速度，也许不超过5年，现在大力投资云计算、机房的公司，会不会半夜哭醒？  
 
 <section style="text-align: center; height: 50px;"><section style="width:48px;height:48px;color:#fff;font-size:16px;line-height:48px;display:inline-block;text-align:center;background-image:url(http://image2.135editor.com/mmbiz_gif/yqVAqoZvDibElUrxgDE4QeKBff3ehKBcxKdGhmMbTCFtF1y4BYviab1IbDHuSvqYyrFUFdicSOrOMABzH2nfYVm0A/0?wx_fmt=gif);background-repeat:no-repeat;background-size:100%;background-position:0;margin:0 auto;background-color:rgb(255,255,255);"><p style="margin:10px;padding:0px;font-size:16px;text-align:center;font-weight:bold;color:#ffffff"><span>4</span></p></section><section style="height:2px;background-color:rgb(34,33,33);margin-top:-26px;"></section></section>
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201806/sci.jpg)
+![](http://blog.17study.com.cn/attachments/201806/sci.jpg)
 其实还可能有很多。不过总结一下，对照第二节中我们提到比特币的那些特征。  
 只要是具有分布式的计算、存储、服务、查询等可能或者需求，采用P2P的方式定制客户端，利用线上计算机富裕的计算能力，采用可靠的加密机制保证安全，让付出工作的计算机获取到合理的报酬，很多业务都可以区块链化，并从中获益。  
 在这个过程中，服务方不需要大额的支出中心机房等建设费用，客户通过大量的分布式服务提高体验度，每个节点通过提供富裕的算力得到收益。甚至每个节点的故障、落后之后升级你也不用管，节点计算机的用户自己就会完成了。而在总体更高的层面上，减少重复性投资和浪费的能源也会对环境降低压力，更加绿色环保，相比而言，“地球一小时”那样的活动跟区块链所带来的收益相比就不值一提了。  

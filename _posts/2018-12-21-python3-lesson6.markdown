@@ -2,12 +2,12 @@
 layout:         page
 title:          从零开始学习PYTHON3讲义（六）
 subtitle:       for循环跟斐波那契数列
-card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201901/python3.jpeg
+card-image:		http://blog.17study.com.cn/attachments/201901/python3.jpeg
 date:           2018-12-21
 tags:           python
 post-card-type: image
 ---
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201901/python3.jpeg)
+![](http://blog.17study.com.cn/attachments/201901/python3.jpeg)
 <script src='https://cdn.bootcdn.net/ajax/libs/mathjax/2.7.7/MathJax.js?config=TeX-MML-AM_CHTML'></script>
 ### 《从零开始PYTHON3》第六讲
 几乎但凡接触过一点编程的人都知道for循环，在大多数语言的学习中，这也是第一个要学习的循环模式。  

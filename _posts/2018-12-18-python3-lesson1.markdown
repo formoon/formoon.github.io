@@ -2,12 +2,12 @@
 layout:         page
 title:          从零开始学习PYTHON3讲义（一）
 subtitle:       认识Python
-card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201901/python3.jpeg
+card-image:		http://blog.17study.com.cn/attachments/201901/python3.jpeg
 date:           2018-12-18
 tags:           python
 post-card-type: image
 ---
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201901/python3.jpeg)
+![](http://blog.17study.com.cn/attachments/201901/python3.jpeg)
 
 | 课程名称        | 从零开始PYTHON3 |
 | :-------------- | -------- |

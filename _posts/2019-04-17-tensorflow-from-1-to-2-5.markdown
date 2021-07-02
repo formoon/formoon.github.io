@@ -2,12 +2,12 @@
 layout:         page
 title:          TensorFlow从1到2（五）
 subtitle:       图片内容识别和自然语言语义识别
-card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png
+card-image:		http://blog.17study.com.cn/attachments/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-04-17
 tags:           tensorflow
 post-card-type: image
 ---
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png)  
+![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/tf-logo-card-2.png)  
 #### Keras内置的预定义模型
 上一节我们讲过了完整的保存模型及其训练完成的参数。  
 Keras中使用这种方式，预置了多个著名的成熟神经网络模型。当然，这实际是Keras的功劳，并不适合算在TensorFlow 2.0头上。  
@@ -74,7 +74,7 @@ if __name__ == '__main__':
 ```
 Keras库载入图片文件的代码间接引用了pillow库，所以程序执行前请先安装：`pip3 install pillow`。  
 仍然使用原文中的图片尝试识别：  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/bigcat.jpeg)  
+![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/bigcat.jpeg)  
 ```python
 $ ./pic-recognize.py -i pics/bigcat.jpeg 
 [('n02128385', 'leopard', 0.9778516), ('n02130308', 'cheetah', 0.008372171), ('n02128925', 'jaguar', 0.007467962)]

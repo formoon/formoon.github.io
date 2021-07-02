@@ -1,4 +1,4 @@
-I"S�<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
+I"S�<p><img srchttp://blog.17study.com.cn/r/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
 <h4 id="三种开发模式">三种开发模式</h4>
 <p>使用TensorFlow 2.0完成机器学习一般有三种方式：</p>
 <ul>
@@ -10,7 +10,7 @@ TensorFlow 1.x的开发中，Keras就作为第三方库存在。2.0中，更是�
 评估器是TensorFlow官方推荐的内置高级API，层次上看跟Keras实际处于同样位置，只是似乎大家都视而不见了，以至于现在从用户的实际情况看用的人要远远少于Keras。</li>
 </ul>
 
-<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/est-struct-1.png" alt="" />
+<p><img src="http://blog.17study.com.cn/attachments/201904/tensorFlow2/est-struct-1.png" alt="" />
 通常认为评估器因为内置的紧密结合，运行速度要高于Keras。Keras一直是一个通用的高层框架，除了支持TensorFlow作为后端，还同时支持Theano和CNTK。高度的抽象肯定会影响Keras的速度，不过本人并未实际对比测试。我觉的，对于大量数据导致的长时间训练来说，这点效率上的差异不应当成为大问题，否则Python这种解释型的语言就不会成为优选的机器学习基础平台了。<br />
 在TensorFlow 1.x中可以使用tf.estimator.model_to_estimator方法将Keras模型转换为TensorFlow评估器。TensorFlow 2.0中，统一到了tf.keras.estimator.model_to_estimator方法。所以如果偏爱评估器的话，使用Keras也不会成为障碍。</p>
 
@@ -143,31 +143,31 @@ Type <span class="s2">"help"</span>, <span class="s2">"copyright"</span>, <span 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dftrain</span><span class="p">.</span><span class="n">age</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/est-age-0.png" alt="" />
+<p><img src="http://blog.17study.com.cn/attachments/201904/tensorFlow2/est-age-0.png" alt="" />
 直方图中显示，乘客年龄主要分布在20岁至30岁之间。<br />
 再来看看性别分布：</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dftrain</span><span class="p">.</span><span class="n">sex</span><span class="p">.</span><span class="n">value_counts</span><span class="p">().</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s">'barh'</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/est-sex-0.png" alt="" />
+<p><img src="http://blog.17study.com.cn/attachments/201904/tensorFlow2/est-sex-0.png" alt="" />
 男性乘客的数量，几乎是女性乘客的两倍。<br />
 接着是船舱等级的分布，这个参数能间接体现乘客的经济实力：</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dftrain</span><span class="p">[</span><span class="s">'class'</span><span class="p">].</span><span class="n">value_counts</span><span class="p">().</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s">'barh'</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/est-class-0.png" alt="" />
+<p><img src="http://blog.17study.com.cn/attachments/201904/tensorFlow2/est-class-0.png" alt="" />
 图中显示，大多数乘客还是在三等舱。<br />
 继续看乘客上船的地点：</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">dftrain</span><span class="p">[</span><span class="s">'embark_town'</span><span class="p">].</span><span class="n">value_counts</span><span class="p">().</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s">'barh'</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/est-town-0.png" alt="" />
+<p><img src="http://blog.17study.com.cn/attachments/201904/tensorFlow2/est-town-0.png" alt="" />
 大多数乘客来自南安普顿。<br />
 继续，把性别跟最后生存标注关联起来：</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">pd</span><span class="p">.</span><span class="n">concat</span><span class="p">([</span><span class="n">dftrain</span><span class="p">,</span> <span class="n">y_train</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">).</span><span class="n">groupby</span><span class="p">(</span><span class="s">'sex'</span><span class="p">).</span><span class="n">survived</span><span class="p">.</span><span class="n">mean</span><span class="p">().</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s">'barh'</span><span class="p">).</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">'% survive'</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/est-sex-1.png" alt="" />
+<p><img src="http://blog.17study.com.cn/attachments/201904/tensorFlow2/est-sex-1.png" alt="" />
 女性的存活率几乎超过男性的5倍。<br />
 再来一个更复杂的统计，我们首先把年龄分段，然后看看不同年龄段的乘客最终存活率：</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">def</span> <span class="nf">calc_age_section</span><span class="p">(</span><span class="n">n</span><span class="p">,</span> <span class="n">lim</span><span class="p">):</span>
@@ -179,7 +179,7 @@ Type <span class="s2">"help"</span>, <span class="s2">"copyright"</span>, <span 
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 
 </code></pre></div></div>
-<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/est-survive-ages-0.png" alt="" />
+<p><img src="http://blog.17study.com.cn/attachments/201904/tensorFlow2/est-survive-ages-0.png" alt="" />
 10岁以下儿童和80岁以上的老人得到了最多的生存机会。<br />
 在那个寒冷、慌乱的沉船夜晚，弱者反而更多的活了下来。</p>
 
@@ -383,7 +383,7 @@ global_step             100.000000
 <span class="n">probs2</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">kind</span><span class="o">=</span><span class="s">'hist'</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">title</span><span class="o">=</span><span class="s">'bt-est predicted probabilities'</span><span class="p">);</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/est-predicted-probabilities-0.png" alt="" />
+<p><img src="http://blog.17study.com.cn/attachments/201904/tensorFlow2/est-predicted-probabilities-0.png" alt="" />
 大量集中在图形左侧的数据簇，显示了乘客九死一生的悲惨命运。<br />
 因为我们的预测结果只有两种可能：0表示未能生存；1表示生存下来。所以预测的结果，应当明显的尽量靠近0和1两端。中间悬而未决的部分应当尽可能少。从图形的情况看，如果不考虑分类准确率问题，提升树分类器效果要更好一些。<br />
 当然作为成熟的预定义模型，模型都是很优秀的，只是提升树可能更适合本应用的场景。</p>
@@ -418,7 +418,7 @@ global_step             100.000000
 <span class="n">plot_roc</span><span class="p">(</span><span class="n">probs2</span><span class="p">,</span> <span class="s">"bt-est ROC"</span><span class="p">)</span>
 <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
 </code></pre></div></div>
-<p><img src="https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/est-predicted-ROC-1.png" alt="" />
+<p><img src="http://blog.17study.com.cn/attachments/201904/tensorFlow2/est-predicted-ROC-1.png" alt="" />
 从ROC曲线看，在本例中使用提升树模型的优势更为明显。</p>
 
 <p>（待续…）</p>

@@ -2,12 +2,12 @@
 layout:         page
 title:          TensorFlow从1到2（一）
 subtitle:       续讲从锅炉工到AI专家
-card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png
+card-image:		http://blog.17study.com.cn/attachments/201904/tensorFlow2/tf-logo-card-2.png
 date:           2019-03-27
 tags:           tensorflow
 post-card-type: image
 ---
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201904/tensorFlow2/tf-logo-card-2.png)  
+![](http://blog.17study.com.cn/attachments/201904/tensorFlow2/tf-logo-card-2.png)  
 #### 引言
 原来引用过一个段子，这里还要再引用一次。是关于苹果的。大意是，苹果发布了新的开发语言Swift，有非常多优秀的特征，于是很多时髦的程序员入坑学习。不料，经过一段头脑体操一般的勤学苦练，发现使用Swift做开发，不仅要学习Swift，还要学习Swift2、Swift3、Swift4...  
 后来我发现，这个段子很有普遍性，并非仅仅苹果如此，今天的TensorFlow 2.0也有点这样的趋势。以至于我不得不专门写一个课程的续集，来面对使用新版本软件开始机器学习的读者。  

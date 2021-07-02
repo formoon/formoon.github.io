@@ -2,17 +2,17 @@
 layout:         page
 title:          正确设置越狱版ios的终端编码
 subtitle:       命令行中文的处理
-card-image:		https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/ios-utf8/iphone.png
+card-image:		http://blog.17study.com.cn/attachments/201906/ios-utf8/iphone.png
 date:           2019-06-25
 tags:           html
 post-card-type: image
 ---
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/ios-utf8/iphone.png)  
+![](http://blog.17study.com.cn/attachments/201906/ios-utf8/iphone.png)  
 本文是针对越狱版iPhone手机的，手机没有越狱就别看了，看了也没办法用。  
 
 越狱版的iPhone当然是为了跟电脑一样做各种有趣的事情的。  
 但通常越狱的iPhone在命令行都无法处理中文，比如你的播放器里面的中文歌曲名，列出来全部是乱码的样子。类似下面的图：  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/ios-utf8/distort.png)  
+![](http://blog.17study.com.cn/attachments/201906/ios-utf8/distort.png)  
 
 输入中文也做不到，在终端窗口输入中文，只会收到一串的警告音，什么也输入不上去或者同样是一串乱码显示。  
 这样很多强大的命令行工具也不能用了，比如find/grep。  
@@ -33,5 +33,5 @@ echo "export LC_ALL='en_US.UTF-8'" >> ~/.profile
 # 下面退出ssh, 重新连接iPhone就成功了，这是为了让修改之后的.profile设置生效
 ```
 此时终端已经能够友好的处理中文了：  
-![](https://raw.githubusercontent.com/formoon/formoon.github.io/master/attachments/201906/ios-utf8/chs.png)  
+![](http://blog.17study.com.cn/attachments/201906/ios-utf8/chs.png)  
 
