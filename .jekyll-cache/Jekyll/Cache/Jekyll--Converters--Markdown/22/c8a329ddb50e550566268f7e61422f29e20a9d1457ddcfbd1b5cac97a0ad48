@@ -1,0 +1,293 @@
+I"ߪ<p><img src="/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
+<h4 id="迁移学习基本概念">迁移学习基本概念</h4>
+<p>迁移学习是这两年比较火的一个话题，主要原因是在当前的机器学习中，样本数据的获取是成本最高的一块。而迁移学习可以有效的把原有的学习经验（对于模型就是模型本身及其训练好的权重值）带入到新的领域，从而不需要过多的样本数据，也能达到大批量数据所达成的效果，进一步节省了学习的计算量和时间。</p>
+
+<p>MobileNet V2是由谷歌在2018年初发布的一个视觉模型，在Keras中已经内置的并使用ImageNet完成了训练，可以直接拿来就用，这个我们在本系列第五篇中已经提过了。MobileNet V2有轻量和高效的特点。通过Inverted residual block结构，可以用较少的运算量得到较高的精度，很适合移动端的机器学习需求。论文在<a href="https://128.84.21.199/abs/1801.04381">这里</a>。<br />
+在ImageNet数据集上，MobileNet V2能达到92.5%的识别正确率。本篇中，我们以此模型为基础，介绍一个典型的迁移学习实现方法。并通过调整模型完成优化。</p>
+
+<h4 id="问题描述">问题描述</h4>
+<p>MobileNet V2原本是识别图片中主题的名称。在ImageNet中，有大量的经过标注的照片，标注的信息也非常详细。比如我们熟悉的猫猫、狗狗，ImageNet并不简单的标注为cat或者dog，而是更详细的标注为加菲、德牧这样精确到具体品种的信息。<br />
+我们这里使用调整之后的MobileNet V2模型，用于对图片内容的猫猫和狗狗分类。不去管原本是哪种具体的品种，只分成cat/dog两个大类。<br />
+这个问题的描述实际上隐藏了两个重点：</p>
+<ul>
+  <li>迁移学习并不是无限制、随意实现的。原有学习数据和数据的场景，同当前的问题，是有共同点、可借鉴可迁移的。</li>
+  <li>把cat、dog的具体品种忽略，简单的分成两类，并不能认为就是把问题简化了。要知道人工智能并不是人，举例来说，其实机器学习模型自己，并不知道“藏獒”跟“狗”之间有什么关系。在机器学习的模型中，会认为这是两个不同的分类。</li>
+</ul>
+
+<h4 id="从简单开始先展示一下识别">从简单开始，先展示一下识别</h4>
+<p>如同本系列第五篇一样，先使用最简短的代码熟悉一下MobileNet V2。<br />
+我们这个例子所使用的数据，是使用tensorflow_datasets模块来自动下载、解压、管理的。所以请先安装这个扩展包：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">$</span> <span class="n">pip3</span> <span class="n">install</span> <span class="n">tfds</span><span class="o">-</span><span class="n">nightly</span> 
+</code></pre></div></div>
+<p>程序在第一次运行的时候，会自动下载微软的实验数据集。请尽量使用程序自动下载，因为下载之后会自动解压。数据集的保存路径为：“~/tensorflow_datasets/”，这个是tensorflow_datasets默认的。<br />
+数据集中是随机尺寸的图片，程序第一步会将图片统一到224x224的尺寸，这个是预置的MobileNet V2模型所决定的。<br />
+我们从样本中取头两个图片显示在屏幕上，并且使用模型预测图片内容。请参考源代码中的注释阅读程序，也可以对照一下第五篇的vgg-19/ResNet50模型预测图片内容的程序，这些模型的使用方法几乎是相同的。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
+</span>
+<span class="c1"># 引入所使用到的扩展库
+</span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+<span class="kn">import</span> <span class="nn">tensorflow_datasets</span> <span class="k">as</span> <span class="n">tfds</span>
+
+<span class="n">keras</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span>
+
+<span class="c1"># 载入训练数据，载入时按照80%:10%:10%的比例拆分为训练、验证、测试三个数据集
+# 本程序只是演示识别图片，区分为三类并没有直接意义，但下面的程序训练模型会使用到
+</span><span class="n">SPLIT_WEIGHTS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">splits</span> <span class="o">=</span> <span class="n">tfds</span><span class="p">.</span><span class="n">Split</span><span class="p">.</span><span class="n">TRAIN</span><span class="p">.</span><span class="n">subsplit</span><span class="p">(</span><span class="n">weighted</span><span class="o">=</span><span class="n">SPLIT_WEIGHTS</span><span class="p">)</span>
+<span class="p">(</span><span class="n">raw_train</span><span class="p">,</span> <span class="n">raw_validation</span><span class="p">,</span> <span class="n">raw_test</span><span class="p">),</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">tfds</span><span class="p">.</span><span class="n">load</span><span class="p">(</span>
+    <span class="s">'cats_vs_dogs'</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">splits</span><span class="p">),</span>
+    <span class="n">with_info</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">as_supervised</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="c1"># 图片标注
+</span><span class="n">get_label_name</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">.</span><span class="n">features</span><span class="p">[</span><span class="s">'label'</span><span class="p">].</span><span class="n">int2str</span>
+
+<span class="c1"># 显示头两幅图片
+</span><span class="n">i</span> <span class="o">=</span> <span class="mi">1</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="s">'Dog &amp; Cat'</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">image</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">raw_train</span><span class="p">.</span><span class="n">take</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="n">get_label_name</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
+    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="c1"># 所有图片转为224x224的尺寸，适应模型的要求
+</span><span class="n">IMG_SIZE</span> <span class="o">=</span> <span class="mi">224</span>
+<span class="k">def</span> <span class="nf">format_example</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">cast</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="p">(</span><span class="n">image</span><span class="o">/</span><span class="mf">127.5</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">image</span><span class="p">.</span><span class="n">resize</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="p">(</span><span class="n">IMG_SIZE</span><span class="p">,</span> <span class="n">IMG_SIZE</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">image</span><span class="p">,</span> <span class="n">label</span>
+<span class="n">train</span> <span class="o">=</span> <span class="n">raw_train</span><span class="p">.</span><span class="nb">map</span><span class="p">(</span><span class="n">format_example</span><span class="p">)</span>
+
+<span class="c1"># 载入模型，第一次执行会下载h5文件
+# 预测和迁移学习所用的模型并不完全相同，所以会下载两次
+</span><span class="n">test_model</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">applications</span><span class="p">.</span><span class="n">MobileNetV2</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s">'imagenet'</span><span class="p">)</span>
+
+<span class="c1"># 预测头两张照片并显示结果
+</span><span class="k">for</span> <span class="n">image</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">train</span><span class="p">.</span><span class="n">take</span><span class="p">(</span><span class="mi">2</span><span class="p">):</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">predict_class</span> <span class="o">=</span> <span class="n">test_model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    <span class="n">desc</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">applications</span><span class="p">.</span><span class="n">mobilenet_v2</span><span class="p">.</span><span class="n">decode_predictions</span><span class="p">(</span><span class="n">predict_class</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">desc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</code></pre></div></div>
+<p>我们执行程序看看预测结果：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./cats_dogs_1predict.py
+<span class="o">[(</span><span class="s1">'n02089078'</span>, <span class="s1">'black-and-tan_coonhound'</span>, 0.46141574<span class="o">)</span>, <span class="o">(</span><span class="s1">'n02105412'</span>, <span class="s1">'kelpie'</span>, 0.15314996<span class="o">)</span>, <span class="o">(</span><span class="s1">'n02106550'</span>, <span class="s1">'Rottweiler'</span>, 0.092713624<span class="o">)]</span>
+<span class="o">[(</span><span class="s1">'n02123045'</span>, <span class="s1">'tabby'</span>, 0.29928064<span class="o">)</span>, <span class="o">(</span><span class="s1">'n02123159'</span>, <span class="s1">'tiger_cat'</span>, 0.08147916<span class="o">)</span>, <span class="o">(</span><span class="s1">'n02096177'</span>, <span class="s1">'cairn'</span>, 0.047330838<span class="o">)]</span>
+</code></pre></div></div>
+<p><img src="/attachments/201904/tensorFlow2/tl-dog-vs-cat1.png" alt="" /><br />
+程序准确的预测出了结果。</p>
+
+<h4 id="迁移学习改造">迁移学习改造</h4>
+<p>我们进行猫、狗分类训练，先了解一下样本集。样本集的图片没有什么区别，刚才我们见到了。标注则非常简单，就是1（代表Dog）或者0(代表Cat)。上面的程序中，我们使用<code class="language-plaintext highlighter-rouge">get_label_name(label)</code>将数字转换为可读的字符串。这个标注比ImageNet要简单的多。<br />
+MobileNet V2模型默认是将图片分类到1000类，每一类都有各自的标注。因为本问题分类只有两类，所以在代码上，我们构建模型的时候增加include_top=False参数，表示我们不需要原有模型中最后的神经网络层（分类到1000类），以便我们增加自己的输出层。当然这样在第一次执行程序的时候，需要重新下载另外一个不包含top层的h5模型数据文件。<br />
+随后我们在原有模型的后面增加一个池化层，对数据降维。最后是一个1个节点的输出层，因为我们需要的结果只有两类。<br />
+到了迁移学习的重点了，我们的基础模型的各项参数变量，我们并不想改变，因为这样才能保留原来大规模训练的优势，从而保留原来的经验。我们在程序中使用<code class="language-plaintext highlighter-rouge">model.trainable = False</code>，设置在训练中，基础模型的各项参数变量不会被新的训练修改数据。<br />
+接着我们把数据集分为训练、验证、测试三个数据集，用测试集数据和验证集数据对新的模型进行训练和过程验证。随后对完成训练的模型，使用测试集数据进行评估。<br />
+请看源代码：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
+</span>
+<span class="c1"># 引入所使用到的扩展库
+</span><span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+<span class="kn">import</span> <span class="nn">tensorflow_datasets</span> <span class="k">as</span> <span class="n">tfds</span>
+
+<span class="n">keras</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span>
+
+<span class="c1"># 载入训练数据，载入时按照80%:10%:10%的比例拆分为训练、验证、测试三个数据集
+</span><span class="n">SPLIT_WEIGHTS</span> <span class="o">=</span> <span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">splits</span> <span class="o">=</span> <span class="n">tfds</span><span class="p">.</span><span class="n">Split</span><span class="p">.</span><span class="n">TRAIN</span><span class="p">.</span><span class="n">subsplit</span><span class="p">(</span><span class="n">weighted</span><span class="o">=</span><span class="n">SPLIT_WEIGHTS</span><span class="p">)</span>
+<span class="p">(</span><span class="n">raw_train</span><span class="p">,</span> <span class="n">raw_validation</span><span class="p">,</span> <span class="n">raw_test</span><span class="p">),</span> <span class="n">metadata</span> <span class="o">=</span> <span class="n">tfds</span><span class="p">.</span><span class="n">load</span><span class="p">(</span>
+    <span class="s">'cats_vs_dogs'</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">splits</span><span class="p">),</span>
+    <span class="n">with_info</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">as_supervised</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># cat/dog两类图片，复杂度要低于1000类的图片，所以分辨率可以略低，这样也能节省训练时间
+# 所有图片重新调整为160x160点阵
+</span><span class="n">IMG_SIZE</span> <span class="o">=</span> <span class="mi">160</span>
+<span class="k">def</span> <span class="nf">format_example</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">label</span><span class="p">):</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">cast</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="c1"># 数据规范化为-1到+1的浮点数
+</span>    <span class="n">image</span> <span class="o">=</span> <span class="p">(</span><span class="n">image</span><span class="o">/</span><span class="mf">127.5</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">image</span><span class="p">.</span><span class="n">resize</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="p">(</span><span class="n">IMG_SIZE</span><span class="p">,</span> <span class="n">IMG_SIZE</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">image</span><span class="p">,</span> <span class="n">label</span>
+
+<span class="n">train</span> <span class="o">=</span> <span class="n">raw_train</span><span class="p">.</span><span class="nb">map</span><span class="p">(</span><span class="n">format_example</span><span class="p">)</span>
+<span class="n">validation</span> <span class="o">=</span> <span class="n">raw_validation</span><span class="p">.</span><span class="nb">map</span><span class="p">(</span><span class="n">format_example</span><span class="p">)</span>
+<span class="n">test</span> <span class="o">=</span> <span class="n">raw_test</span><span class="p">.</span><span class="nb">map</span><span class="p">(</span><span class="n">format_example</span><span class="p">)</span>
+
+<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">32</span>
+<span class="n">SHUFFLE_BUFFER_SIZE</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">train_batches</span> <span class="o">=</span> <span class="n">train</span><span class="p">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">SHUFFLE_BUFFER_SIZE</span><span class="p">).</span><span class="n">batch</span><span class="p">(</span><span class="n">BATCH_SIZE</span><span class="p">)</span>
+<span class="n">validation_batches</span> <span class="o">=</span> <span class="n">validation</span><span class="p">.</span><span class="n">batch</span><span class="p">(</span><span class="n">BATCH_SIZE</span><span class="p">)</span>
+<span class="n">test_batches</span> <span class="o">=</span> <span class="n">test</span><span class="p">.</span><span class="n">batch</span><span class="p">(</span><span class="n">BATCH_SIZE</span><span class="p">)</span>
+
+<span class="c1"># 输入形状就是160x160x3,最后3为RGB3字节色
+</span><span class="n">IMG_SHAPE</span> <span class="o">=</span> <span class="p">(</span><span class="n">IMG_SIZE</span><span class="p">,</span> <span class="n">IMG_SIZE</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+<span class="n">base_model</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">applications</span><span class="p">.</span><span class="n">MobileNetV2</span><span class="p">(</span><span class="n">input_shape</span><span class="o">=</span><span class="n">IMG_SHAPE</span><span class="p">,</span>
+                                               <span class="n">include_top</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>  <span class="c1"># 使用不包含原有1000类输出层的模型
+</span>                                               <span class="n">weights</span><span class="o">=</span><span class="s">'imagenet'</span><span class="p">)</span>
+<span class="c1"># 设置基础模型：MobileNetV2的各项权重参数不会被训练所更改
+</span><span class="n">base_model</span><span class="p">.</span><span class="n">trainable</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="c1"># 输出模型汇总信息
+</span><span class="n">base_model</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+
+<span class="c1"># 增加输出池化层
+</span><span class="n">global_average_layer</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">GlobalAveragePooling2D</span><span class="p">()</span>
+
+<span class="c1"># 输出层
+</span><span class="n">prediction_layer</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="c1"># 定义最终完整的模型
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">Sequential</span><span class="p">([</span>
+    <span class="n">base_model</span><span class="p">,</span>
+    <span class="n">global_average_layer</span><span class="p">,</span>
+    <span class="n">prediction_layer</span>
+<span class="p">])</span>
+<span class="c1"># 学习梯度
+</span><span class="n">base_learning_rate</span> <span class="o">=</span> <span class="mf">0.0001</span>
+<span class="c1"># 编译模型
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">optimizers</span><span class="p">.</span><span class="n">RMSprop</span><span class="p">(</span><span class="n">lr</span><span class="o">=</span><span class="n">base_learning_rate</span><span class="p">),</span>
+              <span class="n">loss</span><span class="o">=</span><span class="s">'binary_crossentropy'</span><span class="p">,</span>
+              <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+
+<span class="c1"># 各部分数据数量
+</span><span class="n">num_train</span><span class="p">,</span> <span class="n">num_val</span><span class="p">,</span> <span class="n">num_test</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="n">metadata</span><span class="p">.</span><span class="n">splits</span><span class="p">[</span><span class="s">'train'</span><span class="p">].</span><span class="n">num_examples</span><span class="o">*</span><span class="n">weight</span><span class="o">/</span><span class="mi">10</span>
+  <span class="k">for</span> <span class="n">weight</span> <span class="ow">in</span> <span class="n">SPLIT_WEIGHTS</span>
+<span class="p">)</span>
+<span class="c1"># 迭代次数
+</span><span class="n">initial_epochs</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">steps_per_epoch</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">num_train</span><span class="p">)</span><span class="o">//</span><span class="n">BATCH_SIZE</span>
+<span class="c1"># 验证和评估次数
+</span><span class="n">validation_steps</span> <span class="o">=</span> <span class="mi">20</span>
+
+<span class="c1"># 显示一下未经训练的初始模型评估结果
+</span><span class="n">loss0</span><span class="p">,</span> <span class="n">accuracy0</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">test_batches</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="n">validation_steps</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"initial loss: {:.2f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">loss0</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"initial accuracy: {:.2f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">accuracy0</span><span class="p">))</span>
+
+<span class="c1"># 训练
+</span><span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_batches</span><span class="p">.</span><span class="n">repeat</span><span class="p">(),</span>
+                    <span class="n">epochs</span><span class="o">=</span><span class="n">initial_epochs</span><span class="p">,</span>
+                    <span class="n">steps_per_epoch</span><span class="o">=</span><span class="n">steps_per_epoch</span><span class="p">,</span>
+                    <span class="n">validation_data</span><span class="o">=</span><span class="n">validation_batches</span><span class="p">.</span><span class="n">repeat</span><span class="p">(),</span> 
+                    <span class="n">validation_steps</span><span class="o">=</span><span class="n">validation_steps</span><span class="p">)</span>
+<span class="c1"># 评估
+</span><span class="n">loss0</span><span class="p">,</span> <span class="n">accuracy0</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">test_batches</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="n">validation_steps</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Train1ed loss: {:.2f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">loss0</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Train1ed accuracy: {:.2f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">accuracy0</span><span class="p">))</span>
+</code></pre></div></div>
+<p>因为数据集比较大，模型也比较复杂，所以程序执行起来时间很长。最终的评估结果类似为：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Train1ed loss: 0.38
+Train1ed accuracy: 0.95
+</code></pre></div></div>
+<p>如果不对比来看，这个结果还不错啦。不过准确率比原来对更为复杂的ImageNet数据集的评估值还要低很多，显然还有很大的优化空间。</p>
+
+<h4 id="模型优化">模型优化</h4>
+<p>在整个模型中，我们自己增加的部分很少，优化的余地并不多。考虑到原有ImageNet图片库的样本，大多并非猫和狗。所以完全保留原有的模型参数可能对MobileNet V2来讲也是资源上的浪费。<br />
+因此我们采取的优化策略就是开放一部分模型的网络层，允许在进一步的训练中，调整其权重值，从而期望更好的结果。<br />
+在MobileNet V2模型中，一共有155层卷积或者神经网络。这个值可以使用<code class="language-plaintext highlighter-rouge">len(model.layers)</code>来查看。我们仍然锁定前面的100层，把后面的网络层打开，允许训练修改其参数。<br />
+在随后新模型的训练中，也不需要全部重头开始训练，model.fit方法中，可以指定initial_epoch参数，接着前面的训练继续进行。<br />
+请看源代码：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="p">...</span><span class="n">继续前面的代码最后输入</span><span class="p">...</span>
+<span class="c1"># 打开允许修改基础模型的权重参数
+</span><span class="n">base_model</span><span class="p">.</span><span class="n">trainable</span> <span class="o">=</span> <span class="bp">True</span>
+<span class="c1"># 仍然锁死前100层的权重不允许修改
+</span><span class="n">fine_tune_at</span> <span class="o">=</span> <span class="mi">100</span>
+<span class="c1"># 冻结fine_tune_at之前的层
+</span><span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">base_model</span><span class="p">.</span><span class="n">layers</span><span class="p">[:</span><span class="n">fine_tune_at</span><span class="p">]:</span>
+    <span class="n">layer</span><span class="p">.</span><span class="n">trainable</span> <span class="o">=</span> <span class="bp">False</span>
+<span class="c1"># 重新编译模型
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s">'binary_crossentropy'</span><span class="p">,</span>
+              <span class="n">optimizer</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">optimizers</span><span class="p">.</span><span class="n">RMSprop</span><span class="p">(</span><span class="n">lr</span><span class="o">=</span><span class="n">base_learning_rate</span><span class="o">/</span><span class="mi">10</span><span class="p">),</span>
+              <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+<span class="c1"># 输出模型的概况，注意观察有些层被锁定，有些层可以更改
+</span><span class="n">model</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+<span class="c1"># 在前次训练的基础上再训练10次
+</span><span class="n">fine_tune_epochs</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">total_epochs</span> <span class="o">=</span> <span class="n">initial_epochs</span> <span class="o">+</span> <span class="n">fine_tune_epochs</span>
+<span class="c1"># 训练模型
+</span><span class="n">history_fine</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_batches</span><span class="p">.</span><span class="n">repeat</span><span class="p">(),</span> 
+                         <span class="n">steps_per_epoch</span><span class="o">=</span><span class="n">steps_per_epoch</span><span class="p">,</span>
+                         <span class="n">epochs</span><span class="o">=</span><span class="n">total_epochs</span><span class="p">,</span> 
+                         <span class="n">initial_epoch</span><span class="o">=</span><span class="n">initial_epochs</span><span class="p">,</span>
+                         <span class="n">validation_data</span><span class="o">=</span><span class="n">validation_batches</span><span class="p">.</span><span class="n">repeat</span><span class="p">(),</span> 
+                         <span class="n">validation_steps</span><span class="o">=</span><span class="n">validation_steps</span><span class="p">)</span>
+<span class="c1"># 评估新模型
+</span><span class="n">loss0</span><span class="p">,</span> <span class="n">accuracy0</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">test_batches</span><span class="p">,</span> <span class="n">steps</span><span class="o">=</span><span class="n">validation_steps</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"final loss: {:.2f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">loss0</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"final accuracy: {:.2f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">accuracy0</span><span class="p">))</span>
+
+</code></pre></div></div>
+<p>执行优化后的程序，其中model.summary()的输出信息：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Model: <span class="s2">"sequential"</span>
+_________________________________________________________________
+Layer <span class="o">(</span><span class="nb">type</span><span class="o">)</span>                 Output Shape              Param <span class="c">#</span>
+<span class="o">=================================================================</span>
+mobilenetv2_1.00_160 <span class="o">(</span>Model<span class="o">)</span> <span class="o">(</span>None, 5, 5, 1280<span class="o">)</span>        2257984
+_________________________________________________________________
+global_average_pooling2d <span class="o">(</span>Gl <span class="o">(</span>None, 1280<span class="o">)</span>              0
+_________________________________________________________________
+dense <span class="o">(</span>Dense<span class="o">)</span>                <span class="o">(</span>None, 1<span class="o">)</span>                 1281
+<span class="o">=================================================================</span>
+Total params: 2,259,265
+Trainable params: 1,863,873
+Non-trainable params: 395,392
+</code></pre></div></div>
+<p>Non-trainable params这一部分，就是指我们锁定不参与新数据训练的参数数量。如果你注意看前面一部分base_model.summary()的输出，所有的参数都被锁定不参与训练。<br />
+最后的评估结果为：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>final loss: 0.23
+final accuracy: 0.97
+</code></pre></div></div>
+<p>看起来虽然略好，但似乎优化效果并不明显。<br />
+其实这主要是观察数值不够直观造成的，我们继续为程序增加绘图功能：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>	<span class="p">...</span><span class="n">继续前面的代码最后输入</span><span class="p">...</span>
+<span class="c1"># 优化前训练迭代数据
+</span><span class="n">acc</span> <span class="o">=</span> <span class="n">history</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">]</span>
+<span class="n">val_acc</span> <span class="o">=</span> <span class="n">history</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'val_accuracy'</span><span class="p">]</span>
+
+<span class="n">loss</span> <span class="o">=</span> <span class="n">history</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'loss'</span><span class="p">]</span>
+<span class="n">val_loss</span> <span class="o">=</span> <span class="n">history</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'val_loss'</span><span class="p">]</span>
+
+<span class="c1"># 优化后训练迭代数据
+</span><span class="n">acc</span> <span class="o">+=</span> <span class="n">history_fine</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">]</span>
+<span class="n">val_acc</span> <span class="o">+=</span> <span class="n">history_fine</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'val_accuracy'</span><span class="p">]</span>
+
+<span class="n">loss</span> <span class="o">+=</span> <span class="n">history_fine</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'loss'</span><span class="p">]</span>
+<span class="n">val_loss</span> <span class="o">+=</span> <span class="n">history_fine</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'val_loss'</span><span class="p">]</span>
+
+<span class="c1"># 使用训练数据绘图
+</span><span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">acc</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Training Accuracy'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">val_acc</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Validation Accuracy'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">([</span><span class="mf">0.8</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">([</span><span class="n">initial_epochs</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">initial_epochs</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+          <span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s">'Start Fine Tuning'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s">'lower right'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Training and Validation Accuracy'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Training Loss'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span><span class="n">val_loss</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">'Validation Loss'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">([</span><span class="n">initial_epochs</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="n">initial_epochs</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
+         <span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">(),</span> <span class="n">label</span><span class="o">=</span><span class="s">'Start Fine Tuning'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="s">'upper right'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">title</span><span class="p">(</span><span class="s">'Training and Validation Loss'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'epoch'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p>我们为了讲解方便，把最终的程序分成了几个部分，实际上为了节省时间，是可以合并在一起执行的，这样不需要重复训练很多次。<br />
+从绘图结果看，优化的效果还是很明显的：<br />
+<img src="/attachments/201904/tensorFlow2/tl-dog-vs-cat2.png" alt="" /><br />
+两张图，中间都有一条绿线分隔开优化前和优化后的训练数据。在前半段，正确率和损失值的优化过程是明显比较慢的，而且训练集和验证集两条线的分离也说明有过拟合的现象。在后半段，有一个明显的阶梯表现出来模型性能明显改善，训练集和验证集也更接近。说明各项指标都有效改善了。<br />
+（待续…）</p>
+
+:ET

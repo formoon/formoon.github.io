@@ -1,4 +1,4 @@
-I"�$<p><img src="https://www.boost.org/doc/libs/1_60_0/libs/python/doc/html/images/python.png" alt="" />
+I"%<p><img src="https://www.boost.org/doc/libs/1_60_0/libs/python/doc/html/images/python.png" alt="" />
 　　想要享受更轻松愉悦的编程，脚本语言是首选。想要更敏捷高效，c++则高山仰止。所以我一直试图在各种通用或者专用的脚本语言中将c++的优势融入其中。原来贡献过一篇<a href="https://formoon.github.io/2018/08/02/callto-cpp-from-nodejs/">《c++和js的混合编程》</a>也是同样的目的。<br />
 　　得益于机器学习领域的发展，Python最近一直维持热度，但Python的速度，比node.js都差距不小，所以使用c++来提高一些速度更有必要。<br />
 　　编写Python的扩展模块已经有不少的不错的框架，但感觉上boost是最好用的一个。</p>
@@ -10,8 +10,8 @@
 
 <h4 id="简单示例">简单示例</h4>
 <p>　　从boost官网抄了一个简单的示例，包括了初始化、从Python传递参数给c++和从c++返回结果给Python的一个基本流程。源代码非常短，请看下面：</p>
-<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;string&gt;
-#include &lt;boost/python.hpp&gt;
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;string&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;boost/python.hpp&gt;</span><span class="cp">
 </span>
 <span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
 <span class="k">using</span> <span class="k">namespace</span> <span class="n">boost</span><span class="o">::</span><span class="n">python</span><span class="p">;</span>

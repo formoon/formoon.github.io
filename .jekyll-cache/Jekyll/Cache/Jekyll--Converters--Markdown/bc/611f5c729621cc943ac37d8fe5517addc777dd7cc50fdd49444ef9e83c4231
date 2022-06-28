@@ -1,4 +1,4 @@
-I"dg<p><img src="http://p9.pstatp.com/origin/16880003de1c4ef5ae0c" alt="" />（图文基本无关）<br />
+I"�g<p><img src="http://p9.pstatp.com/origin/16880003de1c4ef5ae0c" alt="" />（图文基本无关）<br />
 如果单纯说简单方便，其使用AppleScript更好，特别是现在有了JS的加入，比如：</p>
 <div class="language-applescript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cm">(*</span><span class="w">
 
@@ -39,7 +39,7 @@
 <span class="p">[</span><span class="n">as</span> <span class="n">release</span><span class="p">];</span>
 </code></pre></div></div>
 <p>但是如果真的开发一个产品，使用纯的c/object-c还是更规范、可控一些，因此上面这个两个脚本的方法不算在内。闲话不说，直接贴代码：</p>
-<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include &lt;stdio.h&gt;
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;stdio.h&gt;</span><span class="cp">
 </span>
 <span class="cp">#import &lt;Foundation/Foundation.h&gt;
 #import &lt;CoreFoundation/CoreFoundation.h&gt;

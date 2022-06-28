@@ -1,0 +1,349 @@
+I"��<p><img src="/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
+<h4 id="风格迁移">风格迁移</h4>
+<p><a href="http://blog.17study.com.cn/2018/01/15/tensorFlow-series-8/">《从锅炉工到AI专家(8)》</a>中我们介绍了一个“图片风格迁移”的例子。因为所引用的作品中使用了TensorFlow 1.x的代码，算法也相对复杂，所以文中没有仔细介绍风格迁移的原理。<br />
+今天在TensorFlow 2.0的帮助，和新算法思想的优化下，实现同样功能的代码量大幅减少，结构也越发清晰。所以今天就来讲讲这个话题。</p>
+
+<p>“风格迁移”指的是将艺术作品的笔触、技法等表现出来的视觉效果，应用在普通照片上，使得所生成的图片，类似使用同样笔触、技法所绘制完成，但内容跟照片相同的“伪画作”。<br />
+在神经网络机器学习的帮助下，生成图片的观赏性非常高，远非早期传统方法得到的图片可比。<br />
+这里重贴一遍前文中的例图，让我们有一个更直观的感受。<br />
+首先是一张原程序作者的的自拍照：<br />
+<img src="https://raw.githubusercontent.com/anishathalye/neural-style/master/examples/1-content.jpg" alt="" />
+接着不陌生，著名大作《星空》：<br />
+<img src="https://raw.githubusercontent.com/anishathalye/neural-style/master/examples/1-style.jpg" alt="" /><br />
+（请将以上两图保存至工作目录，不要修改文件名，我们稍晚的代码中会用到。）<br />
+两张图片经过程序处理后，会得到一幅新的图片：<br />
+<img src="https://raw.githubusercontent.com/anishathalye/neural-style/master/examples/1-output.jpg" alt="" /><br />
+即使用《星空》风格模仿的手绘作品《黄粱一梦》:)</p>
+<h4 id="基本原理">基本原理</h4>
+<p>风格迁移原理基于论文<a href="https://arxiv.org/abs/1508.06576">《A Neural Algorithm of Artistic Style》</a>。<br />
+虽然论文中并没有明说，但采用卷积神经网络做图像的风格迁移应当属于一个实验科学的成果而非单纯的理论研究。<br />
+我们再引用一张前系列讲解CNN时候的图片：<br />
+<img src="/attachments/201801/ml-nn/cnn1.png" alt="" /><br />
+一张图片数据所形成的矩阵，在经过卷积网络的时候，图像中边缘等视觉特征会被放大、强化，从而形成一种特殊的输出。通常我们只关心数据结果，并没有把这些数据还原为图片来观察。而论文作者不仅这样做了，恐怕还进行了大量的实验。<br />
+这些神经网络中间结果图片具有如此典型的特征，可以脱离出主题内容而成为单纯风格的描述。被敏锐的作者抓住深入研究也就不奇怪了。<br />
+<img src="/attachments/201904/tensorFlow2/nst-cnn1.jpg" alt="" />
+最终研究成果确立了卷积神经网络进行图片迁移的两大基础算法：</p>
+<ul>
+  <li>在神经网络中，确定的抽取某些层代表内容的数字描述，以及另外一些层代表风格的数字描述。</li>
+  <li>多个层的输出数据，通过公式的计算，拟合到同输入图像相同的色域空间。这个公式即能用于代价函数中原始风格同目标风格之间的对比，也可以变形后通过组合多个风格层，生成新的目标图片。</li>
+</ul>
+
+<p>本系列文章都是尽力不出现数学公式，用代码讲原理。<br />
+在《从锅炉工到AI专家(8)》引用的代码中，除了构建神经网络、训练，主要工作是在损失函数降低到满意程度之后，使用网络中间层的输出结果计算、组合成目标图片。原文中对这部分的流程也做了简介。<br />
+新的代码来自TensorFlow官方文档。除了程序升级为TensorFlow 2.0原生代码。在图片的产生上也做了大幅创新：使用照片图片训练神经网络，每一阶梯的训练结果，不应用回神经网络（网络的权重参数一直固定锁死的），而把训练结果应用到图片本身。在下一次的训练循环中，使用新的图片再次计算损失值。这样，当损失值最小的时候，训练图片本身就已经是符合我们要求的生成图片。当然本质上，跟前一种方法一样的。但感觉上，结构清晰了很多。这个过程对比起来，大量节省了图片生成的计算。当然，主要原因还是TensorFlow 2.0内置的tf.linalg.einsum方法强大好用。</p>
+
+<p>在特征层的定义上，照片内容的描述使用vgg-19网络的第5部分的第2层卷积输出结果。艺术图片风格特征的描述使用了5个层，分别是vgg-19网络的第1至第5部分第1个网络层的输出结果。在程序中，可以这样描述：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 定义最能代表内容特征的网络层
+</span><span class="n">content_layers</span> <span class="o">=</span> <span class="p">[</span><span class="s">'block5_conv2'</span><span class="p">]</span> 
+
+<span class="c1"># 定义最能代表风格特征的网络层
+</span><span class="n">style_layers</span> <span class="o">=</span> <span class="p">[</span><span class="s">'block1_conv1'</span><span class="p">,</span>
+                <span class="s">'block2_conv1'</span><span class="p">,</span>
+                <span class="s">'block3_conv1'</span><span class="p">,</span> 
+                <span class="s">'block4_conv1'</span><span class="p">,</span> 
+                <span class="s">'block5_conv1'</span><span class="p">]</span>
+</code></pre></div></div>
+<p>网络层的名称来自于vgg-19网络定义完成后，各层的名称。可以使用如下代码得到所有层的名称：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="p">...</span>
+<span class="c1"># 建立无需分类结果的vgg网络
+</span><span class="n">vgg</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">applications</span><span class="p">.</span><span class="n">VGG19</span><span class="p">(</span><span class="n">include_top</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="s">'imagenet'</span><span class="p">)</span>
+
+<span class="c1"># 显示vgg中所有层的名称
+</span><span class="k">print</span><span class="p">()</span>
+<span class="k">for</span> <span class="n">layer</span> <span class="ow">in</span> <span class="n">vgg</span><span class="p">.</span><span class="n">layers</span><span class="p">:</span>
+    <span class="k">print</span><span class="p">(</span><span class="n">layer</span><span class="p">.</span><span class="n">name</span><span class="p">)</span>
+    <span class="p">...</span>
+</code></pre></div></div>
+
+<p>通常的模型训练，都是使用代价函数比较网络输出结果，和目标标注值的差异，使得差异逐渐缩小。<br />
+本例的训练目标比较复杂，可以描述为两条：</p>
+<ul>
+  <li>生成图片的风格层输出，同艺术图片的风格层输出差异最小</li>
+  <li>生成图片的内容层输出，同原始照片的内容层输出差异最小</li>
+</ul>
+
+<p>虽然这个代价函数略微复杂，不过比VAE的代价函数还是简单多了:)</p>
+
+<h4 id="源代码">源代码</h4>
+<p>程序中的注释非常详细。跟以前的程序有一点区别，就是直接使用TensorFlow内置方法读取了图片文件，然后调用jpg解码还原为矩阵。<br />
+不过TensorFlow内置的将图像0-255整数值转换为浮点数的过程，会自动将数值变为0-1的浮点小数。<br />
+这个过程其实对我们多此一举，因为我们后续的很多计算都需要转换回0-255。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
+</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="n">mpl</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">functools</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
+
+<span class="c1"># 设置绘图窗口参数，用于图片显示
+</span><span class="n">mpl</span><span class="p">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s">'figure.figsize'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">13</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="n">mpl</span><span class="p">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s">'axes.grid'</span><span class="p">]</span> <span class="o">=</span> <span class="bp">False</span>
+
+<span class="c1"># 获取下载后本地图片的路径，content_path是真实照片，style_path是艺术品风格图片
+</span><span class="n">content_path</span> <span class="o">=</span> <span class="s">"1-content.jpg"</span>
+<span class="n">style_path</span> <span class="o">=</span> <span class="s">"1-style.jpg"</span>
+
+<span class="c1"># 读取一张图片，并做预处理
+</span><span class="k">def</span> <span class="nf">load_img</span><span class="p">(</span><span class="n">path_to_img</span><span class="p">):</span>
+    <span class="n">max_dim</span> <span class="o">=</span> <span class="mi">512</span>
+    <span class="c1"># 读取二进制文件
+</span>    <span class="n">img</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">io</span><span class="p">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">path_to_img</span><span class="p">)</span>
+    <span class="c1"># 做JPEG解码，这时候得到宽x高x色深矩阵，数字0-255
+</span>    <span class="n">img</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">image</span><span class="p">.</span><span class="n">decode_jpeg</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    <span class="c1"># 类型从int转换到32位浮点，数值范围0-1
+</span>    <span class="n">img</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">image</span><span class="p">.</span><span class="n">convert_image_dtype</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="c1"># 减掉最后色深一维，获取到的相当于图片尺寸（整数），转为浮点
+</span>    <span class="n">shape</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">cast</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">img</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="c1"># 获取图片长端
+</span>    <span class="nb">long</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">shape</span><span class="p">)</span>
+    <span class="c1"># 以长端为比例缩放，让图片成为512x???
+</span>    <span class="n">scale</span> <span class="o">=</span> <span class="n">max_dim</span><span class="o">/</span><span class="nb">long</span>
+    <span class="n">new_shape</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">cast</span><span class="p">(</span><span class="n">shape</span><span class="o">*</span><span class="n">scale</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">)</span>
+    <span class="c1"># 实际缩放图片
+</span>    <span class="n">img</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">image</span><span class="p">.</span><span class="n">resize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">new_shape</span><span class="p">)</span>
+    <span class="c1"># 再扩展一维，成为图片数字中的一张图片（1，长，宽，色深）
+</span>    <span class="n">img</span> <span class="o">=</span> <span class="n">img</span><span class="p">[</span><span class="n">tf</span><span class="p">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="k">return</span> <span class="n">img</span>
+
+<span class="c1"># 读入两张图片
+</span><span class="n">content_image</span> <span class="o">=</span> <span class="n">load_img</span><span class="p">(</span><span class="n">content_path</span><span class="p">)</span>
+<span class="n">style_image</span> <span class="o">=</span> <span class="n">load_img</span><span class="p">(</span><span class="n">style_path</span><span class="p">)</span>
+
+<span class="c1">############################################################
+# 定义最能代表内容特征的网络层
+</span><span class="n">content_layers</span> <span class="o">=</span> <span class="p">[</span><span class="s">'block5_conv2'</span><span class="p">]</span> 
+
+<span class="c1"># 定义最能代表风格特征的网络层
+</span><span class="n">style_layers</span> <span class="o">=</span> <span class="p">[</span><span class="s">'block1_conv1'</span><span class="p">,</span>
+                <span class="s">'block2_conv1'</span><span class="p">,</span>
+                <span class="s">'block3_conv1'</span><span class="p">,</span> 
+                <span class="s">'block4_conv1'</span><span class="p">,</span> 
+                <span class="s">'block5_conv1'</span><span class="p">]</span>
+<span class="c1"># 神经网络层的数量
+</span><span class="n">num_content_layers</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">content_layers</span><span class="p">)</span>
+<span class="n">num_style_layers</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">style_layers</span><span class="p">)</span>
+
+<span class="c1"># 定义一个工具函数，帮助建立得到特定中间层输出结果的新模型
+</span><span class="k">def</span> <span class="nf">vgg_layers</span><span class="p">(</span><span class="n">layer_names</span><span class="p">):</span>
+    <span class="s">""" Creates a vgg model that returns a list of intermediate output values."""</span>
+    <span class="c1"># 定义使用ImageNet数据训练的vgg19网络
+</span>    <span class="n">vgg</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">applications</span><span class="p">.</span><span class="n">VGG19</span><span class="p">(</span><span class="n">include_top</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="s">'imagenet'</span><span class="p">)</span>
+    <span class="c1"># 已经经过了训练，所以锁定各项参数避免再次训练
+</span>    <span class="n">vgg</span><span class="p">.</span><span class="n">trainable</span> <span class="o">=</span> <span class="bp">False</span>
+    <span class="c1"># 获取所需层的输出结果
+</span>    <span class="n">outputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">vgg</span><span class="p">.</span><span class="n">get_layer</span><span class="p">(</span><span class="n">name</span><span class="p">).</span><span class="n">output</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">layer_names</span><span class="p">]</span>
+    <span class="c1"># 最终返回结果是一个模型，输入是图片，输出为所需的中间层输出
+</span>    <span class="n">model</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">Model</span><span class="p">([</span><span class="n">vgg</span><span class="p">.</span><span class="nb">input</span><span class="p">],</span> <span class="n">outputs</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model</span>
+
+<span class="c1"># 定义函数计算风格矩阵，这实际是由抽取出来的5个网络层的输出计算得来的
+</span><span class="k">def</span> <span class="nf">gram_matrix</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">linalg</span><span class="p">.</span><span class="n">einsum</span><span class="p">(</span><span class="s">'bijc,bijd-&gt;bcd'</span><span class="p">,</span> <span class="n">input_tensor</span><span class="p">,</span> <span class="n">input_tensor</span><span class="p">)</span>
+    <span class="n">input_shape</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">shape</span><span class="p">(</span><span class="n">input_tensor</span><span class="p">)</span>
+    <span class="n">num_locations</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">cast</span><span class="p">(</span><span class="n">input_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">input_shape</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span><span class="o">/</span><span class="p">(</span><span class="n">num_locations</span><span class="p">)</span>
+
+<span class="c1"># 自定义keras模型
+</span><span class="k">class</span> <span class="nc">StyleContentModel</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">models</span><span class="p">.</span><span class="n">Model</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">style_layers</span><span class="p">,</span> <span class="n">content_layers</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">StyleContentModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">).</span><span class="n">__init__</span><span class="p">()</span>
+        <span class="c1"># 自己的vgg模型，包含上面所列的风格抽取层和内容抽取层
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">vgg</span> <span class="o">=</span> <span class="n">vgg_layers</span><span class="p">(</span><span class="n">style_layers</span> <span class="o">+</span> <span class="n">content_layers</span><span class="p">)</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">style_layers</span> <span class="o">=</span> <span class="n">style_layers</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">content_layers</span> <span class="o">=</span> <span class="n">content_layers</span>
+        <span class="bp">self</span><span class="p">.</span><span class="n">num_style_layers</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">style_layers</span><span class="p">)</span>
+        <span class="c1"># vgg各层参数锁定不再参数训练
+</span>        <span class="bp">self</span><span class="p">.</span><span class="n">vgg</span><span class="p">.</span><span class="n">trainable</span> <span class="o">=</span> <span class="bp">False</span>
+
+    <span class="k">def</span> <span class="nf">call</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">input</span><span class="p">):</span>
+        <span class="c1"># 输入的图片是0-1范围浮点，转换到0-255以符合vgg要求
+</span>        <span class="nb">input</span> <span class="o">=</span> <span class="nb">input</span><span class="o">*</span><span class="mf">255.0</span>
+        <span class="c1"># 对输入图片数据做预处理
+</span>        <span class="n">preprocessed_input</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">applications</span><span class="p">.</span><span class="n">vgg19</span><span class="p">.</span><span class="n">preprocess_input</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
+        <span class="c1"># 获取风格层和内容层输出
+</span>        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="p">.</span><span class="n">vgg</span><span class="p">(</span><span class="n">preprocessed_input</span><span class="p">)</span>
+        <span class="c1"># 输出实际是一个数组，拆分为风格输出和内容输出
+</span>        <span class="n">style_outputs</span><span class="p">,</span> <span class="n">content_outputs</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">outputs</span><span class="p">[:</span><span class="bp">self</span><span class="p">.</span><span class="n">num_style_layers</span><span class="p">],</span>
+                <span class="n">outputs</span><span class="p">[</span><span class="bp">self</span><span class="p">.</span><span class="n">num_style_layers</span><span class="p">:])</span>
+        <span class="c1"># 计算风格矩阵
+</span>        <span class="n">style_outputs</span> <span class="o">=</span> <span class="p">[</span><span class="n">gram_matrix</span><span class="p">(</span><span class="n">style_output</span><span class="p">)</span>
+                         <span class="k">for</span> <span class="n">style_output</span> <span class="ow">in</span> <span class="n">style_outputs</span><span class="p">]</span>
+
+        <span class="c1"># 转换为字典
+</span>        <span class="n">content_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">content_name</span><span class="p">:</span> <span class="n">value</span>
+                        <span class="k">for</span> <span class="n">content_name</span><span class="p">,</span> <span class="n">value</span>
+                        <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">content_layers</span><span class="p">,</span> <span class="n">content_outputs</span><span class="p">)}</span>
+        <span class="c1"># 转换为字典
+</span>        <span class="n">style_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">style_name</span><span class="p">:</span> <span class="n">value</span>
+                      <span class="k">for</span> <span class="n">style_name</span><span class="p">,</span> <span class="n">value</span>
+                      <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="p">.</span><span class="n">style_layers</span><span class="p">,</span> <span class="n">style_outputs</span><span class="p">)}</span>
+        <span class="c1"># 返回内容和风格结果
+</span>        <span class="k">return</span> <span class="p">{</span><span class="s">'content'</span><span class="p">:</span> <span class="n">content_dict</span><span class="p">,</span> <span class="s">'style'</span><span class="p">:</span> <span class="n">style_dict</span><span class="p">}</span>
+
+<span class="c1"># 使用自定义模型建立一个抽取器
+</span><span class="n">extractor</span> <span class="o">=</span> <span class="n">StyleContentModel</span><span class="p">(</span><span class="n">style_layers</span><span class="p">,</span> <span class="n">content_layers</span><span class="p">)</span>
+
+<span class="c1"># 设定风格特征的目标，即最终生成的图片，希望风格上尽量接近风格图片
+</span><span class="n">style_targets</span> <span class="o">=</span> <span class="n">extractor</span><span class="p">(</span><span class="n">style_image</span><span class="p">)[</span><span class="s">'style'</span><span class="p">]</span>
+<span class="c1"># 设定内容特征的目标，即最终生成的图片，希望内容上尽量接近内容图片
+</span><span class="n">content_targets</span> <span class="o">=</span> <span class="n">extractor</span><span class="p">(</span><span class="n">content_image</span><span class="p">)[</span><span class="s">'content'</span><span class="p">]</span>
+
+<span class="c1"># 内容图片转换为张量
+</span><span class="n">image</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">content_image</span><span class="p">)</span>
+
+<span class="c1"># 截取0-1的浮点数，超范围部分被截取
+</span><span class="k">def</span> <span class="nf">clip_0_1</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">clip_by_value</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">clip_value_min</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">clip_value_max</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+<span class="c1"># 优化器
+</span><span class="n">opt</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">optimizers</span><span class="p">.</span><span class="n">Adam</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span> <span class="n">beta_1</span><span class="o">=</span><span class="mf">0.99</span><span class="p">,</span> <span class="n">epsilon</span><span class="o">=</span><span class="mf">1e-1</span><span class="p">)</span>
+<span class="c1"># 预定义风格和内容在最终结果中的权重值，用于在损失函数中计算总损失值
+</span><span class="n">style_weight</span> <span class="o">=</span> <span class="mf">1e-2</span>
+<span class="n">content_weight</span> <span class="o">=</span> <span class="mf">1e4</span>
+
+<span class="c1"># 损失函数
+</span><span class="k">def</span> <span class="nf">style_content_loss</span><span class="p">(</span><span class="n">outputs</span><span class="p">):</span>
+    <span class="n">style_outputs</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="s">'style'</span><span class="p">]</span>
+    <span class="n">content_outputs</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="s">'content'</span><span class="p">]</span>
+    <span class="c1"># 风格损失值，就是计算方差
+</span>    <span class="n">style_loss</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">add_n</span><span class="p">([</span><span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">((</span><span class="n">style_outputs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">-</span><span class="n">style_targets</span><span class="p">[</span><span class="n">name</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> 
+                           <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">style_outputs</span><span class="p">.</span><span class="n">keys</span><span class="p">()])</span>
+    <span class="c1"># 权重值平均到每层，计算总体风格损失值
+</span>    <span class="n">style_loss</span> <span class="o">*=</span> <span class="n">style_weight</span><span class="o">/</span><span class="n">num_style_layers</span>
+
+    <span class="c1"># 内容损失值，也是计算方差
+</span>    <span class="n">content_loss</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">add_n</span><span class="p">([</span><span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">((</span><span class="n">content_outputs</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">-</span><span class="n">content_targets</span><span class="p">[</span><span class="n">name</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> 
+                             <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">content_outputs</span><span class="p">.</span><span class="n">keys</span><span class="p">()])</span>
+    <span class="n">content_loss</span> <span class="o">*=</span> <span class="n">content_weight</span><span class="o">/</span><span class="n">num_content_layers</span>
+    <span class="c1"># 总损失值
+</span>    <span class="n">loss</span> <span class="o">=</span> <span class="n">style_loss</span><span class="o">+</span><span class="n">content_loss</span>
+    <span class="k">return</span> <span class="n">loss</span>
+<span class="c1">################################################################
+</span>
+<span class="c1"># 一次训练
+</span><span class="o">@</span><span class="n">tf</span><span class="p">.</span><span class="n">function</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">train_step</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">GradientTape</span><span class="p">()</span> <span class="k">as</span> <span class="n">tape</span><span class="p">:</span>
+        <span class="c1"># 抽取风格层、内容层输出
+</span>        <span class="n">outputs</span> <span class="o">=</span> <span class="n">extractor</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="c1"># 计算损失值
+</span>        <span class="n">loss</span> <span class="o">=</span> <span class="n">style_content_loss</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+
+    <span class="c1"># 梯度下降
+</span>    <span class="n">grad</span> <span class="o">=</span> <span class="n">tape</span><span class="p">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>
+    <span class="c1"># 应用计算后的新参数，注意这个新值不是应用到网络
+</span>    <span class="c1"># 作为训练完成的vgg网络，其参数前面已经设定不可更改
+</span>    <span class="c1"># 这个参数实际将应用于原图
+</span>    <span class="c1"># 以求取，新图片经过网络后，损失值最小
+</span>    <span class="n">opt</span><span class="p">.</span><span class="n">apply_gradients</span><span class="p">([(</span><span class="n">grad</span><span class="p">,</span> <span class="n">image</span><span class="p">)])</span>
+    <span class="c1"># 更新图片，用新图片进行下次训练迭代
+</span>    <span class="n">image</span><span class="p">.</span><span class="n">assign</span><span class="p">(</span><span class="n">clip_0_1</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
+
+<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span>
+<span class="n">epochs</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">steps_per_epoch</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="n">step</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps_per_epoch</span><span class="p">):</span>
+        <span class="n">step</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">train_step</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"."</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s">''</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">""</span><span class="p">)</span>
+    <span class="c1"># 每100次迭代显示一次图片
+</span>    <span class="c1"># imshow(image.read_value())
+</span>    <span class="c1"># plt.title("Train step: {}".format(step))
+</span>    <span class="c1"># plt.show()
+</span>
+<span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Total time: {:.1f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">end</span><span class="o">-</span><span class="n">start</span><span class="p">))</span>
+
+<span class="c1">########################################
+#保存结果图片
+</span><span class="n">file_name</span> <span class="o">=</span> <span class="s">'newart1.png'</span>
+<span class="n">mpl</span><span class="p">.</span><span class="n">image</span><span class="p">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">image</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</code></pre></div></div>
+<p>程序的输出结果如下图：<br />
+<img src="/attachments/201904/tensorFlow2/nst-newart1.png" alt="" />
+看起来基本达到了设计要求，不过再仔细观察，似乎效果虽然都有了，但画面看上去有一点不干净，有很多小的噪点甚至有了干涉纹。<br />
+这是因为，在照片原图和艺术作品原图中，肯定天然就存在有噪点以及图片中本身应当有的小而频繁的花纹。这些内容在通过卷积加强后，两幅照片再叠加，这些噪声就被强化了，从而在生成的图片中体现的非常明显。<br />
+这个问题如果在传统算法中可以使用高通滤波。在卷积神经网络中则更容易，是统计总体变分损失值(Total Variation Loss)，在代价函数中，让这个损失值降到最小，就抑制了这种噪点的产生。也相当于神经网络具有了降噪的效果。<br />
+变分损失是计算图片中，在X方向及Y方向，相邻像素的差值。如果像素差别不大，那差肯定很小甚至趋近于0。如果差别大，当然差值就大。<br />
+请使用下面的代码，替换上面程序中训练的部分：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">###################################################
+# 计算x方向及y方向相邻像素差值，如果有高频花纹，这个值肯定会高，
+# 因为相邻点相同差值接近0，区别越大，差值当然越大
+</span><span class="k">def</span> <span class="nf">high_pass_x_y</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+    <span class="n">x_var</span> <span class="o">=</span> <span class="n">image</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">1</span><span class="p">:,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">image</span><span class="p">[:,</span> <span class="p">:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">y_var</span> <span class="o">=</span> <span class="n">image</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">:,</span> <span class="p">:,</span> <span class="p">:]</span> <span class="o">-</span> <span class="n">image</span><span class="p">[:,</span> <span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+
+    <span class="k">return</span> <span class="n">x_var</span><span class="p">,</span> <span class="n">y_var</span>
+
+<span class="c1"># 计算总体变分损失
+</span><span class="k">def</span> <span class="nf">total_variation_loss</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+    <span class="n">x_deltas</span><span class="p">,</span> <span class="n">y_deltas</span> <span class="o">=</span> <span class="n">high_pass_x_y</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">x_deltas</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">+</span><span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">y_deltas</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+
+
+<span class="c1"># 总体变分损失值在损失值中所占权重
+</span><span class="n">total_variation_weight</span> <span class="o">=</span> <span class="mf">1e8</span>
+
+<span class="c1"># 一次训练
+</span><span class="o">@</span><span class="n">tf</span><span class="p">.</span><span class="n">function</span><span class="p">()</span>
+<span class="k">def</span> <span class="nf">train_step</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+    <span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">GradientTape</span><span class="p">()</span> <span class="k">as</span> <span class="n">tape</span><span class="p">:</span>
+        <span class="c1"># 抽取风格层、内容层输出
+</span>        <span class="n">outputs</span> <span class="o">=</span> <span class="n">extractor</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="c1"># 计算损失值
+</span>        <span class="n">loss</span> <span class="o">=</span> <span class="n">style_content_loss</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+        <span class="n">loss</span> <span class="o">+=</span> <span class="n">total_variation_weight</span><span class="o">*</span><span class="n">total_variation_loss</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+    <span class="c1"># 梯度下降
+</span>    <span class="n">grad</span> <span class="o">=</span> <span class="n">tape</span><span class="p">.</span><span class="n">gradient</span><span class="p">(</span><span class="n">loss</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span>
+    <span class="c1"># 应用计算后的新参数，注意这个新值不是应用到网络
+</span>    <span class="c1"># 作为训练完成的vgg网络，其参数前面已经设定不可更改
+</span>    <span class="c1"># 这个参数实际将应用于原图
+</span>    <span class="c1"># 以求取，新图片经过网络后，损失值最小
+</span>    <span class="n">opt</span><span class="p">.</span><span class="n">apply_gradients</span><span class="p">([(</span><span class="n">grad</span><span class="p">,</span> <span class="n">image</span><span class="p">)])</span>
+    <span class="c1"># 更新图片，用新图片进行下次训练迭代
+</span>    <span class="n">image</span><span class="p">.</span><span class="n">assign</span><span class="p">(</span><span class="n">clip_0_1</span><span class="p">(</span><span class="n">image</span><span class="p">))</span>
+
+<span class="c1"># 内容图片作为逐步迭代生成的新图片，一开始当然是原图，这里是转换为张量
+</span><span class="n">image</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">content_image</span><span class="p">)</span>
+
+<span class="n">start</span> <span class="o">=</span> <span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span>
+
+<span class="c1"># 迭代10次，每次100步训练
+</span><span class="n">epochs</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="n">steps</span> <span class="o">=</span> <span class="mi">100</span>
+
+<span class="n">step</span> <span class="o">=</span> <span class="mi">0</span>
+<span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">steps</span><span class="p">):</span>
+        <span class="n">step</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">train_step</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"."</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s">''</span><span class="p">)</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">""</span><span class="p">)</span>
+<span class="n">end</span> <span class="o">=</span> <span class="n">time</span><span class="p">.</span><span class="n">time</span><span class="p">()</span>
+<span class="k">print</span><span class="p">(</span><span class="s">"Total time: {:.1f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">end</span><span class="o">-</span><span class="n">start</span><span class="p">))</span>
+
+<span class="c1">#保存结果图片
+</span><span class="n">file_name</span> <span class="o">=</span> <span class="s">'newart1.png'</span>
+<span class="n">mpl</span><span class="p">.</span><span class="n">image</span><span class="p">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">image</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</code></pre></div></div>
+<p>再次执行，所得到的输出图片如下：<br />
+<img src="/attachments/201904/tensorFlow2/nst-newart2.png" alt="" />
+效果不错吧？可以换上自己的照片还有自己心仪的艺术作品来试试。<br />
+程序中限制了图片宽、高最大值是512，如果设备性能比较好，或者有更大尺寸的需求，可以修改程序中的常量。</p>
+
+<p>（待续…）</p>
+
+:ET

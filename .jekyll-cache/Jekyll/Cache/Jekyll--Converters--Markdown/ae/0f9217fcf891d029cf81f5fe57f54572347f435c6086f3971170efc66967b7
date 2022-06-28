@@ -1,0 +1,109 @@
+I"�:<p><img src="/attachments/201810/opencv-freetype-demo.png" alt="" />
+　　在mac电脑上管理这些gnu的库一般都使用Homebrew，但总有一些你个性化的需要是官方的Homebrew配方无法满足的。比如在屏幕的输出中使用中文字符。<br />
+　　在OPENCV中输出UTF8字符集早已经有人完成过类似的工作，方法是使用freetype的支持，程序中选择使用的字库，从而在屏幕上输出任意的字符。但官方的Homebrew OPENCV的配方中，并不包含freetype的支持。这时候，只好自己来编译OPENCV及contrib库，因为freetype的支持就在contrib库中。</p>
+<h4 id="编译安装">编译安装</h4>
+<p>　　OPENCV的开发已经非常成熟，所以编译过程并不复杂，大致包含如下的过程：</p>
+<ol>
+  <li>使用App Store安装Xcode，随后执行一次Xcode根据提示安装其命令行工具。</li>
+  <li>使用brew安装第三方的依赖库，比如git/cmake/freetype等，很多依赖库根据你使用的模块不同，也有不同的需求。大多依赖库如果你不安装，OPENCV在编译的时候会自动下载，但下载和编译的过程都很慢，不如提前预装编译好的版本。
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>brew <span class="nb">install </span>cmake automake pkg-config ant autoconf git freetype
+</code></pre></div>    </div>
+  </li>
+  <li>准备一个工作目录，下载OPENCV和contrib的源码(以OPENCV3.4为例)：
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir source
+cd source
+</span>git clone <span class="nt">--single-branch</span> <span class="nt">-b</span> 3.4 https://github.com/opencv/opencv.git
+git clone <span class="nt">--single-branch</span> <span class="nt">-b</span> 3.4 https://github.com/opencv/opencv_contrib.git
+</code></pre></div>    </div>
+    <p>master分支可能会包含一些并不稳定的代码，所以不推荐使用master分支的代码。</p>
+  </li>
+  <li>配置、编译及安装
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir source</span>/opencv/build
+<span class="nb">cd source</span>/opencv/build
+cmake <span class="nt">-D</span> <span class="nv">CMAKE_BUILD_TYPE</span><span class="o">=</span>Release <span class="nt">-D</span> <span class="nv">CMAKE_INSTALL_PREFIX</span><span class="o">=</span>/usr/local <span class="nt">-D</span> <span class="nv">OPENCV_EXTRA_MODULES_PATH</span><span class="o">=</span>../../opencv_contrib/modules/ ..
+make <span class="nt">-j4</span>
+<span class="nb">sudo </span>make <span class="nb">install</span> 
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<p>　　上面这种方式通常能满足大多的需求。如果你不想要在编译中加入所有的扩展包，可以使用BUILD_opencv_*的参数屏蔽，比如：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cmake <span class="nt">-D</span> <span class="nv">CMAKE_BUILD_TYPE</span><span class="o">=</span>Release <span class="nt">-D</span> <span class="nv">CMAKE_INSTALL_PREFIX</span><span class="o">=</span>/usr/local <span class="nt">-D</span> <span class="nv">OPENCV_EXTRA_MODULES_PATH</span><span class="o">=</span>../../opencv_contrib/modules/ <span class="nt">-DBUILD_opencv_legacy</span><span class="o">=</span>OFF ..
+</code></pre></div></div>
+<p>　　如果已经使用Homebrew安装了OPENCV，并不想全部重新安装，只想安装freetype支持，可以手工将编译出的freetype部分拷贝到系统路径：　　</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cp source</span>/opencv-3.4.3/build/lib/libopencv_freetype<span class="k">*</span> /usr/local/lib/
+<span class="nb">cp source</span>/opencv_contrib-3.4/modules/freetype/include/opencv2/freetype.hpp /usr/local/include/opencv2/
+</code></pre></div></div>
+<p>　　然后还要在pkg-config配置文件中增加freetype库的链接（使用make install的自动安装是不需要这一步的）：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vi /usr/local/lib/pkgconfig/opencv.pc
+在Libs一行的最后增加：-lopencv_freetype  
+</code></pre></div></div>
+<h4 id="使用">使用</h4>
+<p>　　使用freetype替代opencv原有的文字输出功能很简单，这里提供一个修改过的官方样例，假设文件名为drawUtf8.cpp:</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;opencv2/opencv.hpp&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;opencv2/freetype.hpp&gt;</span><span class="cp">
+</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">std</span><span class="p">;</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">cv</span><span class="p">;</span>
+
+<span class="kt">int</span> <span class="nf">main</span><span class="p">(</span><span class="kt">int</span> <span class="n">argc</span><span class="p">,</span><span class="kt">char</span> <span class="o">**</span><span class="n">argv</span><span class="p">){</span>
+	<span class="n">String</span> <span class="n">text</span> <span class="o">=</span> <span class="s">"Hello世界！毛泽东"</span><span class="p">;</span>
+	<span class="kt">int</span> <span class="n">fontHeight</span> <span class="o">=</span> <span class="mi">60</span><span class="p">;</span>
+	<span class="kt">int</span> <span class="n">thickness</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span><span class="p">;</span>
+	<span class="kt">int</span> <span class="n">linestyle</span> <span class="o">=</span> <span class="mi">8</span><span class="p">;</span>
+	<span class="kt">int</span> <span class="n">baseline</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span>
+
+	<span class="n">Ptr</span><span class="o">&lt;</span><span class="n">freetype</span><span class="o">::</span><span class="n">FreeType2</span><span class="o">&gt;</span> <span class="n">ft2</span><span class="p">;</span>
+	<span class="n">ft2</span> <span class="o">=</span> <span class="n">freetype</span><span class="o">::</span><span class="n">createFreeType2</span><span class="p">();</span>
+	<span class="c1">//下面的字库要自己下载并拷贝到需要的位置</span>
+	<span class="n">ft2</span><span class="o">-&gt;</span><span class="n">loadFontData</span><span class="p">(</span> <span class="s">"/user/local/ttf/毛泽东草体.ttf"</span><span class="p">,</span> <span class="mi">0</span> <span class="p">);</span>
+
+	<span class="n">namedWindow</span><span class="p">(</span><span class="s">"box"</span><span class="p">);</span>
+	<span class="n">Mat</span> <span class="n">img</span><span class="p">(</span><span class="mi">600</span><span class="p">,</span> <span class="mi">800</span><span class="p">,</span> <span class="n">CV_8UC3</span><span class="p">,</span> <span class="n">Scalar</span><span class="o">::</span><span class="n">all</span><span class="p">(</span><span class="mi">0</span><span class="p">));</span>
+
+	<span class="n">Size</span> <span class="n">textSize</span> <span class="o">=</span> <span class="n">ft2</span><span class="o">-&gt;</span><span class="n">getTextSize</span><span class="p">(</span><span class="n">text</span><span class="p">,</span>
+	                             <span class="n">fontHeight</span><span class="p">,</span>
+	                             <span class="n">thickness</span><span class="p">,</span>
+	                             <span class="o">&amp;</span><span class="n">baseline</span><span class="p">);</span>
+	<span class="k">if</span><span class="p">(</span><span class="n">thickness</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">){</span>
+	    <span class="n">baseline</span> <span class="o">+=</span> <span class="n">thickness</span><span class="p">;</span>
+	<span class="p">}</span>
+
+	<span class="n">Point</span> <span class="n">textOrg</span><span class="p">((</span><span class="n">img</span><span class="p">.</span><span class="n">cols</span> <span class="o">-</span> <span class="n">textSize</span><span class="p">.</span><span class="n">width</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span>
+	              <span class="p">(</span><span class="n">img</span><span class="p">.</span><span class="n">rows</span> <span class="o">+</span> <span class="n">textSize</span><span class="p">.</span><span class="n">height</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">);</span>
+	<span class="n">rectangle</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">textOrg</span> <span class="o">+</span> <span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">baseline</span><span class="p">),</span>
+	      <span class="n">textOrg</span> <span class="o">+</span> <span class="n">Point</span><span class="p">(</span><span class="n">textSize</span><span class="p">.</span><span class="n">width</span><span class="p">,</span> <span class="o">-</span><span class="n">textSize</span><span class="p">.</span><span class="n">height</span><span class="p">),</span>
+	      <span class="n">Scalar</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">255</span><span class="p">,</span><span class="mi">0</span><span class="p">),</span><span class="mi">1</span><span class="p">,</span><span class="mi">8</span><span class="p">);</span>
+	<span class="n">line</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">textOrg</span> <span class="o">+</span> <span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">thickness</span><span class="p">),</span>
+	 <span class="n">textOrg</span> <span class="o">+</span> <span class="n">Point</span><span class="p">(</span><span class="n">textSize</span><span class="p">.</span><span class="n">width</span><span class="p">,</span> <span class="n">thickness</span><span class="p">),</span>
+	 <span class="n">Scalar</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span><span class="mi">1</span><span class="p">,</span><span class="mi">8</span><span class="p">);</span>
+	<span class="n">ft2</span><span class="o">-&gt;</span><span class="n">putText</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">text</span><span class="p">,</span> <span class="n">textOrg</span><span class="p">,</span> <span class="n">fontHeight</span><span class="p">,</span>
+	         <span class="n">Scalar</span><span class="o">::</span><span class="n">all</span><span class="p">(</span><span class="mi">255</span><span class="p">),</span> <span class="n">thickness</span><span class="p">,</span> <span class="n">linestyle</span><span class="p">,</span> <span class="nb">true</span> <span class="p">);</span>
+	<span class="n">imshow</span><span class="p">(</span><span class="s">"box"</span><span class="p">,</span><span class="n">img</span><span class="p">);</span>
+	
+	<span class="k">while</span><span class="p">(</span><span class="mi">1</span><span class="p">){</span> <span class="k">if</span><span class="p">(</span><span class="n">waitKey</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span><span class="o">==</span><span class="mi">27</span><span class="p">)</span><span class="k">break</span><span class="p">;</span> <span class="p">}</span> 
+
+	<span class="k">return</span> <span class="mi">0</span><span class="p">;</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>　　随后编译执行：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#编译</span>
+g++ <span class="nt">-o</span> drawUtf8 drawUtf8.cpp <span class="si">$(</span>pkg-config <span class="nt">--cflags</span> <span class="nt">--libs</span> opencv<span class="si">)</span>
+<span class="c">#执行</span>
+./drawUtf8
+</code></pre></div></div>
+<p>　　执行的效果请参看题头图。<br />
+　　最后一种情况，如果编译后只想在当前目录使用，不想安装。这种情况通常还是并不常见，因为默认OPENCV是使用动态编译，各项依赖库如果不安装到系统路径，是无法使用的。可以考虑在cmake参数中增加-DBUILD_SHARED_LIBS=0选项来进行静态编译，但这种情况我并没有尝试，参数仅来自于官方的介绍。<br />
+　　在当前目录中进行应用程序的编译最主要是配置头文件路径及链接库文件的路径，这些内容是比较多的，建议自己使用Makefile或者建立脚本文件来编译，比如mk.sh：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/sh</span>
+<span class="nv">CFLAGS</span><span class="o">=</span><span class="s2">"-I source/opencv/include -I source/opencv_contrib/modules/freetype/include -lopencv_stitching -lopencv_superres -lopencv_videostab -lopencv_aruco -lopencv_bgsegm -lopencv_bioinspired -lopencv_ccalib -lopencv_dnn_objdetect -lopencv_dpm -lopencv_face -lopencv_photo -lopencv_fuzzy -lopencv_hfs -lopencv_img_hash -lopencv_line_descriptor -lopencv_optflow -lopencv_reg -lopencv_rgbd -lopencv_saliency -lopencv_stereo -lopencv_structured_light -lopencv_phase_unwrapping -lopencv_surface_matching -lopencv_tracking -lopencv_datasets -lopencv_dnn -lopencv_plot -lopencv_xfeatures2d -lopencv_shape -lopencv_video -lopencv_ml -lopencv_ximgproc -lopencv_calib3d -lopencv_features2d -lopencv_highgui -lopencv_videoio -lopencv_flann -lopencv_xobjdetect -lopencv_imgcodecs -lopencv_objdetect -lopencv_xphoto -lopencv_imgproc -lopencv_core -lopencv_freetype"</span>
+<span class="nv">LDFLAGS</span><span class="o">=</span><span class="s2">"-L source/opencv/build/lib"</span>
+g++ <span class="nv">$CFLAGS</span> <span class="nt">-o</span> <span class="nv">$1</span> <span class="nv">$1</span>.cpp <span class="nv">$LDFLAGS</span>
+</code></pre></div></div>
+<p>　　使用举例:<code class="language-plaintext highlighter-rouge">./mk.sh drawUtf8</code>。</p>
+
+<h4 id="参考资料">参考资料</h4>
+<p>官方的编译介绍：<a href="https://github.com/opencv/opencv_contrib">https://github.com/opencv/opencv_contrib</a><br />
+contrib模块列表：<a href="https://github.com/opencv/opencv_contrib/tree/3.4/modules">https://github.com/opencv/opencv_contrib/tree/3.4/modules</a></p>
+
+:ET

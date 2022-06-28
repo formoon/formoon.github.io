@@ -1,0 +1,554 @@
+I"":<h4 id="rnn循环神经网络recurrent-neural-network">RNN循环神经网络(Recurrent Neural Network)</h4>
+<p>如同word2vec中提到的，很多数据的原型，前后之间是存在关联性的。关联性的打破必然造成关键指征的丢失，从而在后续的训练和预测流程中降低准确率。<br />
+除了提过的自然语言处理(NLP)领域，自动驾驶前一时间点的雷达扫描数据跟后一时间点的扫描数据、音乐旋律的时间性、股票前一天跟后一天的数据，都属于这类的典型案例。<br />
+因此在传统的神经网络中，每一个节点，如果把上一次的运算结果记录下来，在下一次数据处理的时候，跟上一次的运算结果结合在一起混合运算，就可以体现出上一次的数据对本次的影响。<br />
+<img src="/attachments/201801/ml-nn/rnn0.jpg" alt="" /><br />
+如上图所示，图中每一个节点就相当于神经网络中的一个节点，t-1 、 t 、 t+1是指该节点在时间序列中的动作，你可以理解为第n批次的数据。<br />
+所以上面图中的3个节点，在实现中实际是同1个节点。<br />
+指的是，在n-1批次数据到来的时候，节点进行计算，完成输出，同时保留了一个state。<br />
+在下一批次数据到来的时候，state值跟新到来的数据一起进行运算，再次完成输出，再次保留一个state参与下一批次的运算，如此循环。这也是循环神经网络名称的由来。</p>
+
+<p>RNN算法存在一个问题，那就是同一节点在某一时间点所保存的状态，随着时间的增长，它所能造成的影响就越小，逐渐衰减至无。这对于一些长距离上下文相关的应用，仍然是不满足要求的。<br />
+这就又发展出了LSTM算法。</p>
+
+<h4 id="lstm长短期记忆网络long-short-term-memory">LSTM长短期记忆网络（Long Short-Term Memory）</h4>
+<p><img src="https://gss1.bdstatic.com/-vo3dSag_xI4khGkpoWK1HF6hhy/baike/c0%3Dbaike116%2C5%2C5%2C116%2C38/sign=8c5d1cc9daa20cf4529df68d17602053/91ef76c6a7efce1b48c95384a551f3deb58f659a.jpg" alt="" /><br />
+如图所示：LSTM区别于RNN的地方，主要就在于它在算法中加入了一个判断信息有用与否的“处理器”，这个处理器作用的结构被称为cell。
+一个cell当中被放置了三个“门电路”，分别叫做输入门、遗忘门和输出门。一个信息进入LSTM的网络当中，可以根据规则来判断是否有用。只有符合算法认证的信息才会留下，不符的信息则通过遗忘门被遗忘。</p>
+<ul>
+  <li>遗忘门决定让哪些信息继续通过这个cell。</li>
+  <li>输入门决定让多少新的信息加入到 cell状态中来。</li>
+  <li>输出门决定我们要输出什么样的值。</li>
+</ul>
+
+<p>通过这样简单的节点结构改善，就有效的解决了长时序依赖数据在神经网络中的表现。</p>
+
+<p>LSTM随后还出现了不少变种，进一步加强了功能或者提高了效率。比如当前比较有名的GRU（Gated Recurrent Unit ）是2014年提出的。GRU在不降低处理效果的同时，减少了一个门结构。只有重置门（reset gate）和更新门（update gate）两个门，并且把细胞状态和隐藏状态进行了合并。这使得算法的实现更容易，结构更清晰，运算效率也有所提高。<br />
+目前的应用中，较多的使用是LSTM或者GRU。RNN网络其实已经很少直接用到了。</p>
+
+<h4 id="实现一个rnn网络">实现一个RNN网络</h4>
+<p>官方的RNN网络教程是实现了一个NLP的应用，技术上很切合RNN的典型特征。不过从程序逻辑上太复杂了，而且计算结果也很不直观。<br />
+为了能尽快的抓住RNN网络的本质，本例仍然延续以前用过的MNIST程序，把其中的识别模型替换为RNN-LSTM网络，相信可以更快的让大家上手RNN-LSTM。<br />
+本例中的源码来自<a href="https://github.com/aymericdamien/TensorFlow-Examples/blob/master/examples/3_NeuralNetworks/recurrent_network.py">aymericdamien的github仓库</a>，为了更接近我们原来的示例代码，适当做了修改。在此对原作者表示感谢。<br />
+<a href="https://www.tensorflow.org/tutorials/recurrent">官方的课程</a>建议在读完这里的内容之后再去学习，并且也很值得深入的研究。<br />
+源码：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python
+# -*- coding=UTF-8 -*-
+</span>
+<span class="s">""" Recurrent Neural Network.
+
+A Recurrent Neural Network (LSTM) implementation example using TensorFlow library.
+This example is using the MNIST database of handwritten digits (http://yann.lecun.com/exdb/mnist/)
+
+Links:
+    [Long Short Term Memory](http://deeplearning.cs.cmu.edu/pdfs/Hochreiter97_lstm.pdf)
+    [MNIST Dataset](http://yann.lecun.com/exdb/mnist/).
+
+Author: Aymeric Damien
+Project: https://github.com/aymericdamien/TensorFlow-Examples/
+"""</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">print_function</span>
+
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+<span class="kn">from</span> <span class="nn">tensorflow.contrib</span> <span class="kn">import</span> <span class="n">rnn</span>
+
+<span class="c1"># Import MNIST data
+</span><span class="kn">from</span> <span class="nn">tensorflow.examples.tutorials.mnist</span> <span class="kn">import</span> <span class="n">input_data</span>
+<span class="c1">#这里指向以前下载的数据，节省下载时间
+#使用时请将后面的路径修改为自己数据所在路径
+</span><span class="n">mnist</span> <span class="o">=</span> <span class="n">input_data</span><span class="p">.</span><span class="n">read_data_sets</span><span class="p">(</span><span class="s">"../mnist/data"</span><span class="p">,</span> <span class="n">one_hot</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="s">'''
+To classify images using a recurrent neural network, we consider every image
+row as a sequence of pixels. Because MNIST image shape is 28*28px, we will then
+handle 28 sequences of 28 steps for every sample.
+'''</span>
+
+<span class="c1"># Training Parameters
+#训练梯度
+</span><span class="n">learning_rate</span> <span class="o">=</span> <span class="mf">0.001</span>
+<span class="c1">#训练总步骤
+</span><span class="n">training_steps</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="c1">#每批次量
+</span><span class="n">batch_size</span> <span class="o">=</span> <span class="mi">128</span>
+<span class="c1">#每200步显示一次训练进度
+</span><span class="n">display_step</span> <span class="o">=</span> <span class="mi">200</span>
+
+<span class="c1"># Network Parameters
+#下面两个值实际就是28x28的图片，但是分成每组进入RNN的数据28个，
+#然后一共28个批次（时序）的数据，利用这种方式，找出单方向相邻两个点之间的规律
+#这种方式当时不如CNN的效果，但我们这里是为了展示RNN的应用
+</span><span class="n">num_input</span> <span class="o">=</span> <span class="mi">28</span> <span class="c1"># MNIST data input (img shape: 28*28)
+</span><span class="n">timesteps</span> <span class="o">=</span> <span class="mi">28</span> <span class="c1"># timesteps
+#LSTM网络的参数，隐藏层数量
+</span><span class="n">num_hidden</span> <span class="o">=</span> <span class="mi">128</span> <span class="c1"># hidden layer num of features
+#最终分为10类，0-9十个字付
+</span><span class="n">num_classes</span> <span class="o">=</span> <span class="mi">10</span> <span class="c1"># MNIST total classes (0-9 digits)
+</span>
+<span class="c1"># tf Graph input
+#训练数据输入，跟MNIST相同
+</span><span class="n">X</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="s">"float"</span><span class="p">,</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">,</span> <span class="n">num_input</span><span class="p">])</span>
+<span class="n">Y</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="s">"float"</span><span class="p">,</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">])</span>
+
+<span class="c1"># Define weights
+#权重和偏移量
+</span><span class="n">weights</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">random_normal</span><span class="p">([</span><span class="n">num_hidden</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">]))</span>
+<span class="n">biases</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">random_normal</span><span class="p">([</span><span class="n">num_classes</span><span class="p">]))</span>
+
+
+<span class="k">def</span> <span class="nf">RNN</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">biases</span><span class="p">):</span>
+
+    <span class="c1"># Prepare data shape to match `rnn` function requirements
+</span>    <span class="c1"># Current data input shape: (batch_size, timesteps, n_input)
+</span>    <span class="c1"># Required shape: 'timesteps' tensors list of shape (batch_size, n_input)
+</span>
+    <span class="c1"># Unstack to get a list of 'timesteps' tensors of shape (batch_size, n_input)
+</span>    <span class="c1">#进入的数据是X[128(批量),784(28x28)]这样的数据
+</span>    <span class="c1">#下面函数转换成x[128,28]的数组，数组长度是28
+</span>    <span class="c1">#相当于一个[28,128,28]的张量
+</span>    <span class="n">x</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">unstack</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c1"># Define a lstm cell with tensorflow
+</span>    <span class="c1">#定义一个lstm Cell,其中有128个单元，这个数值可以修改调优
+</span>    <span class="n">lstm_cell</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">.</span><span class="n">BasicLSTMCell</span><span class="p">(</span><span class="n">num_hidden</span><span class="p">,</span> <span class="n">forget_bias</span><span class="o">=</span><span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="c1"># Get lstm cell output
+</span>    <span class="c1">#使用单元计算x,最后获得输出及状态
+</span>    <span class="n">outputs</span><span class="p">,</span> <span class="n">states</span> <span class="o">=</span> <span class="n">rnn</span><span class="p">.</span><span class="n">static_rnn</span><span class="p">(</span><span class="n">lstm_cell</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
+
+    <span class="c1"># Linear activation, using rnn inner loop last output
+</span>    <span class="c1">#仍然是我们熟悉的算法，这里相当于该节点的激活函数（就是原来rule的位置）
+</span>    <span class="k">return</span> <span class="n">tf</span><span class="p">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">outputs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">weights</span><span class="p">)</span> <span class="o">+</span> <span class="n">biases</span>
+
+<span class="c1">#使用RNN网络定义一个算法模型
+</span><span class="n">logits</span> <span class="o">=</span> <span class="n">RNN</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">weights</span><span class="p">,</span> <span class="n">biases</span><span class="p">)</span>
+<span class="c1">#预测算法
+</span><span class="n">prediction</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
+
+<span class="c1"># Define loss and optimizer
+#代价函数、优化器及训练器，跟原来基本是类似的
+</span><span class="n">loss_op</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">softmax_cross_entropy_with_logits</span><span class="p">(</span>
+    <span class="n">logits</span><span class="o">=</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">Y</span><span class="p">))</span>
+<span class="n">optimizer</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">GradientDescentOptimizer</span><span class="p">(</span><span class="n">learning_rate</span><span class="o">=</span><span class="n">learning_rate</span><span class="p">)</span>
+<span class="n">train_op</span> <span class="o">=</span> <span class="n">optimizer</span><span class="p">.</span><span class="n">minimize</span><span class="p">(</span><span class="n">loss_op</span><span class="p">)</span>
+
+<span class="c1"># Evaluate model (with test logits, for dropout to be disabled)
+#使用上面定义的预测算法进行预测，跟样本标签相同即为预测正确
+</span><span class="n">correct_pred</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">equal</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">prediction</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span> <span class="n">tf</span><span class="p">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+<span class="c1">#最后换算成正确率
+</span><span class="n">accuracy</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">cast</span><span class="p">(</span><span class="n">correct_pred</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">))</span>
+
+<span class="c1"># Initialize the variables (i.e. assign their default value)
+</span><span class="n">init</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">global_variables_initializer</span><span class="p">()</span>
+
+<span class="c1"># Start training
+</span><span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+
+    <span class="c1"># Run the initializer
+</span>    <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">init</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">step</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">training_steps</span><span class="o">+</span><span class="mi">1</span><span class="p">):</span>
+        <span class="n">batch_x</span><span class="p">,</span> <span class="n">batch_y</span> <span class="o">=</span> <span class="n">mnist</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">next_batch</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>
+        <span class="c1"># Reshape data to get 28 seq of 28 elements
+</span>        <span class="c1">#首先把数据从[128,784]转换成[128,28,28]的形状，这跟以前线性回归是不同的
+</span>        <span class="n">batch_x</span> <span class="o">=</span> <span class="n">batch_x</span><span class="p">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">,</span> <span class="n">num_input</span><span class="p">))</span>
+        <span class="c1"># Run optimization op (backprop)
+</span>        <span class="c1">#逐批次训练
+</span>        <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">train_op</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">X</span><span class="p">:</span> <span class="n">batch_x</span><span class="p">,</span> <span class="n">Y</span><span class="p">:</span> <span class="n">batch_y</span><span class="p">})</span>
+        <span class="k">if</span> <span class="n">step</span> <span class="o">%</span> <span class="n">display_step</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">step</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># Calculate batch loss and accuracy
+</span>            <span class="c1">#每200个批次显示一下进度，当前的代价值机正确率
+</span>            <span class="n">loss</span><span class="p">,</span> <span class="n">acc</span> <span class="o">=</span> <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">([</span><span class="n">loss_op</span><span class="p">,</span> <span class="n">accuracy</span><span class="p">],</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">X</span><span class="p">:</span> <span class="n">batch_x</span><span class="p">,</span>
+                                                                 <span class="n">Y</span><span class="p">:</span> <span class="n">batch_y</span><span class="p">})</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">"Step "</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">step</span><span class="p">)</span> <span class="o">+</span> <span class="s">", Minibatch Loss= "</span> <span class="o">+</span> \
+                  <span class="s">"{:.4f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span> <span class="o">+</span> <span class="s">", Training Accuracy= "</span> <span class="o">+</span> \
+                  <span class="s">"{:.3f}"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">acc</span><span class="p">))</span>
+
+    <span class="k">print</span><span class="p">(</span><span class="s">"Optimization Finished!"</span><span class="p">)</span>
+
+    <span class="c1"># Calculate accuracy for 128 mnist test images
+</span>    <span class="c1">#训练完成，使用测试组数据进行预测
+</span>    <span class="n">test_len</span> <span class="o">=</span> <span class="mi">128</span>
+    <span class="n">test_data</span> <span class="o">=</span> <span class="n">mnist</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">images</span><span class="p">[:</span><span class="n">test_len</span><span class="p">].</span><span class="n">reshape</span><span class="p">((</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">timesteps</span><span class="p">,</span> <span class="n">num_input</span><span class="p">))</span>
+    <span class="n">test_label</span> <span class="o">=</span> <span class="n">mnist</span><span class="p">.</span><span class="n">test</span><span class="p">.</span><span class="n">labels</span><span class="p">[:</span><span class="n">test_len</span><span class="p">]</span>
+    <span class="k">print</span><span class="p">(</span><span class="s">"Testing Accuracy:"</span><span class="p">,</span> \
+        <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">accuracy</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">X</span><span class="p">:</span> <span class="n">test_data</span><span class="p">,</span> <span class="n">Y</span><span class="p">:</span> <span class="n">test_label</span><span class="p">}))</span>
+</code></pre></div></div>
+<p>跟原来的MNIST代码对比，本源码有以下几个修改：</p>
+<ul>
+  <li>常量在前面集中定义，这是编程习惯上的调整，跟TensorFlow及RNN-LSTM无关</li>
+  <li>核心算法替换成了RNN，在RNN函数中实现，其中主要做了3个动作：
+    <ul>
+      <li>首先把数据切成28个数据一个批次。原来从训练集中读取的数据是[128批次,784数据]的张量。<br />
+ 随后在主循环中改成了：[128,28,28]的张量喂入RNN。注释中有说明，这是利用RNN的特征，试图寻找每张图片在单一方向上相邻两个点之间是否存在规律。<br />
+ RNN中第一个动作就是按照时序分成28个批次。变成了[28,128,28]的样式。</li>
+      <li>随后定义了一个基本的LSTM Cell，包含128个单元，这里可以理解为神经网络中的隐藏层。</li>
+      <li>最后使用我们熟悉的线性回归作用到每一个输出单元中去，在这里，这个线性回归也相当于神经网络中每个节点的激活函数。</li>
+    </ul>
+  </li>
+  <li>交叉熵的计算又换了一种算法：softmax_cross_entropy_with_logits，同我们前面用过的sparse_softmax_cross_entropy功能是接近的，基本可以互相代换。</li>
+  <li>随后的训练和预测，基本同原来的算法是相同。</li>
+</ul>
+
+<p>运算结果：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Step 9000, Minibatch <span class="nv">Loss</span><span class="o">=</span> 0.4518, Training <span class="nv">Accuracy</span><span class="o">=</span> 0.859
+Step 9200, Minibatch <span class="nv">Loss</span><span class="o">=</span> 0.4717, Training <span class="nv">Accuracy</span><span class="o">=</span> 0.852
+Step 9400, Minibatch <span class="nv">Loss</span><span class="o">=</span> 0.5074, Training <span class="nv">Accuracy</span><span class="o">=</span> 0.859
+Step 9600, Minibatch <span class="nv">Loss</span><span class="o">=</span> 0.4006, Training <span class="nv">Accuracy</span><span class="o">=</span> 0.883
+Step 9800, Minibatch <span class="nv">Loss</span><span class="o">=</span> 0.3571, Training <span class="nv">Accuracy</span><span class="o">=</span> 0.875
+Step 10000, Minibatch <span class="nv">Loss</span><span class="o">=</span> 0.3069, Training <span class="nv">Accuracy</span><span class="o">=</span> 0.906
+Optimization Finished!
+Testing Accuracy: 0.8828125
+</code></pre></div></div>
+<p>训练的结果并不是很高，因为对于图像识别，RNN并不是很好的算法，这里只是演示一个基本的RNN-LSTM模型。</p>
+
+<h4 id="自动写诗">自动写诗</h4>
+<p>上面的例子让大家对于RNN/LSTM做了入门。实际上RNN/LSTM并不适合用于图像识别，一个典型的LSTM应用案例应当是NLP。我们下面再举一个这方面的案例。<br />
+本节是一个利用唐诗数据库，训练一个RNN/LSTM网络，随后利用训练好的网络自动写诗的案例。<br />
+源码来自互联网，作者：<a href="http://blog.topspeedsnail.com">斗大的熊猫</a>，在此表示感谢。<br />
+为了适应python2.x+TensorFlow1.4.1的运行环境，另外也为了大家读起来方便把训练部分跟生成部分集成到了一起，因此源码有所修改。也建议大家去原作者的博客去读一读相关的文章，会很有收获，在引文中也有直接的链接。<br />
+源码讲解：</p>
+<ul>
+  <li>首先是唐诗的数据库，可以在此链接下载到：<a href="https://pan.baidu.com/s/1o7QlUhO">全唐诗(43030首)</a></li>
+  <li>readPoetry()函数中，读取了全部的唐诗，分离并抛弃掉标题部分，因为这部分往往不符合诗词的一般格式，参与诗词的训练没有意义。<br />
+随后对诗词进行基本的归一化，诸如剔除空格、根据字数分类。原诗中包含说明、介绍、引用等不署于诗词的部分，因为这部分数据完全不规范不能自动处理，所以这样的诗词干脆剔除掉不参与训练。<br />
+最后得到的样本集，每首诗保持了中间的逗号和句号，用于体现逗号、句号跟之前的字的规律。此外认为在开头和结尾增加了”[“和”]”字符。用于体现每首诗第一个字和最后一个字跟相邻字之间的规律。</li>
+  <li>接着把诗文向量化，就是上一篇word2vec的工作。但这个源码估计为了降低工作量，没有进行分词，程序假定每个字就是一个词，多字词的关系会被丢失，但这在后面“自动写诗”的环节会比较容易处理，否则可能造成每句诗中因为词语的存在而字数不同。另外一点就是没有把同义词在向量空间中拉近相关的距离，这里也是为了简化操作。也可以说还存在改进的空间。</li>
+  <li>genTrainData()以64首诗为一个批次，生成了训练数据集x_batches/y_batches，因为总体算诗词的数据集比较小。这里没有动态逐批次生成，而是一次生成到两个数组中去。在训练结束生成古诗的时候，这部分实际是没有用的，但训练跟生成集成在同一个程序中，就忽略这点工作了。需要注意的是，生成古诗的时候，批次会设定为1，因为是通过一个汉字预测下一个汉字。</li>
+  <li>neural_network()函数中定义了RNN/LSTM网络，实际上这个主函数考虑了使用RNN / LSTM / GRU三种网络的构建选择，可以任意选择其一。在这里使用了python函数可以跟变量一样赋值并调用的特性，读源码的时候可以注意一下。<br />
+与上一个例子还有一点不同，就是这里使用了两层的RNN网络，回忆一下多层神经网络，理解这个概念应当不难。这项工作是由tf.nn.rnn_cell.MultiRNNCell函数完成的。<br />
+tf.get_variable()函数也是定义TensorFlow变量，我们之前一直使用tf.Variable()，两者功能类似，前者更适合在作用域的管理下共享变量。<br />
+接着要介绍的是个重点：tf.nn.dynamic_rnn，我们前面说过，因为是时序输入的计算模式，所以输入数据可以是不等长的，这是RNN网络的特征之一。我们之前所有的案例，每个训练批次的数据必须是定长，上一个RNN案例中也使用了rnn.static_rnn，这表示使用定长的数据集。<br />
+后面的激活函数再次是我们熟悉的softmax，这次等于是把上面数字化之后的唐诗中的汉字做成一个库，分类到其中之一，即为推测出的下一个字。<br />
+总结一下模型部分：唐诗数字化的时候，完整的保留了每首诗开头文字、结尾文字、每句的结尾文字之间的关系。所建立的RNN模型，实际上会以上一个文字，预测下一个文字，甚至标点符号都是预测而得到的。</li>
+  <li>随后的训练部分train_neural_network()没有太多新概念，要注意的是每次调用模型的训练，会保留其last_state，并在下个批次训练的时候，迭代进去。这是我们前面讲RNN模型的时候说过的。而这种模式，是在之前的各种模型中没有出现过的。</li>
+  <li>gen_poetry()自动生成诗句是一个很完整的预测，初始的值会是一个字符”[“，表示一个诗的开始，我们样本中，每首诗的开始都是人为增加的“[”字符。RNN模型肯定不会对这么高频的规律搞错。这种模式生成的古诗虽然远远比不上人的作品，但可读性还是比较好的。</li>
+  <li>藏头诗部分gen_poetry_with_head()，这部分生成的会比较牵强。原因是，人为指定的藏头诗第一个字，不可能刚好吻合唐诗数据库中每句第一个字的规律，因此直接预测出来，很可能没有完成一句话，就已经是句号或者逗号。<br />
+程序只能根据预置的句长（这里指定七言）,跳过逗号、句号以及结束符号“]”，跳过之后再次重新生成，其实已经不符合一句话中的规律，但为了达到藏头诗的效果，也只能如此。</li>
+  <li>训练模型使用的批次是64。生成时候所使用的预测模型批次是1，因为使用一个汉字去预测后一个。这个在main()中会自动调整。</li>
+</ul>
+
+<p>其余的部分相信凭借注释和以前的经验应当能看懂了：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python
+# -*- coding=UTF-8 -*-
+</span>
+<span class="c1"># source from: 
+#  http://blog.topspeedsnail.com/archives/10542
+# poetry.txt from:
+#  https://pan.baidu.com/s/1o7QlUhO
+# revised: andrew
+#  https://formoon.github.io
+#  add python 2.x support and tf 1.4.1 support
+#------------------------------------------------------------------#
+</span>
+<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">codecs</span>
+<span class="kn">import</span> <span class="nn">os</span><span class="p">,</span><span class="n">time</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="nb">reload</span><span class="p">(</span><span class="n">sys</span><span class="p">)</span>
+<span class="n">sys</span><span class="p">.</span><span class="n">setdefaultencoding</span><span class="p">(</span><span class="s">'utf-8'</span><span class="p">)</span>
+
+<span class="c1">#-------------------------------数据预处理---------------------------#
+</span>
+<span class="n">poetry_file</span> <span class="o">=</span><span class="s">'poetry.txt'</span>
+
+<span class="c1"># 诗集
+</span><span class="n">poetrys</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">def</span> <span class="nf">readPoetry</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">poetrys</span>
+    <span class="c1">#with open(poetry_file, "r", encoding='utf-8',) as f:
+</span>    <span class="k">with</span> <span class="n">codecs</span><span class="p">.</span><span class="nb">open</span><span class="p">(</span><span class="n">poetry_file</span><span class="p">,</span> <span class="s">"r"</span><span class="p">,</span><span class="s">"utf-8"</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">content</span> <span class="o">=</span> <span class="n">line</span><span class="p">.</span><span class="n">strip</span><span class="p">().</span><span class="n">split</span><span class="p">(</span><span class="s">':'</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span>
+                <span class="c1">#title, content = line.strip().split(':')
+</span>                <span class="n">content</span> <span class="o">=</span> <span class="n">content</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">' '</span><span class="p">,</span><span class="s">''</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s">'_'</span> <span class="ow">in</span> <span class="n">content</span> <span class="ow">or</span> <span class="s">'('</span> <span class="ow">in</span> <span class="n">content</span> <span class="ow">or</span> <span class="s">'（'</span> <span class="ow">in</span> <span class="n">content</span> <span class="ow">or</span> <span class="s">'《'</span> <span class="ow">in</span> <span class="n">content</span> <span class="ow">or</span> <span class="s">'['</span> <span class="ow">in</span> <span class="n">content</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">5</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">content</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">79</span><span class="p">:</span>
+                	<span class="k">continue</span>
+                <span class="n">content</span> <span class="o">=</span> <span class="s">'['</span> <span class="o">+</span> <span class="n">content</span> <span class="o">+</span> <span class="s">']'</span>
+                <span class="n">poetrys</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
+            <span class="k">except</span> <span class="nb">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">pass</span>
+    <span class="c1"># 按诗的字数排序
+</span>    <span class="n">poetrys</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">poetrys</span><span class="p">,</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">line</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="p">))</span>
+
+<span class="c1">#for item in poetrys:
+#    print(item)
+</span>
+<span class="c1"># 统计每个字出现次数
+</span><span class="n">readPoetry</span><span class="p">()</span>
+<span class="n">all_words</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">poetry</span> <span class="ow">in</span> <span class="n">poetrys</span><span class="p">:</span>
+	<span class="n">all_words</span> <span class="o">+=</span> <span class="p">[</span><span class="n">word</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">poetry</span><span class="p">]</span>
+<span class="c1">#    print poetry
+#    for word in poetry:
+#        print(word)
+#        all_words += word
+</span><span class="n">counter</span> <span class="o">=</span> <span class="n">collections</span><span class="p">.</span><span class="n">Counter</span><span class="p">(</span><span class="n">all_words</span><span class="p">)</span>
+<span class="n">count_pairs</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">counter</span><span class="p">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="n">words</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">count_pairs</span><span class="p">)</span>
+<span class="c1">#print words
+</span>
+<span class="c1"># 取前多少个常用字
+</span><span class="n">words</span> <span class="o">=</span> <span class="n">words</span><span class="p">[:</span><span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)]</span> <span class="o">+</span> <span class="p">(</span><span class="s">' '</span><span class="p">,)</span>
+<span class="c1"># 每个字映射为一个数字ID
+</span><span class="n">word_num_map</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">words</span><span class="p">,</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">))))</span>
+<span class="c1">#print(word_num_map)
+# 把诗转换为向量形式，参考word2vec
+</span><span class="n">to_num</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">word</span><span class="p">:</span> <span class="n">word_num_map</span><span class="p">.</span><span class="n">get</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">))</span>
+<span class="n">poetrys_vector</span> <span class="o">=</span> <span class="p">[</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">to_num</span><span class="p">,</span> <span class="n">poetry</span><span class="p">))</span> <span class="k">for</span> <span class="n">poetry</span> <span class="ow">in</span> <span class="n">poetrys</span><span class="p">]</span>
+<span class="c1">#[[314, 3199, 367, 1556, 26, 179, 680, 0, 3199, 41, 506, 40, 151, 4, 98, 1],
+#[339, 3, 133, 31, 302, 653, 512, 0, 37, 148, 294, 25, 54, 833, 3, 1, 965, 1315, 377, 1700, 562, 21, 37, 0, 2, 1253, 21, 36, 264, 877, 809, 1]
+#....]
+</span>
+<span class="c1"># 每次取64首诗进行训练
+</span><span class="n">batch_size</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="n">n_chunk</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">poetrys_vector</span><span class="p">)</span> <span class="o">//</span> <span class="n">batch_size</span>
+<span class="n">x_batches</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">y_batches</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">def</span> <span class="nf">genTrainData</span><span class="p">(</span><span class="n">b</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">batch_size</span><span class="p">,</span><span class="n">n_chunk</span><span class="p">,</span><span class="n">x_batches</span><span class="p">,</span><span class="n">y_batches</span><span class="p">,</span><span class="n">poetrys_vector</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="n">b</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_chunk</span><span class="p">):</span>
+    	<span class="n">start_index</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">batch_size</span>
+    	<span class="n">end_index</span> <span class="o">=</span> <span class="n">start_index</span> <span class="o">+</span> <span class="n">batch_size</span>
+
+    	<span class="n">batches</span> <span class="o">=</span> <span class="n">poetrys_vector</span><span class="p">[</span><span class="n">start_index</span><span class="p">:</span><span class="n">end_index</span><span class="p">]</span>
+    	<span class="n">length</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">len</span><span class="p">,</span><span class="n">batches</span><span class="p">))</span>
+    	<span class="n">xdata</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">full</span><span class="p">((</span><span class="n">batch_size</span><span class="p">,</span><span class="n">length</span><span class="p">),</span> <span class="n">word_num_map</span><span class="p">[</span><span class="s">' '</span><span class="p">],</span> <span class="n">np</span><span class="p">.</span><span class="n">int32</span><span class="p">)</span>
+    	<span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">):</span>
+    		<span class="n">xdata</span><span class="p">[</span><span class="n">row</span><span class="p">,:</span><span class="nb">len</span><span class="p">(</span><span class="n">batches</span><span class="p">[</span><span class="n">row</span><span class="p">])]</span> <span class="o">=</span> <span class="n">batches</span><span class="p">[</span><span class="n">row</span><span class="p">]</span>
+    	<span class="n">ydata</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">copy</span><span class="p">(</span><span class="n">xdata</span><span class="p">)</span>
+    	<span class="n">ydata</span><span class="p">[:,:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">xdata</span><span class="p">[:,</span><span class="mi">1</span><span class="p">:]</span>
+    	<span class="s">"""
+    	xdata ydata
+    	[6,2,4,6,9] [2,4,6,9,9]
+    	[1,4,2,8,5] [4,2,8,5,5]
+    	"""</span>
+    	<span class="n">x_batches</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">xdata</span><span class="p">)</span>
+    	<span class="n">y_batches</span><span class="p">.</span><span class="n">append</span><span class="p">(</span><span class="n">ydata</span><span class="p">)</span>
+
+
+<span class="c1">#---------------------------------------RNN--------------------------------------#
+</span>
+<span class="c1"># 定义RNN
+</span><span class="k">def</span> <span class="nf">neural_network</span><span class="p">(</span><span class="n">input_data</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s">'lstm'</span><span class="p">,</span> <span class="n">rnn_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">num_layers</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+	<span class="k">if</span> <span class="n">model</span> <span class="o">==</span> <span class="s">'rnn'</span><span class="p">:</span>
+		<span class="n">cell_fun</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">rnn_cell</span><span class="p">.</span><span class="n">BasicRNNCell</span>
+	<span class="k">elif</span> <span class="n">model</span> <span class="o">==</span> <span class="s">'gru'</span><span class="p">:</span>
+		<span class="n">cell_fun</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">rnn_cell</span><span class="p">.</span><span class="n">GRUCell</span>
+	<span class="k">elif</span> <span class="n">model</span> <span class="o">==</span> <span class="s">'lstm'</span><span class="p">:</span>
+		<span class="n">cell_fun</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">rnn_cell</span><span class="p">.</span><span class="n">BasicLSTMCell</span>
+
+	<span class="n">cell</span> <span class="o">=</span> <span class="n">cell_fun</span><span class="p">(</span><span class="n">rnn_size</span><span class="p">,</span> <span class="n">state_is_tuple</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+	<span class="n">cell</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">rnn_cell</span><span class="p">.</span><span class="n">MultiRNNCell</span><span class="p">([</span><span class="n">cell</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_layers</span><span class="p">,</span> <span class="n">state_is_tuple</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+	<span class="n">initial_state</span> <span class="o">=</span> <span class="n">cell</span><span class="p">.</span><span class="n">zero_state</span><span class="p">(</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">)</span>
+
+	<span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">variable_scope</span><span class="p">(</span><span class="s">'rnnlm'</span><span class="p">):</span>
+		<span class="n">softmax_w</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s">"softmax_w"</span><span class="p">,</span> <span class="p">[</span><span class="n">rnn_size</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+		<span class="n">softmax_b</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s">"softmax_b"</span><span class="p">,</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">])</span>
+		<span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">device</span><span class="p">(</span><span class="s">"/cpu:0"</span><span class="p">):</span>
+			<span class="n">embedding</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">get_variable</span><span class="p">(</span><span class="s">"embedding"</span><span class="p">,</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">rnn_size</span><span class="p">])</span>
+			<span class="n">inputs</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">embedding_lookup</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="n">input_data</span><span class="p">)</span>
+
+	<span class="n">outputs</span><span class="p">,</span> <span class="n">last_state</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">dynamic_rnn</span><span class="p">(</span><span class="n">cell</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">initial_state</span><span class="o">=</span><span class="n">initial_state</span><span class="p">,</span> <span class="n">scope</span><span class="o">=</span><span class="s">'rnnlm'</span><span class="p">)</span>
+	<span class="n">output</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">outputs</span><span class="p">,[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">rnn_size</span><span class="p">])</span>
+
+	<span class="n">logits</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">matmul</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">softmax_w</span><span class="p">)</span> <span class="o">+</span> <span class="n">softmax_b</span>
+	<span class="n">probs</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">nn</span><span class="p">.</span><span class="n">softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
+	<span class="k">return</span> <span class="n">logits</span><span class="p">,</span> <span class="n">last_state</span><span class="p">,</span> <span class="n">probs</span><span class="p">,</span> <span class="n">cell</span><span class="p">,</span> <span class="n">initial_state</span>
+<span class="c1">#训练
+</span><span class="k">def</span> <span class="nf">train_neural_network</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">datafile</span>
+    <span class="n">input_data</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">,</span> <span class="p">[</span><span class="mi">64</span><span class="p">,</span> <span class="bp">None</span><span class="p">])</span>
+    <span class="n">output_targets</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">,</span> <span class="p">[</span><span class="mi">64</span><span class="p">,</span> <span class="bp">None</span><span class="p">])</span>
+    
+    <span class="n">logits</span><span class="p">,</span> <span class="n">last_state</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">neural_network</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
+    <span class="n">targets</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">output_targets</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+    <span class="c1">#loss = tf.nn.seq2seq.sequence_loss_by_example([logits], [targets], [tf.ones_like(targets, dtype=tf.float32)], len(words))
+</span>    <span class="n">loss</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">contrib</span><span class="p">.</span><span class="n">legacy_seq2seq</span><span class="p">.</span><span class="n">sequence_loss_by_example</span><span class="p">([</span><span class="n">logits</span><span class="p">],</span> <span class="p">[</span><span class="n">targets</span><span class="p">],</span> <span class="p">[</span><span class="n">tf</span><span class="p">.</span><span class="n">ones_like</span><span class="p">(</span><span class="n">targets</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">)],</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">))</span>
+    <span class="n">cost</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">reduce_mean</span><span class="p">(</span><span class="n">loss</span><span class="p">)</span>
+    <span class="n">learning_rate</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">Variable</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">trainable</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+    <span class="n">tvars</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">trainable_variables</span><span class="p">()</span>
+    <span class="n">grads</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">clip_by_global_norm</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">gradients</span><span class="p">(</span><span class="n">cost</span><span class="p">,</span> <span class="n">tvars</span><span class="p">),</span> <span class="mi">5</span><span class="p">)</span>
+    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">AdamOptimizer</span><span class="p">(</span><span class="n">learning_rate</span><span class="p">)</span>
+    <span class="n">train_op</span> <span class="o">=</span> <span class="n">optimizer</span><span class="p">.</span><span class="n">apply_gradients</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">grads</span><span class="p">,</span> <span class="n">tvars</span><span class="p">))</span>
+
+    <span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+        <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+
+        <span class="c1">#saver = tf.train.Saver(tf.all_variables())
+</span>        <span class="n">saver</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">Saver</span><span class="p">()</span>
+
+        <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">50</span><span class="p">):</span>
+            <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">assign</span><span class="p">(</span><span class="n">learning_rate</span><span class="p">,</span> <span class="mf">0.002</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.97</span> <span class="o">**</span> <span class="n">epoch</span><span class="p">)))</span>
+            <span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="k">for</span> <span class="n">batche</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_chunk</span><span class="p">):</span>
+                <span class="n">train_loss</span><span class="p">,</span> <span class="n">_</span> <span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">([</span><span class="n">cost</span><span class="p">,</span> <span class="n">last_state</span><span class="p">,</span> <span class="n">train_op</span><span class="p">],</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">input_data</span><span class="p">:</span> <span class="n">x_batches</span><span class="p">[</span><span class="n">n</span><span class="p">],</span> <span class="n">output_targets</span><span class="p">:</span> <span class="n">y_batches</span><span class="p">[</span><span class="n">n</span><span class="p">]})</span>
+                <span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="k">print</span><span class="p">(</span><span class="n">epoch</span><span class="p">,</span> <span class="n">batche</span><span class="p">,</span> <span class="n">train_loss</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">epoch</span> <span class="o">%</span> <span class="mi">7</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1">#保存的数据，文件名中有批次的标志
+</span>                <span class="n">saver</span><span class="p">.</span><span class="n">save</span><span class="p">(</span><span class="n">sess</span><span class="p">,</span> <span class="n">datafile</span><span class="p">,</span> <span class="n">global_step</span><span class="o">=</span><span class="n">epoch</span><span class="p">)</span>
+
+<span class="c1">#-------------------------------生成古诗---------------------------------#
+# 使用训练完成的模型
+</span> 
+<span class="k">def</span> <span class="nf">gen_poetry</span><span class="p">():</span>
+    <span class="k">global</span> <span class="n">datafile</span>
+    <span class="n">input_data</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="bp">None</span><span class="p">])</span>
+    <span class="n">output_targets</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="bp">None</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">to_word</span><span class="p">(</span><span class="n">weights</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">s</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">words</span><span class="p">[</span><span class="n">sample</span><span class="p">]</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">last_state</span><span class="p">,</span> <span class="n">probs</span><span class="p">,</span> <span class="n">cell</span><span class="p">,</span> <span class="n">initial_state</span> <span class="o">=</span> <span class="n">neural_network</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+        <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+
+        <span class="n">saver</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">Saver</span><span class="p">()</span>
+        <span class="c1">#读取最后一个批次的训练数据
+</span>        <span class="n">saver</span><span class="p">.</span><span class="n">restore</span><span class="p">(</span><span class="n">sess</span><span class="p">,</span> <span class="n">datafile</span><span class="o">+</span><span class="s">"-49"</span><span class="p">)</span>
+
+        <span class="n">state_</span> <span class="o">=</span> <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">cell</span><span class="p">.</span><span class="n">zero_state</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">))</span>
+
+        <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">word_num_map</span><span class="p">.</span><span class="n">get</span><span class="p">,</span> <span class="s">'['</span><span class="p">))])</span>
+        <span class="p">[</span><span class="n">probs_</span><span class="p">,</span> <span class="n">state_</span><span class="p">]</span> <span class="o">=</span> <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">([</span><span class="n">probs</span><span class="p">,</span> <span class="n">last_state</span><span class="p">],</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">input_data</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">:</span> <span class="n">state_</span><span class="p">})</span>
+        <span class="n">word</span> <span class="o">=</span> <span class="n">to_word</span><span class="p">(</span><span class="n">probs_</span><span class="p">)</span>
+        <span class="c1">#word = words[np.argmax(probs_)]
+</span>        <span class="n">poem</span> <span class="o">=</span> <span class="s">''</span>
+        <span class="k">while</span> <span class="n">word</span> <span class="o">!=</span> <span class="s">']'</span><span class="p">:</span>
+            <span class="n">poem</span> <span class="o">+=</span> <span class="n">word</span>
+            <span class="k">if</span> <span class="n">word</span> <span class="o">==</span> <span class="s">'，'</span> <span class="ow">or</span> <span class="n">word</span><span class="o">==</span><span class="s">'。'</span><span class="p">:</span>
+                <span class="n">poem</span> <span class="o">+=</span> <span class="s">'</span><span class="se">\n</span><span class="s">'</span>
+            <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="n">word_num_map</span><span class="p">[</span><span class="n">word</span><span class="p">]</span>
+            <span class="p">[</span><span class="n">probs_</span><span class="p">,</span> <span class="n">state_</span><span class="p">]</span> <span class="o">=</span> <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">([</span><span class="n">probs</span><span class="p">,</span> <span class="n">last_state</span><span class="p">],</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">input_data</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">:</span> <span class="n">state_</span><span class="p">})</span>
+            <span class="n">word</span> <span class="o">=</span> <span class="n">to_word</span><span class="p">(</span><span class="n">probs_</span><span class="p">)</span>
+            <span class="c1">#word = words[np.argmax(probs_)]
+</span>        <span class="k">return</span> <span class="n">poem</span>
+ 
+
+<span class="c1">#-------------------------------生成藏头诗---------------------------------#
+</span><span class="k">def</span> <span class="nf">gen_poetry_with_head</span><span class="p">(</span><span class="n">head</span><span class="p">,</span><span class="n">phase</span><span class="p">):</span>
+    <span class="k">global</span> <span class="n">datafile</span>
+    <span class="n">input_data</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="bp">None</span><span class="p">])</span>
+    <span class="n">output_targets</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">placeholder</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">int32</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="bp">None</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">to_word</span><span class="p">(</span><span class="n">weights</span><span class="p">):</span>
+        <span class="n">t</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">cumsum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+        <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nb">sum</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="n">searchsorted</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">np</span><span class="p">.</span><span class="n">random</span><span class="p">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="n">s</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">words</span><span class="p">[</span><span class="n">sample</span><span class="p">]</span>
+
+    <span class="n">_</span><span class="p">,</span> <span class="n">last_state</span><span class="p">,</span> <span class="n">probs</span><span class="p">,</span> <span class="n">cell</span><span class="p">,</span> <span class="n">initial_state</span> <span class="o">=</span> <span class="n">neural_network</span><span class="p">(</span><span class="n">input_data</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">tf</span><span class="p">.</span><span class="n">Session</span><span class="p">()</span> <span class="k">as</span> <span class="n">sess</span><span class="p">:</span>
+<span class="c1">#        sess.run(tf.initialize_all_variables())
+</span>        <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">global_variables_initializer</span><span class="p">())</span>
+
+        <span class="n">saver</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">train</span><span class="p">.</span><span class="n">Saver</span><span class="p">()</span>
+        <span class="n">saver</span><span class="p">.</span><span class="n">restore</span><span class="p">(</span><span class="n">sess</span><span class="p">,</span> <span class="n">datafile</span><span class="o">+</span><span class="s">"-49"</span><span class="p">)</span>
+
+        <span class="n">state_</span> <span class="o">=</span> <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">cell</span><span class="p">.</span><span class="n">zero_state</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">tf</span><span class="p">.</span><span class="n">float32</span><span class="p">))</span>
+        <span class="n">poem</span> <span class="o">=</span> <span class="s">''</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">head</span><span class="o">=</span><span class="nb">unicode</span><span class="p">(</span><span class="n">head</span><span class="p">,</span><span class="s">"utf-8"</span><span class="p">);</span>
+        <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">head</span><span class="p">:</span>
+            <span class="k">while</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">word</span> <span class="o">!=</span> <span class="s">'，'</span> <span class="ow">and</span> <span class="n">word</span> <span class="o">!=</span> <span class="s">'。'</span> <span class="ow">and</span> <span class="n">word</span> <span class="o">!=</span> <span class="s">']'</span><span class="p">:</span>
+                    <span class="n">poem</span> <span class="o">+=</span> <span class="n">word</span>
+                    <span class="n">p</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">p</span> <span class="o">==</span> <span class="n">phase</span><span class="p">:</span>
+                        <span class="n">p</span> <span class="o">=</span> <span class="mi">0</span>
+                        <span class="k">break</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">word</span><span class="o">=</span><span class="s">'['</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">array</span><span class="p">([</span><span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="n">word_num_map</span><span class="p">.</span><span class="n">get</span><span class="p">,</span> <span class="n">word</span><span class="p">))])</span>
+                <span class="p">[</span><span class="n">probs_</span><span class="p">,</span> <span class="n">state_</span><span class="p">]</span> <span class="o">=</span> <span class="n">sess</span><span class="p">.</span><span class="n">run</span><span class="p">([</span><span class="n">probs</span><span class="p">,</span> <span class="n">last_state</span><span class="p">],</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span><span class="n">input_data</span><span class="p">:</span> <span class="n">x</span><span class="p">,</span> <span class="n">initial_state</span><span class="p">:</span> <span class="n">state_</span><span class="p">})</span>
+                <span class="n">word</span> <span class="o">=</span> <span class="n">to_word</span><span class="p">(</span><span class="n">probs_</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">2</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">poem</span> <span class="o">+=</span> <span class="s">'，</span><span class="se">\n</span><span class="s">'</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">poem</span> <span class="o">+=</span> <span class="s">'。</span><span class="se">\n</span><span class="s">'</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">poem</span>
+
+<span class="n">FLAGS</span> <span class="o">=</span> <span class="bp">None</span> 
+<span class="n">datafile</span><span class="o">=</span><span class="s">'./data/module-49'</span>
+<span class="k">def</span> <span class="nf">datafile_exist</span><span class="p">():</span>
+    <span class="k">return</span> <span class="n">os</span><span class="p">.</span><span class="n">path</span><span class="p">.</span><span class="n">exists</span><span class="p">(</span><span class="n">datafile</span><span class="o">+</span><span class="s">"-49.index"</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">_</span><span class="p">):</span>
+<span class="c1">#    if FLAGS.train or (not datafile_exist()):
+</span>    <span class="k">if</span> <span class="n">FLAGS</span><span class="p">.</span><span class="n">train</span><span class="p">:</span>
+        <span class="n">genTrainData</span><span class="p">(</span><span class="mi">64</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">"poems: "</span><span class="p">,</span><span class="nb">len</span><span class="p">(</span><span class="n">poetrys</span><span class="p">))</span>
+        <span class="n">train_neural_network</span><span class="p">()</span>
+        <span class="nb">exit</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">datafile_exist</span><span class="p">():</span>
+        <span class="n">genTrainData</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">FLAGS</span><span class="p">.</span><span class="n">generate</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">gen_poetry</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="n">gen_poetry_with_head</span><span class="p">(</span><span class="n">FLAGS</span><span class="p">.</span><span class="n">head</span><span class="p">,</span><span class="mi">7</span><span class="p">))</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="p">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="p">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'-a'</span><span class="p">,</span><span class="s">'--head'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">'大寒将至'</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s">'poetry with appointed head char'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="p">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'-t'</span><span class="p">,</span><span class="s">'--train'</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">'store_true'</span><span class="p">,</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s">'Force do train'</span><span class="p">)</span>
+    <span class="n">parser</span><span class="p">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'-g'</span><span class="p">,</span><span class="s">'--generate'</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="s">'store_true'</span><span class="p">,</span><span class="n">default</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                      <span class="n">help</span><span class="o">=</span><span class="s">'Force do train'</span><span class="p">)</span>
+    <span class="n">FLAGS</span><span class="p">,</span> <span class="n">unparsed</span> <span class="o">=</span> <span class="n">parser</span><span class="p">.</span><span class="n">parse_known_args</span><span class="p">()</span>
+    <span class="n">tf</span><span class="p">.</span><span class="n">app</span><span class="p">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="o">=</span><span class="n">main</span><span class="p">,</span> <span class="n">argv</span><span class="o">=</span><span class="p">[</span><span class="n">sys</span><span class="p">.</span><span class="n">argv</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+</span> <span class="n">unparsed</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>使用方法：<br />
+-a参数是指定藏头诗开始的字;<br />
+-g参数直接自动生成;<br />
+-t强制开始训练。（注意训练的时间还是比较长的）</p>
+
+<p>生成的效果请看：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> ./poetry.py <span class="nt">-g</span>
+沉眉默去迎风雪，
+江上才风著故人。
+手把柯子不看泪，
+笑逢太守也怜君。
+秋风不定红钿啭，
+茶雪欹眠愁断人。
+语苦微成求不死，
+醉看花发渐盈衣。
+
+<span class="c">#藏头诗</span>
+<span class="o">&gt;</span> ./poetry.py <span class="nt">-a</span> <span class="s2">"春节快乐"</span>
+春奔桃芳水路犹，
+节似鸟飞酒绿出。
+快龟缕日发春时，
+乐见来还日只相。
+
+</code></pre></div></div>
+<p>至少有了个古诗的样子了。</p>
+
+<p>(待续…)</p>
+
+<h4 id="引文及参考">引文及参考</h4>
+<p><a href="http://blog.topspeedsnail.com/archives/10443">TensorFlow练习3: RNN, Recurrent Neural Networks</a><br />
+<a href="http://blog.topspeedsnail.com/archives/10542">TensorFlow练习7: 基于RNN生成古诗词</a><br />
+<a href="https://zhuanlan.zhihu.com/p/26646665">如何用TensorFlow构建RNN？这里有一份极简的教程</a><br />
+<a href="http://blog.csdn.net/jerr__y/article/details/58598296">（译）理解 LSTM 网络 （Understanding LSTM Networks by colah）</a></p>
+
+:ET

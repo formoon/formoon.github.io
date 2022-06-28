@@ -2,12 +2,12 @@
 layout:         page
 title:          MySQL数据库文件的移动
 subtitle:       数据库文件移动和权限设置
-card-image:		https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1440923339,67641147&fm=26&gp=0.jpg
+card-image:		/attachments/201908/mysql.webp
 date:           2019-08-12
 tags:           linux mysql
 post-card-type: image
 ---
-![](https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=1440923339,67641147&fm=26&gp=0.jpg)  
+![](/attachments/201908/mysql.webp)  
 新型数据库层出不穷，MySQL一幅日薄西山的样子。其实还有很多人或者偏爱、或者使用以前遗留的系统，仍然生活在MySQL的世界。  
 我也是有很久不用了，这个很久超过十年。  
 不过前几天有个朋友让我帮忙为他们升级服务器，才发现，老革命居然碰到个新问题。  

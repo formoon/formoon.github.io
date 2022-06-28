@@ -1,0 +1,18 @@
+I"�<p><img src="/attachments/201801/iphone.jpg" alt="" />（图文无关）</p>
+
+<p>本博使用了从网上分享的模板，一直还是很满意的。为了增加功能，中间经过了几次小的修补，这不，这就又来了一次。<br />
+起因是在微信上给朋友分享了一篇博文，自己看的时候，博文挺好，模板页面一看就专门考虑了小尺寸屏幕的适配，基本是尽力保持了看上去优雅的设计。<br />
+但是到了首页就碰到了麻烦，因为屏幕尺寸，所以每一行只能显示一个博文块，向上拖动滚屏的时候，总是卡，也就是手指在页面上拖动操作，页面并没有产生相应的滚动。<br />
+随后进行了较多的实验，找到规律，就是如果拖动博文块边缘页面的部分，是没有问题的。每个博文块第一次点击上的时候，都不能被拖动，第二次则就可以了。随之而来，再移动到另外一个博文块的时候，现象重复出现。<br />
+查看页面的源码，很容易就感觉是博文块鼠标”hover”时候的特效有问题。因为在手机浏览器上，不会有鼠标悬停的操作。在网上搜索，中英文页面都没有搜索到类似现象，大多是用touchdown之类的触摸屏操作来模拟鼠标的方式，并不适合本博的情况。无果的情况下，决定实验试一试。<br />
+在scripts.html页面中增加了几行代码：</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kd">var</span> <span class="nx">u</span> <span class="o">=</span> <span class="nb">navigator</span><span class="p">.</span><span class="nx">userAgent</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="nx">u</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="dl">'</span><span class="s1">Android</span><span class="dl">'</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span> <span class="o">||</span> <span class="nx">u</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="dl">'</span><span class="s1">iPhone</span><span class="dl">'</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span> <span class="o">||</span> <span class="nx">u</span><span class="p">.</span><span class="nx">indexOf</span><span class="p">(</span><span class="dl">'</span><span class="s1">iPad</span><span class="dl">'</span><span class="p">)</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">1</span><span class="p">){</span>
+	<span class="nx">$</span><span class="p">(</span><span class="dl">"</span><span class="s2">a</span><span class="dl">"</span><span class="p">).</span><span class="nx">addClass</span><span class="p">(</span><span class="dl">"</span><span class="s2">hover</span><span class="dl">"</span><span class="p">);</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>脚本的意思是检查当前浏览器，如果是手机浏览器，则强制给所有html a标签链接增加’hover’属性。<br />
+起jekyll服务器测试，居然解决了，看来症结就是在此。<br />
+留文记录一下。</p>
+
+:ET

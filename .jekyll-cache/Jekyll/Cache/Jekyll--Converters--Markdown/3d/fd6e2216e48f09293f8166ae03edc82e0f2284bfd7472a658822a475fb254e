@@ -1,0 +1,6 @@
+I"�<p><img src="/attachments/201906/android_jni/android_java_c.jpeg" alt="" /></p>
+<h4 id="前言">前言</h4>
+<p>都知道的，Android基于Linux系统，然后覆盖了一层由Java虚拟机为核心的壳系统。跟一般常见的Linux+Java系统不同的，是其中有对硬件驱动进行支持，以避开GPL开源协议限制的HAL硬件抽象层。  <br />
+大多数时候，我们使用JVM语言进行编程，比如传统的Java或者新贵Kotlin。碰到对速度比较敏感的项目，比如游戏，比如视频播放。我们就会用到Android的JNI技术，使用NDK的支持，利用C++开发高计算量的模块，供给上层的Java程序调用。<br />
+本文先从一个最简单的JNI例子来开始介绍Android中Java和C++的混合编程，随后再介绍Android直接调用ELF命令行程序的规范方法，以及调用混合了第三方库略微复杂的命令行程序。</p>
+:ET

@@ -1,0 +1,115 @@
+I"i/<p><img src="/attachments/201909/curl.webp" alt="" /><br />
+大多数人都厌烦使用老旧的系统，无论软件还是硬件。但有的时候又不得不困守其中，坚持延续着系统的寿命，或者还需要点几柱香，祈求神佛的护佑。<br />
+Linux是一个模块化极好的操作系统，得益于此，当其中有组件落伍之时，大多数情况下，还能通过下载源码，手工编译来升级组件，从而保证系统的可用性。<br />
+在这个过程中，cURL工具是必不可少的，特别很多常用的开发平台，都使用了libcurl库作为下载的基础工具。比如PHP/PYTHON/RUST/NPM等。当cURL出现故障的时候，直接就导致很多开发工具的升级或者安装依赖包无法继续。</p>
+
+<p>今天碰到一个故障，一台有些年头的服务器在升级一个安全组件的时候报了一个错误：</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cURL error 35: error:14077410:SSL routines:SSL23_GET_SERVER_HELLO:sslv3 alert handshake failure
+</code></pre></div></div>
+<p>字面意思上看，是ssl3在握手的时候出现了错误。<br />
+但实际上，如果换用一台正常的设备访问同样的网站，再加上-v参数，能看到网站实际是用了TLS的加密方式：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl <span class="nt">-v</span> https://sh.rustup.rs
+<span class="k">*</span> Rebuilt URL to: https://sh.rustup.rs/
+<span class="k">*</span>   Trying 13.225.103.123...
+<span class="k">*</span> TCP_NODELAY <span class="nb">set</span>
+<span class="k">*</span> Connected to sh.rustup.rs <span class="o">(</span>13.225.103.123<span class="o">)</span> port 443 <span class="o">(</span><span class="c">#0)</span>
+<span class="k">*</span> ALPN, offering h2
+<span class="k">*</span> ALPN, offering http/1.1
+<span class="k">*</span> Cipher selection: ALL:!EXPORT:!EXPORT40:!EXPORT56:!aNULL:!LOW:!RC4:@STRENGTH
+<span class="k">*</span> successfully <span class="nb">set </span>certificate verify locations:
+<span class="k">*</span>   CAfile: /etc/ssl/cert.pem
+  CApath: none
+<span class="k">*</span> TLSv1.2 <span class="o">(</span>OUT<span class="o">)</span>, TLS handshake, Client hello <span class="o">(</span>1<span class="o">)</span>:
+<span class="k">*</span> TLSv1.2 <span class="o">(</span>IN<span class="o">)</span>, TLS handshake, Server hello <span class="o">(</span>2<span class="o">)</span>:
+<span class="k">*</span> TLSv1.2 <span class="o">(</span>IN<span class="o">)</span>, TLS handshake, Certificate <span class="o">(</span>11<span class="o">)</span>:
+<span class="k">*</span> TLSv1.2 <span class="o">(</span>IN<span class="o">)</span>, TLS handshake, Server key exchange <span class="o">(</span>12<span class="o">)</span>:
+<span class="k">*</span> TLSv1.2 <span class="o">(</span>IN<span class="o">)</span>, TLS handshake, Server finished <span class="o">(</span>14<span class="o">)</span>:
+<span class="k">*</span> TLSv1.2 <span class="o">(</span>OUT<span class="o">)</span>, TLS handshake, Client key exchange <span class="o">(</span>16<span class="o">)</span>:
+<span class="k">*</span> TLSv1.2 <span class="o">(</span>OUT<span class="o">)</span>, TLS change cipher, Client hello <span class="o">(</span>1<span class="o">)</span>:
+<span class="k">*</span> TLSv1.2 <span class="o">(</span>OUT<span class="o">)</span>, TLS handshake, Finished <span class="o">(</span>20<span class="o">)</span>:
+<span class="k">*</span> TLSv1.2 <span class="o">(</span>IN<span class="o">)</span>, TLS change cipher, Client hello <span class="o">(</span>1<span class="o">)</span>:
+<span class="k">*</span> TLSv1.2 <span class="o">(</span>IN<span class="o">)</span>, TLS handshake, Finished <span class="o">(</span>20<span class="o">)</span>:
+<span class="k">*</span> SSL connection using TLSv1.2 / ECDHE-RSA-AES128-GCM-SHA256
+    ...<span class="o">(</span>略<span class="o">)</span>
+</code></pre></div></div>
+<p>cURL在https的处理方面，主要依赖openssl的处理，所以实际上单纯重新编译cURL是不起作用的，必须把openssl也下载新版本重新编译。</p>
+
+<p>首先在目标服务器上卸载掉原有的curl和openssl，并且安装基本的编译系统:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>apt-get purge curl libcurl3 libcurl3-gnutls libcurl4-openssl-dev openssl libssl-dev
+<span class="nv">$ </span><span class="nb">sudo </span>apt-get autoremove <span class="nt">-y</span>
+
+<span class="nv">$ </span><span class="nb">sudo </span>apt-get <span class="nb">install </span>build-essential libtool make
+</code></pre></div></div>
+<p>libtool make 正常情况下其实已经包含在build-essential，但仍然有个别发行版本需要单独安装，不过不用担心，已经安装过的组件反正是会自动跳过的，耽误不了什么时间。<br />
+在这个过程中应当庆幸apt工具并没有依赖cURL，不然那才是一场灾难 :)<br />
+不过接下来就只能换到一台正常的电脑上工作了，因为openssl和cURL源码的下载必须通过可用的下载工具，而通常如果openssl的版本过低，即便不用cURL，常用的wget一般也是无法工作的。<br />
+在openssl源码的选择上是个小坑。如果是一台新的服务器，当然会希望使用最新的版本，很少会有什么兼容性问题。<br />
+但在一台老的服务器上，操作系统版本也比较低，使用最新的版本就不一定好了。经常会碰到各种各样的问题。这个过程很可能需要自己来尝试，找一个尽量新，但运行没有问题的版本。<br />
+当前在openssl官网提供下载的有三个稳定版本：1.0.2t/1.1.0l/1.1.1d，三个版本都已经支持tls，我经过测试选择了1.1.0l，在这台服务器能正常工作。<br />
+下载的源码文件可以通过scp的方式拷贝到目标服务器：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>scp openssl-1.1.0l.tar.gz master@211.100.34.33:~/
+</code></pre></div></div>
+<p>随后登陆到目标服务器上：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">tar </span>xvf openssl-1.1.0l.tar.gz
+<span class="nv">$ </span><span class="nb">cd </span>openssl-1.1.0l
+<span class="nv">$ </span>./config
+<span class="nv">$ </span>make
+<span class="nv">$ </span><span class="nb">sudo </span>make <span class="nb">install</span>
+<span class="nv">$ </span><span class="nb">sudo echo</span> <span class="s2">"/usr/local/ssl/lib"</span> <span class="o">&gt;&gt;</span> /etc/ld.so.conf
+</code></pre></div></div>
+<p>安装之后的测试可以通过openssl内置的s_client:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>openssl s_client <span class="nt">-tls1_2</span> <span class="nt">-connect</span>  sh.rustup.rs:443
+CONNECTED<span class="o">(</span>00000005<span class="o">)</span>
+<span class="nv">depth</span><span class="o">=</span>2 C <span class="o">=</span> US, O <span class="o">=</span> Amazon, CN <span class="o">=</span> Amazon Root CA 1
+verify <span class="k">return</span>:1
+<span class="nv">depth</span><span class="o">=</span>1 C <span class="o">=</span> US, O <span class="o">=</span> Amazon, OU <span class="o">=</span> Server CA 1B, CN <span class="o">=</span> Amazon
+verify <span class="k">return</span>:1
+<span class="nv">depth</span><span class="o">=</span>0 CN <span class="o">=</span> sh.rustup.rs
+verify <span class="k">return</span>:1
+<span class="nt">---</span>
+Certificate chain
+ 0 s:CN <span class="o">=</span> sh.rustup.rs
+   i:C <span class="o">=</span> US, O <span class="o">=</span> Amazon, OU <span class="o">=</span> Server CA 1B, CN <span class="o">=</span> Amazon
+ 1 s:C <span class="o">=</span> US, O <span class="o">=</span> Amazon, OU <span class="o">=</span> Server CA 1B, CN <span class="o">=</span> Amazon
+   i:C <span class="o">=</span> US, O <span class="o">=</span> Amazon, CN <span class="o">=</span> Amazon Root CA 1
+ 2 s:C <span class="o">=</span> US, O <span class="o">=</span> Amazon, CN <span class="o">=</span> Amazon Root CA 1
+   i:C <span class="o">=</span> US, ST <span class="o">=</span> Arizona, L <span class="o">=</span> Scottsdale, O <span class="o">=</span> <span class="s2">"Starfield Technologies, Inc."</span>, CN <span class="o">=</span> Starfield Services Root Certificate Authority - G2
+ 3 s:C <span class="o">=</span> US, ST <span class="o">=</span> Arizona, L <span class="o">=</span> Scottsdale, O <span class="o">=</span> <span class="s2">"Starfield Technologies, Inc."</span>, CN <span class="o">=</span> Starfield Services Root Certificate Authority - G2
+   i:C <span class="o">=</span> US, O <span class="o">=</span> <span class="s2">"Starfield Technologies, Inc."</span>, OU <span class="o">=</span> Starfield Class 2 Certification Authority
+<span class="nt">---</span>
+Server certificate
+<span class="nt">-----BEGIN</span> CERTIFICATE-----
+MIIFYDCCBEigAwIBAgIQCYiHqMAcId0Jd6fEfXdC8jANBgkqhkiG9w0BAQsFADBG
+MQswCQYDVQQGEwJVUzEPMA0GA1UEChMGQW1hem9uMRUwEwYDVQQLEwxTZXJ2ZXIg
+Q0EgMUIxDzANBgNVBAMTBkFtYXpvbjAeFw0xOTA1MjkwMDAwMDBaFw0yMDA2Mjkx
+MjAwMDBaMBcxFTATBgNVBAMTDHNoLnJ1c3R1cC5yczCCASIwDQYJKoZIhvcNAQEB
+BQADggEPADCCAQoCggEBAN7D4NF6MP8rKvehZtNeSH19cqW5DFD+o8S3rywcyWvo
+jkDrdbgxrVhCBf6DY9IlVantRrSJr3N+vmd64y13riRhZC/Q4dqL7S6lyqEtOoj+
+   ...<span class="o">(</span>略<span class="o">)</span>
+</code></pre></div></div>
+<p>能拿到服务器发出的公钥表示编译的openssl版本可以正常的工作和支持tls加密。<br />
+然后可以继续下面编译cURL，否则编译完白费时间，仍然不能用。</p>
+
+<p>cURL通常使用最新版就可以，极少碰到不兼容的情况。仍然在工作电脑下载，完成后scp拷贝到目标服务器，过程略。<br />
+然后登录到目标服务器上：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">tar </span>xvf curl-7.66.0.tar.gz
+<span class="nv">$ </span><span class="nb">cd </span>curl-7.66.0
+<span class="c"># 下面一行显示的指名了ssl安装的路径，采用默认编译的话，openssl1.1.0l是安装在这个目录</span>
+<span class="c"># openssl1.1.1d是安装在/usr/local，请根据自己的版本确认一下安装路径</span>
+<span class="c"># 如果确认当前只有安装的这一个版本openssl,只需要--with-ssl参数，不附加目录参数也是可以的</span>
+<span class="c"># 但通常系统中因为其它依赖openssl的软件存在，经常有其他版本的libssl,没有被彻底删除，</span>
+<span class="c"># 这时候必须制定一个准确路径</span>
+<span class="nv">$ </span>./configure <span class="nt">--with-ssl</span><span class="o">=</span>/usr/local/ssl
+<span class="nv">$ </span>make
+<span class="nv">$ </span><span class="nb">sudo </span>make <span class="nb">install</span>
+</code></pre></div></div>
+<p>此时的cURL已经支持TLS加密的服务器了，但使用仍会报错：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl: <span class="o">(</span>60<span class="o">)</span> SSL certificate problem: unable to get <span class="nb">local </span>issuer certificate
+</code></pre></div></div>
+<p>这是因为没有安装ssl加密的根证书。<br />
+根证书可以在<code class="language-plaintext highlighter-rouge">https://curl.haxx.se/ca/cacert.pem</code>下载，建议仍在工作机下载，之后拷贝到目标服务器。<br />
+根证书放到openssl的配置目录，一般是：<code class="language-plaintext highlighter-rouge">/usr/local/ssl/certs/</code>或者<code class="language-plaintext highlighter-rouge">/etc/ssl/certs/</code>。</p>
+
+<p>之后可以正常使用了。</p>
+
+:ET

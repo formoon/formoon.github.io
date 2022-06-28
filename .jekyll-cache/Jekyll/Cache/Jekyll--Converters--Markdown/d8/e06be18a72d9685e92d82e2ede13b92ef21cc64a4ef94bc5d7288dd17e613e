@@ -1,0 +1,295 @@
+I"K�<p><img src="/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
+<h4 id="keras内置的预定义模型">Keras内置的预定义模型</h4>
+<p>上一节我们讲过了完整的保存模型及其训练完成的参数。<br />
+Keras中使用这种方式，预置了多个著名的成熟神经网络模型。当然，这实际是Keras的功劳，并不适合算在TensorFlow 2.0头上。<br />
+当前TensorFlow 2.0-alpha版本捆绑的Keras中包含：</p>
+<ul>
+  <li>densenet</li>
+  <li>inception_resnet_v2</li>
+  <li>inception_v3</li>
+  <li>mobilenet</li>
+  <li>mobilenet_v2</li>
+  <li>nasnet</li>
+  <li>resnet50</li>
+  <li>vgg16</li>
+  <li>vgg19</li>
+  <li>xception</li>
+</ul>
+
+<p>这些模型都已经使用大规模的数据训练完成，可以上手即用，实为良心佳作、码农福利。<br />
+在<a href="http://blog.17study.com.cn/2018/01/15/tensorFlow-series-8/">《从锅炉工到AI专家(8)》</a>文中，我们演示了一个使用vgg19神经网络识别图片内容的例子。那段代码并不难，但是使用TensorFlow 1.x的API构建vgg19这种复杂的神经网络可说费劲不小。有兴趣的读者可以移步至原文再体会一下那种纠结。</p>
+
+<p>而现在再做同样的事则是再简单不过了，你完全可以在你同事去茶水间倒咖啡的时间完成一个全功能的可用代码。比如跟上文功能相同的代码如下：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
+</span>
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+<span class="kn">from</span> <span class="nn">tensorflow</span> <span class="kn">import</span> <span class="n">keras</span>
+<span class="c1"># 载入vgg19模型
+</span><span class="kn">from</span> <span class="nn">tensorflow.keras.applications</span> <span class="kn">import</span> <span class="n">vgg19</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras.preprocessing</span> <span class="kn">import</span> <span class="n">image</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+
+<span class="c1"># 用于保存命令行参数
+</span><span class="n">FLAGS</span> <span class="o">=</span> <span class="bp">None</span>
+
+<span class="c1"># 初始化vgg19模型，weights参数指的是使用ImageNet图片集训练的模型
+# 每种模型第一次使用的时候都会自网络下载保存的h5文件
+# vgg19的数据文件约为584M
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">vgg19</span><span class="p">.</span><span class="n">VGG19</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s">'imagenet'</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">(</span><span class="n">imgPath</span><span class="p">):</span>
+	<span class="c1"># 载入命令行参数指定的图片文件, 载入时变形为224x224，这是模型规范数据要求的
+</span>    <span class="n">img</span> <span class="o">=</span> <span class="n">image</span><span class="p">.</span><span class="n">load_img</span><span class="p">(</span><span class="n">imgPath</span><span class="p">,</span> <span class="n">target_size</span><span class="o">=</span><span class="p">(</span><span class="mi">224</span><span class="p">,</span> <span class="mi">224</span><span class="p">))</span>
+	<span class="c1"># 将图片转换为(224,224,3)数组，最后的3是因为RGB三色彩图
+</span>    <span class="n">img</span> <span class="o">=</span> <span class="n">image</span><span class="p">.</span><span class="n">img_to_array</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+	<span class="c1"># 跟前面的例子一样，使用模型进行预测是批处理模式，
+</span>	<span class="c1"># 所以对于单个的图片，要扩展一维成为（1,224,224,3)这样的形式
+</span>	<span class="c1"># 相当于建立一个预测队列，但其中只有一张图片
+</span>    <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+	<span class="c1"># 使用模型预测（识别）
+</span>    <span class="n">predict_class</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+	<span class="c1"># 获取图片识别可能性最高的3个结果
+</span>    <span class="n">desc</span> <span class="o">=</span> <span class="n">vgg19</span><span class="p">.</span><span class="n">decode_predictions</span><span class="p">(</span><span class="n">predict_class</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+	<span class="c1"># 我们的预测队列中只有一张图片，所以结果也只有第一个有效，显示出来
+</span>    <span class="k">print</span><span class="p">(</span><span class="n">desc</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">'__main__'</span><span class="p">:</span>
+	<span class="c1"># 命令行参数处理
+</span>    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="p">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span><span class="p">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s">'-i'</span><span class="p">,</span> <span class="s">'--image_file'</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s">'pics/bigcat.jpeg'</span><span class="p">,</span>
+                        <span class="n">help</span><span class="o">=</span><span class="s">'Pic file name'</span><span class="p">)</span>
+    <span class="n">FLAGS</span><span class="p">,</span> <span class="n">unparsed</span> <span class="o">=</span> <span class="n">parser</span><span class="p">.</span><span class="n">parse_known_args</span><span class="p">()</span>
+    <span class="n">main</span><span class="p">(</span><span class="n">FLAGS</span><span class="p">.</span><span class="n">image_file</span><span class="p">)</span>
+
+</code></pre></div></div>
+<p>Keras库载入图片文件的代码间接引用了pillow库，所以程序执行前请先安装：<code class="language-plaintext highlighter-rouge">pip3 install pillow</code>。<br />
+仍然使用原文中的图片尝试识别：<br />
+<img src="/attachments/201904/tensorFlow2/bigcat.jpeg" alt="" /></p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">$</span> <span class="p">.</span><span class="o">/</span><span class="n">pic</span><span class="o">-</span><span class="n">recognize</span><span class="p">.</span><span class="n">py</span> <span class="o">-</span><span class="n">i</span> <span class="n">pics</span><span class="o">/</span><span class="n">bigcat</span><span class="p">.</span><span class="n">jpeg</span> 
+<span class="p">[(</span><span class="s">'n02128385'</span><span class="p">,</span> <span class="s">'leopard'</span><span class="p">,</span> <span class="mf">0.9778516</span><span class="p">),</span> <span class="p">(</span><span class="s">'n02130308'</span><span class="p">,</span> <span class="s">'cheetah'</span><span class="p">,</span> <span class="mf">0.008372171</span><span class="p">),</span> <span class="p">(</span><span class="s">'n02128925'</span><span class="p">,</span> <span class="s">'jaguar'</span><span class="p">,</span> <span class="mf">0.007467962</span><span class="p">)]</span>
+</code></pre></div></div>
+<p>结果表示，图片是leopard(美洲豹)的可能性为97.79%，是cheetah(猎豹)的可能性为0.84%，是jaguar(美洲虎)的可能性为0.75%。</p>
+
+<p>使用这种方式，在图片识别中，换用其他网络模型非常轻松，只需要替换程序中的三条语句，比如我们将模型换为resnet50：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">模型引入</span><span class="err">，</span><span class="n">由</span><span class="err">：</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras.applications</span> <span class="kn">import</span> <span class="n">vgg19</span>
+<span class="n">替换为</span><span class="err">：</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras.applications</span> <span class="kn">import</span> <span class="n">resnet50</span>
+
+<span class="n">模型构建</span><span class="err">，</span><span class="n">由</span><span class="err">：</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">vgg19</span><span class="p">.</span><span class="n">VGG19</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s">'imagenet'</span><span class="p">)</span>
+<span class="n">替换为</span><span class="err">：</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">resnet50</span><span class="p">.</span><span class="n">ResNet50</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s">'imagenet'</span><span class="p">)</span>
+<span class="n">注意第一次运行的时候</span><span class="err">，</span><span class="n">同样会下载resnet50的h5文件</span><span class="err">，</span><span class="n">这需要不短时间</span><span class="err">。</span>  
+
+<span class="n">显示预测结果</span><span class="err">，</span><span class="n">由</span><span class="err">：</span>
+    <span class="n">desc</span> <span class="o">=</span> <span class="n">vgg19</span><span class="p">.</span><span class="n">decode_predictions</span><span class="p">(</span><span class="n">predict_class</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+<span class="n">替换为</span><span class="err">：</span>
+    <span class="n">desc</span> <span class="o">=</span> <span class="n">resnet50</span><span class="p">.</span><span class="n">decode_predictions</span><span class="p">(</span><span class="n">predict_class</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</code></pre></div></div>
+<p>因为模型不同，执行结果会有细微区别，但这种久经考验的成熟网络，识别正确性没有问题：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./pic-recognize.py <span class="nt">-i</span> pics/bigcat.jpeg 
+<span class="o">[(</span><span class="s1">'n02128385'</span>, <span class="s1">'leopard'</span>, 0.8544763<span class="o">)</span>, <span class="o">(</span><span class="s1">'n02128925'</span>, <span class="s1">'jaguar'</span>, 0.09733019<span class="o">)</span>, <span class="o">(</span><span class="s1">'n02128757'</span>, <span class="s1">'snow_leopard'</span>, 0.040557403<span class="o">)]</span>
+</code></pre></div></div>
+
+<h4 id="自然语义识别">自然语义识别</h4>
+<p>类似这样的功能集成、数据预处理工作在TensorFlow 2.0中增加了很多，对技术人员是极大的方便。比如在<a href="http://blog.17study.com.cn/2018/01/16/tensorFlow-series-9/">《从锅炉工到AI专家(9)》</a>一文中，我们介绍了NLP项目重要的预处理工作：单词向量化。<br />
+在Keras中，单词向量化已经标准化为了模型中的一层。固化的同时，使用的自由度也很高，可以在代码中控制需要编码的单词数量和向量化的维度以及很多其它参数。详细的文档可以看<a href="https://www.tensorflow.org/versions/r2.0/api_docs/python/tf/keras/layers/Embedding">官方文档</a>。<br />
+单词数字化的相关知识，我们后面一篇也会介绍。</p>
+
+<p>本例中，我们来看一个TensorFlow 2.0教程中的例子，自然语义识别。<br />
+程序使用IMDB影片点评样本集作为训练数据。数据集的下载、载入和管理，我们使用tensorflow_datasets工具包。所以首先要安装一下：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>pip3 <span class="nb">install </span>tfds-nightly 
+</code></pre></div></div>
+<p>IMDB数据集包括影评和标注两个部分：影评就是摘选的关于影片的评论，是一段英文文字；标注只有0或者1两个数字。0表示本条影评对影片评价低，认为电影不好看，是负面情绪。1则表示本条影评对电影评价高，认为是好看的电影，是正面情绪。<br />
+可惜是英文的数据集。如果想做类似的中文语义分析工作，需要我们自己配合优秀的分词工具来完成。<br />
+我们使用的IMDB的数据集已经预先完成了单词数字化的工作，也就是已经由整数编码代表单词。所以配合的，必须有编码表来对应使用，才能还原原始的评论文字。<br />
+下面我们在Python命令行使用交互模式，来看一下原始数据的样子：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">$</span> <span class="n">python3</span>
+<span class="n">Python</span> <span class="mf">3.7</span><span class="p">.</span><span class="mi">3</span> <span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="n">Mar</span> <span class="mi">27</span> <span class="mi">2019</span><span class="p">,</span> <span class="mi">09</span><span class="p">:</span><span class="mi">23</span><span class="p">:</span><span class="mi">39</span><span class="p">)</span> 
+<span class="p">[</span><span class="n">Clang</span> <span class="mf">10.0</span><span class="p">.</span><span class="mi">0</span> <span class="p">(</span><span class="n">clang</span><span class="o">-</span><span class="mf">1000.11</span><span class="p">.</span><span class="mf">45.5</span><span class="p">)]</span> <span class="n">on</span> <span class="n">darwin</span>
+<span class="n">Type</span> <span class="s">"help"</span><span class="p">,</span> <span class="s">"copyright"</span><span class="p">,</span> <span class="s">"credits"</span> <span class="ow">or</span> <span class="s">"license"</span> <span class="k">for</span> <span class="n">more</span> <span class="n">information</span><span class="p">.</span>
+<span class="c1"># 引入TensorFlow数据集处理工具
+</span><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">tensorflow_datasets</span> <span class="k">as</span> <span class="n">tfds</span>
+<span class="c1"># 载入简化版训练样本数据集，简化版只包含8000+单词，这能让训练过程快一点，
+# 完整版则包含几万
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">dataset</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">tfds</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="s">'imdb_reviews/subwords8k'</span><span class="p">,</span> <span class="n">with_info</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+<span class="p">...</span>                           <span class="n">as_supervised</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="c1"># 数据集中已经划分好了训练数据集和测试数据集
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">train_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s">'train'</span><span class="p">],</span> <span class="n">dataset</span><span class="p">[</span><span class="s">'test'</span><span class="p">]</span>
+<span class="c1"># 初始化单词编码对照表，用于一会儿还原数字数组到影评文字
+</span><span class="o">&gt;&gt;&gt;</span> <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">info</span><span class="p">.</span><span class="n">features</span><span class="p">[</span><span class="s">'text'</span><span class="p">].</span><span class="n">encoder</span>
+<span class="c1"># 显示一条原始数据，是一个数字数组及一个单独的数字
+# 前者是已经编码的影评，后者是标注
+</span><span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">train_dataset</span><span class="p">.</span><span class="n">take</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+<span class="p">...</span>     <span class="k">print</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+<span class="p">...</span> 
+<span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">(</span>
+<span class="p">[</span> <span class="mi">768</span>   <span class="mi">99</span>  <span class="mi">416</span>    <span class="mi">9</span>  <span class="mi">733</span>    <span class="mi">1</span>  <span class="mi">626</span>    <span class="mi">6</span>  <span class="mi">467</span>  <span class="mi">159</span>   <span class="mi">33</span>  <span class="mi">788</span>   <span class="mi">53</span>   <span class="mi">29</span>
+ <span class="mi">1224</span>    <span class="mi">3</span>  <span class="mi">156</span>  <span class="mi">155</span> <span class="mi">1234</span> <span class="mi">2492</span>   <span class="mi">14</span>   <span class="mi">32</span>  <span class="mi">151</span> <span class="mi">7968</span>   <span class="mi">40</span>  <span class="mi">193</span>   <span class="mi">31</span>  <span class="mi">303</span>
+ <span class="mi">7976</span>   <span class="mi">59</span> <span class="mi">4159</span>  <span class="mi">104</span>    <span class="mi">3</span>   <span class="mi">12</span>  <span class="mi">258</span> <span class="mi">2674</span>  <span class="mi">551</span> <span class="mi">5557</span>   <span class="mi">40</span>   <span class="mi">44</span>  <span class="mi">113</span>   <span class="mi">55</span>
+  <span class="mi">143</span>  <span class="mi">121</span>   <span class="mi">83</span>   <span class="mi">35</span> <span class="mi">1151</span>   <span class="mi">11</span>  <span class="mi">195</span>   <span class="mi">13</span>  <span class="mi">746</span>   <span class="mi">61</span>   <span class="mi">55</span>  <span class="mi">300</span>    <span class="mi">3</span> <span class="mi">3075</span>
+ <span class="mi">8044</span>   <span class="mi">38</span>   <span class="mi">66</span>   <span class="mi">54</span>    <span class="mi">9</span>    <span class="mi">4</span>  <span class="mi">355</span>  <span class="mi">811</span>   <span class="mi">23</span> <span class="mi">1406</span> <span class="mi">6481</span> <span class="mi">7961</span> <span class="mi">1060</span> <span class="mi">6786</span>
+  <span class="mi">409</span> <span class="mi">3570</span> <span class="mi">7411</span> <span class="mi">3743</span> <span class="mi">2314</span> <span class="mi">7998</span> <span class="mi">8005</span> <span class="mi">1782</span>    <span class="mi">3</span>   <span class="mi">19</span>  <span class="mi">953</span>    <span class="mi">9</span> <span class="mi">5922</span> <span class="mi">8029</span>
+    <span class="mi">3</span>   <span class="mi">12</span>  <span class="mi">207</span> <span class="mi">7968</span>   <span class="mi">21</span>  <span class="mi">582</span>   <span class="mi">72</span> <span class="mi">8002</span> <span class="mi">7968</span>  <span class="mi">123</span>  <span class="mi">853</span>  <span class="mi">178</span>  <span class="mi">132</span> <span class="mi">1527</span>
+    <span class="mi">3</span>   <span class="mi">19</span> <span class="mi">1575</span>   <span class="mi">29</span> <span class="mi">1288</span> <span class="mi">2847</span> <span class="mi">2742</span> <span class="mi">8029</span>    <span class="mi">3</span>   <span class="mi">19</span>  <span class="mi">188</span>    <span class="mi">9</span>  <span class="mi">715</span> <span class="mi">7974</span>
+ <span class="mi">7753</span>   <span class="mi">26</span>  <span class="mi">144</span>    <span class="mi">1</span>  <span class="mi">263</span>   <span class="mi">85</span>   <span class="mi">33</span>  <span class="mi">479</span>  <span class="mi">892</span>    <span class="mi">3</span> <span class="mi">1566</span> <span class="mi">1380</span>    <span class="mi">7</span> <span class="mi">1929</span>
+ <span class="mi">4887</span> <span class="mi">7961</span> <span class="mi">3760</span>   <span class="mi">47</span> <span class="mi">4584</span>  <span class="mi">204</span>   <span class="mi">88</span>  <span class="mi">183</span>  <span class="mi">800</span> <span class="mi">1160</span>    <span class="mi">5</span>   <span class="mi">42</span>    <span class="mi">9</span> <span class="mi">6396</span>
+   <span class="mi">20</span> <span class="mi">1838</span>   <span class="mi">24</span>   <span class="mi">10</span>   <span class="mi">16</span>   <span class="mi">10</span>   <span class="mi">17</span>   <span class="mi">19</span>  <span class="mi">349</span>  <span class="mi">233</span>    <span class="mi">9</span>    <span class="mi">1</span> <span class="mi">5845</span>  <span class="mi">432</span>
+    <span class="mi">6</span>   <span class="mi">15</span>  <span class="mi">208</span>    <span class="mi">3</span>   <span class="mi">69</span>    <span class="mi">9</span>   <span class="mi">20</span>   <span class="mi">75</span>    <span class="mi">1</span> <span class="mi">1876</span>  <span class="mi">574</span>   <span class="mi">61</span>    <span class="mi">6</span>   <span class="mi">79</span>
+  <span class="mi">141</span>    <span class="mi">7</span>  <span class="mi">115</span>   <span class="mi">15</span>   <span class="mi">51</span>   <span class="mi">20</span>  <span class="mi">785</span>   <span class="mi">20</span> <span class="mi">3374</span>    <span class="mi">3</span> <span class="mi">1976</span> <span class="mi">1515</span> <span class="mi">7968</span>    <span class="mi">8</span>
+  <span class="mi">171</span>   <span class="mi">29</span> <span class="mi">7463</span>  <span class="mi">104</span>    <span class="mi">2</span> <span class="mi">5114</span>    <span class="mi">5</span>  <span class="mi">569</span>    <span class="mi">6</span> <span class="mi">2203</span>   <span class="mi">95</span>  <span class="mi">185</span>   <span class="mi">52</span> <span class="mi">5374</span>
+  <span class="mi">376</span>  <span class="mi">231</span>    <span class="mi">5</span>  <span class="mi">789</span>   <span class="mi">47</span> <span class="mi">7514</span>   <span class="mi">11</span> <span class="mi">2246</span>  <span class="mi">714</span>    <span class="mi">2</span> <span class="mi">7779</span>   <span class="mi">49</span> <span class="mi">1709</span> <span class="mi">1877</span>
+    <span class="mi">4</span>    <span class="mi">5</span>   <span class="mi">19</span> <span class="mi">3583</span> <span class="mi">3599</span> <span class="mi">7961</span>    <span class="mi">7</span> <span class="mi">1302</span>  <span class="mi">146</span>    <span class="mi">6</span>    <span class="mi">1</span> <span class="mi">1871</span>    <span class="mi">3</span>  <span class="mi">128</span>
+   <span class="mi">11</span>    <span class="mi">1</span> <span class="mi">2674</span>  <span class="mi">194</span> <span class="mi">3754</span>  <span class="mi">100</span> <span class="mi">7974</span>  <span class="mi">267</span>    <span class="mi">6</span>  <span class="mi">405</span>   <span class="mi">68</span>   <span class="mi">29</span> <span class="mi">1966</span> <span class="mi">5928</span>
+  <span class="mi">291</span>    <span class="mi">7</span> <span class="mi">2862</span>  <span class="mi">488</span>   <span class="mi">52</span> <span class="mi">2048</span>  <span class="mi">858</span>  <span class="mi">700</span> <span class="mi">1532</span>   <span class="mi">28</span> <span class="mi">1551</span>    <span class="mi">2</span>  <span class="mi">142</span> <span class="mi">7968</span>
+    <span class="mi">8</span>  <span class="mi">638</span>  <span class="mi">152</span>    <span class="mi">1</span> <span class="mi">2246</span> <span class="mi">2968</span>  <span class="mi">739</span>  <span class="mi">251</span>   <span class="mi">19</span> <span class="mi">3712</span> <span class="mi">1183</span>  <span class="mi">830</span> <span class="mi">1379</span> <span class="mi">5368</span>
+   <span class="mi">47</span>    <span class="mi">5</span> <span class="mi">1889</span> <span class="mi">7974</span> <span class="mi">4038</span>   <span class="mi">34</span> <span class="mi">4636</span>   <span class="mi">52</span> <span class="mi">3653</span> <span class="mi">6991</span>   <span class="mi">34</span> <span class="mi">4491</span> <span class="mi">8029</span> <span class="mi">7975</span><span class="p">],</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">280</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">int64</span><span class="p">)</span> <span class="n">tf</span><span class="p">.</span><span class="n">Tensor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">shape</span><span class="o">=</span><span class="p">(),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">int64</span><span class="p">)</span>
+<span class="c1"># 显示一条还原的影评和标注
+</span><span class="o">&gt;&gt;&gt;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">train_dataset</span><span class="p">.</span><span class="n">take</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+<span class="p">...</span>     <span class="k">print</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">.</span><span class="n">decode</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">].</span><span class="n">numpy</span><span class="p">())</span>
+<span class="p">...</span> 
+<span class="n">Just</span> <span class="n">because</span> <span class="n">someone</span> <span class="ow">is</span> <span class="n">under</span> <span class="n">the</span> <span class="n">age</span> <span class="n">of</span> <span class="mi">10</span> <span class="n">does</span> <span class="ow">not</span> <span class="n">mean</span> <span class="n">they</span> <span class="n">are</span> <span class="n">stupid</span><span class="p">.</span> <span class="n">If</span> <span class="n">your</span> <span class="n">child</span> <span class="n">likes</span> <span class="n">this</span> <span class="n">film</span> <span class="n">you</span><span class="s">'d better have him/her tested. I am continually amazed at how so many people can be involved in something that turns out so bad. This "film" is a showcase for digital wizardry AND NOTHING ELSE. The writing is horrid. I can'</span><span class="n">t</span> <span class="n">remember</span> <span class="n">when</span> <span class="n">I</span><span class="s">'ve heard such bad dialogue. The songs are beyond wretched. The acting is sub-par but then the actors were not given much. Who decided to employ Joey Fatone? He cannot sing and he is ugly as sin.&lt;br /&gt;&lt;br /&gt;The worst thing is the obviousness of it all. It is as if the writers went out of their way to make it all as stupid as possible. Great children'</span><span class="n">s</span> <span class="n">movies</span> <span class="n">are</span> <span class="n">wicked</span><span class="p">,</span> <span class="n">smart</span> <span class="ow">and</span> <span class="n">full</span> <span class="n">of</span> <span class="n">wit</span> <span class="o">-</span> <span class="n">films</span> <span class="n">like</span> <span class="n">Shrek</span> <span class="ow">and</span> <span class="n">Toy</span> <span class="n">Story</span> <span class="ow">in</span> <span class="n">recent</span> <span class="n">years</span><span class="p">,</span> <span class="n">Willie</span> <span class="n">Wonka</span> <span class="ow">and</span> <span class="n">The</span> <span class="n">Witches</span> <span class="n">to</span> <span class="n">mention</span> <span class="n">two</span> <span class="n">of</span> <span class="n">the</span> <span class="n">past</span><span class="p">.</span> <span class="n">But</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">continual</span> <span class="n">dumbing</span><span class="o">-</span><span class="n">down</span> <span class="n">of</span> <span class="n">American</span> <span class="n">more</span> <span class="n">are</span> <span class="n">flocking</span> <span class="n">to</span> <span class="n">dreck</span> <span class="n">like</span> <span class="n">Finding</span> <span class="n">Nemo</span> <span class="p">(</span><span class="n">yes</span><span class="p">,</span> <span class="n">that</span><span class="s">'s right), the recent Charlie &amp; The Chocolate Factory and eye-crossing trash like Red Riding Hood. 0
+# 影评部分不多说，标注部分是数字0，表示这是一条负面评价
+</span></code></pre></div></div>
+<p>NLP类项目，通常多用RNN、LSTM、GRU网络。主要原因是一条文本，单词数并不确定，虽然可以做补足(Padding)，但使用通常神经网络效果并不好。此外文本中各单词之间是有相关性的，这类似图片中的相邻点之间的相关，但文本的相关性跨度更大。 <br />
+关于RNN/LSTM/GRU的原理我们在<a href="http://blog.17study.com.cn/2018/01/17/tensorFlow-series-10/">《从锅炉工到AI专家(10)》</a>一文中已经有过介绍。这里不再重复，直接进入代码部分，通过注释来理解所做的工作：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
+</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+
+<span class="c1"># 引入tensorflow数据集工具包
+</span><span class="kn">import</span> <span class="nn">tensorflow_datasets</span> <span class="k">as</span> <span class="n">tfds</span>
+<span class="c1"># 引入tensorflow
+</span><span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+
+<span class="c1"># 加载数据集，第一次会需要从网上下载imdb数据库
+</span><span class="n">dataset</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">tfds</span><span class="p">.</span><span class="n">load</span><span class="p">(</span><span class="s">'imdb_reviews/subwords8k'</span><span class="p">,</span> <span class="n">with_info</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span>
+                          <span class="n">as_supervised</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="c1"># 将训练集和测试集分别赋予两个变量                          
+</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s">'train'</span><span class="p">],</span> <span class="n">dataset</span><span class="p">[</span><span class="s">'test'</span><span class="p">]</span>
+
+<span class="c1"># 初始化对应的文本编码对照表
+</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">info</span><span class="p">.</span><span class="n">features</span><span class="p">[</span><span class="s">'text'</span><span class="p">].</span><span class="n">encoder</span>
+<span class="c1"># 显示当前样本集包含的所有单词数
+</span><span class="k">print</span><span class="p">(</span><span class="s">'Vocabulary size: {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">.</span><span class="n">vocab_size</span><span class="p">))</span>
+
+<span class="n">BUFFER_SIZE</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="n">BATCH_SIZE</span> <span class="o">=</span> <span class="mi">64</span>
+<span class="c1"># 将训练集打乱顺序
+</span><span class="n">train_dataset</span> <span class="o">=</span> <span class="n">train_dataset</span><span class="p">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">BUFFER_SIZE</span><span class="p">)</span>
+<span class="c1"># 每批次的数据对齐
+</span><span class="n">train_dataset</span> <span class="o">=</span> <span class="n">train_dataset</span><span class="p">.</span><span class="n">padded_batch</span><span class="p">(</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">train_dataset</span><span class="p">.</span><span class="n">output_shapes</span><span class="p">)</span>
+<span class="n">test_dataset</span> <span class="o">=</span> <span class="n">test_dataset</span><span class="p">.</span><span class="n">padded_batch</span><span class="p">(</span><span class="n">BATCH_SIZE</span><span class="p">,</span> <span class="n">test_dataset</span><span class="p">.</span><span class="n">output_shapes</span><span class="p">)</span>
+
+<span class="c1"># 构造神经网络模型
+# 第一层就是将已经数字化的影评数据向量化
+# 向量化在上个系列中已经讲过，功能就是将单词嵌入多维矩阵
+# 并使得语义相近的单词，在空间距离上更接近
+</span><span class="n">model</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">Sequential</span><span class="p">([</span>
+    <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Embedding</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">.</span><span class="n">vocab_size</span><span class="p">,</span> <span class="mi">64</span><span class="p">),</span>
+    <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Bidirectional</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">LSTM</span><span class="p">(</span>
+        <span class="mi">64</span><span class="p">,</span> <span class="n">return_sequences</span><span class="o">=</span><span class="bp">True</span><span class="p">)),</span>
+    <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Bidirectional</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">LSTM</span><span class="p">(</span><span class="mi">32</span><span class="p">)),</span>
+    <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">),</span>
+    <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'sigmoid'</span><span class="p">)</span>
+<span class="p">])</span>
+<span class="c1"># 编译模型
+</span><span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s">'binary_crossentropy'</span><span class="p">,</span>
+              <span class="n">optimizer</span><span class="o">=</span><span class="s">'adam'</span><span class="p">,</span>
+              <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">])</span>
+<span class="c1"># 训练模型
+</span><span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                    <span class="n">validation_data</span><span class="o">=</span><span class="n">test_dataset</span><span class="p">)</span>
+
+<span class="c1"># 本训练耗时比较长，所以训练完保存一次数据，以便以后我们会想再次尝试
+</span><span class="n">model</span><span class="p">.</span><span class="n">save_weights</span><span class="p">(</span><span class="s">'./imdb-classify-lstm/final_chkp'</span><span class="p">)</span>
+
+<span class="c1"># 恢复数据，如果以后想再次测试影评预测，可以将上面训练、保存屏蔽起来
+# 然后从这里开始使用
+</span><span class="n">model</span><span class="p">.</span><span class="n">load_weights</span><span class="p">(</span><span class="s">'./imdb-classify-lstm/final_chkp'</span><span class="p">)</span>
+<span class="c1"># 使用测试集数据评估模型，并显示损失值和准确度
+</span><span class="n">test_loss</span><span class="p">,</span> <span class="n">test_acc</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">Test Loss: {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">test_loss</span><span class="p">))</span>
+<span class="k">print</span><span class="p">(</span><span class="s">'Test Accuracy: {}'</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">test_acc</span><span class="p">))</span>
+
+<span class="c1">#########################################################
+# 以下为使用模型对一段文字进行情绪预测
+</span>
+<span class="c1"># 工具函数，将一个不足指定长度的数组，使用0在尾部填充，以凑够长度
+# 我们使用的模型嵌入层输入序列没有指定input_length，但这个参数是有默认值的，
+# 相当于实际上是定长的，补充到同嵌入矩阵相同维度的长度，准确率会更高
+# 当然对于只有0、1两个结果的分类来说，效果并不明显
+</span><span class="k">def</span> <span class="nf">pad_to_size</span><span class="p">(</span><span class="n">vec</span><span class="p">,</span> <span class="n">size</span><span class="p">):</span>
+    <span class="n">zeros</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">size</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">vec</span><span class="p">))</span>
+    <span class="n">vec</span><span class="p">.</span><span class="n">extend</span><span class="p">(</span><span class="n">zeros</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">vec</span>
+
+<span class="c1"># 对一段文字进行预测
+</span><span class="k">def</span> <span class="nf">sample_predict</span><span class="p">(</span><span class="n">sentence</span><span class="p">,</span> <span class="n">pad</span><span class="p">):</span>
+    <span class="c1"># 输入的文字，首先要使用imdb数据库相同的数字、单词对照表进行编码
+</span>    <span class="c1"># 对于表中没有的单词，还会建立新对照项
+</span>    <span class="n">tokenized_sample_pred_text</span> <span class="o">=</span> <span class="n">tokenizer</span><span class="p">.</span><span class="n">encode</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span>
+    <span class="c1"># 补充短的文字段到定长
+</span>    <span class="k">if</span> <span class="n">pad</span><span class="p">:</span>
+        <span class="n">tokenized_sample_pred_text</span> <span class="o">=</span> <span class="n">pad_to_size</span><span class="p">(</span><span class="n">tokenized_sample_pred_text</span><span class="p">,</span> <span class="mi">64</span><span class="p">)</span>
+    <span class="c1"># 扩展一维，使数据成为只有1个数据的一个批次
+</span>    <span class="n">predictions</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">tf</span><span class="p">.</span><span class="n">expand_dims</span><span class="p">(</span><span class="n">tokenized_sample_pred_text</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
+
+<span class="c1"># 预测1，文字大意：电影不好，动画和画面都很可怕，我不会推荐这个电影
+</span><span class="n">sample_pred_text</span> <span class="o">=</span> <span class="p">(</span><span class="s">'The movie was not good. The animation and the graphics '</span>
+                    <span class="s">'were terrible. I would not recommend this movie.'</span><span class="p">)</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">sample_predict</span><span class="p">(</span><span class="n">sample_pred_text</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
+
+<span class="c1"># 预测2，文字大意：电影很无聊，我不喜欢这个电影
+</span><span class="n">sample_pred_text</span> <span class="o">=</span> <span class="p">(</span><span class="s">"The movie was boring. I don't like this movie."</span><span class="p">)</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">sample_predict</span><span class="p">(</span><span class="n">sample_pred_text</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
+
+<span class="c1"># 预测3，文字大意：这个电影很赞，里面的一切都很精致，我喜欢它
+</span><span class="n">sample_pred_text</span> <span class="o">=</span> <span class="p">(</span><span class="s">'The movie was great. Everything in this movies '</span>
+                    <span class="s">'is delicate, I love it.'</span><span class="p">)</span>
+<span class="n">predictions</span> <span class="o">=</span> <span class="n">sample_predict</span><span class="p">(</span><span class="n">sample_pred_text</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="k">print</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
+</code></pre></div></div>
+<p>这个样例的训练已经比较慢了，在我用的电脑使用入门级的GPU运算跑了差不多20分钟。所以程序训练结束的时候保存了一次模型的参数，以便以后我们还想再测试更多的文本。<br />
+程序执行的输出大致如下:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./imdb-classify-lstm.py
+Vocabulary size: 8185
+Epoch 1/10
+391/391 <span class="o">[==============================]</span> - 117s 299ms/step - loss: 0.5763 - accuracy: 0.6985 - val_loss: 0.0000e+00 - val_accuracy: 0.0000e+00
+Epoch 2/10
+391/391 <span class="o">[==============================]</span> - 114s 292ms/step - loss: 0.4639 - accuracy: 0.7876 - val_loss: 0.5006 - val_accuracy: 0.7731
+Epoch 3/10
+391/391 <span class="o">[==============================]</span> - 115s 295ms/step - loss: 0.3296 - accuracy: 0.8680 - val_loss: 0.3920 - val_accuracy: 0.8344
+Epoch 4/10
+391/391 <span class="o">[==============================]</span> - 115s 295ms/step - loss: 0.2674 - accuracy: 0.8977 - val_loss: 0.3640 - val_accuracy: 0.8597
+Epoch 5/10
+391/391 <span class="o">[==============================]</span> - 115s 295ms/step - loss: 0.2168 - accuracy: 0.9218 - val_loss: 0.3190 - val_accuracy: 0.8698
+Epoch 6/10
+391/391 <span class="o">[==============================]</span> - 115s 294ms/step - loss: 0.1717 - accuracy: 0.9423 - val_loss: 0.3201 - val_accuracy: 0.8754
+Epoch 7/10
+391/391 <span class="o">[==============================]</span> - 114s 293ms/step - loss: 0.1339 - accuracy: 0.9573 - val_loss: 0.3470 - val_accuracy: 0.8678
+Epoch 8/10
+391/391 <span class="o">[==============================]</span> - 115s 294ms/step - loss: 0.1044 - accuracy: 0.9693 - val_loss: 0.4094 - val_accuracy: 0.8569
+Epoch 9/10
+391/391 <span class="o">[==============================]</span> - 116s 296ms/step - loss: 0.0826 - accuracy: 0.9771 - val_loss: 0.4496 - val_accuracy: 0.8704
+Epoch 10/10
+391/391 <span class="o">[==============================]</span> - 115s 295ms/step - loss: 0.0671 - accuracy: 0.9820 - val_loss: 0.4516 - val_accuracy: 0.8696
+    391/Unknown - 37s 95ms/step - loss: 0.4516 - accuracy: 0.8696
+Test Loss: 0.45155299115745
+Test Accuracy: 0.8695999979972839
+<span class="o">[[</span>0.00420592]]
+<span class="o">[[</span>0.00562131]]
+<span class="o">[[</span>0.99653375]]
+
+</code></pre></div></div>
+<p>最终的结果，前两个值很接近0，表示这两句影评倾向于批评意见。第三个值接近1，表示这条影评是正面意见。注意这三条影评都是我们即兴随意写出的，并非样本库中的数据，是真正的“自然语言”。</p>
+
+<p>（待续…）</p>
+
+:ET

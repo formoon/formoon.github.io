@@ -1,0 +1,109 @@
+I"�6<p><img src="/attachments/201712/25/ar6.png" alt="" /></p>
+
+<p>这是几年前写的一个笔记，估计Seven会用得到，所以翻出来重新贴上。<br />
+很多人学习电脑其实都是从单片机开始的，单片机结构简单，又五脏俱全，所以学习单片机入门，应当能够更容易的让初学者具备电脑的整体观。相信Z80/C51时候训练的习惯，很可能会伴随某些人整个技术生涯吧。 而随着IOT再次活跃起来的单片机，跟C51这些传统上的单片机相比变化不小。集成度更高、速度更快、外围接口和外围传感器更完善，编程也更加方便容易了。这些IOT常见的单片机中，Arduino无论如何算是比较火的一个系列，这个系列包括很多款，最便宜的差不多只要10多块钱（人民币）就可以买到，而且内置了连接电脑的USB转串口芯片，拿到手插上电脑就可以开发。<br />
+今天说的这个小东西，使用了如下的器件：</p>
+<ul>
+  <li>Arduino单片机本身，最便宜的版本就可以</li>
+  <li>温度、湿度感应器</li>
+  <li>液晶显示屏(如果不需要显示也可以没有或者根据需要买其它型号)，本文中使用LCD1602</li>
+  <li>排线若干</li>
+  <li>为了试验方便，建议几块钱买一块Arduino shield马甲板</li>
+</ul>
+
+<p>作为一篇给新手的笔记，首先把器件介绍一下：<br />
+<img src="/attachments/201712/25/ar0.jpg" alt="" /><br />
+这个是温度、湿度传感器，是一款很常见的A/D转换器件，共有3个针脚，分别是V(CC)电源端、G(ND)接地、S(ignal)信号端。大多数的传感器其实都是这样的形式，通过给出工作电压维持器件工作，在信号端得到数据。此类器件因为输出是数字化的模拟量，并非只有开、关两个状态，所以必须接在GPIO的模拟端。<br />
+<img src="/attachments/201712/25/ar1.jpg" alt="" /><br />
+<img src="/attachments/201712/25/ar2.jpg" alt="" /><br />
+这个是LCD1602的液晶显示屏，型号数字指的是每行16个字符，共2行，这里的字符特指是英文字符，这款LCD没有中文显示功能。器件接口使用I2C(读做:I方C),指的是I的平方，所以经常也写作IIC应当更加准确。I2C是一种接口标准，共4根管脚，分别是GND接地、VCC电源、SDA数据、SCL时钟，跟上一个器件的3根管脚主要区别是SDA是数字量，就是只有1、0两个状态，通过时钟信号的配合来区分位与位之间的间隔。IIC接口算是相对比较新的一种接口协议，详细资料可以在网上搜索，目前这种接口在手机、机顶盒、移动设备中有大量的应用。
+<img src="/attachments/201712/25/ar3.jpg" alt="" /><br />
+这个就是马甲板，从功能上说，虽然外观区别很大，但其实就类似平常实验常用的面包板。只是这个马甲板专门为了Arduino设计，在管脚和功能方面，更适合Arduino的实验接线。比如请看图中，A/D接口、I2C接口（已经接线的两组）都单独的引了出来，其中很多管脚实际是跟其它管脚复用的，在马甲板上专门跟同协议管脚布线在一起，显然用起来更方便、灵活，对新手来说也更清楚。但是在正常实验结束后，如果会投入生产的话，一般会重新布线重新制作电路板，即便利用标准Arduino板投产也会直接接线到主板上，不会再用马甲板。所以马甲板的目的就是为了实验的方便。<br />
+本实验其实一共就只需要3组接线：温度湿度传感器3根线、LCD显示屏4根线还有Arduino主板到电脑的Usb线，这里的Usb线有供电、数据传输两个功能。下图是连接在一起的全家福：<br />
+<img src="/attachments/201712/25/ar4.jpg" alt="" /><br />
+硬件部分连接好，仔细检查不要有短路、断路的点，可以进入软件部分。</p>
+
+<p>在电脑上打开Arduino IDE软件，这里用的是1.8.4，因为是几年前的笔记，相信当前肯定有更新的版本了。不过对于嵌入式开发，真的往往并不是新版本就好，具体情况要具体看，稳定性通常都是第一需要关注的。<br />
+在Arduino IDE中建立一个新工程，贴入以下代码，为了便于理解，对代码的解析就直接写在注释代码中了：</p>
+<div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//这个是Arduino的标准库，其中提供了I2C接口的操作，这里不需要程序员自己操作I2C接口，是由下面的液晶板代码间接操作的</span>
+<span class="cp">#include</span> <span class="cpf">&lt;Wire.h&gt;</span><span class="c1"> </span><span class="cp">
+</span><span class="c1">//这个是液晶屏的代码库，是由器件厂商提供的，目前绝大多数的器件都会有厂商提供的软件包（或者叫驱动）来完成器件的操作</span>
+<span class="cp">#include</span> <span class="cpf">&lt;LiquidCrystal_I2C.h&gt;</span><span class="cp">
+</span><span class="c1">//这个是温度、湿度传感器的软件包</span>
+<span class="cp">#include</span> <span class="cpf">&lt;dht11.h&gt;</span><span class="cp">
+</span>
+<span class="c1">//A0是温度、湿度传感器的接口号</span>
+<span class="cp">#define DHT11PIN A0
+</span><span class="c1">//声明一个变量来操作传感器</span>
+<span class="n">dht11</span> <span class="n">DHT11</span><span class="p">;</span>
+
+<span class="c1">//同样是声明一个变量来操作液晶屏，0x27是LCD地址，这个是器件手册中给出的，照抄就好</span>
+<span class="c1">//16*2字符，这也是器件手册中的</span>
+<span class="n">LiquidCrystal_I2C</span> <span class="nf">lcd</span><span class="p">(</span><span class="mh">0x27</span><span class="p">,</span><span class="mi">16</span><span class="p">,</span><span class="mi">2</span><span class="p">);</span>  <span class="c1">// set the LCD address to 0x27 for a 16 chars and 2 line display</span>
+
+<span class="c1">//所有的Arduino程序都分为setup、loop两部分，前者作为正式工作前环境准备、初始化等工作，后者是一个工作循环</span>
+<span class="kt">void</span> <span class="nf">setup</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="n">lcd</span><span class="p">.</span><span class="n">init</span><span class="p">();</span>                      <span class="c1">//初始化LCD</span>
+ 
+  <span class="c1">//打开背光</span>
+  <span class="n">lcd</span><span class="p">.</span><span class="n">backlight</span><span class="p">();</span>
+  <span class="c1">//下面三行是显示一个简单的启动信息，相当于一般软件的启动页</span>
+  <span class="n">lcd</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">"Temperature &amp;"</span><span class="p">);</span>
+  <span class="n">lcd</span><span class="p">.</span><span class="n">setCursor</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>  <span class="c1">//设置光标位置</span>
+  <span class="n">lcd</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">"    Humidity"</span><span class="p">);</span>
+
+  <span class="c1">//下面三行是初始化串口，从而把温度、湿度的值实时传递到桌面电脑</span>
+  <span class="c1">//在这个试验中实际串口是没有用的。我曾经把这个数据连接到微信公众号，从而对微信公众号说一句“温度”，就得到房间的温度值</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">begin</span><span class="p">(</span><span class="mi">9600</span><span class="p">);</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">"DHT11 Monitoring"</span><span class="p">);</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">"</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="c1">//工作主循环</span>
+<span class="kt">void</span> <span class="nf">loop</span><span class="p">()</span>
+<span class="p">{</span>
+  <span class="kt">char</span> <span class="n">strTemp</span><span class="p">[</span><span class="mh">0x20</span><span class="p">],</span><span class="n">strHumid</span><span class="p">[</span><span class="mh">0x20</span><span class="p">];</span>
+	<span class="c1">//读温度、湿度值</span>
+  <span class="kt">int</span> <span class="n">val</span> <span class="o">=</span> <span class="n">DHT11</span><span class="p">.</span><span class="n">read</span><span class="p">(</span><span class="n">DHT11PIN</span><span class="p">);</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="s">"Read sensor: "</span><span class="p">);</span>
+  <span class="k">switch</span> <span class="p">(</span><span class="n">val</span><span class="p">)</span>
+  <span class="p">{</span>  
+<span class="c1">//这个switch是用于判断读取值的异常情况，是器件手册中给出的，看下面的信息应当不难理解</span>
+<span class="c1">//通常一个新手跟专业人员比较大的区别之一就在异常的处理，专业人员不会报有任何幻想，会尽力的处理掉所有异常情况</span>
+  <span class="k">case</span> <span class="n">DHTLIB_OK</span><span class="p">:</span>
+    <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">"OK"</span><span class="p">);</span>
+    <span class="k">break</span><span class="p">;</span>
+  <span class="k">case</span> <span class="n">DHTLIB_ERROR_CHECKSUM</span><span class="p">:</span> 
+    <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">"Checksum error"</span><span class="p">);</span> 
+    <span class="k">break</span><span class="p">;</span>
+  <span class="k">case</span> <span class="n">DHTLIB_ERROR_TIMEOUT</span><span class="p">:</span> 
+    <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">"Time out error"</span><span class="p">);</span> 
+    <span class="k">break</span><span class="p">;</span>
+  <span class="nl">default:</span> 
+    <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="s">"Unknown error"</span><span class="p">);</span> 
+    <span class="k">break</span><span class="p">;</span>
+  <span class="p">}</span>
+
+<span class="c1">//在串口输出温度湿度值</span>
+  <span class="n">snprintf</span><span class="p">(</span><span class="n">strHumid</span><span class="p">,</span><span class="mh">0x20</span><span class="p">,</span><span class="s">"%02d%%"</span><span class="p">,(</span><span class="kt">int</span><span class="p">)</span><span class="n">DHT11</span><span class="p">.</span><span class="n">humidity</span><span class="p">);</span>
+  <span class="n">snprintf</span><span class="p">(</span><span class="n">strTemp</span><span class="p">,</span><span class="mh">0x20</span><span class="p">,</span><span class="s">"%02dC"</span><span class="p">,(</span><span class="kt">int</span><span class="p">)</span><span class="n">DHT11</span><span class="p">.</span><span class="n">temperature</span><span class="p">);</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="n">strHumid</span><span class="p">);</span>
+  <span class="n">Serial</span><span class="p">.</span><span class="n">println</span><span class="p">(</span><span class="n">strTemp</span><span class="p">);</span>
+
+<span class="c1">//在lcd输出温度、湿度值</span>
+  <span class="n">snprintf</span><span class="p">(</span><span class="n">strHumid</span><span class="p">,</span><span class="mh">0x20</span><span class="p">,</span><span class="s">"Humidity:%02d%%    "</span><span class="p">,(</span><span class="kt">int</span><span class="p">)</span><span class="n">DHT11</span><span class="p">.</span><span class="n">humidity</span><span class="p">);</span>
+  <span class="n">snprintf</span><span class="p">(</span><span class="n">strTemp</span><span class="p">,</span><span class="mh">0x20</span><span class="p">,</span><span class="s">"Temperature:%02dC    "</span><span class="p">,(</span><span class="kt">int</span><span class="p">)</span><span class="n">DHT11</span><span class="p">.</span><span class="n">temperature</span><span class="p">);</span>
+  <span class="n">lcd</span><span class="p">.</span><span class="n">setCursor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">0</span><span class="p">);</span>
+  <span class="n">lcd</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">strTemp</span><span class="p">);</span>
+  <span class="n">lcd</span><span class="p">.</span><span class="n">setCursor</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">1</span><span class="p">);</span>
+  <span class="n">lcd</span><span class="p">.</span><span class="n">print</span><span class="p">(</span><span class="n">strHumid</span><span class="p">);</span>
+
+<span class="c1">//延迟两秒后再次循环</span>
+  <span class="n">delay</span><span class="p">(</span><span class="mi">2000</span><span class="p">);</span>
+<span class="p">}</span>
+
+</code></pre></div></div>
+<p>好了，在ArduinoIDE中，点击Tools菜单，选择正确的Arduino板型号和端口，把程序upload到单片机运行看一看吧。<br />
+<img src="/attachments/201712/25/ar5.jpg" alt="" /></p>
+:ET

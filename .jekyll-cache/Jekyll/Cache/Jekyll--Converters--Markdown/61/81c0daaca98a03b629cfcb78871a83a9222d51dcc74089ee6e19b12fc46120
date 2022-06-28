@@ -8,13 +8,13 @@
 <p>接着发现还是不稳定，从经验上感觉通常都是由于线程的不可重入或者冲突造成的，再给两边加上异步的队列调用方式：</p>
 <div class="language-swift highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//从AppDelegate调用到后台类</span>
 <span class="k">let</span> <span class="nv">background</span> <span class="o">=</span> <span class="kt">DispatchQueue</span><span class="o">.</span><span class="nf">global</span><span class="p">()</span>
-<span class="n">background</span><span class="o">.</span><span class="n">async</span> <span class="p">{</span>
+<span class="n">background</span><span class="o">.</span><span class="k">async</span> <span class="p">{</span>
     <span class="n">someClass</span><span class="o">.</span><span class="nf">someMethod</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="p">}</span>
 
 <span class="c1">//从后台类回调到AppDelegate</span>
 <span class="k">let</span> <span class="nv">main</span> <span class="o">=</span> <span class="kt">DispatchQueue</span><span class="o">.</span><span class="n">main</span>
-<span class="n">main</span><span class="o">.</span><span class="n">async</span> <span class="p">{</span>
+<span class="n">main</span><span class="o">.</span><span class="k">async</span> <span class="p">{</span>
     <span class="k">let</span> <span class="nv">appDelegate</span> <span class="o">=</span> <span class="kt">NSApplication</span><span class="o">.</span><span class="n">shared</span><span class="o">.</span><span class="n">delegate</span> <span class="k">as?</span> <span class="kt">AppDelegate</span>
     <span class="n">appDelegate</span><span class="p">?</span><span class="o">.</span><span class="nf">methodName</span><span class="p">()</span>
 <span class="p">}</span>

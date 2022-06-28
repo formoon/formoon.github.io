@@ -1,0 +1,184 @@
+I"�Z<p><img src="/attachments/201802/nodejs.jpeg" alt="" />
+因为项目的原因，最近经常使用node.js搭RESTful接口。<br />
+性能还是很不错啦，感觉比Spring Boot之类的要快。而且在不错的性能之外，只要程序结构组织好，别让太多的回调把程序结构搞乱，整体开发效率比Java快的就太多了。</p>
+
+<p>如果想进一步提高效率，使用c++来优化部分模块是不错的选择。尤其可贵的是nodejs对于同c++的混合编程支持的很好，个人感觉跟写Python的扩展模块处于同样的易用水平。</p>
+
+<p>我们从Hello World开始：<br />
+首先要有一个空白的工作目录，在其中建立一个node包管理文件package.json，内容为：</p>
+<div class="language-js highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+  <span class="dl">"</span><span class="s2">name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">test-cpp-module</span><span class="dl">"</span><span class="p">,</span>
+  <span class="dl">"</span><span class="s2">version</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">0.1.0</span><span class="dl">"</span><span class="p">,</span>
+  <span class="dl">"</span><span class="s2">private</span><span class="dl">"</span><span class="p">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="dl">"</span><span class="s2">gypfile</span><span class="dl">"</span><span class="p">:</span> <span class="kc">true</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>随后在目录中执行命令：<code class="language-plaintext highlighter-rouge">npm install node-addon-api --save</code>安装nodejs扩展模块的开发支持包。这里假设你已经安装配置好了nodejs和相应的npm包管理工具，还有xcode的相关命令行编译工具。我们不重复这些基本工具的安装配置，需要的话请参考官网相关文档。<br />
+上面命令执行完成，我们就完成了基本开发环境的配置。</p>
+
+<p>c++的模块由binding.gyp文件描述，并完成自动编译的相关配置工作，我们新建一个binding.gyp文件，内容为：</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+  <span class="dl">"</span><span class="s2">targets</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="dl">"</span><span class="s2">target_name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">democpp</span><span class="dl">"</span><span class="p">,</span>
+      <span class="dl">"</span><span class="s2">sources</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="dl">"</span><span class="s2">democpp.cc</span><span class="dl">"</span>
+      <span class="p">],</span>
+      <span class="dl">"</span><span class="s2">include_dirs</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="dl">"</span><span class="s2">&lt;!@(node -p </span><span class="se">\"</span><span class="s2">require('node-addon-api').include</span><span class="se">\"</span><span class="s2">)</span><span class="dl">"</span>
+      <span class="p">],</span>
+      <span class="dl">"</span><span class="s2">dependencies</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="dl">"</span><span class="s2">&lt;!(node -p </span><span class="se">\"</span><span class="s2">require('node-addon-api').gyp</span><span class="se">\"</span><span class="s2">)</span><span class="dl">"</span>
+      <span class="p">],</span>
+      <span class="dl">"</span><span class="s2">cflags!</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span><span class="dl">"</span><span class="s2">-fno-exceptions</span><span class="dl">"</span><span class="p">],</span>
+      <span class="dl">"</span><span class="s2">cflags_cc!</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span><span class="dl">"</span><span class="s2">-fno-exceptions</span><span class="dl">"</span><span class="p">],</span>
+      <span class="dl">"</span><span class="s2">defines</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span><span class="dl">"</span><span class="s2">NAPI_CPP_EXCEPTIONS</span><span class="dl">"</span><span class="p">],</span>
+      <span class="dl">"</span><span class="s2">xcode_settings</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">GCC_ENABLE_CPP_EXCEPTIONS</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">YES</span><span class="dl">"</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<ul>
+  <li>文件中首先使用target_name指定了编译之后模块的名称。</li>
+  <li>sources指明c++的源文件，如果有多个文件，需要用逗号隔开，放到同一个数组中。</li>
+  <li>include_dirs是编译时使用的头文件引入路径，这里使用node -p执行node-addon-api模块中的预置变量。</li>
+  <li>dependencies是必须的，不要改变。</li>
+  <li>后面部分，cflags!/cflags_cc!/defines三行指定如果c++程序碰到意外错误的时候，由NAPI接口来处理，而不是通常的由c++程序自己处理。这防止因为c++部分程序碰到意外直接就退出了程序，而是由nodejs程序来捕获处理。如果是在Linux中编译使用，有这三行就够了。</li>
+  <li>但如果是在macOS上编译使用，则还要需要最后一项xcode-settings设置，意思相同，就是关闭macOS编译器的意外处理功能。<br />
+最后是c++的源码，democpp.cc文件：</li>
+</ul>
+
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;napi.h&gt;</span><span class="cp">
+</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">Napi</span><span class="p">;</span>
+
+<span class="n">String</span> <span class="nf">Hello</span><span class="p">(</span><span class="k">const</span> <span class="n">CallbackInfo</span><span class="o">&amp;</span> <span class="n">info</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="n">String</span><span class="o">::</span><span class="n">New</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">Env</span><span class="p">(),</span> <span class="s">"world"</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="n">Napi</span><span class="o">::</span><span class="n">Object</span>  <span class="nf">Init</span><span class="p">(</span><span class="n">Env</span> <span class="n">env</span><span class="p">,</span> <span class="n">Object</span> <span class="n">exports</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">exports</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="s">"hello"</span><span class="p">,</span> <span class="n">Function</span><span class="o">::</span><span class="n">New</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">Hello</span><span class="p">));</span>
+  <span class="k">return</span> <span class="n">exports</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">NODE_API_MODULE</span><span class="p">(</span><span class="n">addon</span><span class="p">,</span> <span class="n">Init</span><span class="p">)</span>
+
+</code></pre></div></div>
+<p>程序中引入napi.h头文件，使用Napi的namespace还有最后的NODE_API_MODULE(addon,Init)都是模板化的，照抄过来不用动。<br />
+Init函数中，使用<code class="language-plaintext highlighter-rouge">exports.Set()</code>引出要暴露给nodejs调用的函数。如果有多个需要引出的函数，就写多行。<br />
+Hello函数是我们主要完成工作的部分，本例中很简单，只是用字符串的方式返回一个“world”。</p>
+
+<p>以上democpp.cc/binding.gyp/package.json三个文件准备好之后，在命令行执行：<code class="language-plaintext highlighter-rouge">npm install</code>，顺利的话会得到这样的输出信息：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>npm <span class="nb">install</span>
+
+<span class="o">&gt;</span> test-cpp-module@0.1.0 <span class="nb">install</span> /home/andrew/Documents/dev/html/nodejs/callcpp
+<span class="o">&gt;</span> node-gyp rebuild
+
+  SOLINK_MODULE<span class="o">(</span>target<span class="o">)</span> Release/nothing.node
+  CXX<span class="o">(</span>target<span class="o">)</span> Release/obj.target/democpp/democpp.o
+  SOLINK_MODULE<span class="o">(</span>target<span class="o">)</span> Release/democpp.node
+</code></pre></div></div>
+<p>这表示编译顺利完成了，如果碰到错误，可以根据错误信息去判断解决方案。通常都是环境配置缺少相关程序或者上述的三个文件有打字错误。<br />
+下面我们验证一下模块的编译结果，在命令行使用nodejs，引入编译的模块文件，然后调用hello函数来看看：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> <span class="nv">$ </span>node
+<span class="o">&gt;</span> <span class="nv">democpp</span><span class="o">=</span>require<span class="o">(</span><span class="s2">"./build/Release/democpp.node"</span><span class="o">)</span>
+<span class="o">{</span> hello: <span class="o">[</span>Function] <span class="o">}</span>
+<span class="o">&gt;</span> democpp.hello<span class="o">()</span>
+<span class="s1">'world'</span>
+<span class="o">&gt;</span> 
+</code></pre></div></div>
+
+<p>上面是最简单的一个范例，下面我们增加一点难度。在GNU的环境下，通常我们的程序都会包含很多第三方的扩展库，我们这里再举一个调用openssl的例子：<br />
+package.json文件不用修改，我们不需要在nodejs层面增加新的依赖包。<br />
+编译带第三方扩展库的c++程序，通常需要在编译时指定额外的头文件包含路径和链接第三方库，这些都是在binding.gyp中指定的，这些指定在nodejs自动编译的时候，会解析并应用在命令行的编译工具中。</p>
+<div class="language-javascript highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span>
+  <span class="dl">"</span><span class="s2">targets</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+      <span class="dl">"</span><span class="s2">target_name</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">democpp</span><span class="dl">"</span><span class="p">,</span>
+      <span class="dl">"</span><span class="s2">sources</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="dl">"</span><span class="s2">democpp.cc</span><span class="dl">"</span>
+      <span class="p">],</span>
+      <span class="dl">"</span><span class="s2">include_dirs</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="dl">"</span><span class="s2">&lt;!@(node -p </span><span class="se">\"</span><span class="s2">require('node-addon-api').include</span><span class="se">\"</span><span class="s2">)</span><span class="dl">"</span>
+      <span class="p">],</span>
+      <span class="dl">"</span><span class="s2">libraries</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span> 
+        <span class="dl">'</span><span class="s1">-lssl -lcrypto</span><span class="dl">'</span><span class="p">,</span>
+      <span class="p">],</span>
+      <span class="dl">"</span><span class="s2">dependencies</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span>
+        <span class="dl">"</span><span class="s2">&lt;!(node -p </span><span class="se">\"</span><span class="s2">require('node-addon-api').gyp</span><span class="se">\"</span><span class="s2">)</span><span class="dl">"</span>
+      <span class="p">],</span>
+      <span class="dl">"</span><span class="s2">cflags!</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span><span class="dl">"</span><span class="s2">-fno-exceptions</span><span class="dl">"</span><span class="p">],</span>
+      <span class="dl">"</span><span class="s2">cflags_cc!</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span><span class="dl">"</span><span class="s2">-fno-exceptions</span><span class="dl">"</span><span class="p">],</span>
+      <span class="dl">"</span><span class="s2">defines</span><span class="dl">"</span><span class="p">:</span> <span class="p">[</span><span class="dl">"</span><span class="s2">NAPI_CPP_EXCEPTIONS</span><span class="dl">"</span><span class="p">],</span>
+      <span class="dl">"</span><span class="s2">xcode_settings</span><span class="dl">"</span><span class="p">:</span> <span class="p">{</span>
+        <span class="dl">"</span><span class="s2">GCC_ENABLE_CPP_EXCEPTIONS</span><span class="dl">"</span><span class="p">:</span> <span class="dl">"</span><span class="s2">YES</span><span class="dl">"</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div></div>
+<p>在macOS和常用linux版本中，openssl的头文件会自动安装在系统的头文件路径中，比如/usr/local/include,所以这里头文件的引入路径并没有增加。如果使用了自己安装的扩展库，需要在include_dirs一节增加新的头文件包含路径。<br />
+接着增加了libraries一节，指定了Openssl扩展库的链接参数<code class="language-plaintext highlighter-rouge">-lssl -lcrypto</code>，这个是必须的。<br />
+最后是修改democpp.cc文件，添加一个使用openssl中的md5算法对字符串进行md5编码的函数：</p>
+<div class="language-cpp highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">#include</span> <span class="cpf">&lt;napi.h&gt;</span><span class="cp">
+#include</span> <span class="cpf">&lt;openssl/md5.h&gt;</span><span class="cp">
+</span>
+<span class="k">using</span> <span class="k">namespace</span> <span class="n">Napi</span><span class="p">;</span>
+
+<span class="kt">void</span> <span class="nf">openssl_md5</span><span class="p">(</span><span class="k">const</span> <span class="kt">char</span> <span class="o">*</span><span class="n">data</span><span class="p">,</span> <span class="kt">int</span> <span class="n">size</span><span class="p">,</span> <span class="kt">unsigned</span> <span class="kt">char</span> <span class="o">*</span><span class="n">buf</span><span class="p">){</span>
+	<span class="n">MD5_CTX</span> <span class="n">c</span><span class="p">;</span>
+	<span class="n">MD5_Init</span><span class="p">(</span><span class="o">&amp;</span><span class="n">c</span><span class="p">);</span>
+	<span class="n">MD5_Update</span><span class="p">(</span><span class="o">&amp;</span><span class="n">c</span><span class="p">,</span><span class="n">data</span><span class="p">,</span><span class="n">size</span><span class="p">);</span>
+	<span class="n">MD5_Final</span><span class="p">(</span><span class="n">buf</span><span class="p">,</span><span class="o">&amp;</span><span class="n">c</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">String</span> <span class="nf">GetMD5</span><span class="p">(</span><span class="k">const</span> <span class="n">CallbackInfo</span><span class="o">&amp;</span> <span class="n">info</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">Env</span> <span class="n">env</span> <span class="o">=</span> <span class="n">info</span><span class="p">.</span><span class="n">Env</span><span class="p">();</span>
+  <span class="n">std</span><span class="o">::</span><span class="n">string</span> <span class="n">password</span> <span class="o">=</span> <span class="n">info</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">As</span><span class="o">&lt;</span><span class="n">String</span><span class="o">&gt;</span><span class="p">().</span><span class="n">Utf8Value</span><span class="p">();</span>
+  <span class="c1">//printf("md5 in str:%s %ld\n",password.c_str(),password.size());</span>
+  <span class="kt">unsigned</span> <span class="kt">char</span> <span class="n">hash</span><span class="p">[</span><span class="mi">16</span><span class="p">];</span>
+  <span class="n">memset</span><span class="p">(</span><span class="n">hash</span><span class="p">,</span><span class="mi">0</span><span class="p">,</span><span class="mi">16</span><span class="p">);</span>
+  <span class="n">openssl_md5</span><span class="p">(</span><span class="n">password</span><span class="p">.</span><span class="n">c_str</span><span class="p">(),</span><span class="n">password</span><span class="p">.</span><span class="n">size</span><span class="p">(),</span><span class="n">hash</span><span class="p">);</span>
+  <span class="kt">char</span> <span class="n">tmp</span><span class="p">[</span><span class="mi">3</span><span class="p">];</span>
+  <span class="kt">char</span> <span class="n">md5str</span><span class="p">[</span><span class="mi">33</span><span class="p">]</span><span class="o">=</span><span class="p">{};</span>
+  <span class="kt">int</span> <span class="n">i</span><span class="p">;</span>
+	<span class="k">for</span> <span class="p">(</span><span class="n">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="mi">16</span><span class="p">;</span> <span class="n">i</span><span class="o">++</span><span class="p">){</span>
+	  <span class="n">sprintf</span><span class="p">(</span><span class="n">tmp</span><span class="p">,</span><span class="s">"%02x"</span><span class="p">,</span><span class="n">hash</span><span class="p">[</span><span class="n">i</span><span class="p">]);</span>
+	  <span class="n">strcat</span><span class="p">(</span><span class="n">md5str</span><span class="p">,</span><span class="n">tmp</span><span class="p">);</span>
+	<span class="p">}</span>
+  <span class="k">return</span> <span class="n">String</span><span class="o">::</span><span class="n">New</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">md5str</span><span class="p">,</span><span class="mi">32</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="n">String</span> <span class="nf">Hello</span><span class="p">(</span><span class="k">const</span> <span class="n">CallbackInfo</span><span class="o">&amp;</span> <span class="n">info</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> <span class="n">String</span><span class="o">::</span><span class="n">New</span><span class="p">(</span><span class="n">info</span><span class="p">.</span><span class="n">Env</span><span class="p">(),</span> <span class="s">"world"</span><span class="p">);</span>
+<span class="p">}</span>
+<span class="n">Napi</span><span class="o">::</span><span class="n">Object</span>  <span class="nf">Init</span><span class="p">(</span><span class="n">Env</span> <span class="n">env</span><span class="p">,</span> <span class="n">Object</span> <span class="n">exports</span><span class="p">)</span> <span class="p">{</span>
+  <span class="n">exports</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="s">"hello"</span><span class="p">,</span> <span class="n">Function</span><span class="o">::</span><span class="n">New</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">Hello</span><span class="p">));</span>
+  <span class="n">exports</span><span class="p">.</span><span class="n">Set</span><span class="p">(</span><span class="s">"md5"</span><span class="p">,</span> <span class="n">Function</span><span class="o">::</span><span class="n">New</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">GetMD5</span><span class="p">));</span>
+  <span class="k">return</span> <span class="n">exports</span><span class="p">;</span>
+<span class="p">}</span>
+<span class="n">NODE_API_MODULE</span><span class="p">(</span><span class="n">addon</span><span class="p">,</span> <span class="n">Init</span><span class="p">)</span>
+</code></pre></div></div>
+<p>为了工作方便，源码中增加了一个没有引出的openssl_md5函数，仅供程序内部使用。因为没有引出，nodejs并不知道这个函数的存在。<br />
+从nodejs传递参数给c++的函数，是使用<code class="language-plaintext highlighter-rouge">info[0].As&lt;String&gt;().Utf8Value()</code>这样的形式。返回值到nodejs在hello函数中就已经看过了。<br />
+各项修改完成，同样回到命令行使用<code class="language-plaintext highlighter-rouge">npm install</code>重新编译。编译的过程和信息略，我们直接看调用的测试：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;</span> <span class="nv">$ </span>node
+<span class="o">&gt;</span> <span class="nv">democpp</span><span class="o">=</span>require<span class="o">(</span><span class="s2">"./build/Release/democpp.node"</span><span class="o">)</span>
+<span class="o">{</span> hello: <span class="o">[</span>Function], md5: <span class="o">[</span>Function] <span class="o">}</span>
+<span class="o">&gt;</span> democpp.hello<span class="o">()</span>
+<span class="s1">'world'</span>
+<span class="o">&gt;</span> democpp.md5<span class="o">(</span><span class="s2">"abc"</span><span class="o">)</span>
+<span class="s1">'900150983cd24fb0d6963f7d28e17f72'</span>
+<span class="o">&gt;</span> 
+</code></pre></div></div>
+<p>想验证一下计算的正确性？可以直接执行openssl试试：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">echo</span> <span class="nt">-n</span> <span class="s2">"abc"</span> | openssl md5
+900150983cd24fb0d6963f7d28e17f72
+</code></pre></div></div>
+<p>嗯，无悬念的相同。</p>
+
+<h4 id="参考文档">参考文档</h4>
+<p><a href="https://github.com/kriasoft/nodejs-api-starter">https://github.com/kriasoft/nodejs-api-starter</a><br />
+<a href="https://github.com/nodejs/node-addon-api/blob/master/doc/node-gyp.md">https://github.com/nodejs/node-addon-api/blob/master/doc/node-gyp.md</a></p>
+
+:ET

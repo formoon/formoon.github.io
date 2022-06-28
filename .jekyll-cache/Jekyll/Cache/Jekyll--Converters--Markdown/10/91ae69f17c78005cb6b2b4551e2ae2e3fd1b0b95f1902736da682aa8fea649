@@ -1,0 +1,202 @@
+I"�|<p><img src="/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /><br />
+<a href="http://blog.17study.com.cn/2018/01/11/tensorFlow-series-6/">《从锅炉工到AI专家(6)》</a>一文中，我们把神经网络模型降维，简单的在二维空间中介绍了过拟合和欠拟合的现象和解决方法。但是因为条件所限，在该文中我们只介绍了理论，并没有实际观察现象和应对。<br />
+现在有了TensorFLow 2.0 / Keras的支持，可以非常容易的构建模型。我们可以方便的人工模拟过拟合的情形，实际来操作监控、调整模型，从而显著改善模型指标。</p>
+
+<h4 id="从图中识别过拟合和欠拟合">从图中识别过拟合和欠拟合</h4>
+<p>先借用上一篇的两组图：<br />
+<img src="/attachments/201904/tensorFlow2/regression_mae_mse.png" alt="" />
+<img src="/attachments/201904/tensorFlow2/regression_mae_mse2.png" alt="" />
+先看上边的一组图，随着训练迭代次数的增加，预测的错误率迅速下降。<br />
+我们上一篇中讲，达到一定迭代次数之后，验证的错误率就稳定不变了。实际上你仔细观察，训练集的错误率在稳定下降，但验证集的错误率还会略有上升。两者之间的差异越来越大，图中的两条曲线，显著分离了，并且分离的趋势还在增加。这就是过拟合的典型特征。<br />
+这表示，模型过分适应了当前的训练集数据，对于训练集数据有了较好表现。对于之外的数据，反而不适应，从而效果很差。<br />
+这通常都是由于较小的数据样本造成的。如果数据集足够大，较多的训练通常都能让模型表现的更好。过拟合对于生产环境伤害是比较大的，因为生产中大多接收到的都是新数据，而过拟合无法对这些新数据达成较好表现。<br />
+所以如果数据集不够的情况下，采用适当的迭代次数可能是更好的选择。这也是上一节我们采用EarlyStopping机制的原因之一。最终的表现是上边下面一组图的样子。<br />
+欠拟合与此相反，表示模型还有较大改善空间。上面两组图中，左侧下降沿的曲线都可以认为是欠拟合。表现特征是无论测试集还是验证集，都没有足够的正确率。当然也因此，测试集和验证集表现类似，拟合非常紧密。<br />
+欠拟合的情况，除了训练不足之外，模型不够强大或者或者模型不适合业务情况都是可能的原因。</p>
+
+<h4 id="实验模拟过拟合">实验模拟过拟合</h4>
+<p>我们使用IMDB影评样本库来做这个实验。实验程序主要部分来自于<a href="http://blog.17study.com.cn/2019/04/08/tensorflow-from-1-to-2-5/">本系列第五篇</a>中第二个例子，当然有较大的修改。<br />
+程序主要分为几个部分：</p>
+<ul>
+  <li>下载IMDB影评库（仅第一次），载入内存，并做单词向量化。</li>
+  <li>单词向量化编码使用了multi-hot-sequences，这种编码跟one-hot类似，但一句话中有多个单词，因此会有多个’1’。一个影评就是一个0、1序列。这种编码模型非常有用，但在本例中，数据歧义会更多，更容易出现过拟合。</li>
+  <li>定义baseline/small/big三个不同规模的神经网络模型，并分别编译训练，训练时保存过程数据。</li>
+  <li>使用三组过程数据绘制曲线图，指标是binary_crossentropy，这是我们经常当做损失函数使用的指征，这个值在正常训练的时候收敛到越小越好。</li>
+</ul>
+
+<p>程序中，文本的编码方式、模型都并不是很合理，因为我们不是想得到一个最优的模型，而是想演示过拟合的场景。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
+</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+<span class="kn">from</span> <span class="nn">tensorflow</span> <span class="kn">import</span> <span class="n">keras</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="n">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="n">NUM_WORDS</span> <span class="o">=</span> <span class="mi">10000</span>
+<span class="c1"># 载入IMDB样本数据
+</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">),</span> <span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">)</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">datasets</span><span class="p">.</span><span class="n">imdb</span><span class="p">.</span><span class="n">load_data</span><span class="p">(</span><span class="n">num_words</span><span class="o">=</span><span class="n">NUM_WORDS</span><span class="p">)</span>
+
+<span class="c1"># 将单词数字化，转化为multi-hot序列编码方式
+</span><span class="k">def</span> <span class="nf">multi_hot_sequences</span><span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">dimension</span><span class="p">):</span>
+    <span class="c1"># 建立一个空矩阵保存结果
+</span>    <span class="n">results</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="n">zeros</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">sequences</span><span class="p">),</span> <span class="n">dimension</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">word_indices</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sequences</span><span class="p">):</span>
+        <span class="n">results</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">word_indices</span><span class="p">]</span> <span class="o">=</span> <span class="mf">1.0</span>  <span class="c1"># 出现过的词设置为1.0
+</span>    <span class="k">return</span> <span class="n">results</span>
+
+<span class="n">train_data</span> <span class="o">=</span> <span class="n">multi_hot_sequences</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="n">NUM_WORDS</span><span class="p">)</span>
+<span class="n">test_data</span> <span class="o">=</span> <span class="n">multi_hot_sequences</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">dimension</span><span class="o">=</span><span class="n">NUM_WORDS</span><span class="p">)</span>
+
+<span class="c1"># 建立baseline模型，并编译训练
+</span><span class="n">baseline_model</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">Sequential</span><span class="p">([</span>
+    <span class="c1"># 指定`input_shape`以保证下面的.summary()可以执行，
+</span>    <span class="c1"># 否则在模型结构无法确定
+</span>    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">NUM_WORDS</span><span class="p">,)),</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">),</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'sigmoid'</span><span class="p">)</span>
+<span class="p">])</span>
+<span class="n">baseline_model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'adam'</span><span class="p">,</span>
+                       <span class="n">loss</span><span class="o">=</span><span class="s">'binary_crossentropy'</span><span class="p">,</span>
+                       <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">,</span> <span class="s">'binary_crossentropy'</span><span class="p">])</span>
+<span class="n">baseline_model</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+<span class="n">baseline_history</span> <span class="o">=</span> <span class="n">baseline_model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span>
+                                      <span class="n">train_labels</span><span class="p">,</span>
+                                      <span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                                      <span class="n">batch_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+                                      <span class="n">validation_data</span><span class="o">=</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">),</span>
+                                      <span class="n">verbose</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1"># 小模型定义、编译、训练
+</span><span class="n">smaller_model</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">Sequential</span><span class="p">([</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">NUM_WORDS</span><span class="p">,)),</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">),</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'sigmoid'</span><span class="p">)</span>
+<span class="p">])</span>
+<span class="n">smaller_model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'adam'</span><span class="p">,</span>
+                      <span class="n">loss</span><span class="o">=</span><span class="s">'binary_crossentropy'</span><span class="p">,</span>
+                      <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">,</span> <span class="s">'binary_crossentropy'</span><span class="p">])</span>
+<span class="n">smaller_model</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+<span class="n">smaller_history</span> <span class="o">=</span> <span class="n">smaller_model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span>
+                                    <span class="n">train_labels</span><span class="p">,</span>
+                                    <span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                                    <span class="n">batch_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+                                    <span class="n">validation_data</span><span class="o">=</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">),</span>
+                                    <span class="n">verbose</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="c1"># 大模型定义、编译、训练
+</span><span class="n">bigger_model</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">models</span><span class="p">.</span><span class="n">Sequential</span><span class="p">([</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">NUM_WORDS</span><span class="p">,)),</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">),</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'sigmoid'</span><span class="p">)</span>
+<span class="p">])</span>
+
+<span class="n">bigger_model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'adam'</span><span class="p">,</span>
+                     <span class="n">loss</span><span class="o">=</span><span class="s">'binary_crossentropy'</span><span class="p">,</span>
+                     <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">,</span><span class="s">'binary_crossentropy'</span><span class="p">])</span>
+
+<span class="n">bigger_model</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+<span class="n">bigger_history</span> <span class="o">=</span> <span class="n">bigger_model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">,</span>
+                                  <span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                                  <span class="n">batch_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+                                  <span class="n">validation_data</span><span class="o">=</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">),</span>
+                                  <span class="n">verbose</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># 绘图函数
+</span><span class="k">def</span> <span class="nf">plot_history</span><span class="p">(</span><span class="n">histories</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="s">'binary_crossentropy'</span><span class="p">):</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">history</span> <span class="ow">in</span> <span class="n">histories</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">history</span><span class="p">.</span><span class="n">epoch</span><span class="p">,</span> <span class="n">history</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="s">'val_'</span><span class="o">+</span><span class="n">key</span><span class="p">],</span>
+            <span class="s">'--'</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="n">name</span><span class="p">.</span><span class="n">title</span><span class="p">()</span><span class="o">+</span><span class="s">' Val'</span><span class="p">)</span>
+        <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span>
+            <span class="n">history</span><span class="p">.</span><span class="n">epoch</span><span class="p">,</span> <span class="n">history</span><span class="p">.</span><span class="n">history</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="n">val</span><span class="p">[</span><span class="mi">0</span><span class="p">].</span><span class="n">get_color</span><span class="p">(),</span>
+            <span class="n">label</span><span class="o">=</span><span class="n">name</span><span class="p">.</span><span class="n">title</span><span class="p">()</span><span class="o">+</span><span class="s">' Train'</span><span class="p">)</span>
+
+    <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Epochs'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="n">key</span><span class="p">.</span><span class="n">replace</span><span class="p">(</span><span class="s">'_'</span><span class="p">,</span><span class="s">' '</span><span class="p">).</span><span class="n">title</span><span class="p">())</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">()</span>
+
+    <span class="n">plt</span><span class="p">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span><span class="nb">max</span><span class="p">(</span><span class="n">history</span><span class="p">.</span><span class="n">epoch</span><span class="p">)])</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="c1"># 绘制三个模型的三组曲线
+</span><span class="n">plot_history</span><span class="p">([(</span><span class="s">'baseline'</span><span class="p">,</span> <span class="n">baseline_history</span><span class="p">),</span>
+              <span class="p">(</span><span class="s">'smaller'</span><span class="p">,</span> <span class="n">smaller_history</span><span class="p">),</span>
+              <span class="p">(</span><span class="s">'bigger'</span><span class="p">,</span> <span class="n">bigger_history</span><span class="p">)])</span>
+
+</code></pre></div></div>
+<p>程序在命令行的输出就不贴出来了，除了输出的训练迭代过程，在之前还输出了每个模型的summary()。这里主要看最后的binary_crossentropy曲线图。<br />
+<img src="/attachments/201904/tensorFlow2/imdb-overfitting.png" alt="" /><br />
+图中的虚线都是验证集数据的表现，实线是训练集数据的表现。三个模型的训练数据和测试数据交叉熵曲线都出现了较大的分离，代表出现了过拟合。尤其是bigger模型的两条绿线，几乎是一开始就出现了较大的背离。</p>
+
+<h4 id="优化过拟合">优化过拟合</h4>
+<p>优化过拟合首先要知道过拟合产生的原因，我们借用一张前一系列讲解过拟合时候用过的图，是吴恩达老师课程的笔记：<br />
+<img src="/attachments/201801/ml-nn/overfitting1.png" alt="" />
+如果一个模型产生过拟合，那这个模型的总体效果就可能是一个非常复杂的非线性方程。方程非常努力的学习所有“可见”数据，导致了复杂的权重值，使得曲线弯来弯去，变得极为复杂。多层网络更加剧了这种复杂度，最终的复杂曲线绕开了可行的区域，只对局部的可见数据有效，对于实际数据命中率低。所以从我们程序跑的结果图来看，也是越复杂的网络模型，过拟合现象反而越严重。<br />
+这么说简单的模型就好喽？并非如此，太简单的模型往往无法表达复杂的逻辑，从而产生欠拟合。其实看看成熟的那些模型比如ResNet50，都是非常复杂的结构。<br />
+过拟合既然产生的主要原因是在权重值上，我们在这方面做工作即可。</p>
+
+<h4 id="增加权重的规范化">增加权重的规范化</h4>
+<p>通常有两种方法，称为L1规范化和L2规范化。前者为代价值增加一定比例的权重值的绝对值。后者增加一定比例权重值的平方值。具体的实现来源于公式，有兴趣的可以参考一下这篇文章<a href="https://medium.com/datadriveninvestor/l1-l2-regularization-7f1b4fe948f2">《L1 and L2 Regularization》</a>。<br />
+我们删除掉上面源码中的bigger模型和small模型的部分，包括模型的构建、编译和训练，添加下面的代码：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 构建一个L2规范化的模型
+</span><span class="n">l2_model</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">models</span><span class="p">.</span><span class="n">Sequential</span><span class="p">([</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">kernel_regularizer</span><span class="o">=</span><span class="n">keras</span><span class="p">.</span><span class="n">regularizers</span><span class="p">.</span><span class="n">l2</span><span class="p">(</span><span class="mf">0.001</span><span class="p">),</span>
+                       <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">NUM_WORDS</span><span class="p">,)),</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">kernel_regularizer</span><span class="o">=</span><span class="n">keras</span><span class="p">.</span><span class="n">regularizers</span><span class="p">.</span><span class="n">l2</span><span class="p">(</span><span class="mf">0.001</span><span class="p">),</span>
+                       <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">),</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'sigmoid'</span><span class="p">)</span>
+<span class="p">])</span>
+
+<span class="n">l2_model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'adam'</span><span class="p">,</span>
+                 <span class="n">loss</span><span class="o">=</span><span class="s">'binary_crossentropy'</span><span class="p">,</span>
+                 <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">,</span> <span class="s">'binary_crossentropy'</span><span class="p">])</span>
+
+<span class="n">l2_model_history</span> <span class="o">=</span> <span class="n">l2_model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">,</span>
+                                <span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                                <span class="n">batch_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+                                <span class="n">validation_data</span><span class="o">=</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">),</span>
+                                <span class="n">verbose</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</code></pre></div></div>
+<p>这个模型的逻辑结构同baseline的模型完全一致，只是在前两层中增加了L2规范化的设置参数。<br />
+先不着急运行，我们继续另外一种方法。</p>
+
+<h4 id="添加dropout">添加DropOut</h4>
+<p>DropOut是我们在上个系列中已经讲过的方法，应用的很广泛也非常有效。<br />
+其机理非常简单，就是在一层网络中，“丢弃”一定比例的输出（设置为数值0）给下一层。丢弃的比例通常设置为0.2至0.5。这个过程只在训练过程中有效，一般会在预测过程中关闭这个机制。<br />
+我们继续在上面代码中，添加一组采用DropOut机制的模型，模型的基本结构依然同baseline相同：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="n">dpt_model</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">models</span><span class="p">.</span><span class="n">Sequential</span><span class="p">([</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">(</span><span class="n">NUM_WORDS</span><span class="p">,)),</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.5</span><span class="p">),</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">),</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dropout</span><span class="p">(</span><span class="mf">0.5</span><span class="p">),</span>
+    <span class="n">keras</span><span class="p">.</span><span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'sigmoid'</span><span class="p">)</span>
+<span class="p">])</span>
+
+<span class="n">dpt_model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">optimizer</span><span class="o">=</span><span class="s">'adam'</span><span class="p">,</span>
+                  <span class="n">loss</span><span class="o">=</span><span class="s">'binary_crossentropy'</span><span class="p">,</span>
+                  <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'accuracy'</span><span class="p">,</span><span class="s">'binary_crossentropy'</span><span class="p">])</span>
+
+<span class="n">dpt_model_history</span> <span class="o">=</span> <span class="n">dpt_model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">train_data</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">,</span>
+                                  <span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+                                  <span class="n">batch_size</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span>
+                                  <span class="n">validation_data</span><span class="o">=</span><span class="p">(</span><span class="n">test_data</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">),</span>
+                                  <span class="n">verbose</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+		<span class="p">....</span>
+<span class="c1"># 最后的绘图函数不变，绘图语句修改如下：
+</span><span class="n">plot_history</span><span class="p">([</span>
+            <span class="p">(</span><span class="s">'baseline'</span><span class="p">,</span> <span class="n">baseline_history</span><span class="p">),</span>
+            <span class="p">(</span><span class="s">'l2'</span><span class="p">,</span> <span class="n">l2_model_history</span><span class="p">),</span>
+            <span class="p">(</span><span class="s">'dropout'</span><span class="p">,</span> <span class="n">dpt_model_history</span><span class="p">)])</span>
+</code></pre></div></div>
+<p>现在可以执行程序了。<br />
+程序获得的曲线图如下，图中可见，我们在不降低模型的复杂度的情况下，L2规范化(黄色曲线)和DropOut（绿色曲线）都有效的改善了模型的过拟合问题。<br />
+<img src="/attachments/201904/tensorFlow2/imdb-overfitting2.png" alt="" /></p>
+
+<p>（待续…）</p>
+
+:ET

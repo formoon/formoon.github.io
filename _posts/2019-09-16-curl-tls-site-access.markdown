@@ -2,12 +2,12 @@
 layout:         page
 title:          cURL无法访问TLS网站故障解决
 subtitle:       手工重新编译openssl和cURL
-card-image:		https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=1183492921,3025675101&fm=15&gp=0.jpg
+card-image:		/attachments/201909/curl.webp
 date:           2019-09-16
 tags:           html
 post-card-type: image
 ---
-![](https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=1183492921,3025675101&fm=15&gp=0.jpg)  
+![](/attachments/201909/curl.webp)  
 大多数人都厌烦使用老旧的系统，无论软件还是硬件。但有的时候又不得不困守其中，坚持延续着系统的寿命，或者还需要点几柱香，祈求神佛的护佑。  
 Linux是一个模块化极好的操作系统，得益于此，当其中有组件落伍之时，大多数情况下，还能通过下载源码，手工编译来升级组件，从而保证系统的可用性。  
 在这个过程中，cURL工具是必不可少的，特别很多常用的开发平台，都使用了libcurl库作为下载的基础工具。比如PHP/PYTHON/RUST/NPM等。当cURL出现故障的时候，直接就导致很多开发工具的升级或者安装依赖包无法继续。  

@@ -1,0 +1,461 @@
+I"<p><img src="/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /></p>
+<h4 id="线性回归模型">线性回归模型</h4>
+<p>“回归”这个词，既是Regression算法的名称，也代表了不同的计算结果。当然结果也是由算法决定的。<br />
+不同于前面讲过的多个分类算法或者逻辑回归，线性回归模型的结果是一个连续的值。<br />
+实际上我们第一篇的房价预测就属于线性回归算法，如果把这个模型用于预测，结果是一个连续值而不是有限的分类。<br />
+从代码上讲，那个例子更多的是为了延续从TensorFlow 1.x而来的解题思路，我不想在这个系列的第一篇就给大家印象，TensorFlow 2.0成为了完全不同的另一个东西。在TensorFlow 2.0中，有更方便的方法可以解决类似问题。<br />
+线性回归算法在大多数机器学习课程中，也都是最早会学习的算法。所以对这个算法，我们都不陌生。<br />
+因此本篇的重点不在算法本身，也不在油耗的预测，而是通过油耗预测这样简单的例子，介绍在TensorFlow 2.0中，如何更好的对训练过程进行监控和管理，还有其它一些方便有效的小技巧。</p>
+
+<h4 id="了解样本数据">了解样本数据</h4>
+<p>在机器学习算法本身没有大的突破的情况下，对样本数据的选取、预处理往往是项目成功的关键。我们接续前一篇继续说一说样本数据。<br />
+样本数据的预处理依靠对样本数据的了解和分析。Python的交互模式配合第三方工具包则是对样本数据分析的强力武器。<br />
+下面我们使用Python的交互模式，载入油耗预测的样本数据，先直观的看一下样本数据：<br />
+（第一次载入样本数据会从网上下载，速度比较慢）</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">$</span> <span class="n">python3</span>
+<span class="n">Python</span> <span class="mf">3.7</span><span class="p">.</span><span class="mi">3</span> <span class="p">(</span><span class="n">default</span><span class="p">,</span> <span class="n">Mar</span> <span class="mi">27</span> <span class="mi">2019</span><span class="p">,</span> <span class="mi">09</span><span class="p">:</span><span class="mi">23</span><span class="p">:</span><span class="mi">39</span><span class="p">)</span> 
+<span class="p">[</span><span class="n">Clang</span> <span class="mf">10.0</span><span class="p">.</span><span class="mi">0</span> <span class="p">(</span><span class="n">clang</span><span class="o">-</span><span class="mf">1000.11</span><span class="p">.</span><span class="mf">45.5</span><span class="p">)]</span> <span class="n">on</span> <span class="n">darwin</span>
+<span class="n">Type</span> <span class="s">"help"</span><span class="p">,</span> <span class="s">"copyright"</span><span class="p">,</span> <span class="s">"credits"</span> <span class="ow">or</span> <span class="s">"license"</span> <span class="k">for</span> <span class="n">more</span> <span class="n">information</span><span class="p">.</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">tensorflow</span> <span class="kn">import</span> <span class="n">keras</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">dataset_path</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">utils</span><span class="p">.</span><span class="n">get_file</span><span class="p">(</span><span class="s">"auto-mpg.data"</span><span class="p">,</span> <span class="s">"http://archive.ics.uci.edu/ml/machine-learning-databases/auto-mpg/auto-mpg.data"</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="s">'MPG'</span><span class="p">,</span><span class="s">'Cylinders'</span><span class="p">,</span><span class="s">'Displacement'</span><span class="p">,</span><span class="s">'Horsepower'</span><span class="p">,</span><span class="s">'Weight'</span><span class="p">,</span>
+<span class="p">...</span>                 <span class="s">'Acceleration'</span><span class="p">,</span> <span class="s">'Model Year'</span><span class="p">,</span> <span class="s">'Origin'</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">raw_dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">dataset_path</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span>
+<span class="p">...</span>                       <span class="n">na_values</span> <span class="o">=</span> <span class="s">"?"</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="p">,</span>
+<span class="p">...</span>                       <span class="n">sep</span><span class="o">=</span><span class="s">" "</span><span class="p">,</span> <span class="n">skipinitialspace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> 
+<span class="o">&gt;&gt;&gt;</span> <span class="n">raw_dataset</span><span class="p">.</span><span class="n">tail</span><span class="p">()</span>
+      <span class="n">MPG</span>  <span class="n">Cylinders</span>  <span class="n">Displacement</span>  <span class="n">Horsepower</span>  <span class="n">Weight</span>  <span class="n">Acceleration</span>  <span class="n">Model</span> <span class="n">Year</span>  <span class="n">Origin</span>
+<span class="mi">393</span>  <span class="mf">27.0</span>          <span class="mi">4</span>         <span class="mf">140.0</span>        <span class="mf">86.0</span>  <span class="mf">2790.0</span>          <span class="mf">15.6</span>          <span class="mi">82</span>       <span class="mi">1</span>
+<span class="mi">394</span>  <span class="mf">44.0</span>          <span class="mi">4</span>          <span class="mf">97.0</span>        <span class="mf">52.0</span>  <span class="mf">2130.0</span>          <span class="mf">24.6</span>          <span class="mi">82</span>       <span class="mi">2</span>
+<span class="mi">395</span>  <span class="mf">32.0</span>          <span class="mi">4</span>         <span class="mf">135.0</span>        <span class="mf">84.0</span>  <span class="mf">2295.0</span>          <span class="mf">11.6</span>          <span class="mi">82</span>       <span class="mi">1</span>
+<span class="mi">396</span>  <span class="mf">28.0</span>          <span class="mi">4</span>         <span class="mf">120.0</span>        <span class="mf">79.0</span>  <span class="mf">2625.0</span>          <span class="mf">18.6</span>          <span class="mi">82</span>       <span class="mi">1</span>
+<span class="mi">397</span>  <span class="mf">31.0</span>          <span class="mi">4</span>         <span class="mf">119.0</span>        <span class="mf">82.0</span>  <span class="mf">2720.0</span>          <span class="mf">19.4</span>          <span class="mi">82</span>       <span class="mi">1</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">raw_dataset</span>
+      <span class="n">MPG</span>  <span class="n">Cylinders</span>  <span class="n">Displacement</span>  <span class="n">Horsepower</span>  <span class="n">Weight</span>  <span class="n">Acceleration</span>  <span class="n">Model</span> <span class="n">Year</span>  <span class="n">Origin</span>
+<span class="mi">0</span>    <span class="mf">18.0</span>          <span class="mi">8</span>         <span class="mf">307.0</span>       <span class="mf">130.0</span>  <span class="mf">3504.0</span>          <span class="mf">12.0</span>          <span class="mi">70</span>       <span class="mi">1</span>
+<span class="mi">1</span>    <span class="mf">15.0</span>          <span class="mi">8</span>         <span class="mf">350.0</span>       <span class="mf">165.0</span>  <span class="mf">3693.0</span>          <span class="mf">11.5</span>          <span class="mi">70</span>       <span class="mi">1</span>
+<span class="mi">2</span>    <span class="mf">18.0</span>          <span class="mi">8</span>         <span class="mf">318.0</span>       <span class="mf">150.0</span>  <span class="mf">3436.0</span>          <span class="mf">11.0</span>          <span class="mi">70</span>       <span class="mi">1</span>
+<span class="mi">3</span>    <span class="mf">16.0</span>          <span class="mi">8</span>         <span class="mf">304.0</span>       <span class="mf">150.0</span>  <span class="mf">3433.0</span>          <span class="mf">12.0</span>          <span class="mi">70</span>       <span class="mi">1</span>
+<span class="p">..</span>    <span class="p">...</span>        <span class="p">...</span>           <span class="p">...</span>         <span class="p">...</span>     <span class="p">...</span>           <span class="p">...</span>         <span class="p">...</span>     <span class="p">...</span>
+<span class="mi">373</span>  <span class="mf">24.0</span>          <span class="mi">4</span>         <span class="mf">140.0</span>        <span class="mf">92.0</span>  <span class="mf">2865.0</span>          <span class="mf">16.4</span>          <span class="mi">82</span>       <span class="mi">1</span>
+<span class="mi">374</span>  <span class="mf">23.0</span>          <span class="mi">4</span>         <span class="mf">151.0</span>         <span class="n">NaN</span>  <span class="mf">3035.0</span>          <span class="mf">20.5</span>          <span class="mi">82</span>       <span class="mi">1</span>
+<span class="p">..</span>    <span class="p">...</span>        <span class="p">...</span>           <span class="p">...</span>         <span class="p">...</span>     <span class="p">...</span>           <span class="p">...</span>         <span class="p">...</span>     <span class="p">...</span>
+<span class="mi">396</span>  <span class="mf">28.0</span>          <span class="mi">4</span>         <span class="mf">120.0</span>        <span class="mf">79.0</span>  <span class="mf">2625.0</span>          <span class="mf">18.6</span>          <span class="mi">82</span>       <span class="mi">1</span>
+<span class="mi">397</span>  <span class="mf">31.0</span>          <span class="mi">4</span>         <span class="mf">119.0</span>        <span class="mf">82.0</span>  <span class="mf">2720.0</span>          <span class="mf">19.4</span>          <span class="mi">82</span>       <span class="mi">1</span>
+
+<span class="p">[</span><span class="mi">398</span> <span class="n">rows</span> <span class="n">x</span> <span class="mi">8</span> <span class="n">columns</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> 
+</code></pre></div></div>
+<p>本篇就不用表格来逐行解释属性列的含义了，我们会在用到的每一列单独说明。<br />
+使用raw_dataset.tail()列出数据的最后几行，显示数据一共只有398行。说明数据集并不是很大，可以直接全部列出来粗略的看一下。这一步使用Excel之类的工具效果可能更好。不过习惯命令行操作的工程师直接列出也是一样的。<br />
+数据中可以看到第374行，在Horsepower（发动机功率）一列，意外的有NaN未知数据。这样的数据当然是无效的，需要首先进行数据清洗。大数据转行过来的技术人员都熟悉，数据清洗是保证数据有效性必不可少的手段。<br />
+其实这里的NaN并不能完全说意外，我们在使用Pandas打开数据集的时候使用了参数：na_values = “?”，这是指数据集中如果有“？”字符，则数据当做无效数据，方便后续使用内置方法处理。这个参数可以根据你获取的数据集修改。<br />
+比如检查数据集是否有无效数据可以使用isna()方法：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="c1"># 继续上面的交互操作
+</span><span class="p">...</span> 
+<span class="o">&gt;&gt;&gt;</span> <span class="n">raw_dataset</span><span class="p">.</span><span class="n">isna</span><span class="p">().</span><span class="nb">sum</span><span class="p">()</span>
+<span class="n">MPG</span>             <span class="mi">0</span>
+<span class="n">Cylinders</span>       <span class="mi">0</span>
+<span class="n">Displacement</span>    <span class="mi">0</span>
+<span class="n">Horsepower</span>      <span class="mi">6</span>
+<span class="n">Weight</span>          <span class="mi">0</span>
+<span class="n">Acceleration</span>    <span class="mi">0</span>
+<span class="n">Model</span> <span class="n">Year</span>      <span class="mi">0</span>
+<span class="n">Origin</span>          <span class="mi">0</span>
+<span class="n">dtype</span><span class="p">:</span> <span class="n">int64</span>
+<span class="o">&gt;&gt;&gt;</span> 
+<span class="o">&gt;&gt;&gt;</span> <span class="c1"># 确认有6个无效数据，需要抛弃相应行
+</span><span class="p">...</span> <span class="c1"># 将数据复制一份，防止误操作
+</span><span class="p">...</span> 
+<span class="o">&gt;&gt;&gt;</span> <span class="n">dataset</span> <span class="o">=</span> <span class="n">raw_dataset</span><span class="p">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> 
+<span class="o">&gt;&gt;&gt;</span> <span class="c1"># 抛弃无效数据所在行
+</span><span class="p">...</span> 
+<span class="o">&gt;&gt;&gt;</span> <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">.</span><span class="n">dropna</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> 
+</code></pre></div></div>
+<p>接着Origin一列，实际是一个分类类型，并不是数字。分别代表车型的产地为美国、欧洲或者日本。上一篇中我们已经有了经验，我们要把这个数据列转成one-hot编码方式：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="c1"># 取出Origin数据列，原数据集中将不会再有这一列
+</span><span class="p">...</span> 
+<span class="o">&gt;&gt;&gt;</span> <span class="n">origin</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">.</span><span class="n">pop</span><span class="p">(</span><span class="s">'Origin'</span><span class="p">)</span>
+<span class="o">&gt;&gt;&gt;</span> 
+<span class="o">&gt;&gt;&gt;</span> <span class="c1"># 根据分类编码，分别为新对应列赋值1.0
+</span><span class="p">...</span> 
+<span class="o">&gt;&gt;&gt;</span> <span class="n">dataset</span><span class="p">[</span><span class="s">'USA'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">origin</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mf">1.0</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">dataset</span><span class="p">[</span><span class="s">'Europe'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">origin</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="mf">1.0</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">dataset</span><span class="p">[</span><span class="s">'Japan'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">origin</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="mf">1.0</span>
+<span class="o">&gt;&gt;&gt;</span> 
+<span class="o">&gt;&gt;&gt;</span> <span class="c1"># 列出新的数据集尾部，以观察结果
+</span><span class="p">...</span> 
+<span class="o">&gt;&gt;&gt;</span> <span class="n">dataset</span><span class="p">.</span><span class="n">tail</span><span class="p">()</span>
+      <span class="n">MPG</span>  <span class="n">Cylinders</span>  <span class="n">Displacement</span>  <span class="n">Horsepower</span>  <span class="n">Weight</span>  <span class="n">Acceleration</span>  <span class="n">Model</span> <span class="n">Year</span>  <span class="n">USA</span>  <span class="n">Europe</span>  <span class="n">Japan</span>
+<span class="mi">393</span>  <span class="mf">27.0</span>          <span class="mi">4</span>         <span class="mf">140.0</span>        <span class="mf">86.0</span>  <span class="mf">2790.0</span>          <span class="mf">15.6</span>          <span class="mi">82</span>  <span class="mf">1.0</span>     <span class="mf">0.0</span>    <span class="mf">0.0</span>
+<span class="mi">394</span>  <span class="mf">44.0</span>          <span class="mi">4</span>          <span class="mf">97.0</span>        <span class="mf">52.0</span>  <span class="mf">2130.0</span>          <span class="mf">24.6</span>          <span class="mi">82</span>  <span class="mf">0.0</span>     <span class="mf">1.0</span>    <span class="mf">0.0</span>
+<span class="mi">395</span>  <span class="mf">32.0</span>          <span class="mi">4</span>         <span class="mf">135.0</span>        <span class="mf">84.0</span>  <span class="mf">2295.0</span>          <span class="mf">11.6</span>          <span class="mi">82</span>  <span class="mf">1.0</span>     <span class="mf">0.0</span>    <span class="mf">0.0</span>
+<span class="mi">396</span>  <span class="mf">28.0</span>          <span class="mi">4</span>         <span class="mf">120.0</span>        <span class="mf">79.0</span>  <span class="mf">2625.0</span>          <span class="mf">18.6</span>          <span class="mi">82</span>  <span class="mf">1.0</span>     <span class="mf">0.0</span>    <span class="mf">0.0</span>
+<span class="mi">397</span>  <span class="mf">31.0</span>          <span class="mi">4</span>         <span class="mf">119.0</span>        <span class="mf">82.0</span>  <span class="mf">2720.0</span>          <span class="mf">19.4</span>          <span class="mi">82</span>  <span class="mf">1.0</span>     <span class="mf">0.0</span>    <span class="mf">0.0</span>
+<span class="o">&gt;&gt;&gt;</span> 
+</code></pre></div></div>
+<p>不同前一篇，这次做One-hot编码的方式直接使用了Python语言的逻辑计算表达式，效果一样好。<br />
+关于怎么知道哪个数字代表哪个产地，如果是自己设计的数据采集方式，你自己当然应当知道。如果使用了别人的数据集，应当仔细阅读数据的说明。这里就不多解释了。<br />
+我们还可以使用seaborn工具（第一篇中已经安装了）对数据做进一步分析，seaborn包含一组散列图绘制工具，可以更直观的揭示数据之间的关联：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="c1"># 继续上面的交互操作
+</span><span class="p">...</span> 
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">sns</span><span class="p">.</span><span class="n">pairplot</span><span class="p">(</span><span class="n">dataset</span><span class="p">[[</span><span class="s">"MPG"</span><span class="p">,</span> <span class="s">"Cylinders"</span><span class="p">,</span> <span class="s">"Displacement"</span><span class="p">,</span> <span class="s">"Weight"</span><span class="p">]],</span> <span class="n">diag_kind</span><span class="o">=</span><span class="s">"kde"</span><span class="p">)</span>
+<span class="o">&lt;</span><span class="n">seaborn</span><span class="p">.</span><span class="n">axisgrid</span><span class="p">.</span><span class="n">PairGrid</span> <span class="nb">object</span> <span class="n">at</span> <span class="mh">0x139405358</span><span class="o">&gt;</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p><img src="/attachments/201904/tensorFlow2/regression_pairplot.png" alt="" /><br />
+上图选取了MPG(油耗)、Cylinders(气缸数量)、Displacement(排气量)、Weight(车重)四项数据，做两两对比形成的散点图。<br />
+散点矩阵图（SPLOM:Scatterplot Matrix）可以用于粗略揭示数据中，不同列之间的相关性。可以粗略估计哪些变量是正相关的，哪些是负相关的，进而为下一步数据分析提供决策。当然这些图需要行业专家的理解和分析。然后为程序人员提供间接帮助。</p>
+
+<h4 id="数据规范化">数据规范化</h4>
+<p>从刚才的样本数据中，我们可以看出各列的数据，取值范围还是很不均衡的。在进入模型之前，我们需要做数据规范化。也就是将所有列的数据统一为在同一个取值范围的浮点数。<br />
+我们可以利用Pandas中对数据的统计结果做数据的规范化，这样可以省去自己写程序做数据统计。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="c1"># 继续上面的交互操作
+</span><span class="p">...</span> 
+<span class="o">&gt;&gt;&gt;</span> <span class="n">data_stats</span><span class="o">=</span><span class="n">dataset</span><span class="p">.</span><span class="n">describe</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">data_stats</span>
+              <span class="n">MPG</span>   <span class="n">Cylinders</span>  <span class="n">Displacement</span>  <span class="n">Horsepower</span>  <span class="p">...</span>  <span class="n">Model</span> <span class="n">Year</span>         <span class="n">USA</span>      <span class="n">Europe</span>       <span class="n">Japan</span>
+<span class="n">count</span>  <span class="mf">392.000000</span>  <span class="mf">392.000000</span>    <span class="mf">392.000000</span>  <span class="mf">392.000000</span>  <span class="p">...</span>  <span class="mf">392.000000</span>  <span class="mf">392.000000</span>  <span class="mf">392.000000</span>  <span class="mf">392.000000</span>
+<span class="n">mean</span>    <span class="mf">23.445918</span>    <span class="mf">5.471939</span>    <span class="mf">194.411990</span>  <span class="mf">104.469388</span>  <span class="p">...</span>   <span class="mf">75.979592</span>    <span class="mf">0.625000</span>    <span class="mf">0.173469</span>    <span class="mf">0.201531</span>
+<span class="n">std</span>      <span class="mf">7.805007</span>    <span class="mf">1.705783</span>    <span class="mf">104.644004</span>   <span class="mf">38.491160</span>  <span class="p">...</span>    <span class="mf">3.683737</span>    <span class="mf">0.484742</span>    <span class="mf">0.379136</span>    <span class="mf">0.401656</span>
+<span class="nb">min</span>      <span class="mf">9.000000</span>    <span class="mf">3.000000</span>     <span class="mf">68.000000</span>   <span class="mf">46.000000</span>  <span class="p">...</span>   <span class="mf">70.000000</span>    <span class="mf">0.000000</span>    <span class="mf">0.000000</span>    <span class="mf">0.000000</span>
+<span class="mi">25</span><span class="o">%</span>     <span class="mf">17.000000</span>    <span class="mf">4.000000</span>    <span class="mf">105.000000</span>   <span class="mf">75.000000</span>  <span class="p">...</span>   <span class="mf">73.000000</span>    <span class="mf">0.000000</span>    <span class="mf">0.000000</span>    <span class="mf">0.000000</span>
+<span class="mi">50</span><span class="o">%</span>     <span class="mf">22.750000</span>    <span class="mf">4.000000</span>    <span class="mf">151.000000</span>   <span class="mf">93.500000</span>  <span class="p">...</span>   <span class="mf">76.000000</span>    <span class="mf">1.000000</span>    <span class="mf">0.000000</span>    <span class="mf">0.000000</span>
+<span class="mi">75</span><span class="o">%</span>     <span class="mf">29.000000</span>    <span class="mf">8.000000</span>    <span class="mf">275.750000</span>  <span class="mf">126.000000</span>  <span class="p">...</span>   <span class="mf">79.000000</span>    <span class="mf">1.000000</span>    <span class="mf">0.000000</span>    <span class="mf">0.000000</span>
+<span class="nb">max</span>     <span class="mf">46.600000</span>    <span class="mf">8.000000</span>    <span class="mf">455.000000</span>  <span class="mf">230.000000</span>  <span class="p">...</span>   <span class="mf">82.000000</span>    <span class="mf">1.000000</span>    <span class="mf">1.000000</span>    <span class="mf">1.000000</span>
+
+<span class="p">[</span><span class="mi">8</span> <span class="n">rows</span> <span class="n">x</span> <span class="mi">10</span> <span class="n">columns</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> 
+</code></pre></div></div>
+<p>对于每一列，Pandas都进行了记录总数、平均值、标准差、最小值等统计。我们做数据规范化，可以直接使用这些参数来进行。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">&gt;&gt;&gt;</span> <span class="c1"># 继续上面的交互操作
+</span><span class="p">...</span> 
+<span class="o">&gt;&gt;&gt;</span> <span class="n">data_stats</span><span class="o">=</span><span class="n">data_stats</span><span class="p">.</span><span class="n">transpose</span><span class="p">()</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">data_stats</span>
+              <span class="n">count</span>         <span class="n">mean</span>         <span class="n">std</span>     <span class="nb">min</span>       <span class="mi">25</span><span class="o">%</span>      <span class="mi">50</span><span class="o">%</span>       <span class="mi">75</span><span class="o">%</span>     <span class="nb">max</span>
+<span class="n">MPG</span>           <span class="mf">392.0</span>    <span class="mf">23.445918</span>    <span class="mf">7.805007</span>     <span class="mf">9.0</span>    <span class="mf">17.000</span>    <span class="mf">22.75</span>    <span class="mf">29.000</span>    <span class="mf">46.6</span>
+<span class="n">Cylinders</span>     <span class="mf">392.0</span>     <span class="mf">5.471939</span>    <span class="mf">1.705783</span>     <span class="mf">3.0</span>     <span class="mf">4.000</span>     <span class="mf">4.00</span>     <span class="mf">8.000</span>     <span class="mf">8.0</span>
+<span class="n">Displacement</span>  <span class="mf">392.0</span>   <span class="mf">194.411990</span>  <span class="mf">104.644004</span>    <span class="mf">68.0</span>   <span class="mf">105.000</span>   <span class="mf">151.00</span>   <span class="mf">275.750</span>   <span class="mf">455.0</span>
+<span class="n">Horsepower</span>    <span class="mf">392.0</span>   <span class="mf">104.469388</span>   <span class="mf">38.491160</span>    <span class="mf">46.0</span>    <span class="mf">75.000</span>    <span class="mf">93.50</span>   <span class="mf">126.000</span>   <span class="mf">230.0</span>
+<span class="n">Weight</span>        <span class="mf">392.0</span>  <span class="mf">2977.584184</span>  <span class="mf">849.402560</span>  <span class="mf">1613.0</span>  <span class="mf">2225.250</span>  <span class="mf">2803.50</span>  <span class="mf">3614.750</span>  <span class="mf">5140.0</span>
+<span class="n">Acceleration</span>  <span class="mf">392.0</span>    <span class="mf">15.541327</span>    <span class="mf">2.758864</span>     <span class="mf">8.0</span>    <span class="mf">13.775</span>    <span class="mf">15.50</span>    <span class="mf">17.025</span>    <span class="mf">24.8</span>
+<span class="n">Model</span> <span class="n">Year</span>    <span class="mf">392.0</span>    <span class="mf">75.979592</span>    <span class="mf">3.683737</span>    <span class="mf">70.0</span>    <span class="mf">73.000</span>    <span class="mf">76.00</span>    <span class="mf">79.000</span>    <span class="mf">82.0</span>
+<span class="n">USA</span>           <span class="mf">392.0</span>     <span class="mf">0.625000</span>    <span class="mf">0.484742</span>     <span class="mf">0.0</span>     <span class="mf">0.000</span>     <span class="mf">1.00</span>     <span class="mf">1.000</span>     <span class="mf">1.0</span>
+<span class="n">Europe</span>        <span class="mf">392.0</span>     <span class="mf">0.173469</span>    <span class="mf">0.379136</span>     <span class="mf">0.0</span>     <span class="mf">0.000</span>     <span class="mf">0.00</span>     <span class="mf">0.000</span>     <span class="mf">1.0</span>
+<span class="n">Japan</span>         <span class="mf">392.0</span>     <span class="mf">0.201531</span>    <span class="mf">0.401656</span>     <span class="mf">0.0</span>     <span class="mf">0.000</span>     <span class="mf">0.00</span>     <span class="mf">0.000</span>     <span class="mf">1.0</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">norm_data</span> <span class="o">=</span> <span class="p">(</span><span class="n">dataset</span> <span class="o">-</span> <span class="n">data_stats</span><span class="p">[</span><span class="s">'mean'</span><span class="p">])</span><span class="o">/</span><span class="n">data_stats</span><span class="p">[</span><span class="s">'std'</span><span class="p">]</span>
+<span class="o">&gt;&gt;&gt;</span> <span class="n">norm_data</span><span class="p">.</span><span class="n">tail</span><span class="p">()</span>
+          <span class="n">MPG</span>  <span class="n">Cylinders</span>  <span class="n">Displacement</span>  <span class="n">Horsepower</span>    <span class="n">Weight</span>  <span class="n">Acceleration</span>  <span class="n">Model</span> <span class="n">Year</span>       <span class="n">USA</span>    <span class="n">Europe</span>     <span class="n">Japan</span>
+<span class="mi">393</span>  <span class="mf">0.455359</span>  <span class="o">-</span><span class="mf">0.862911</span>     <span class="o">-</span><span class="mf">0.519972</span>   <span class="o">-</span><span class="mf">0.479835</span> <span class="o">-</span><span class="mf">0.220842</span>      <span class="mf">0.021267</span>    <span class="mf">1.634321</span>  <span class="mf">0.773608</span> <span class="o">-</span><span class="mf">0.457538</span> <span class="o">-</span><span class="mf">0.501749</span>
+<span class="mi">394</span>  <span class="mf">2.633448</span>  <span class="o">-</span><span class="mf">0.862911</span>     <span class="o">-</span><span class="mf">0.930889</span>   <span class="o">-</span><span class="mf">1.363154</span> <span class="o">-</span><span class="mf">0.997859</span>      <span class="mf">3.283479</span>    <span class="mf">1.634321</span> <span class="o">-</span><span class="mf">1.289347</span>  <span class="mf">2.180035</span> <span class="o">-</span><span class="mf">0.501749</span>
+<span class="mi">395</span>  <span class="mf">1.095974</span>  <span class="o">-</span><span class="mf">0.862911</span>     <span class="o">-</span><span class="mf">0.567753</span>   <span class="o">-</span><span class="mf">0.531795</span> <span class="o">-</span><span class="mf">0.803605</span>     <span class="o">-</span><span class="mf">1.428605</span>    <span class="mf">1.634321</span>  <span class="mf">0.773608</span> <span class="o">-</span><span class="mf">0.457538</span> <span class="o">-</span><span class="mf">0.501749</span>
+<span class="mi">396</span>  <span class="mf">0.583482</span>  <span class="o">-</span><span class="mf">0.862911</span>     <span class="o">-</span><span class="mf">0.711097</span>   <span class="o">-</span><span class="mf">0.661694</span> <span class="o">-</span><span class="mf">0.415097</span>      <span class="mf">1.108671</span>    <span class="mf">1.634321</span>  <span class="mf">0.773608</span> <span class="o">-</span><span class="mf">0.457538</span> <span class="o">-</span><span class="mf">0.501749</span>
+<span class="mi">397</span>  <span class="mf">0.967851</span>  <span class="o">-</span><span class="mf">0.862911</span>     <span class="o">-</span><span class="mf">0.720653</span>   <span class="o">-</span><span class="mf">0.583754</span> <span class="o">-</span><span class="mf">0.303253</span>      <span class="mf">1.398646</span>    <span class="mf">1.634321</span>  <span class="mf">0.773608</span> <span class="o">-</span><span class="mf">0.457538</span> <span class="o">-</span><span class="mf">0.501749</span>
+<span class="o">&gt;&gt;&gt;</span> 
+</code></pre></div></div>
+
+<h4 id="初步的程序">初步的程序</h4>
+<p>有了上面这些尝试，开始着手编程，主要有以下几步工作：</p>
+<ul>
+  <li>将样本数据集分为训练集和测试集两部分</li>
+  <li>将数据集中的MPG(百英里油耗数）去掉，单独出来作为数据集的标注结果，达成监督学习</li>
+  <li>构建模型，编译模型</li>
+  <li>使用训练集数据对模型进行训练</li>
+  <li>使用测试集样本进行数据预测，评估模型效果</li>
+</ul>
+
+<p>我们使用附带注释的源码来代替讲解：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#!/usr/bin/env python3
+</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="kn">import</span> <span class="n">absolute_import</span><span class="p">,</span> <span class="n">division</span><span class="p">,</span> <span class="n">print_function</span>
+
+<span class="c1"># 引入各项扩展库
+</span><span class="kn">import</span> <span class="nn">pathlib</span>
+
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="n">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="n">sns</span>
+
+<span class="kn">import</span> <span class="nn">tensorflow</span> <span class="k">as</span> <span class="n">tf</span>
+
+<span class="kn">from</span> <span class="nn">tensorflow</span> <span class="kn">import</span> <span class="n">keras</span>
+<span class="kn">from</span> <span class="nn">tensorflow.keras</span> <span class="kn">import</span> <span class="n">layers</span>
+
+<span class="c1"># 下载样本数据
+</span><span class="n">dataset_path</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">utils</span><span class="p">.</span><span class="n">get_file</span><span class="p">(</span><span class="s">"auto-mpg.data"</span><span class="p">,</span> <span class="s">"https://archive.ics.uci.edu/ml/machine-learning-databases/auto-mpg/auto-mpg.data"</span><span class="p">)</span>
+<span class="c1"># 样本中所需要的列名称
+</span><span class="n">column_names</span> <span class="o">=</span> <span class="p">[</span><span class="s">'MPG'</span><span class="p">,</span> <span class="s">'Cylinders'</span><span class="p">,</span> <span class="s">'Displacement'</span><span class="p">,</span> <span class="s">'Horsepower'</span><span class="p">,</span> <span class="s">'Weight'</span><span class="p">,</span>
+                <span class="s">'Acceleration'</span><span class="p">,</span> <span class="s">'Model Year'</span><span class="p">,</span> <span class="s">'Origin'</span><span class="p">]</span> 
+<span class="c1"># 从样本文件中读取指定列的数据
+</span><span class="n">raw_dataset</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">dataset_path</span><span class="p">,</span> <span class="n">names</span><span class="o">=</span><span class="n">column_names</span><span class="p">,</span>
+                          <span class="n">na_values</span><span class="o">=</span><span class="s">"?"</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s">'</span><span class="se">\t</span><span class="s">'</span><span class="p">,</span>
+                          <span class="n">sep</span><span class="o">=</span><span class="s">" "</span><span class="p">,</span> <span class="n">skipinitialspace</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+<span class="c1"># 复制一份数据做后续操作
+</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">raw_dataset</span><span class="p">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="c1"># 数据清洗，去掉无意义的数据
+</span><span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">.</span><span class="n">dropna</span><span class="p">()</span>
+
+<span class="c1"># 将Origin数据做one-hot编码，相当于转换成3个产地字段
+</span><span class="n">origin</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">.</span><span class="n">pop</span><span class="p">(</span><span class="s">'Origin'</span><span class="p">)</span>
+<span class="n">dataset</span><span class="p">[</span><span class="s">'USA'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">origin</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span><span class="o">*</span><span class="mf">1.0</span>
+<span class="n">dataset</span><span class="p">[</span><span class="s">'Europe'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">origin</span> <span class="o">==</span> <span class="mi">2</span><span class="p">)</span><span class="o">*</span><span class="mf">1.0</span>
+<span class="n">dataset</span><span class="p">[</span><span class="s">'Japan'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">origin</span> <span class="o">==</span> <span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="mf">1.0</span>
+
+<span class="c1"># 随机分配80%的数据作为训练集
+# frac是保留80%的数据
+# random_state相当于随机数的种子，在这里固定一个值是为了每次运行，随机分配得到的样本集是相同的
+</span><span class="n">train_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">.</span><span class="n">sample</span><span class="p">(</span><span class="n">frac</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1"># 训练集的数据去除掉，剩下的是20%，作为测试集
+</span><span class="n">test_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">.</span><span class="n">drop</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">.</span><span class="n">index</span><span class="p">)</span>
+<span class="c1"># 获取数据集的统计信息
+</span><span class="n">train_stats</span> <span class="o">=</span> <span class="n">train_dataset</span><span class="p">.</span><span class="n">describe</span><span class="p">()</span>
+<span class="c1"># MPG是训练模型要求的结果，也就是标注字段，没有意义，从统计中去除
+</span><span class="n">train_stats</span><span class="p">.</span><span class="n">pop</span><span class="p">(</span><span class="s">"MPG"</span><span class="p">)</span>
+<span class="c1"># 对统计结果做行列转置，方便将统计结果作为下面做数据规范化的参数
+</span><span class="n">train_stats</span> <span class="o">=</span> <span class="n">train_stats</span><span class="p">.</span><span class="n">transpose</span><span class="p">()</span>
+
+<span class="c1"># 训练集和测试集的数据集都去掉MPG列，单独取出作为标注
+</span><span class="n">train_labels</span> <span class="o">=</span> <span class="n">train_dataset</span><span class="p">.</span><span class="n">pop</span><span class="p">(</span><span class="s">'MPG'</span><span class="p">)</span>
+<span class="n">test_labels</span> <span class="o">=</span> <span class="n">test_dataset</span><span class="p">.</span><span class="n">pop</span><span class="p">(</span><span class="s">'MPG'</span><span class="p">)</span>
+
+<span class="c1"># 定义一个数据规范化函数帮助简化操作
+</span><span class="k">def</span> <span class="nf">norm</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">train_stats</span><span class="p">[</span><span class="s">'mean'</span><span class="p">])</span> <span class="o">/</span> <span class="n">train_stats</span><span class="p">[</span><span class="s">'std'</span><span class="p">]</span>
+<span class="c1"># 训练集和测试集数据规范化
+</span><span class="n">normed_train_data</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
+<span class="n">normed_test_data</span> <span class="o">=</span> <span class="n">norm</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">)</span>
+
+<span class="c1"># 构建回归模型
+</span><span class="k">def</span> <span class="nf">build_model</span><span class="p">():</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">Sequential</span><span class="p">([</span>
+        <span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">.</span><span class="n">keys</span><span class="p">())]),</span>
+        <span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">),</span>
+        <span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>    <span class="c1"># 回归的主要区别就是最后不需要激活函数，从而保证最后是一个连续值
+</span>    <span class="p">])</span>
+
+    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">optimizers</span><span class="p">.</span><span class="n">RMSprop</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+
+    <span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s">'mse'</span><span class="p">,</span>
+                  <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
+                  <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'acc'</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">model</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">build_model</span><span class="p">()</span>
+<span class="c1"># 显示构造的模型
+</span><span class="n">model</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+
+<span class="n">EPOCHS</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span>
+  <span class="n">normed_train_data</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">,</span>
+  <span class="n">epochs</span><span class="o">=</span><span class="n">EPOCHS</span><span class="p">,</span> <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="c1"># 使用测试集预测数据
+</span><span class="n">test_result</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">normed_test_data</span><span class="p">)</span>
+<span class="c1"># 显示预测结果
+</span><span class="k">print</span><span class="p">(</span><span class="s">'===================</span><span class="se">\n</span><span class="s">test_result:'</span><span class="p">,</span> <span class="n">test_result</span><span class="p">)</span>
+</code></pre></div></div>
+<p>使用的模型非常简单，训练和预测也没有什么特别之处，无需再讲解。执行程序的输出大致如下：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./mpg1.py
+Model: <span class="s2">"sequential"</span>
+_________________________________________________________________
+Layer <span class="o">(</span><span class="nb">type</span><span class="o">)</span>                 Output Shape              Param <span class="c">#   </span>
+<span class="o">=================================================================</span>
+dense <span class="o">(</span>Dense<span class="o">)</span>                <span class="o">(</span>None, 64<span class="o">)</span>                640       
+_________________________________________________________________
+dense_1 <span class="o">(</span>Dense<span class="o">)</span>              <span class="o">(</span>None, 64<span class="o">)</span>                4160      
+_________________________________________________________________
+dense_2 <span class="o">(</span>Dense<span class="o">)</span>              <span class="o">(</span>None, 1<span class="o">)</span>                 65        
+<span class="o">=================================================================</span>
+Total params: 4,865
+Trainable params: 4,865
+Non-trainable params: 0
+_________________________________________________________________
+Train on 251 samples, validate on 63 samples
+Epoch 1/1000
+251/251 <span class="o">[==============================]</span> - 0s 2ms/sample - loss: 582.3197 - acc: 0.0000e+00 - val_loss: 582.2971 - val_acc: 0.0000e+00
+Epoch 2/1000
+251/251 <span class="o">[==============================]</span> - 0s 67us/sample - loss: 542.1007 - acc: 0.0000e+00 - val_loss: 541.7508 - val_acc: 0.0000e+00
+	......
+Epoch 1000/1000
+251/251 <span class="o">[==============================]</span> - 0s 58us/sample - loss: 2.7232 - acc: 0.0000e+00 - val_loss: 9.4673 - val_acc: 0.0000e+00
+<span class="o">===================</span>
+test_result: <span class="o">[[</span>16.366997 <span class="o">]</span>
+ <span class="o">[</span> 8.665408 <span class="o">]</span>
+ <span class="o">[</span> 8.548    <span class="o">]</span>
+ <span class="o">[</span>25.14063  <span class="o">]</span>
+ <span class="o">[</span>18.678812 <span class="o">]</span>
+	......
+</code></pre></div></div>
+<p>输出的数据中，一开始是所使用的模型信息，这是model.summary()输出的结果。如果有时间，翻翻前面vgg-19和resnet50网络的模型，也试用一下，保证你得到一个惊讶的结果:)<br />
+随后是1000次迭代的训练输出。最后是预测的结果。<br />
+如果你细心的话，可能已经发现了问题，从第一个训练周期开始，一直到第1000次，虽然损失loss在降低，但正确率acc一直为0，这是为什么？<br />
+其实看看最后的预测结果就知道了。对于这种连续输出值的回归问题，结果不是有限的分类，而是很精确的浮点数。这样的结果，只能保证大体比例上，同标注集是吻合的，不可能做到一一对应的相等。这是所有的正确率结果为0的原因，也是我们没有跟前面的例子一样，使用model.evaluate对模型进行评估的原因。<br />
+由此可见，我们在模型编译的时候选取评价指标参数为’acc’（正确率）就是不合理的。替代的，我们可以使用MAE(Mean Abs Error)平均绝对误差或者MSE(Mean Square Error)均方根误差/标准误差。<br />
+此外你可能看到了，程序数据集简单、模型也简单，所以训练速度很快。1000次的迭代训练，信息输出本身占用的时间甚至多过了训练所需的时间。<br />
+model.fit()训练函数中可以指定verbose=0来屏蔽输出，但完全没有输出也是很不友好的。我们可以使用前面用过的回调函数机制，来显示自定义的输出内容。比如我们可以在每个训练循环中输出一个“.”来显示训练的进展。<br />
+来改进一下程序，用以下程序段来替代上面代码中，”构建回归模型”之后所有的内容。</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 替代前面代码中，构建回归模型以下内容
+# 构建回归模型
+</span><span class="k">def</span> <span class="nf">build_model</span><span class="p">():</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">Sequential</span><span class="p">([</span>
+        <span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">,</span> <span class="n">input_shape</span><span class="o">=</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">.</span><span class="n">keys</span><span class="p">())]),</span>
+        <span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">64</span><span class="p">,</span> <span class="n">activation</span><span class="o">=</span><span class="s">'relu'</span><span class="p">),</span>
+        <span class="n">layers</span><span class="p">.</span><span class="n">Dense</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>    <span class="c1"># 回归的主要区别就是最后不需要激活函数，从而保证最后是一个连续值
+</span>    <span class="p">])</span>
+
+    <span class="n">optimizer</span> <span class="o">=</span> <span class="n">tf</span><span class="p">.</span><span class="n">keras</span><span class="p">.</span><span class="n">optimizers</span><span class="p">.</span><span class="n">RMSprop</span><span class="p">(</span><span class="mf">0.001</span><span class="p">)</span>
+
+    <span class="n">model</span><span class="p">.</span><span class="nb">compile</span><span class="p">(</span><span class="n">loss</span><span class="o">=</span><span class="s">'mse'</span><span class="p">,</span>
+                  <span class="n">optimizer</span><span class="o">=</span><span class="n">optimizer</span><span class="p">,</span>
+                  <span class="n">metrics</span><span class="o">=</span><span class="p">[</span><span class="s">'mae'</span><span class="p">,</span> <span class="s">'mse'</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">model</span>
+
+<span class="c1"># 自定义一个类，实现keras的回调，在训练过程中显示“.”
+</span><span class="k">class</span> <span class="nc">PrintDot</span><span class="p">(</span><span class="n">keras</span><span class="p">.</span><span class="n">callbacks</span><span class="p">.</span><span class="n">Callback</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">on_epoch_end</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">logs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">epoch</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">print</span><span class="p">(</span><span class="s">''</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="s">'.'</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s">''</span><span class="p">)</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">build_model</span><span class="p">()</span>
+<span class="c1"># 显示构造的模型
+</span><span class="n">model</span><span class="p">.</span><span class="n">summary</span><span class="p">()</span>
+
+<span class="n">EPOCHS</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span>
+  <span class="n">normed_train_data</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">,</span>
+  <span class="n">epochs</span><span class="o">=</span><span class="n">EPOCHS</span><span class="p">,</span> <span class="n">validation_split</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+  <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">PrintDot</span><span class="p">()])</span>
+
+<span class="c1"># 使用测试集评估模型
+</span><span class="n">loss</span><span class="p">,</span> <span class="n">mae</span><span class="p">,</span> <span class="n">mse</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">normed_test_data</span><span class="p">,</span> <span class="n">test_labels</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="c1"># 显示评估结果
+</span><span class="k">print</span><span class="p">(</span><span class="s">"</span><span class="se">\n</span><span class="s">Testing set Mean Abs Error: {:5.2f} MPG"</span><span class="p">.</span><span class="nb">format</span><span class="p">(</span><span class="n">mae</span><span class="p">))</span>
+</code></pre></div></div>
+<p>再次执行，输出结果看起来干净多了：</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./mpg2.py
+Model: <span class="s2">"sequential"</span>
+_________________________________________________________________
+Layer <span class="o">(</span><span class="nb">type</span><span class="o">)</span>                 Output Shape              Param <span class="c">#   </span>
+<span class="o">=================================================================</span>
+dense <span class="o">(</span>Dense<span class="o">)</span>                <span class="o">(</span>None, 64<span class="o">)</span>                640       
+_________________________________________________________________
+dense_1 <span class="o">(</span>Dense<span class="o">)</span>              <span class="o">(</span>None, 64<span class="o">)</span>                4160      
+_________________________________________________________________
+dense_2 <span class="o">(</span>Dense<span class="o">)</span>              <span class="o">(</span>None, 1<span class="o">)</span>                 65        
+<span class="o">=================================================================</span>
+Total params: 4,865
+Trainable params: 4,865
+Non-trainable params: 0
+_________________________________________________________________
+
+....................................................................................................
+....................................................................................................
+....................................................................................................
+....................................................................................................
+....................................................................................................
+....................................................................................................
+....................................................................................................
+....................................................................................................
+....................................................................................................
+....................................................................................................
+Testing <span class="nb">set </span>Mean Abs Error:  1.98 MPG
+</code></pre></div></div>
+<p>最后我们也敢使用model.evaluate对模型进行评估了，得到的MAE是1.98。</p>
+
+<p>但是MAE、MSE的数据，重点的是看训练过程中的动态值，根据趋势调整我们的程序，才谈得上优化。只有最终一个值其实意义并不大。<br />
+我们继续为程序增加功能，用图形绘制出训练过程的指标变化情况。前面的程序中，我们已经使用history变量保存了训练过程的输出信息，下面就是使用matplotlib将数值绘出。</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 接着上面的代码，在最后添加以下内容：  
+</span><span class="k">def</span> <span class="nf">plot_history</span><span class="p">(</span><span class="n">history</span><span class="p">):</span>
+    <span class="n">hist</span> <span class="o">=</span> <span class="n">pd</span><span class="p">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">history</span><span class="p">.</span><span class="n">history</span><span class="p">)</span>
+    <span class="n">hist</span><span class="p">[</span><span class="s">'epoch'</span><span class="p">]</span> <span class="o">=</span> <span class="n">history</span><span class="p">.</span><span class="n">epoch</span>
+
+    <span class="c1"># plt.figure()
+</span>    <span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="s">'MAE --- MSE'</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Epoch'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Mean Abs Error [MPG]'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">hist</span><span class="p">[</span><span class="s">'epoch'</span><span class="p">],</span> <span class="n">hist</span><span class="p">[</span><span class="s">'mae'</span><span class="p">],</span>
+        <span class="n">label</span><span class="o">=</span><span class="s">'Train Error'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">hist</span><span class="p">[</span><span class="s">'epoch'</span><span class="p">],</span> <span class="n">hist</span><span class="p">[</span><span class="s">'val_mae'</span><span class="p">],</span>
+        <span class="n">label</span><span class="o">=</span><span class="s">'Val Error'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">5</span><span class="p">])</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">()</span>
+
+    <span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'Epoch'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Mean Square Error [$MPG^2$]'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">hist</span><span class="p">[</span><span class="s">'epoch'</span><span class="p">],</span> <span class="n">hist</span><span class="p">[</span><span class="s">'mse'</span><span class="p">],</span>
+        <span class="n">label</span><span class="o">=</span><span class="s">'Train Error'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">(</span>
+        <span class="n">hist</span><span class="p">[</span><span class="s">'epoch'</span><span class="p">],</span> <span class="n">hist</span><span class="p">[</span><span class="s">'val_mse'</span><span class="p">],</span>
+        <span class="n">label</span><span class="o">=</span><span class="s">'Val Error'</span><span class="p">)</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">20</span><span class="p">])</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">legend</span><span class="p">()</span>
+    <span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">plot_history</span><span class="p">(</span><span class="n">history</span><span class="p">)</span>
+</code></pre></div></div>
+<p>执行程序，可以得到下图的结果：<br />
+<img src="/attachments/201904/tensorFlow2/regression_mae_mse.png" alt="" />
+从图中可以看出，虽然随着迭代次数的增加，训练错误率在降低，但大致从100次迭代之后，验证的错误率就基本稳定不变了。限于样本集数量及维度选取、模型设计等方面的原因，对这个结果的满意度先放在一边。这个模型在100次迭代之后就长时间无效的训练显然是一个可优化的点。<br />
+TensorFlow/Keras提供了EarlyStopping机制来应对这种问题，EarlyStopping也是一个回调函数，请看我们实现的代码：</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 以下代码添加到前面代码的最后
+# 设置EarlyStopping回调函数，监控val_loss指标
+# 当该指标在10次迭代中均不变化后退出
+</span><span class="n">early_stop</span> <span class="o">=</span> <span class="n">keras</span><span class="p">.</span><span class="n">callbacks</span><span class="p">.</span><span class="n">EarlyStopping</span><span class="p">(</span><span class="n">monitor</span><span class="o">=</span><span class="s">'val_loss'</span><span class="p">,</span> <span class="n">patience</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="c1"># 再次训练模型
+</span><span class="n">history</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">fit</span><span class="p">(</span><span class="n">normed_train_data</span><span class="p">,</span> <span class="n">train_labels</span><span class="p">,</span> <span class="n">epochs</span><span class="o">=</span><span class="n">EPOCHS</span><span class="p">,</span>
+                    <span class="n">validation_split</span> <span class="o">=</span> <span class="mf">0.2</span><span class="p">,</span> <span class="n">verbose</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">callbacks</span><span class="o">=</span><span class="p">[</span><span class="n">early_stop</span><span class="p">,</span> <span class="n">PrintDot</span><span class="p">()])</span>
+<span class="c1"># 绘制本次训练的指标曲线
+</span><span class="n">plot_history</span><span class="p">(</span><span class="n">history</span><span class="p">)</span>
+</code></pre></div></div>
+<p>执行后，这次得到的结果令人满意了，大致在60次迭代之后，就得到了同前面1000次迭代基本相似的结果：<br />
+<img src="/attachments/201904/tensorFlow2/regression_mae_mse2.png" alt="" />
+既然训练完成，虽然我们使用模型预测的结果无法跟原标注一对一比较，我们可以用图形的方式来比较一下两组值，并做一下预测错误统计：</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1"># 继续在最后增加如下代码
+# 使用测试集数据用模型进行预测
+</span><span class="n">test_predictions</span> <span class="o">=</span> <span class="n">model</span><span class="p">.</span><span class="n">predict</span><span class="p">(</span><span class="n">normed_test_data</span><span class="p">).</span><span class="n">flatten</span><span class="p">()</span>
+
+<span class="c1"># 绘制同标注的对比图和两者误差分布的直方图
+</span><span class="n">plt</span><span class="p">.</span><span class="n">figure</span><span class="p">(</span><span class="s">'Prediction &amp; TrueValues  --- Error'</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">test_labels</span><span class="p">,</span> <span class="n">test_predictions</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">'True Values [MPG]'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">'Predictions [MPG]'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">axis</span><span class="p">(</span><span class="s">'equal'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">axis</span><span class="p">(</span><span class="s">'square'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">plt</span><span class="p">.</span><span class="n">xlim</span><span class="p">()[</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="n">plt</span><span class="p">.</span><span class="n">ylim</span><span class="p">()[</span><span class="mi">1</span><span class="p">]])</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">plot</span><span class="p">([</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">],</span> <span class="p">[</span><span class="o">-</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">])</span>
+
+<span class="n">error</span> <span class="o">=</span> <span class="n">test_predictions</span> <span class="o">-</span> <span class="n">test_labels</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">hist</span><span class="p">(</span><span class="n">error</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">25</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s">"Prediction Error [MPG]"</span><span class="p">)</span>
+<span class="n">_</span> <span class="o">=</span> <span class="n">plt</span><span class="p">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s">"Count"</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="n">show</span><span class="p">()</span>
+</code></pre></div></div>
+<p>程序得到结果图如下：<br />
+<img src="/attachments/201904/tensorFlow2/regression_predict_and_error.png" alt="" />
+左边的图中，如果预测结果同标注结果完全一致，蓝色的点将落在主对角线上，偏离对角线则代表预测误差。从图中可以看出，所有的点大致是落在主对角线周边的。这表示预测结果同标注值基本吻合。<br />
+右边的图是两者之差的范围统计结果，可以理解为左图逆时针逆时针旋转45度后所有点统计的直方图，对角线就是误差为0的位置。图中能看出误差基本符合正态分布，代表预测数值偏大、偏小的数量和比例基本相似，模型是可信的。<br />
+当然限于样本数量过少的问题，模型的优化余地还是很大的。</p>
+
+<p>（待续…）</p>
+
+:ET

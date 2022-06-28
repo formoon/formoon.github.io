@@ -1,4 +1,4 @@
-I"BY<p><img src="http://img.itools.hk/upload/77/27/8b543124-66a9-4372-ab5e-99fd841f7382.jpg" alt="" />
+I"sY<p><img src="http://img.itools.hk/upload/77/27/8b543124-66a9-4372-ab5e-99fd841f7382.jpg" alt="" />
 本来Cuda用的挺好，为了Apple，放弃Cuda，改投OpenCl。好不容易OpenCl也算熟悉了，WWDC2018又宣布了Metal2，建议大家放弃OpenCl，使用Metal Performance Shaders。<br />
 Apple是一个富有“革命性”创新力的公司，很多创新，会彻底的放弃原有的积累。不断带来新能力的同时，也让人又爱又恨。</p>
 
@@ -96,7 +96,7 @@ Metal对并发的支持首先是线程组数量threadgroupsPerGrid，这个基�
 </code></pre></div></div>
 <p>shade程序命名为：shader.metal</p>
 <div class="language-c highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">//各项数据类型必须跟Swift中定义的相同</span>
-<span class="cp">#include &lt;metal_stdlib&gt;
+<span class="cp">#include</span> <span class="cpf">&lt;metal_stdlib&gt;</span><span class="cp">
 </span><span class="k">typedef</span> <span class="kt">unsigned</span> <span class="kt">int</span> <span class="n">uint</span><span class="p">;</span> 
 <span class="k">typedef</span> <span class="kt">int</span> <span class="n">DataType</span><span class="p">;</span>
 

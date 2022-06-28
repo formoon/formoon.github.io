@@ -1,0 +1,30 @@
+I"�
+<p><img src="/attachments/201810/opencv-freetype-demo.png" alt="" />
+　　在mac电脑上管理这些gnu的库一般都使用Homebrew，但总有一些你个性化的需要是官方的Homebrew配方无法满足的。比如在屏幕的输出中使用中文字符。<br />
+　　在OPENCV中输出UTF8字符集早已经有人完成过类似的工作，方法是使用freetype的支持，程序中选择使用的字库，从而在屏幕上输出任意的字符。但官方的Homebrew OPENCV的配方中，并不包含freetype的支持。这时候，只好自己来编译OPENCV及contrib库，因为freetype的支持就在contrib库中。</p>
+<h4 id="编译安装">编译安装</h4>
+<p>　　OPENCV的开发已经非常成熟，所以编译过程并不复杂，大致包含如下的过程：</p>
+<ol>
+  <li>使用App Store安装Xcode，随后执行一次Xcode根据提示安装其命令行工具。</li>
+  <li>使用brew安装第三方的依赖库，比如git/cmake/freetype等，很多依赖库根据你使用的模块不同，也有不同的需求。大多依赖库如果你不安装，OPENCV在编译的时候会自动下载，但下载和编译的过程都很慢，不如提前预装编译好的版本。
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>brew <span class="nb">install </span>cmake automake pkg-config ant autoconf git freetype
+</code></pre></div>    </div>
+  </li>
+  <li>准备一个工作目录，下载OPENCV和contrib的源码(以OPENCV3.4为例)：
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir source
+cd source
+</span>git clone <span class="nt">--single-branch</span> <span class="nt">-b</span> 3.4 https://github.com/opencv/opencv.git
+git clone <span class="nt">--single-branch</span> <span class="nt">-b</span> 3.4 https://github.com/opencv/opencv_contrib.git
+</code></pre></div>    </div>
+    <p>master分支可能会包含一些并不稳定的代码，所以不推荐使用master分支的代码。</p>
+  </li>
+  <li>配置、编译及安装
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir source</span>/opencv/build
+<span class="nb">cd source</span>/opencv/build
+cmake <span class="nt">-D</span> <span class="nv">CMAKE_BUILD_TYPE</span><span class="o">=</span>Release <span class="nt">-D</span> <span class="nv">CMAKE_INSTALL_PREFIX</span><span class="o">=</span>/usr/local <span class="nt">-D</span> <span class="nv">OPENCV_EXTRA_MODULES_PATH</span><span class="o">=</span>../../opencv_contrib/modules/ ..
+make <span class="nt">-j4</span>
+<span class="nb">sudo </span>make <span class="nb">install</span> 
+</code></pre></div>    </div>
+  </li>
+</ol>
+:ET

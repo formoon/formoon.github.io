@@ -1,0 +1,42 @@
+I"q<p><img src="/attachments/201804/19/lifi.jpg" alt="" />
+lifi作为一个入门门槛低、涉及范围广的实验，在理工高校中还是比较流行的。<br />
+通常实验分成3个部分，字符数据传输实验、音频传输实验、视频传输实验。在官方的实验指南中指定使用win7x64或者win xp来进行。老话题，这里说在mac怎么进行实验。</p>
+
+<p>音频传输、视频传输实际跟电脑没关系，只要保证usb供电即可，找两个手机的usb充电器就足够了。<br />
+第一部分的实验则是使用了usb转串口卡，这个重点是安装mac版本的电脑驱动，比如我手头拿到的是CH341串口卡，可以在<a href="http://www.wch.cn/download/CH341SER_MAC_ZIP.html">这里</a>下载驱动。</p>
+
+<ol>
+  <li>首先安装驱动程序，安装完成后会要求重启动mac。</li>
+  <li>查看当前已有的终端设备<br />
+2a.安装完成后，先不要插收发板。进入终端使用命令行操作。<br />
+2b.因为在linux/unix类的操作系统中，一切均为文件，一切设备也都是文件，所以可以在/dev/文件夹中查看当前的串口设备，比如：
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>andrew@macBookPro ~&gt; ls /dev/tty*
+/dev/tty                         /dev/ttyrb                       /dev/ttyu2
+/dev/tty.Bluetooth-Incoming-Port /dev/ttyrc                       /dev/ttyu3
+/dev/tty.MALS                    /dev/ttyrd                       /dev/ttyu4
+/dev/tty.SOC                     /dev/ttyre                       /dev/ttyu5
+/dev/ttyp0                       /dev/ttyrf                       /dev/ttyu6
+/dev/ttyp1                       /dev/ttys0                       /dev/ttyu7
+/dev/ttyp2                       /dev/ttys000                     /dev/ttyu8
+/dev/ttyp3                       /dev/ttys001                     /dev/ttyu9
+/dev/ttyp4                       /dev/ttys002                     /dev/ttyua
+/dev/ttyp5                       /dev/ttys003                     /dev/ttyub
+/dev/ttyp6                       /dev/ttys004                     /dev/ttyuc
+/dev/ttyp7                       /dev/ttys005                     /dev/ttyud
+/dev/ttyp8                       /dev/ttys006                     /dev/ttyue
+/dev/ttyp9                       /dev/ttys007                     /dev/ttyuf
+/dev/ttypa                       /dev/ttys1                       /dev/ttyv0
+</code></pre></div>    </div>
+    <p>2c.注意使用的命令是<code class="language-plaintext highlighter-rouge">ls /dev/tty*</code>，表示列出/dev文件夹下所有tty开头的文件。tty实际是老辈子习惯上终端的缩写，因为老辈子的终端都是串口终端。<br />
+2d.这里列出所有设备的意思，是记清楚在没有新的串口设备之前，都有哪些设备，虽然名字比较乱，但都有规律，好记。<br />
+2e.这时候插上发送板或者接收板，先插1个，然后再次使用<code class="language-plaintext highlighter-rouge">ls /dev/tty*</code>来查看，通常会多了一个设备，名字类似<code class="language-plaintext highlighter-rouge">/dev/tty.wchusbserial*</code>，这个就是新插入的串口设备的设备名，类似windows中的“com9:”这样的名字。不同的操作系统，规则不同而已，意思一样。确定串口名称后，再插上另外一块板子，同样查看新增加的设备名称。<br />
+2f.命令行工具<code class="language-plaintext highlighter-rouge">system_profiler SPUSBDataType</code>可以列出所有连接在电脑上的usb设备，这个命令对于一些设备连接方面的问题也有帮助。</p>
+  </li>
+  <li>正常实验需要在两个usb口一个插入发送板，一个插入接收板，随后系统应当增加了两个tty串口设备。按照上面2e步骤的操作记下来这两个名字。</li>
+  <li>需要打开两个终端窗口，一个模拟发送端，另外一个模拟接收端。</li>
+  <li>命令行使用：<code class="language-plaintext highlighter-rouge">screen /dev/tty.xxxxxx 9600</code>命令来建立一个虚拟终端屏幕。两个终端窗口使用同样的命令，但设备名分别是接收板和发送板，不相同。screen是内置命令，用于模拟终端，随后是发送板、接收板的串口名称，9600是说明书上收发板使用的波特率。</li>
+  <li>这时候在发送板的模拟终端上，可以用键盘敲入字符，正常情况下，在接收板的终端上，会看到另外一边敲的字符。这表示完成了正常的发送和接收。通常的终端，两端都可以发送和接受，但lifi实验板限制发送板只能发送，接收板只能接收。</li>
+  <li>screen软件的退出使用<code class="language-plaintext highlighter-rouge">control-a</code>键接着连续按<code class="language-plaintext highlighter-rouge">control-\</code>键，屏幕会提示是否确认退出，再敲y退出。</li>
+</ol>
+
+:ET

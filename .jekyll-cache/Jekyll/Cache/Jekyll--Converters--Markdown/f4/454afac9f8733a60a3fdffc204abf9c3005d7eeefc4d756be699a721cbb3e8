@@ -1,0 +1,103 @@
+I"[(<p><img src="/attachments/201712/angular.jpeg" alt="" />
+Angular2以后已经非常充分的面向对象化，所以很多原来在javascript中积累的技巧，都需要做出相应的调整。<br />
+检测当前浏览器类型、版本及设备类型，推荐使用：<a href="https://github.com/KoderLabs/ng2-device-detector">https://github.com/KoderLabs/ng2-device-detector</a>。github页面的介绍已经写的很详细，请直接阅读原文文档。这里只讲几个重点：</p>
+
+<p>1.当前的AngularJS版本已经是5，已经有人对上面的模块做了优化，更名为ng4-device-detector,所以安装过程应当是：</p>
+
+<figure class="highlight"><pre><code class="language-bash" data-lang="bash">cnpm <span class="nb">install </span>ng4-device-detector <span class="nt">--save</span></code></pre></figure>
+
+<p>使用cnpm安装而不是原来的npm，原因是如果你在国内，因为众所周知的原因，下载国外的包资源可能会很慢并且有被封掉的可能，cnpm是使用阿里的镜像站下载，速度会快很多。</p>
+
+<p>2.因为变更了控件包，原有的app.module.ts应当变更为：</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">  <span class="k">import</span> <span class="p">{</span> <span class="nx">NgModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@angular/core</span><span class="dl">'</span><span class="p">;</span>
+  <span class="k">import</span> <span class="p">{</span> <span class="nx">Ng4DeviceDetectorModule</span> <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">ng4-device-detector</span><span class="dl">'</span><span class="p">;</span>
+  <span class="p">...</span>
+  <span class="p">@</span><span class="nd">NgModule</span><span class="p">({</span>
+    <span class="na">declarations</span><span class="p">:</span> <span class="p">[</span>
+      <span class="p">...</span>
+      <span class="nx">LoginComponent</span><span class="p">,</span>
+      <span class="nx">SignupComponent</span>
+      <span class="p">...</span>
+    <span class="p">],</span>
+    <span class="na">imports</span><span class="p">:</span> <span class="p">[</span>
+      <span class="nx">CommonModule</span><span class="p">,</span>
+      <span class="nx">FormsModule</span><span class="p">,</span>
+      <span class="nx">Ng4DeviceDetectorModule</span><span class="p">.</span><span class="nx">forRoot</span><span class="p">()</span>
+    <span class="p">],</span>
+    <span class="na">providers</span><span class="p">:[</span>
+      <span class="nx">AuthService</span>
+    <span class="p">]</span>
+    <span class="p">...</span>
+  <span class="p">})</span></code></pre></figure>
+
+<p>看出来了吧，所有ng2都变成ng4,没啥难以理解的，其它的源码部分也要做类似的修改，就不详细说了。</p>
+
+<p>3.ng4-device-detector的小坑<br />
+模块提供了以下几个属性用于判断当前浏览器类型：</p>
+<ul>
+  <li>browser</li>
+  <li>os</li>
+  <li>device</li>
+  <li>userAgent</li>
+  <li>os_version</li>
+</ul>
+
+<p>这里面有个小bug,比如os属性，如果使用手机浏览，正常应当返回<code class="language-plaintext highlighter-rouge">android</code>或者<code class="language-plaintext highlighter-rouge">iphone</code>,但我用iPhone测试的时候，居然也返回<code class="language-plaintext highlighter-rouge">mac</code>，好在device属性正常返回了<code class="language-plaintext highlighter-rouge">iphone</code>。换用Mac访问的时候，os返回仍然是<code class="language-plaintext highlighter-rouge">mac</code>,device返回是<code class="language-plaintext highlighter-rouge">unknow</code>。所以建议使用如下代码来判断设备类型：</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript">	<span class="p">...</span>
+  <span class="nx">isMobile</span><span class="o">=</span><span class="kc">false</span><span class="p">;</span>
+	<span class="p">...</span>
+  <span class="kd">constructor</span><span class="p">(</span><span class="kr">private</span> <span class="nx">deviceService</span><span class="p">:</span> <span class="nx">Ng4DeviceService</span><span class="p">){</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">deviceInfo</span><span class="p">.</span><span class="nx">device</span> <span class="o">==</span> <span class="dl">'</span><span class="s1">android</span><span class="dl">'</span> <span class="o">||</span> 
+        <span class="k">this</span><span class="p">.</span><span class="nx">deviceInfo</span><span class="p">.</span><span class="nx">device</span><span class="o">==</span><span class="dl">'</span><span class="s1">iphone</span><span class="dl">'</span> <span class="o">||</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">deviceInfo</span><span class="p">.</span><span class="nx">device</span> <span class="o">==</span> <span class="dl">'</span><span class="s1">ipad</span><span class="dl">'</span> <span class="p">){</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">isMobile</span><span class="o">=</span><span class="kc">true</span><span class="p">;</span>
+    <span class="p">};</span>
+	<span class="p">...</span></code></pre></figure>
+
+<p>得到了isMobile的值，页面中就可以使用这个值来对应不同版本的页面了：</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html"><span class="nt">&lt;SourcePage</span> <span class="na">*ngIf=</span><span class="s">"!isMobile"</span><span class="nt">&gt;&lt;/SourcePage&gt;</span>
+<span class="nt">&lt;SourcePageMobile</span> <span class="na">*ngIf=</span><span class="s">"isMobile"</span><span class="nt">&gt;&lt;/SourcePageMobile&gt;</span></code></pre></figure>
+
+<p>4.ng4-device-detector的大坑<br />
+都知道正常的ng4项目编译，是使用<code class="language-plaintext highlighter-rouge">ng build</code>命令。<br />
+这样产生的目标文件比较大，所以如果是为了服务器生产部署，应当是用<code class="language-plaintext highlighter-rouge">ng build -prod</code>,这样产生的文件，大约只有平常的1/6容量，速度也会快很多。<br />
+但是引入了ng4-device-detector或者ng2-device-detector，使用<code class="language-plaintext highlighter-rouge">ng build -prod</code>会报错，（使用<code class="language-plaintext highlighter-rouge">ng build</code>及<code class="language-plaintext highlighter-rouge">ng server</code>调试没有问题）,错误信息为：</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ERROR in Error encountered resolving symbol values statically. Calling function 'ɵmakeDecorator', function calls are not supported. Consider replacing the function or lambda with a reference to an exported function, resolving symbol Injectable in /Users/andrew/dev/html/angular/educast-local/node_modules/ng4-device-detector/node_modules/@angular/core/core.d.ts, resolving symbol ɵe in /Users/andrew/dev/html/angular/educast-local/node_modules/ng4-device-detector/node_modules/@angular/core/core.d.ts, resolving symbol ɵe in /Users/andrew/dev/html/angular/educast-local/node_modules/ng4-device-detector/node_modules/@angular/core/core.d.ts
+
+ERROR in ./src/main.ts
+Module not found: Error: Can't resolve './$$_gendir/app/app.module.ngfactory' in '/Users/andrew/dev/html/angular/educast-local/src'
+ @ ./src/main.ts 4:0-74
+ @ multi ./src/main.ts
+</code></pre></div></div>
+<p>主要是新系统对于lambda函数的使用限制造成的，也有说是angular5的bug,虽然修改代码可以解决问题，但是也可以关闭编译器的aot属性来完成编译：</p>
+
+<figure class="highlight"><pre><code class="language-html" data-lang="html">ng build -prod --aot false</code></pre></figure>
+
+<p>这样可以顺利完成编译，并且测试没有问题。</p>
+
+<p>————————————————————————————————————————————</p>
+
+<p>接着是捆绑热键的方法，这个也有第三方的模块可以用，比如<a href="https://www.npmjs.com/package/angular2-hotkeys">angular2-hotkeys</a>,可以去官方页面看看介绍。<br />
+这里介绍一个沿用原来javascript的知识，自己写一部分代码来实现的方式：</p>
+
+<figure class="highlight"><pre><code class="language-javascript" data-lang="javascript"><span class="k">import</span> <span class="p">{</span> <span class="nx">Component</span><span class="p">,</span><span class="nx">ViewChild</span>  <span class="p">}</span> <span class="k">from</span> <span class="dl">'</span><span class="s1">@angular/core</span><span class="dl">'</span><span class="p">;</span>
+	<span class="p">...</span>
+<span class="p">@</span><span class="nd">Component</span><span class="p">({</span>
+  <span class="na">selector</span><span class="p">:</span> <span class="dl">'</span><span class="s1">SourcePage</span><span class="dl">'</span><span class="p">,</span>
+  <span class="na">host</span><span class="p">:</span> <span class="p">{</span><span class="dl">'</span><span class="s1">(window:keydown)</span><span class="dl">'</span><span class="p">:</span> <span class="dl">'</span><span class="s1">hotkeys($event)</span><span class="dl">'</span><span class="p">},</span>
+	<span class="p">...</span>
+
+
+  <span class="nx">hotkeys</span><span class="p">(</span><span class="nx">event</span><span class="p">){</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nx">event</span><span class="p">.</span><span class="nx">keyCode</span> <span class="o">==</span> <span class="mi">13</span><span class="p">){</span>  <span class="c1">//ENTER</span>
+      <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="dl">"</span><span class="s2">ENTER pressed</span><span class="dl">"</span><span class="p">);</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+	</code></pre></figure>
+
+<p>代码应当没有啥好解释的吧，用起来也不错，效率高，还省了额外的附加包。</p>
+
+:ET

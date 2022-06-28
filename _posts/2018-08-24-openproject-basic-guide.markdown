@@ -2,12 +2,12 @@
 layout:         page
 title:          OpenProject基础使用介绍
 subtitle:       从入门到应用
-card-image:		https://www.openproject.org/wp-content/uploads/2016/11/Gantt-chart.png
+card-image:		/attachments/201808/prjManager.webp
 date:           2018-08-24
 tags:           etc
 post-card-type: image
 ---
-![](https://www.openproject.org/wp-content/uploads/2016/11/Gantt-chart.png)
+![](/attachments/201808/prjManager.webp)
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;所有的活动都可以看做一个项目来管理。在企业中更是这样。  
 　　所以项目管理平台，对于任何一个高科技企业来讲都是必不可少的。  
 　　OpenProject（以下简称OP）就是一个不错的项目管理平台，软件开源，文档齐备。对于大多中小型公司来讲，免费版也已经足以满足工作要求。最新版本的OP还对手机小屏幕的浏览进行了优化，完全可以做到使用手机对项目进行管理。  

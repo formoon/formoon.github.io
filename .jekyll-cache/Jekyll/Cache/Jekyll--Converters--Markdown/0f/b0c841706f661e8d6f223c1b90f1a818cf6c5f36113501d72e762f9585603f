@@ -1,0 +1,4 @@
+I"�<p><img src="/attachments/201904/tensorFlow2/tf-logo-card-2.png" alt="" /><br />
+<a href="http://blog.17study.com.cn/2018/01/11/tensorFlow-series-6/">《从锅炉工到AI专家(6)》</a>一文中，我们把神经网络模型降维，简单的在二维空间中介绍了过拟合和欠拟合的现象和解决方法。但是因为条件所限，在该文中我们只介绍了理论，并没有实际观察现象和应对。<br />
+现在有了TensorFLow 2.0 / Keras的支持，可以非常容易的构建模型。我们可以方便的人工模拟过拟合的情形，实际来操作监控、调整模型，从而显著改善模型指标。</p>
+:ET
