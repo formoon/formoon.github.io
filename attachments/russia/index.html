@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+  <!-- <base href="https://file.codetest.org.cn/bookdemo/20220328/etc/ppt/russia/index.html"> -->
+  <meta charset="UTF-8">
+  <title>俄罗斯纪行</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+  <meta name="description" content="Description">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+  <link rel="icon" href="./imgs/favicon.ico">
+  <link rel="stylesheet" href="./cdn/themes/vue.css">
+  <script type="text/javascript" src="./js/GlslCanvas.min.js"></script>
+  <script type="text/javascript" src="./js/moonMain.js"></script>
+  <script src="./js/gsap/gsap.min.js"></script>
+</head>
+<body>
+  <div id="app"></div>
+  <div id="svg-content" style="position: absolute;left: 0px;top: 0px;z-index: 100;">
+    <svg id="svg1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 364.38 157.98" style="width:300px;">
+      <defs><style>.cls-1{font-size:48px;font-family:Superclarendon-BoldItalic, Superclarendon;font-weight:700;font-style:italic;}.cls-1,.cls-3{fill:#a40b5d;}.cls-2{letter-spacing:-0.03em;}</style></defs>
+      <text id="t1" class="cls-1" transform="translate(104.22 115.95)"><tspan class="cls-2">n</tspan><tspan x="38.02" y="0">drew</tspan></text>
+      <path id="A" class="cls-3" d="M68.7,456.73c-1.78-.78,56.56-163.16,76.75-157.85,18.4,4.83-4.36,146.4-5.78,146.28-1.23-.11,14.4-104.54-2.48-109.09C118.07,330.91,70.27,457.41,68.7,456.73Z" transform="translate(-56.16 -298.75)"/>
+      <g id="line"><path class="cls-3" d="M217.4,321.24C220.47,324.87,105,427.43,81,413.38S53.68,347.32,57.48,346c2.81-.95,6.3,27.07,25.21,37.6C126.39,408,214.55,317.85,217.4,321.24Z" transform="translate(-56.16 -298.75)"/></g>
+      <text id="t2" class="cls-1" transform="translate(179.91 59.02)">@2023</text></svg>
+  </div>
+  <script>
+    window.$docsify = {
+      name: '俄罗斯纪行',
+      repo: '',
+      loadSidebar: true,
+      executeScript: true,
+      subMaxLevel: 3,
+      auto2top:true,
+      search: {
+        maxAge: 86400000, // 过期时间，单位毫秒，默认一天
+        paths: 'auto', 
+        placeholder: '输入关键词搜索',
+      },
+      scrollToTop: {
+        auto: true,
+        text: 'Top',
+        right: 15,
+        bottom: 15,
+        offset: 200
+      },
+    };
+
+    var divWidth=window.innerWidth;
+    var divHeight=window.innerHeight;
+    var svgWidth=document.getElementById('svg1').clientWidth;
+    var svgHeight=document.getElementById('svg1').clientHeight;
+    // console.log(divWidth,divHeight);
+
+    var xpos=Math.floor(divWidth/2-svgWidth/2);
+    var ypos=Math.floor(divHeight/2-svgHeight/2);
+    gsap.set("#svg1", {x: xpos, y: -svgHeight-10});
+    gsap.to("#svg1", {duration: 1, x: xpos, y: ypos,ease: "bounce.out"});
+    gsap.to("#t1",{delay:2, druation:1, x:500});
+    gsap.to("#t2",{delay:2, druation:1, x:-500});
+
+    gsap.to("#svg-content", {delay:2.5,duration: 1, opacity:0,
+      onComplete: function() {
+        document.getElementById('svg-content').style.display='none';
+      } });
+
+  </script>
+  <!-- Docsify v4 -->
+  <script src="./cdn/lib/docsify.min.js"></script>
+  <!-- <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script> -->
+  <script src="./cdn/lib/plugins/docsify-pagination.min.js"></script>
+  <script src="./cdn/lib/plugins/docsify-scroll-to-top.min.js"></script>
+</body>
+</html>
